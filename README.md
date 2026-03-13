@@ -7,4 +7,4 @@ Visual explanations of Blind 75 LeetCode problems.
 | Problem | Live Demo |
 |---------|-----------|
 | Three Sum | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/02-two-pointers/three-sum.html) |
-| Container Water | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/02-two-pointers/container-water.html) |
+| Container Water | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/02-two-pointers/continer-water.html) |
