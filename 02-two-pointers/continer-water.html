@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Container With Most Water — Two Pointer Visualization</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181a24;
+    --bg3: #1e2030;
+    --bg4: #262940;
+    --text: #e2e4f0;
+    --text2: #9da2bc;
+    --text3: #5d6280;
+    --orange: #f97316;
+    --orange-bg: rgba(249,115,22,0.12);
+    --purple: #a78bfa;
+    --purple-bg: rgba(167,139,250,0.12);
+    --blue: #38bdf8;
+    --blue-bg: rgba(56,189,248,0.1);
+    --green: #34d399;
+    --green-bg: rgba(52,211,153,0.1);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.1);
+    --border: rgba(255,255,255,0.06);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 780px; margin: 0 auto; }
+
+  .header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .header h1 { font-size: 18px; font-weight: 600; }
+  .badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 6px;
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+  .badge-warn { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .badge-info { background: rgba(56,189,248,0.15); color: #38bdf8; }
+
+  /* Input Section */
+  .input-section {
+    background: var(--bg2); border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+  .input-section label {
+    font-size: 12px; color: var(--text2); font-weight: 500;
+    display: block; margin-bottom: 8px;
+  }
+  .input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .input-row input[type="text"] {
+    flex: 1; min-width: 200px; padding: 8px 14px; border-radius: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 13px;
+    outline: none; transition: border 0.2s;
+  }
+  .input-row input:focus { border-color: var(--orange); }
+  .preset-btn {
+    padding: 7px 14px; border-radius: 8px; font-size: 12px;
+    font-family: var(--mono); cursor: pointer; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text2); transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .preset-btn:hover { background: var(--bg4); color: var(--text); }
+  .preset-btn.active { background: var(--orange-bg); color: var(--orange); border-color: rgba(249,115,22,0.3); }
+  .apply-btn {
+    padding: 7px 16px; border-radius: 8px; font-size: 12px;
+    font-weight: 500; cursor: pointer; border: none;
+    background: var(--orange); color: #fff; transition: opacity 0.2s;
+  }
+  .apply-btn:hover { opacity: 0.85; }
+  .input-error { font-size: 11px; color: var(--red); margin-top: 6px; }
+
+  /* Chart */
+  .chart-area {
+    background: var(--bg2); border-radius: 14px;
+    padding: 24px 16px 12px; margin-bottom: 16px;
+    border: 1px solid var(--border); position: relative;
+    overflow-x: auto;
+  }
+  .chart-area svg { display: block; margin: 0 auto; }
+
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .metric {
+    background: var(--bg2); border-radius: 10px; padding: 12px 16px;
+    border: 1px solid var(--border);
+  }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-val { font-size: 22px; font-weight: 600; font-family: var(--mono); }
+  .metric-val.blue { color: var(--blue); }
+  .metric-val.green { color: var(--green); }
+  .metric-val.default { color: var(--text); }
+
+  /* Action log */
+  .action-log {
+    padding: 12px 16px; border-radius: 10px; font-size: 13px;
+    background: var(--bg2); color: var(--text2); border: 1px solid var(--border);
+    margin-bottom: 16px; font-family: var(--mono); min-height: 40px;
+    display: flex; align-items: center; line-height: 1.5;
+  }
+
+  /* Controls */
+  .controls { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .ctrl-btn {
+    padding: 7px 16px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-family: var(--sans); border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text2); transition: all 0.15s;
+  }
+  .ctrl-btn:hover { background: var(--bg4); color: var(--text); }
+  .ctrl-btn:disabled { opacity: 0.35; cursor: default; }
+  .ctrl-btn.play {
+    background: var(--orange); color: #fff; border: none; font-weight: 500;
+  }
+  .ctrl-btn.play:hover { opacity: 0.85; }
+  .ctrl-btn.pause { background: var(--red-bg); color: var(--red); border-color: rgba(248,113,113,0.2); }
+  .speed-label { font-size: 11px; color: var(--text3); margin-left: auto; }
+  .speed-slider { width: 90px; accent-color: var(--orange); }
+
+  /* Code Panel */
+  .code-panel {
+    background: var(--bg2); border-radius: 14px; padding: 20px;
+    border: 1px solid var(--border); margin-top: 8px;
+  }
+  .code-panel h3 {
+    font-size: 14px; font-weight: 500; color: var(--text);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .code-panel h3 span { font-size: 11px; color: var(--text3); font-weight: 400; }
+
+  .code-block {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.8;
+    background: var(--bg); border-radius: 10px; padding: 16px 0;
+    overflow-x: auto; counter-reset: line;
+  }
+  .code-line {
+    display: flex; padding: 0 16px; transition: background 0.25s;
+    border-left: 3px solid transparent;
+  }
+  .code-line.active {
+    background: var(--orange-bg);
+    border-left-color: var(--orange);
+  }
+  .code-line.executed {
+    border-left-color: rgba(52,211,153,0.3);
+  }
+  .code-line-num {
+    width: 32px; text-align: right; color: var(--text3);
+    user-select: none; flex-shrink: 0; padding-right: 16px; font-size: 11px;
+  }
+  .code-line-text { white-space: pre; color: var(--text2); }
+  .code-line.active .code-line-text { color: var(--text); }
+
+  /* Keyword coloring */
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .num { color: #f78c6c; }
+  .str { color: #c3e88d; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .op { color: #89ddff; }
+  .var-l { color: var(--orange); font-weight: 500; }
+  .var-r { color: var(--purple); font-weight: 500; }
+  .var-res { color: var(--green); font-weight: 500; }
+
+  /* Variable watch */
+  .var-watch {
+    display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;
+  }
+  .var-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px; font-family: var(--mono);
+    font-size: 12px; border: 1px solid var(--border); background: var(--bg);
+  }
+  .var-chip .vname { color: var(--text3); }
+  .var-chip .vval { font-weight: 500; }
+
+  /* Legend */
+  .legend {
+    display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Container With Most Water</h1>
+    <span class="badge badge-warn">Medium</span>
+    <span class="badge badge-info">Two Pointers</span>
+  </div>
+
+  <!-- Input Section -->
+  <div class="input-section">
+    <label>Heights array — pick a preset or enter your own</label>
+    <div class="input-row">
+      <input type="text" id="customInput" value="1,7,2,5,4,7,3,6" />
+      <button class="apply-btn" onclick="applyCustom()">Apply</button>
+    </div>
+    <div class="input-row" style="margin-top:8px;">
+      <button class="preset-btn active" onclick="setPreset(0,this)">[1,7,2,5,4,7,3,6]</button>
+      <button class="preset-btn" onclick="setPreset(1,this)">[2,2,2]</button>
+      <button class="preset-btn" onclick="setPreset(2,this)">[1,8,6,2,5,4,8,3,7]</button>
+      <button class="preset-btn" onclick="setPreset(3,this)">[3,1,2,4,5]</button>
+    </div>
+    <div class="input-error" id="inputError"></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Left pointer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Right pointer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(56,189,248,0.35)"></div> Water area</div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-area"><svg id="chart"></svg></div>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Current area</div><div class="metric-val blue" id="mArea">0</div></div>
+    <div class="metric"><div class="metric-label">Max area</div><div class="metric-val green" id="mMax">0</div></div>
+    <div class="metric"><div class="metric-label">Step</div><div class="metric-val default" id="mStep">1/1</div></div>
+  </div>
+
+  <!-- Action log -->
+  <div class="action-log" id="actionLog">Press Play or step through the algorithm</div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="ctrl-btn" id="btnPrev" onclick="prevStep()" disabled>← Prev</button>
+    <button class="ctrl-btn play" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+    <button class="ctrl-btn" id="btnNext" onclick="nextStep()">Next →</button>
+    <button class="ctrl-btn" onclick="resetSteps()">⟲ Reset</button>
+    <span class="speed-label">Speed</span>
+    <input type="range" class="speed-slider" min="100" max="2000" step="100" value="1400" oninput="setSpeed(this.value)">
+  </div>
+
+  <!-- Code Walkthrough -->
+  <div class="code-panel">
+    <h3>Python solution <span>— highlighted line tracks the current operation</span></h3>
+    <div class="code-block" id="codeBlock"></div>
+    <div class="var-watch" id="varWatch"></div>
+  </div>
+</div>
+
+<script>
+const PRESETS = [
+  [1,7,2,5,4,7,3,6],
+  [2,2,2],
+  [1,8,6,2,5,4,8,3,7],
+  [3,1,2,4,5]
+];
+
+const CODE_LINES = [
+  { text: 'def maxArea(heights):', hl: [['kw','def'],['fn','maxArea'],['op','('],['text','heights'],['op','):' ]] },
+  { text: '    left, right = 0, len(heights) - 1', phase: 'init' },
+  { text: '    res = 0', phase: 'init' },
+  { text: '' },
+  { text: '    while left < right:', phase: 'loop' },
+  { text: '        area = (right - left) * min(heights[left], heights[right])', phase: 'calc' },
+  { text: '        res = max(res, area)', phase: 'update' },
+  { text: '' },
+  { text: '        if heights[left] < heights[right]:', phase: 'compare' },
+  { text: '            left += 1', phase: 'move_left' },
+  { text: '        else:', phase: 'compare_else' },
+  { text: '            right -= 1', phase: 'move_right' },
+  { text: '' },
+  { text: '    return res', phase: 'done' },
+];
+
+let heights = [...PRESETS[0]];
+let steps = [];
+let stepIdx = 0;
+let playing = false;
+let playInterval = null;
+let speed = 800;
+
+function generateSteps(h) {
+  const s = [];
+  let l = 0, r = h.length - 1, mx = 0;
+  s.push({ l, r, area: 0, maxArea: 0, phase: 'init', action: 'Initialize left=0, right=' + (h.length-1) + ', res=0', vars: { left: 0, right: r, res: 0, area: '-' } });
+
+  while (l < r) {
+    // loop check
+    s.push({ l, r, area: s[s.length-1].area, maxArea: mx, phase: 'loop', action: `Check: left(${l}) < right(${r}) → true, enter loop`, vars: { left: l, right: r, res: mx, area: '-' } });
+
+    const w = r - l;
+    const minH = Math.min(h[l], h[r]);
+    const area = w * minH;
+    s.push({ l, r, area, maxArea: mx, phase: 'calc', action: `area = (${r} - ${l}) × min(${h[l]}, ${h[r]}) = ${w} × ${minH} = ${area}`, vars: { left: l, right: r, res: mx, area } });
+
+    const newMx = Math.max(mx, area);
+    const improved = newMx > mx;
+    mx = newMx;
+    s.push({ l, r, area, maxArea: mx, phase: 'update', action: `res = max(${mx === area && improved ? mx : (mx - area + area)}, ${area}) = ${mx}${improved ? ' ★ New max!' : ''}`, vars: { left: l, right: r, res: mx, area } });
+
+    if (h[l] < h[r]) {
+      s.push({ l, r, area, maxArea: mx, phase: 'move_left', action: `heights[${l}]=${h[l]} < heights[${r}]=${h[r]} → move left pointer`, vars: { left: l, right: r, res: mx, area } });
+      l++;
+      s.push({ l, r, area, maxArea: mx, phase: 'loop', action: `left is now ${l}`, vars: { left: l, right: r, res: mx, area } });
+    } else {
+      s.push({ l, r, area, maxArea: mx, phase: 'move_right', action: `heights[${l}]=${h[l]} ≥ heights[${r}]=${h[r]} → move right pointer`, vars: { left: l, right: r, res: mx, area } });
+      r--;
+      s.push({ l, r, area, maxArea: mx, phase: 'loop', action: `right is now ${r}`, vars: { left: l, right: r, res: mx, area } });
+    }
+  }
+  s.push({ l, r, area: s[s.length-1].area, maxArea: mx, phase: 'done', action: `left(${l}) ≥ right(${r}) → loop ends. Return ${mx}`, vars: { left: l, right: r, res: mx, area: '-' } });
+  return s;
+}
+
+function renderChart() {
+  const svg = document.getElementById('chart');
+  const step = steps[stepIdx] || { l: 0, r: heights.length - 1, area: 0, maxArea: 0 };
+  const maxH = Math.max(...heights, 1);
+  const barW = Math.min(52, Math.floor(500 / heights.length) - 6);
+  const gap = 4;
+  const chartH = 220;
+  const scale = (chartH - 30) / maxH;
+  const totalW = heights.length * (barW + gap) + 60;
+
+  svg.setAttribute('width', Math.max(totalW, 300));
+  svg.setAttribute('height', chartH + 40);
+  svg.setAttribute('viewBox', `0 0 ${Math.max(totalW, 300)} ${chartH + 40}`);
+
+  let html = '';
+
+  // Water
+  if (step.l !== undefined && step.r !== undefined && step.l < step.r) {
+    const waterH = Math.min(heights[step.l], heights[step.r]);
+    const x1 = step.l * (barW + gap) + 30;
+    const x2 = (step.r + 1) * (barW + gap) + 30 - gap;
+    const wh = waterH * scale;
+    html += `<rect x="${x1}" y="${chartH - wh}" width="${x2 - x1}" height="${wh}" rx="3" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.35)" stroke-width="1"/>`;
+  }
+
+  // Bars
+  heights.forEach((h, i) => {
+    const x = i * (barW + gap) + 30;
+    const barH = h * scale;
+    const isL = i === step.l;
+    const isR = i === step.r;
+    const fill = isL ? '#f97316' : isR ? '#a78bfa' : '#3a3d54';
+    const op = (isL || isR) ? 1 : 0.7;
+    html += `<rect x="${x}" y="${chartH - barH}" width="${barW}" height="${barH}" rx="4" fill="${fill}" opacity="${op}"/>`;
+    html += `<text x="${x + barW/2}" y="${chartH - barH - 8}" text-anchor="middle" fill="${(isL||isR) ? '#e2e4f0' : '#5d6280'}" font-size="11" font-weight="500" font-family="'JetBrains Mono',monospace">${h}</text>`;
+    html += `<text x="${x + barW/2}" y="${chartH + 16}" text-anchor="middle" fill="#5d6280" font-size="10" font-family="'JetBrains Mono',monospace">${i}</text>`;
+    if (isL) html += `<text x="${x + barW/2}" y="${chartH + 32}" text-anchor="middle" fill="#f97316" font-size="12" font-weight="600" font-family="'DM Sans',sans-serif">L</text>`;
+    if (isR) html += `<text x="${x + barW/2}" y="${chartH + 32}" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="600" font-family="'DM Sans',sans-serif">R</text>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+function renderMetrics() {
+  const step = steps[stepIdx];
+  if (!step) return;
+  document.getElementById('mArea').textContent = step.area;
+  document.getElementById('mMax').textContent = step.maxArea;
+  document.getElementById('mStep').textContent = `${stepIdx + 1} / ${steps.length}`;
+  document.getElementById('actionLog').textContent = step.action;
+}
+
+function renderCode() {
+  const step = steps[stepIdx];
+  if (!step) return;
+
+  const phaseToLine = {
+    'init': 1,
+    'loop': 4,
+    'calc': 5,
+    'update': 6,
+    'compare': 8,
+    'move_left': 9,
+    'compare_else': 10,
+    'move_right': 11,
+    'done': 13,
+  };
+  const activeLine = phaseToLine[step.phase] ?? -1;
+
+  const executedPhases = new Set();
+  for (let i = 0; i <= stepIdx; i++) {
+    if (steps[i].phase) executedPhases.add(steps[i].phase);
+  }
+
+  const block = document.getElementById('codeBlock');
+  let html = '';
+  CODE_LINES.forEach((cl, idx) => {
+    const isActive = idx === activeLine;
+    const linePhase = cl.phase;
+    const isExec = linePhase && executedPhases.has(linePhase) && !isActive;
+    let cls = 'code-line';
+    if (isActive) cls += ' active';
+    else if (isExec) cls += ' executed';
+
+    let lineText = cl.text
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\b(def|while|if|else|return|for|in|and|or|not|class)\b/g, '<span class="kw">$1</span>')
+      .replace(/\b(min|max|len|range|print)\b/g, '<span class="fn">$1</span>')
+      .replace(/\b(\d+)\b/g, '<span class="num">$1</span>')
+      .replace(/#.*$/gm, m => `<span class="cmt">${m}</span>`);
+
+    if (step.vars) {
+      lineText = lineText
+        .replace(/\bleft\b/g, '<span class="var-l">left</span>')
+        .replace(/\bright\b/g, '<span class="var-r">right</span>')
+        .replace(/\bres\b/g, '<span class="var-res">res</span>');
+    }
+
+    html += `<div class="${cls}"><span class="code-line-num">${idx + 1}</span><span class="code-line-text">${lineText}</span></div>`;
+  });
+  block.innerHTML = html;
+
+  // Variables
+  const watch = document.getElementById('varWatch');
+  if (step.vars) {
+    watch.innerHTML = `
+      <div class="var-chip"><span class="vname">left =</span><span class="vval" style="color:var(--orange)">${step.vars.left}</span></div>
+      <div class="var-chip"><span class="vname">right =</span><span class="vval" style="color:var(--purple)">${step.vars.right}</span></div>
+      <div class="var-chip"><span class="vname">res =</span><span class="vval" style="color:var(--green)">${step.vars.res}</span></div>
+      <div class="var-chip"><span class="vname">area =</span><span class="vval" style="color:var(--blue)">${step.vars.area}</span></div>
+    `;
+  }
+}
+
+function render() {
+  renderChart();
+  renderMetrics();
+  renderCode();
+  document.getElementById('btnPrev').disabled = stepIdx <= 0;
+  document.getElementById('btnNext').disabled = stepIdx >= steps.length - 1;
+}
+
+function nextStep() {
+  if (stepIdx < steps.length - 1) { stepIdx++; render(); }
+  else stopPlay();
+}
+function prevStep() {
+  if (stepIdx > 0) { stepIdx--; render(); }
+}
+function resetSteps() {
+  stopPlay();
+  stepIdx = 0;
+  render();
+}
+
+function togglePlay() {
+  if (playing) { stopPlay(); }
+  else {
+    if (stepIdx >= steps.length - 1) stepIdx = 0;
+    playing = true;
+    document.getElementById('btnPlay').className = 'ctrl-btn pause';
+    document.getElementById('btnPlay').textContent = '⏸ Pause';
+    playInterval = setInterval(() => {
+      if (stepIdx >= steps.length - 1) { stopPlay(); return; }
+      stepIdx++;
+      render();
+    }, speed);
+  }
+}
+function stopPlay() {
+  playing = false;
+  clearInterval(playInterval);
+  document.getElementById('btnPlay').className = 'ctrl-btn play';
+  document.getElementById('btnPlay').textContent = '▶ Play';
+}
+function setSpeed(val) {
+  speed = 2100 - parseInt(val);
+  if (playing) { stopPlay(); togglePlay(); }
+}
+
+function loadHeights(h) {
+  heights = h;
+  steps = generateSteps(heights);
+  stepIdx = 0;
+  stopPlay();
+  document.getElementById('customInput').value = heights.join(',');
+  render();
+}
+
+function setPreset(idx, btn) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  loadHeights([...PRESETS[idx]]);
+  document.getElementById('inputError').textContent = '';
+}
+
+function applyCustom() {
+  const raw = document.getElementById('customInput').value.trim();
+  const errEl = document.getElementById('inputError');
+  try {
+    const cleaned = raw.replace(/[\[\]\s]/g, '');
+    const nums = cleaned.split(',').map(s => {
+      const n = parseInt(s, 10);
+      if (isNaN(n)) throw new Error(`"${s}" is not a number`);
+      if (n < 0 || n > 1000) throw new Error(`${n} is out of range (0–1000)`);
+      return n;
+    });
+    if (nums.length < 2) throw new Error('Need at least 2 heights');
+    if (nums.length > 50) throw new Error('Max 50 bars for visualization');
+    errEl.textContent = '';
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    loadHeights(nums);
+  } catch(e) {
+    errEl.textContent = e.message;
+  }
+}
+
+// Handle Enter key in input
+document.getElementById('customInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') applyCustom();
+});
+
+// Init
+loadHeights([...PRESETS[0]]);
+</script>
+</body>
+</html>
