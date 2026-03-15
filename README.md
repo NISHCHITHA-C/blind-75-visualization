@@ -20,3 +20,10 @@ Visual explanations of Blind 75 LeetCode problems.
 | Problem | Live Demo |
 |---------|-----------|
 | Valid Parentheses | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/04-Stack/valid-parenthesis.html) |
+
+## 02 - Binary Search
+
+| Problem | Live Demo |
+|---------|-----------|
+| Find Min Rotated | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/05-Binary-Search/01-find-min-rotated.html) |
+| Search Rotated Sorted | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/05-Binary-Search/02-search-rotated-sorted.html) |
