@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>isValid — Stack Visualiser</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d0f14;
+    --surface:  #13161e;
+    --card:     #1a1e28;
+    --border:   #252a38;
+    --accent:   #f0c040;
+    --green:    #4ade80;
+    --red:      #f87171;
+    --blue:     #60a5fa;
+    --purple:   #c084fc;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --hl-bg:    rgba(240,192,64,0.13);
+    --hl-bar:   #f0c040;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 1rem; font-weight: 800; letter-spacing: .06em; color: var(--accent); }
+  header span { font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .input-row {
+    display: flex; align-items: center; gap: 8px; margin-left: auto;
+  }
+  .input-row label { font-size: .8rem; color: var(--muted); }
+  .input-row input {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: .9rem;
+    padding: 5px 10px; border-radius: 6px; width: 180px; outline: none;
+    transition: border-color .2s;
+  }
+  .input-row input:focus { border-color: var(--accent); }
+
+  .btn {
+    background: var(--accent); color: #000; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: .8rem; padding: 6px 14px;
+    border: none; border-radius: 6px; cursor: pointer; letter-spacing: .04em;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn.ghost {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    grid-template-rows: 1fr;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── CODE PANEL ── */
+  .code-panel {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+    color: var(--muted); padding: 8px 16px;
+    border-bottom: 1px solid var(--border); text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .code-scroll { overflow-y: auto; flex: 1; padding: 8px 0; }
+  .code-line {
+    display: flex; align-items: stretch;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.7;
+    transition: background .15s;
+    position: relative;
+  }
+  .code-line.active { background: var(--hl-bg); }
+  .code-line.active::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--hl-bar);
+    border-radius: 0 2px 2px 0;
+  }
+  .ln {
+    width: 36px; text-align: right; padding-right: 12px;
+    color: var(--muted); font-size: .72rem; flex-shrink: 0;
+    user-select: none; line-height: 1.7;
+  }
+  .code-line.active .ln { color: var(--accent); }
+  .code-text { padding-right: 16px; white-space: pre; color: #cdd6f4; }
+
+  /* syntax colours */
+  .kw  { color: #c084fc; }
+  .fn  { color: #60a5fa; }
+  .st  { color: #a6e3a1; }
+  .cm  { color: #45475a; font-style: italic; }
+  .op  { color: #89dceb; }
+  .nm  { color: #fab387; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ── STRING STRIP ── */
+  .string-strip {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0; background: var(--surface);
+  }
+  .strip-label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .chars { display: flex; gap: 4px; flex-wrap: wrap; }
+  .ch {
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700;
+    border-radius: 6px; border: 2px solid var(--border);
+    background: var(--card); color: var(--muted);
+    transition: all .2s;
+  }
+  .ch.current { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,.12); transform: scale(1.1); }
+  .ch.done    { border-color: var(--border); color: #334155; }
+  .ch.open    { border-color: var(--blue); color: var(--blue); }
+  .ch.close-ok  { border-color: var(--green); color: var(--green); }
+  .ch.close-bad { border-color: var(--red); color: var(--red); }
+
+  /* ── MIDDLE ROW ── */
+  .middle-row {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── STACK VIS ── */
+  .stack-area {
+    padding: 12px 20px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .stack-area .panel-title { padding: 0 0 8px 0; border: none; }
+  .stack-visual {
+    display: flex; flex-direction: column-reverse;
+    gap: 5px; flex: 1; overflow-y: auto;
+    align-items: flex-start;
+  }
+  .stack-item {
+    width: 56px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700;
+    background: var(--card); border: 2px solid var(--blue);
+    color: var(--blue); border-radius: 8px;
+    animation: pushIn .2s ease;
+  }
+  .stack-item.top { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,.08); }
+  @keyframes pushIn { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
+  .stack-empty { color: var(--muted); font-size: .8rem; font-family: 'JetBrains Mono', monospace; margin: auto; }
+
+  /* ── LOG PANEL ── */
+  .log-panel {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--surface);
+  }
+  .log-panel .panel-title { padding: 8px 16px; border-bottom: 1px solid var(--border); }
+  .log-scroll {
+    overflow-y: auto; flex: 1; padding: 8px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .log-entry {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    padding: 4px 8px; border-radius: 4px;
+    border-left: 3px solid var(--border);
+    color: var(--muted); background: var(--card);
+    line-height: 1.5;
+  }
+  .log-entry.push  { border-color: var(--blue);   color: var(--blue); }
+  .log-entry.pop   { border-color: var(--purple);  color: var(--purple); }
+  .log-entry.match { border-color: var(--green);   color: var(--green); }
+  .log-entry.fail  { border-color: var(--red);     color: var(--red); }
+  .log-entry.info  { border-color: var(--accent);  color: var(--accent); }
+
+  /* ── RESULT + CONTROLS ── */
+  .bottom-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 20px; border-top: 1px solid var(--border);
+    background: var(--surface); flex-shrink: 0;
+  }
+  .result-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: .9rem; font-weight: 700;
+    padding: 6px 16px; border-radius: 6px;
+    background: var(--card); color: var(--muted); border: 1px solid var(--border);
+    transition: all .3s;
+  }
+  .result-badge.true  { background: rgba(74,222,128,.12); color: var(--green); border-color: var(--green); }
+  .result-badge.false { background: rgba(248,113,113,.12); color: var(--red);   border-color: var(--red); }
+
+  .speed-row { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+  .speed-row label { font-size: .75rem; color: var(--muted); }
+  .speed-row input[type=range] { accent-color: var(--accent); width: 90px; }
+
+  .step-info { font-size: .78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* scrollbars */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>20. Valid Parentheses — Stack Visualiser</h1>
+  <div class="input-row">
+    <label>Input s =</label>
+    <input id="inputStr" type="text" value="([{}])" maxlength="30" spellcheck="false"/>
+    <button class="btn" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- CODE -->
+  <div class="code-panel">
+    <div class="panel-title">Source Code</div>
+    <div class="code-scroll" id="codeBlock"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <!-- STRING STRIP -->
+    <div class="string-strip">
+      <span class="strip-label">s</span>
+      <div class="chars" id="charStrip"></div>
+    </div>
+
+    <div class="middle-row">
+      <!-- STACK -->
+      <div class="stack-area">
+        <div class="panel-title">Stack (deque)</div>
+        <div class="stack-visual" id="stackVis">
+          <div class="stack-empty" id="stackEmpty">empty</div>
+        </div>
+      </div>
+
+      <!-- LOG -->
+      <div class="log-panel">
+        <div class="panel-title">Step Log</div>
+        <div class="log-scroll" id="logScroll"></div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="bottom-bar">
+      <button class="btn ghost" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn" id="btnNext" onclick="stepForward()">Next ▶</button>
+      <button class="btn ghost" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <span class="step-info" id="stepInfo">Step 0 / 0</span>
+      <div class="result-badge" id="resultBadge">—</div>
+      <div class="speed-row">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="700" step="100"/>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── CODE LINES ──────────────────────────────────────────────
+const CODE = [
+  { text: `<span class="kw">from</span> collections <span class="kw">import</span> deque`, ln:1 },
+  { text: ``, ln:2 },
+  { text: `<span class="kw">class</span> <span class="fn">Solution</span>:`, ln:3 },
+  { text: `    <span class="kw">def</span> <span class="fn">isValid</span>(<span class="nm">self</span>, s: str) -> bool:`, ln:4 },
+  { text: `        stack = <span class="fn">deque</span>()`, ln:5 },
+  { text: `        mapping = {<span class="st">')'</span>: <span class="st">'('</span>, <span class="st">'}'</span>: <span class="st">'{'</span>, <span class="st">']'</span>: <span class="st">'['</span>}`, ln:6 },
+  { text: ``, ln:7 },
+  { text: `        <span class="kw">for</span> char <span class="kw">in</span> s:`, ln:8 },
+  { text: `            <span class="kw">if</span> char <span class="kw">in</span> mapping:  <span class="cm"># closing bracket</span>`, ln:9 },
+  { text: `                top = stack.pop() <span class="kw">if</span> stack <span class="kw">else</span> <span class="st">'#'</span>`, ln:10 },
+  { text: `                <span class="kw">if</span> mapping[char] != top:`, ln:11 },
+  { text: `                    <span class="kw">return</span> <span class="nm">False</span>`, ln:12 },
+  { text: `            <span class="kw">else</span>:`, ln:13 },
+  { text: `                stack.append(char)  <span class="cm"># opening bracket</span>`, ln:14 },
+  { text: ``, ln:15 },
+  { text: `        <span class="kw">return</span> <span class="op">not</span> stack  <span class="cm"># valid only if stack empty</span>`, ln:16 },
+];
+
+function buildCode() {
+  const el = document.getElementById('codeBlock');
+  el.innerHTML = CODE.map((l, i) =>
+    `<div class="code-line" id="cl${i}">
+       <span class="ln">${l.ln}</span>
+       <span class="code-text">${l.text}</span>
+     </div>`
+  ).join('');
+}
+
+// ── SIMULATION ──────────────────────────────────────────────
+const MAPPING = {')':'(', '}':'{', ']':'['};
+let steps = [], cursor = 0, playTimer = null;
+
+function buildSteps(s) {
+  const out = [];
+  const stack = [];
+
+  // initial state
+  out.push({ line:4, stack:[], charIdx:-1, log:null, charClass:null });
+  out.push({ line:5, stack:[], charIdx:-1, log:{type:'info', msg:'stack = deque()'}, charClass:null });
+  out.push({ line:6, stack:[], charIdx:-1, log:{type:'info', msg:'mapping = { ):( , }:{ , ]:[ }'}, charClass:null });
+
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    out.push({ line:8, stack:[...stack], charIdx:i, log:{type:'info', msg:`char = '${ch}'`}, charClass:'current' });
+
+    if (ch in MAPPING) {
+      // closing bracket
+      out.push({ line:9, stack:[...stack], charIdx:i, log:{type:'info', msg:`'${ch}' is a closing bracket`}, charClass:'current' });
+
+      const top = stack.length ? stack[stack.length-1] : '#';
+      if (stack.length) stack.pop();
+      out.push({ line:10, stack:[...stack], charIdx:i, log:{type:'pop', msg:`top = stack.pop() → '${top}'`}, charClass:'current' });
+
+      out.push({ line:11, stack:[...stack], charIdx:i, log:{type:'info', msg:`mapping['${ch}'] = '${MAPPING[ch]}' vs top = '${top}'`}, charClass:'current' });
+
+      if (MAPPING[ch] !== top) {
+        out.push({ line:12, stack:[...stack], charIdx:i, log:{type:'fail', msg:`MISMATCH → return False`}, charClass:'close-bad', result:false });
+        return out;
+      } else {
+        out.push({ line:13, stack:[...stack], charIdx:i, log:{type:'match', msg:`Match ✓ continue`}, charClass:'close-ok' });
+      }
+    } else {
+      // opening bracket
+      out.push({ line:13, stack:[...stack], charIdx:i, log:{type:'info', msg:`'${ch}' is an opening bracket → else`}, charClass:'current' });
+      stack.push(ch);
+      out.push({ line:14, stack:[...stack], charIdx:i, log:{type:'push', msg:`stack.append('${ch}') → stack: [${stack.join(', ')}]`}, charClass:'open' });
+    }
+  }
+
+  const valid = stack.length === 0;
+  out.push({ line:16, stack:[...stack], charIdx:-1, log:{type: valid?'match':'fail', msg:`stack empty? ${valid} → return ${valid}`}, charClass:null, result:valid });
+  return out;
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function highlight(lineIdx) {
+  CODE.forEach((_, i) => document.getElementById('cl'+i)?.classList.remove('active'));
+  if (lineIdx >= 0) document.getElementById('cl'+lineIdx)?.classList.add('active');
+  const el = document.getElementById('cl'+lineIdx);
+  if (el) el.scrollIntoView({ block:'nearest' });
+}
+
+function renderStep(idx) {
+  const s = steps[idx];
+  // code highlight
+  highlight(s.line);
+
+  // char strip
+  const str = document.getElementById('inputStr').value;
+  document.querySelectorAll('.ch').forEach((el, i) => {
+    el.className = 'ch';
+    if (i < idx && s.charIdx === -1) el.classList.add('done');
+    else if (i === s.charIdx) el.classList.add(s.charClass || 'current');
+    else if (i < s.charIdx) el.classList.add('done');
+  });
+
+  // stack
+  const sv = document.getElementById('stackVis');
+  const se = document.getElementById('stackEmpty');
+  sv.innerHTML = '';
+  if (s.stack.length === 0) {
+    sv.appendChild(Object.assign(document.createElement('div'), {className:'stack-empty', textContent:'empty'}));
+  } else {
+    s.stack.forEach((ch, i) => {
+      const div = document.createElement('div');
+      div.className = 'stack-item' + (i === s.stack.length-1 ? ' top' : '');
+      div.textContent = ch;
+      sv.appendChild(div);
+    });
+  }
+
+  // log
+  if (s.log) {
+    const logEl = document.getElementById('logScroll');
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${s.log.type}`;
+    entry.textContent = `[${idx}] ${s.log.msg}`;
+    logEl.appendChild(entry);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // result
+  const rb = document.getElementById('resultBadge');
+  if (s.result !== undefined) {
+    rb.textContent = `return ${s.result}`;
+    rb.className = `result-badge ${s.result}`;
+  } else {
+    rb.textContent = '—';
+    rb.className = 'result-badge';
+  }
+
+  // step info
+  document.getElementById('stepInfo').textContent = `Step ${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === steps.length-1;
+}
+
+function stepForward() {
+  if (cursor < steps.length-1) { cursor++; renderStep(cursor); }
+}
+function stepBack() {
+  if (cursor > 0) {
+    cursor--;
+    // rebuild log from scratch
+    document.getElementById('logScroll').innerHTML = '';
+    for (let i = 0; i <= cursor; i++) {
+      const s = steps[i];
+      if (s.log) {
+        const logEl = document.getElementById('logScroll');
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${s.log.type}`;
+        entry.textContent = `[${i}] ${s.log.msg}`;
+        logEl.appendChild(entry);
+      }
+    }
+    renderStep(cursor);
+  }
+}
+
+let playing = false;
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('btnPlay').textContent = playing ? '⏸ Pause' : '▶ Play';
+  if (playing) runPlay();
+}
+function runPlay() {
+  if (!playing) return;
+  if (cursor >= steps.length-1) { playing = false; document.getElementById('btnPlay').textContent = '▶ Play'; return; }
+  stepForward();
+  const speed = 1600 - parseInt(document.getElementById('speedSlider').value);
+  playTimer = setTimeout(runPlay, speed);
+}
+
+function init() {
+  clearTimeout(playTimer); playing = false;
+  document.getElementById('btnPlay').textContent = '▶ Play';
+  document.getElementById('logScroll').innerHTML = '';
+  document.getElementById('resultBadge').textContent = '—';
+  document.getElementById('resultBadge').className = 'result-badge';
+
+  const str = document.getElementById('inputStr').value;
+
+  // build char strip
+  const strip = document.getElementById('charStrip');
+  strip.innerHTML = str.split('').map((ch,i) =>
+    `<div class="ch" id="ch${i}">${ch}</div>`
+  ).join('');
+
+  steps = buildSteps(str);
+  cursor = 0;
+  highlight(-1);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
