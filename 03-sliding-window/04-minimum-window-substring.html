@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>76. Minimum Window Substring</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 280px;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 1.2rem 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 0.3rem;
+            color: #56CCF2;
+        }
+        
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .viz-panel {
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .code-panel {
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .controls {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .input-group label {
+            font-size: 0.85rem;
+        }
+        
+        input[type="text"] {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+        
+        button {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .target-string {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .target-string h3 {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: #ffd93d;
+        }
+        
+        .target-string .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd93d;
+            letter-spacing: 0.2rem;
+        }
+        
+        .string-display {
+            display: flex;
+            gap: 3px;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .char-box {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .char-box.current-window {
+            background: rgba(86, 204, 242, 0.25);
+            border-color: #56CCF2;
+            border-width: 2px;
+        }
+        
+        .char-box.best-window {
+            background: rgba(46, 213, 115, 0.3);
+            border-color: #2ed573;
+            border-width: 3px;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+        }
+        
+        .char-box.matched {
+            background: rgba(47, 128, 237, 0.3);
+            border-color: #2F80ED;
+        }
+        
+        .char-box.left-pointer::before {
+            content: 'L';
+            position: absolute;
+            top: -18px;
+            left: 2px;
+            font-size: 0.6rem;
+            color: #ff6348;
+            font-weight: 700;
+        }
+        
+        .char-box.right-pointer::after {
+            content: 'R';
+            position: absolute;
+            top: -18px;
+            right: 2px;
+            font-size: 0.6rem;
+            color: #ffa502;
+            font-weight: 700;
+        }
+        
+        .char-index {
+            position: absolute;
+            bottom: -18px;
+            font-size: 0.6rem;
+            opacity: 0.6;
+        }
+        
+        .variables {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        
+        .variables h3 {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            color: #56CCF2;
+        }
+        
+        .var-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.8rem;
+        }
+        
+        .var-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.7rem;
+            border-radius: 8px;
+            border-left: 3px solid rgba(86, 204, 242, 0.5);
+        }
+        
+        .var-name {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 0.3rem;
+        }
+        
+        .var-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #56CCF2;
+        }
+        
+        .maps-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.2rem 0;
+        }
+        
+        .map-panel {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .map-panel h3 {
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .map-items {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .map-item {
+            background: rgba(86, 204, 242, 0.2);
+            border: 2px solid rgba(86, 204, 242, 0.4);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        
+        .map-item .char {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #56CCF2;
+        }
+        
+        .map-item .count {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .result-display {
+            background: rgba(46, 213, 115, 0.2);
+            border: 2px solid #2ed573;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1.2rem 0;
+            text-align: center;
+        }
+        
+        .result-display h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #2ed573;
+        }
+        
+        .result-display .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2ed573;
+            margin: 0.5rem 0;
+        }
+        
+        .result-display .result-substring {
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 0.5rem;
+            letter-spacing: 0.1rem;
+        }
+        
+        .code-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.2rem;
+            font-size: 0.82rem;
+            line-height: 1.6;
+        }
+        
+        .code-line {
+            display: block;
+            padding: 0.2rem 0.5rem;
+            transition: all 0.2s ease;
+            border-radius: 3px;
+            white-space: pre;
+        }
+        
+        .code-line.active {
+            background: rgba(86, 204, 242, 0.3);
+            border-left: 4px solid #56CCF2;
+            margin-left: -0.5rem;
+            padding-left: calc(0.5rem - 4px);
+        }
+        
+        .keyword { color: #ff6348; }
+        .function { color: #2ed573; }
+        .string { color: #ffd93d; }
+        .comment { color: #888; font-style: italic; }
+        .number { color: #a29bfe; }
+        .indent { display: inline-block; width: 1.5rem; }
+        
+        .algo-info {
+            margin: 1.2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 4px solid rgba(86, 204, 242, 0.6);
+            border-radius: 6px;
+        }
+        
+        .algo-info h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #56CCF2;
+        }
+        
+        .algo-info p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .legend-box.current {
+            background: rgba(86, 204, 242, 0.25);
+            border-color: #56CCF2;
+        }
+        
+        .legend-box.best {
+            background: rgba(46, 213, 115, 0.3);
+            border-color: #2ed573;
+        }
+
+        /* ── STEP LOG ── */
+        .log-panel {
+            border-left: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-panel-title {
+            padding: 0.8rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #56CCF2;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .log-clear-btn {
+            font-size: 0.65rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .log-clear-btn:hover { background: rgba(255,255,255,0.2); transform: none; }
+
+        .log-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .log-entry {
+            font-size: 0.7rem;
+            font-family: 'Consolas','Monaco','Courier New',monospace;
+            padding: 5px 8px;
+            border-radius: 5px;
+            border-left: 3px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.65);
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .log-entry.expand  { border-color: #56CCF2; color: #56CCF2; background: rgba(86,204,242,0.08); }
+        .log-entry.match   { border-color: #2ed573; color: #2ed573; background: rgba(46,213,115,0.08); }
+        .log-entry.shrink  { border-color: #ffa502; color: #ffa502; background: rgba(255,165,2,0.08); }
+        .log-entry.best    { border-color: #2ed573; color: #2ed573; background: rgba(46,213,115,0.15); font-weight: 700; }
+        .log-entry.lose    { border-color: #ff6348; color: #ff6348; background: rgba(255,99,72,0.08); }
+        .log-entry.info    { border-color: #a29bfe; color: #a29bfe; background: rgba(162,155,254,0.08); }
+        .log-entry.final   { border-color: #2ed573; color: #2ed573; background: rgba(46,213,115,0.18); font-weight: 700; font-size: 0.75rem; }
+
+        .log-step-num {
+            opacity: 0.45;
+            font-size: 0.62rem;
+            margin-right: 4px;
+        }
+
+        .log-scroll::-webkit-scrollbar { width: 4px; }
+        .log-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>76. Minimum Window Substring</h1>
+            <p>Sliding Window | Hard | Time: O(m + n) | Space: O(m + n)</p>
+        </div>
+        
+        <div class="viz-panel">
+            <div class="target-string">
+                <h3>Target String (t)</h3>
+                <div class="value" id="targetDisplay">XYZ</div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box current"></div>
+                    <span>Current Window</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box best"></div>
+                    <span>Best Window Found</span>
+                </div>
+            </div>
+            
+            <div class="string-display" id="stringDisplay"></div>
+            
+            <div class="variables">
+                <h3>📊 Variable Values</h3>
+                <div class="var-grid">
+                    <div class="var-item">
+                        <div class="var-name">left</div>
+                        <div class="var-value" id="varLeft">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">right</div>
+                        <div class="var-value" id="varRight">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">have</div>
+                        <div class="var-value" id="varHave">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">need</div>
+                        <div class="var-value" id="varNeed">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">min_length</div>
+                        <div class="var-value" id="varMinLen">∞</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="maps-container">
+                <div class="map-panel">
+                    <h3>count_t (Target)</h3>
+                    <div class="map-items" id="countTMap"></div>
+                </div>
+                <div class="map-panel">
+                    <h3>window (Current)</h3>
+                    <div class="map-items" id="windowMap"></div>
+                </div>
+            </div>
+            
+            <div class="result-display" id="resultDisplay" style="display: none;">
+                <h3>✓ Minimum Window Found</h3>
+                <div class="result-value">Length: <span id="resultLength">0</span></div>
+                <div class="result-substring">"<span id="resultSubstring"></span>"</div>
+            </div>
+        </div>
+        
+        <div class="code-panel">
+            <div class="algo-info">
+                <h3>Algorithm Explanation</h3>
+                <p>
+                    Use two hash maps to track character frequencies. Expand window with right pointer.
+                    When window is valid (contains all chars from t), try to shrink from left.
+                    Track the minimum valid window found.
+                </p>
+            </div>
+            
+            <div class="code-container" id="codeContainer">
+<code class="code-line"><span class="keyword">class</span> Solution:</code>
+<code class="code-line"><span class="indent"></span><span class="keyword">def</span> <span class="function">minWindow</span>(<span class="keyword">self</span>, s: <span class="keyword">str</span>, t: <span class="keyword">str</span>) -> <span class="keyword">str</span>:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="keyword">if</span> <span class="keyword">not</span> s <span class="keyword">or</span> <span class="keyword">not</span> t <span class="keyword">or</span> <span class="function">len</span>(s) < <span class="function">len</span>(t):</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="keyword">return</span> <span class="string">""</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Build frequency map for target string t</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>count_t = {}</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="keyword">for</span> char <span class="keyword">in</span> t:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span>count_t[char] = count_t.<span class="function">get</span>(char, <span class="number">0</span>) + <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Track characters in current window</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>window = {}</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Variables for tracking valid window</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>have = <span class="number">0</span>  <span class="comment"># Number of unique chars in window with desired frequency</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>need = <span class="function">len</span>(count_t)  <span class="comment"># Number of unique chars needed from t</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Result: [length, left, right]</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>result = [-<span class="number">1</span>, -<span class="number">1</span>]</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>min_length = <span class="function">float</span>(<span class="string">'inf'</span>)</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>left = <span class="number">0</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Expand window with right pointer</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="keyword">for</span> right <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(s)):</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span>char = s[right]</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span>window[char] = window.<span class="function">get</span>(char, <span class="number">0</span>) + <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="comment"># Check if this character's frequency matches requirement</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="keyword">if</span> char <span class="keyword">in</span> count_t <span class="keyword">and</span> window[char] == count_t[char]:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>have += <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="comment"># Try to shrink window from left while valid</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="keyword">while</span> have == need:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="comment"># Update result if current window is smaller</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>current_length = right - left + <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="keyword">if</span> current_length < min_length:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>min_length = current_length</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>result = [left, right]</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="comment"># Remove character from left of window</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>left_char = s[left]</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>window[left_char] -= <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="comment"># Check if removing this char breaks validity</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="keyword">if</span> left_char <span class="keyword">in</span> count_t <span class="keyword">and</span> window[left_char] < count_t[left_char]:</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>have -= <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span>left += <span class="number">1</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="comment"># Return the minimum window substring</span></code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span>left, right = result</code>
+<code class="code-line"><span class="indent"></span><span class="indent"></span><span class="keyword">return</span> s[left:right + <span class="number">1</span>] <span class="keyword">if</span> min_length != <span class="function">float</span>(<span class="string">'inf'</span>) <span class="keyword">else</span> <span class="string">""</span></code>
+            </div>
+            
+            <div class="algo-info">
+                <h3>Complexity Analysis</h3>
+                <p>
+                    <strong>Time:</strong> O(m + n) - Each character visited at most twice<br>
+                    <strong>Space:</strong> O(m + n) - Hash maps for character frequencies
+                </p>
+            </div>
+        </div>
+
+        <!-- STEP LOG -->
+        <div class="log-panel">
+            <div class="log-panel-title">
+                Step Log
+                <button class="log-clear-btn" onclick="clearLog()">Clear</button>
+            </div>
+            <div class="log-scroll" id="logScroll"></div>
+        </div>
+            <div class="input-group">
+                <label>String (s):</label>
+                <input type="text" id="inputS" value="OUZODYXAZV" />
+            </div>
+            <div class="input-group">
+                <label>Target (t):</label>
+                <input type="text" id="inputT" value="XYZ" />
+            </div>
+            <button onclick="reset()">Reset</button>
+            <button onclick="step()" id="stepBtn">Step</button>
+            <button onclick="play()" id="playBtn">Play</button>
+            <button onclick="pause()" id="pauseBtn" style="display:none;">Pause</button>
+            <div class="input-group">
+                <label>Speed:</label>
+                <input type="range" min="100" max="2000" value="800" id="speedSlider" style="width: 120px;" />
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let s = "OUZODYXAZV";
+        let t = "XYZ";
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+
+        function clearLog() {
+            document.getElementById('logScroll').innerHTML = '';
+        }
+
+        function appendLog(stepIdx, action) {
+            const logEl = document.getElementById('logScroll');
+
+            // Determine type from action text
+            let type = 'info';
+            const a = action.toLowerCase();
+            if (a.includes('add') || a.includes('expand')) type = 'expand';
+            else if (a.includes('matches') || a.includes('match')) type = 'match';
+            else if (a.includes('new best')) type = 'best';
+            else if (a.includes('shrink') || a.includes('remove')) type = 'shrink';
+            else if (a.includes('lost') || a.includes('lose')) type = 'lose';
+            else if (a.includes('complete')) type = 'final';
+
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-step-num">[${stepIdx}]</span>${action}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function minWindow(str, target) {
+            steps = [];
+            
+            if (!str || !target || str.length < target.length) {
+                steps.push({
+                    left: 0, right: -1, count_t: {}, window: {},
+                    have: 0, need: 0, min_length: Infinity,
+                    result: [-1, -1], activeLine: 2,
+                    action: 'Invalid input', isFinal: true
+                });
+                return "";
+            }
+            
+            // Build count_t
+            const count_t = {};
+            for (let char of target) {
+                count_t[char] = (count_t[char] || 0) + 1;
+            }
+            
+            const window = {};
+            let have = 0;
+            const need = Object.keys(count_t).length;
+            let result = [-1, -1];
+            let min_length = Infinity;
+            let left = 0;
+            
+            // Initial state
+            steps.push({
+                left, right: -1, count_t: {...count_t}, window: {...window},
+                have, need, min_length, result: [...result],
+                activeLine: 6, action: 'Built count_t map'
+            });
+            
+            // Expand window
+            for (let right = 0; right < str.length; right++) {
+                const char = str[right];
+                window[char] = (window[char] || 0) + 1;
+                
+                steps.push({
+                    left, right, count_t: {...count_t}, window: {...window},
+                    have, need, min_length, result: [...result],
+                    activeLine: 25, action: `Add '${char}' to window`
+                });
+                
+                // Check if frequency matches
+                if (char in count_t && window[char] === count_t[char]) {
+                    have++;
+                    steps.push({
+                        left, right, count_t: {...count_t}, window: {...window},
+                        have, need, min_length, result: [...result],
+                        activeLine: 29, action: `'${char}' matches! have=${have}`
+                    });
+                }
+                
+                // Try to shrink while valid
+                while (have === need) {
+                    steps.push({
+                        left, right, count_t: {...count_t}, window: {...window},
+                        have, need, min_length, result: [...result],
+                        activeLine: 33, action: 'Window valid, try to shrink'
+                    });
+                    
+                    const current_length = right - left + 1;
+                    if (current_length < min_length) {
+                        min_length = current_length;
+                        result = [left, right];
+                        steps.push({
+                            left, right, count_t: {...count_t}, window: {...window},
+                            have, need, min_length, result: [...result],
+                            activeLine: 37, action: `New best! Length=${min_length}`
+                        });
+                    }
+                    
+                    // Remove from left
+                    const left_char = str[left];
+                    window[left_char]--;
+                    
+                    steps.push({
+                        left, right, count_t: {...count_t}, window: {...window},
+                        have, need, min_length, result: [...result],
+                        activeLine: 42, action: `Remove '${left_char}' from left`
+                    });
+                    
+                    if (left_char in count_t && window[left_char] < count_t[left_char]) {
+                        have--;
+                        steps.push({
+                            left, right, count_t: {...count_t}, window: {...window},
+                            have, need, min_length, result: [...result],
+                            activeLine: 46, action: `Lost '${left_char}', have=${have}`
+                        });
+                    }
+                    
+                    left++;
+                }
+            }
+            
+            // Final result
+            const [resLeft, resRight] = result;
+            steps.push({
+                left, right: str.length - 1, count_t: {...count_t}, window: {...window},
+                have, need, min_length, result: [...result],
+                activeLine: 52, action: 'Complete',
+                isFinal: true,
+                resultString: min_length !== Infinity ? str.substring(resLeft, resRight + 1) : ""
+            });
+            
+            return min_length !== Infinity ? str.substring(resLeft, resRight + 1) : "";
+        }
+        
+        function visualize(stepData) {
+            const display = document.getElementById('stringDisplay');
+            display.innerHTML = '';
+            
+            // Display string
+            for (let i = 0; i < s.length; i++) {
+                const box = document.createElement('div');
+                box.className = 'char-box';
+                box.textContent = s[i];
+                
+                const index = document.createElement('div');
+                index.className = 'char-index';
+                index.textContent = i;
+                box.appendChild(index);
+                
+                // Highlight best window (green) - persists until better found
+                if (stepData.result[0] !== -1 && i >= stepData.result[0] && i <= stepData.result[1]) {
+                    box.classList.add('best-window');
+                }
+                
+                // Highlight current window (blue) - only if not same as best
+                if (i >= stepData.left && i <= stepData.right) {
+                    if (!(stepData.result[0] !== -1 && i >= stepData.result[0] && i <= stepData.result[1])) {
+                        box.classList.add('current-window');
+                    }
+                    
+                    // Check if character matches requirement
+                    const char = s[i];
+                    if (char in stepData.count_t && stepData.window[char] >= stepData.count_t[char]) {
+                        box.classList.add('matched');
+                    }
+                }
+                
+                // Add pointer indicators
+                if (!stepData.isFinal) {
+                    if (i === stepData.left) box.classList.add('left-pointer');
+                    if (i === stepData.right) box.classList.add('right-pointer');
+                }
+                
+                display.appendChild(box);
+            }
+            
+            // Update variables
+            document.getElementById('varLeft').textContent = stepData.left;
+            document.getElementById('varRight').textContent = stepData.right >= 0 ? stepData.right : '—';
+            document.getElementById('varHave').textContent = stepData.have;
+            document.getElementById('varNeed').textContent = stepData.need;
+            document.getElementById('varMinLen').textContent = stepData.min_length === Infinity ? '∞' : stepData.min_length;
+            
+            // Update count_t map
+            const countTDisplay = document.getElementById('countTMap');
+            countTDisplay.innerHTML = '';
+            Object.entries(stepData.count_t).forEach(([char, count]) => {
+                const item = document.createElement('div');
+                item.className = 'map-item';
+                item.innerHTML = `<div class="char">${char}</div><div class="count">${count}</div>`;
+                countTDisplay.appendChild(item);
+            });
+            
+            // Update window map
+            const windowDisplay = document.getElementById('windowMap');
+            windowDisplay.innerHTML = '';
+            const windowEntries = Object.entries(stepData.window).filter(([_, count]) => count > 0);
+            if (windowEntries.length === 0) {
+                windowDisplay.innerHTML = '<div style="opacity: 0.6; font-size: 0.85rem;">Empty</div>';
+            } else {
+                windowEntries.forEach(([char, count]) => {
+                    const item = document.createElement('div');
+                    item.className = 'map-item';
+                    item.innerHTML = `<div class="char">${char}</div><div class="count">${count}</div>`;
+                    windowDisplay.appendChild(item);
+                });
+            }
+            
+            // Show final result
+            const resultDisplay = document.getElementById('resultDisplay');
+            if (stepData.isFinal && stepData.resultString !== undefined) {
+                resultDisplay.style.display = 'block';
+                document.getElementById('resultLength').textContent = stepData.min_length === Infinity ? 'None' : stepData.min_length;
+                document.getElementById('resultSubstring').textContent = stepData.resultString || '(empty)';
+            } else {
+                resultDisplay.style.display = 'none';
+            }
+            
+            // Highlight code line
+            document.querySelectorAll('.code-line').forEach((line, index) => {
+                line.classList.toggle('active', index === stepData.activeLine);
+            });
+
+            // Append to step log
+            if (stepData.action) {
+                appendLog(currentStep, stepData.action);
+            }
+        }
+        
+        function reset() {
+            s = document.getElementById('inputS').value || "OUZODYXAZV";
+            t = document.getElementById('inputT').value || "XYZ";
+            document.getElementById('targetDisplay').textContent = t;
+            currentStep = 0;
+            clearLog();
+            pause();
+            minWindow(s, t);
+            if (steps.length > 0) visualize(steps[0]);
+        }
+        
+        function step() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                visualize(steps[currentStep]);
+            }
+        }
+        
+        function play() {
+            isPlaying = true;
+            document.getElementById('playBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('stepBtn').disabled = true;
+            
+            const speed = 2100 - parseInt(document.getElementById('speedSlider').value);
+            playInterval = setInterval(() => {
+                if (currentStep >= steps.length - 1) {
+                    pause();
+                } else {
+                    step();
+                }
+            }, speed);
+        }
+        
+        function pause() {
+            isPlaying = false;
+            document.getElementById('playBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('stepBtn').disabled = false;
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+        
+        document.getElementById('speedSlider').addEventListener('input', () => {
+            if (isPlaying) {
+                pause();
+                play();
+            }
+        });
+        
+        // Initialize
+        reset();
+    </script>
+</body>
+</html>
