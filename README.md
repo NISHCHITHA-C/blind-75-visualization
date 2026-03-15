@@ -13,7 +13,7 @@ Visual explanations of Blind 75 LeetCode problems.
 
 | Problem | Live Demo |
 |---------|-----------|
-| Minimum Window Substring | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/03-sliding-window/4-minimum-window-substring.html) |
+| Minimum Window Substring | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/03-sliding-window/04-minimum-window-substring.html) |
 
 ##04 - Stack
 
