@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>153. Find Minimum in Rotated Sorted Array</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#0a0c10;
+  --surface:#10131a;
+  --card:#161b24;
+  --border:#1e2535;
+  --accent:#00e5ff;
+  --accent2:#ff6b35;
+  --green:#00ff88;
+  --yellow:#ffd60a;
+  --red:#ff3b5c;
+  --purple:#bd93f9;
+  --text:#dde3ee;
+  --muted:#4a5568;
+  --hl:#00e5ff22;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* noise texture overlay */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;gap:16px;
+  padding:8px 20px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;position:relative;z-index:1;
+}
+.hd-tag{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem;letter-spacing:.08em;
+  color:var(--accent);
+}
+.hd-title{
+  font-size:.82rem;font-weight:500;
+  color:var(--muted);
+}
+.hd-badge{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem;padding:2px 8px;
+  border-radius:3px;
+  background:rgba(255,107,53,.15);
+  border:1px solid rgba(255,107,53,.4);
+  color:var(--accent2);
+}
+.header-right{
+  margin-left:auto;display:flex;align-items:center;gap:10px;
+}
+.inp{
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.8rem;
+  padding:5px 10px;border-radius:5px;
+  width:240px;outline:none;
+  transition:border-color .2s;
+}
+.inp:focus{border-color:var(--accent);}
+.btn{
+  font-family:'DM Sans',sans-serif;font-weight:700;
+  font-size:.75rem;padding:5px 14px;border-radius:5px;
+  border:none;cursor:pointer;transition:all .15s;letter-spacing:.04em;
+}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{opacity:.85;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── MAIN GRID ── */
+main{
+  display:grid;
+  grid-template-columns:400px 1fr 260px;
+  flex:1;overflow:hidden;
+  position:relative;z-index:1;
+}
+
+/* ── CODE PANEL ── */
+.code-panel{
+  border-right:1px solid var(--border);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.panel-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);
+  padding:7px 16px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.code-scroll{overflow-y:auto;flex:1;padding:6px 0;}
+.code-line{
+  display:flex;align-items:stretch;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.77rem;line-height:1.75;
+  position:relative;transition:background .15s;
+  cursor:default;
+}
+.code-line.active{background:var(--hl);}
+.code-line.active::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--accent);border-radius:0 2px 2px 0;
+}
+.ln{
+  width:32px;text-align:right;padding-right:10px;
+  color:var(--muted);font-size:.7rem;flex-shrink:0;
+  user-select:none;line-height:1.75;
+}
+.code-line.active .ln{color:var(--accent);}
+.ct{padding-right:16px;white-space:pre;color:#abb2bf;}
+
+/* syntax */
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4a5c;font-style:italic;}
+.nm{color:#e5c07b;}.st{color:#98c379;}.op{color:#56b6c2;}
+
+/* ── VIZ PANEL ── */
+.viz-panel{
+  display:flex;flex-direction:column;overflow:hidden;
+  padding:0;
+}
+
+/* array display */
+.array-section{
+  padding:14px 20px 10px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.array-section .panel-label{padding:0 0 8px;border:none;}
+.arr-wrap{
+  display:flex;gap:4px;flex-wrap:wrap;align-items:flex-end;
+  min-height:80px;
+}
+.cell{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  flex-shrink:0;
+}
+.cell-box{
+  width:46px;height:46px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.95rem;font-weight:700;
+  border-radius:7px;border:2px solid var(--border);
+  background:var(--card);color:var(--muted);
+  transition:all .25s;
+  position:relative;
+}
+.cell-idx{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.6rem;color:var(--muted);
+}
+.cell-box.in-range{
+  border-color:rgba(0,229,255,.4);
+  background:rgba(0,229,255,.07);
+  color:var(--text);
+}
+.cell-box.is-left{
+  border-color:var(--accent2);
+  background:rgba(255,107,53,.15);
+  color:var(--accent2);
+}
+.cell-box.is-right{
+  border-color:var(--purple);
+  background:rgba(189,147,249,.15);
+  color:var(--purple);
+}
+.cell-box.is-mid{
+  border-color:var(--yellow);
+  background:rgba(255,214,10,.15);
+  color:var(--yellow);
+  transform:scale(1.08);
+  box-shadow:0 0 14px rgba(255,214,10,.25);
+}
+.cell-box.is-min{
+  border-color:var(--green);
+  background:rgba(0,255,136,.15);
+  color:var(--green);
+  box-shadow:0 0 18px rgba(0,255,136,.3);
+}
+/* pointer labels above */
+.ptr-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.6rem;font-weight:700;
+  height:14px;line-height:14px;
+}
+.ptr-L{color:var(--accent2);}
+.ptr-R{color:var(--purple);}
+.ptr-M{color:var(--yellow);}
+.ptr-Min{color:var(--green);}
+
+/* vars row */
+.vars-row{
+  display:flex;gap:8px;padding:10px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;flex-wrap:wrap;
+}
+.var-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:6px 12px;
+  display:flex;flex-direction:column;gap:2px;flex:1;min-width:70px;
+}
+.var-name{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.var-val{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:1rem;font-weight:700;color:var(--accent);
+}
+.var-card.vc-left .var-val{color:var(--accent2);}
+.var-card.vc-right .var-val{color:var(--purple);}
+.var-card.vc-mid .var-val{color:var(--yellow);}
+.var-card.vc-result .var-val{color:var(--green);}
+
+/* binary search bar */
+.bs-bar-section{
+  padding:10px 20px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.bs-bar-section .panel-label{padding:0 0 6px;border:none;}
+.bs-bar{
+  position:relative;height:10px;
+  background:var(--card);border-radius:5px;
+  overflow:hidden;
+}
+.bs-bar-fill{
+  position:absolute;top:0;bottom:0;
+  background:linear-gradient(90deg,var(--accent2),var(--purple));
+  border-radius:5px;transition:all .3s;
+}
+.bs-bar-mid{
+  position:absolute;top:-2px;bottom:-2px;
+  width:4px;border-radius:2px;
+  background:var(--yellow);
+  transition:left .3s;
+}
+
+/* decision box */
+.decision-box{
+  margin:10px 20px;padding:10px 14px;
+  border-radius:7px;border:1px solid var(--border);
+  background:var(--card);
+  font-size:.78rem;color:var(--muted);
+  font-family:'IBM Plex Mono',monospace;
+  min-height:36px;transition:all .2s;
+}
+.decision-box.go-right{
+  border-color:rgba(255,107,53,.5);
+  background:rgba(255,107,53,.08);
+  color:var(--accent2);
+}
+.decision-box.go-left{
+  border-color:rgba(189,147,249,.5);
+  background:rgba(189,147,249,.08);
+  color:var(--purple);
+}
+.decision-box.done{
+  border-color:rgba(0,255,136,.5);
+  background:rgba(0,255,136,.08);
+  color:var(--green);
+}
+
+/* result display */
+.result-box{
+  margin:0 20px 10px;padding:12px 16px;
+  border-radius:8px;border:2px solid var(--green);
+  background:rgba(0,255,136,.06);
+  display:none;text-align:center;
+}
+.result-box h3{font-size:.7rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.result-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;color:var(--green);letter-spacing:.06em;
+}
+
+/* bottom controls */
+.bottom-bar{
+  margin-top:auto;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;border-top:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.step-ctr{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--muted);}
+.speed-wrap{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.speed-wrap label{font-size:.72rem;color:var(--muted);}
+input[type=range]{accent-color:var(--accent);width:90px;}
+
+/* ── LOG PANEL ── */
+.log-panel{
+  border-left:1px solid var(--border);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.log-panel .panel-label{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.log-clear{
+  font-size:.62rem;padding:2px 7px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  color:var(--muted);border-radius:3px;
+  cursor:pointer;font-family:inherit;
+}
+.log-clear:hover{color:var(--text);}
+.log-scroll{
+  flex:1;overflow-y:auto;
+  padding:6px 8px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.log-entry{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem;line-height:1.45;
+  padding:5px 8px;border-radius:5px;
+  border-left:3px solid var(--border);
+  background:var(--card);color:var(--muted);
+}
+.log-entry.init   {border-color:var(--accent);  color:var(--accent);}
+.log-entry.mid    {border-color:var(--yellow);   color:var(--yellow);}
+.log-entry.right  {border-color:var(--accent2);  color:var(--accent2);}
+.log-entry.left   {border-color:var(--purple);   color:var(--purple);}
+.log-entry.done   {border-color:var(--green);    color:var(--green);font-weight:700;}
+
+.log-step{opacity:.4;font-size:.6rem;margin-right:4px;}
+
+/* legend */
+.legend{
+  display:flex;gap:10px;flex-wrap:wrap;
+  padding:6px 20px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.65rem;color:var(--muted);}
+.leg-dot{width:10px;height:10px;border-radius:2px;border:2px solid;}
+.leg-dot.L{border-color:var(--accent2);background:rgba(255,107,53,.2);}
+.leg-dot.R{border-color:var(--purple);background:rgba(189,147,249,.2);}
+.leg-dot.M{border-color:var(--yellow);background:rgba(255,214,10,.2);}
+.leg-dot.Min{border-color:var(--green);background:rgba(0,255,136,.2);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="hd-tag">153</span>
+  <span class="hd-title">Find Minimum in Rotated Sorted Array</span>
+  <span class="hd-badge">O(log n) · Binary Search</span>
+  <div class="header-right">
+    <input class="inp" id="numsInput" type="text" value="3,4,5,6,1,2" placeholder="e.g. 3,4,5,6,1,2"/>
+    <button class="btn btn-primary" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- CODE -->
+  <div class="code-panel">
+    <div class="panel-label">Source Code</div>
+    <div class="code-scroll" id="codeBlock"></div>
+  </div>
+
+  <!-- VIZ -->
+  <div class="viz-panel">
+    <div class="array-section">
+      <div class="panel-label">Array</div>
+      <div class="arr-wrap" id="arrWrap"></div>
+    </div>
+
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot L"></div>left</div>
+      <div class="leg-item"><div class="leg-dot R"></div>right</div>
+      <div class="leg-item"><div class="leg-dot M"></div>mid</div>
+      <div class="leg-item"><div class="leg-dot Min"></div>minimum</div>
+    </div>
+
+    <div class="vars-row">
+      <div class="var-card vc-left">
+        <div class="var-name">left</div>
+        <div class="var-val" id="vLeft">—</div>
+      </div>
+      <div class="var-card vc-right">
+        <div class="var-name">right</div>
+        <div class="var-val" id="vRight">—</div>
+      </div>
+      <div class="var-card vc-mid">
+        <div class="var-name">mid</div>
+        <div class="var-val" id="vMid">—</div>
+      </div>
+      <div class="var-card">
+        <div class="var-name">nums[mid]</div>
+        <div class="var-val" id="vNMid">—</div>
+      </div>
+      <div class="var-card">
+        <div class="var-name">nums[right]</div>
+        <div class="var-val" id="vNRight">—</div>
+      </div>
+      <div class="var-card vc-result">
+        <div class="var-name">result</div>
+        <div class="var-val" id="vResult">—</div>
+      </div>
+    </div>
+
+    <div class="bs-bar-section">
+      <div class="panel-label">Search Range</div>
+      <div class="bs-bar" id="bsBar">
+        <div class="bs-bar-fill" id="bsFill"></div>
+        <div class="bs-bar-mid"  id="bsMid"></div>
+      </div>
+    </div>
+
+    <div class="decision-box" id="decisionBox">Waiting to start...</div>
+
+    <div class="result-box" id="resultBox">
+      <h3>Minimum Found</h3>
+      <div class="result-val" id="resultVal">—</div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn btn-ghost" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-primary" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <button class="btn btn-ghost" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <span class="step-ctr" id="stepCtr">0 / 0</span>
+      <div class="speed-wrap">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="700" step="100"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-panel">
+    <div class="panel-label">
+      Step Log
+      <button class="log-clear" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+// ── CODE LINES ─────────────────────────────────────────────
+const CODE = [
+  {ln:1,  t:`<span class="kw">class</span> <span class="fn">Solution</span>:`},
+  {ln:2,  t:`    <span class="kw">def</span> <span class="fn">findMin</span>(<span class="nm">self</span>, nums: List[int]) -> int:`},
+  {ln:3,  t:`        left, right = <span class="nm">0</span>, <span class="fn">len</span>(nums) - <span class="nm">1</span>`},
+  {ln:4,  t:``},
+  {ln:5,  t:`        <span class="kw">while</span> left < right:`},
+  {ln:6,  t:`            mid = (left + right) <span class="op">//</span> <span class="nm">2</span>`},
+  {ln:7,  t:``},
+  {ln:8,  t:`            <span class="kw">if</span> nums[mid] > nums[right]:  <span class="cm"># min is in RIGHT half</span>`},
+  {ln:9,  t:`                left = mid + <span class="nm">1</span>`},
+  {ln:10, t:`            <span class="kw">else</span>:                        <span class="cm"># min is in LEFT half (including mid)</span>`},
+  {ln:11, t:`                right = mid`},
+  {ln:12, t:``},
+  {ln:13, t:`        <span class="kw">return</span> nums[left]`},
+];
+
+function buildCode(){
+  document.getElementById('codeBlock').innerHTML =
+    CODE.map((l,i)=>
+      `<div class="code-line" id="cl${i}">
+         <span class="ln">${l.ln}</span>
+         <span class="ct">${l.t||' '}</span>
+       </div>`
+    ).join('');
+}
+
+// ── SIMULATION ─────────────────────────────────────────────
+let nums=[], steps=[], cursor=0, playing=false, playTimer=null;
+
+function buildSteps(arr){
+  const out=[];
+  const n=arr.length;
+  let left=0, right=n-1;
+
+  out.push({line:2,left,right,mid:-1,done:false,
+    msg:'init',log:{type:'init',text:`left=0  right=${right}`}});
+  out.push({line:3,left,right,mid:-1,done:false,
+    msg:`left=0, right=${right}`,log:{type:'init',text:`Initialise: left=0, right=${right}`}});
+
+  while(left < right){
+    out.push({line:5,left,right,mid:-1,done:false,
+      msg:`left(${left}) < right(${right}) → enter loop`,
+      log:{type:'mid',text:`Loop check: ${left} < ${right} ✓`}});
+
+    const mid=Math.floor((left+right)/2);
+    out.push({line:6,left,right,mid,done:false,
+      msg:`mid = (${left}+${right})//2 = ${mid}`,
+      log:{type:'mid',text:`mid = (${left}+${right})//2 = ${mid}  →  nums[${mid}]=${arr[mid]}`}});
+
+    out.push({line:8,left,right,mid,done:false,
+      msg:`nums[${mid}]=${arr[mid]} > nums[${right}]=${arr[right]} ?`,
+      log:{type:'mid',text:`Compare: nums[${mid}]=${arr[mid]} vs nums[${right}]=${arr[right]}`}});
+
+    if(arr[mid] > arr[right]){
+      out.push({line:9,left,right:right,mid,done:false,
+        msg:`YES → min in right half → left = ${mid+1}`,
+        log:{type:'right',text:`${arr[mid]} > ${arr[right]} → move LEFT to ${mid+1}`}});
+      left=mid+1;
+    } else {
+      out.push({line:11,left,right,mid,done:false,
+        msg:`NO → min in left half (mid ok) → right = ${mid}`,
+        log:{type:'left',text:`${arr[mid]} ≤ ${arr[right]} → move RIGHT to ${mid}`}});
+      right=mid;
+    }
+  }
+
+  out.push({line:13,left,right,mid:left,done:true,
+    msg:`left==right==${left} → return nums[${left}]=${arr[left]}`,
+    log:{type:'done',text:`✓ Minimum = nums[${left}] = ${arr[left]}`}});
+
+  return out;
+}
+
+// ── RENDER ─────────────────────────────────────────────────
+function highlight(lineIdx){
+  CODE.forEach((_,i)=>document.getElementById('cl'+i)?.classList.remove('active'));
+  if(lineIdx>=0){
+    const el=document.getElementById('cl'+lineIdx);
+    if(el){el.classList.add('active');el.scrollIntoView({block:'nearest'});}
+  }
+}
+
+function renderArr(st){
+  const wrap=document.getElementById('arrWrap');
+  wrap.innerHTML='';
+  nums.forEach((v,i)=>{
+    const cell=document.createElement('div');
+    cell.className='cell';
+
+    // pointer label row
+    const ptrs=[];
+    if(i===st.left && i===st.right && i===st.mid) ptrs.push('<span class="ptr-label ptr-M">L/M/R</span>');
+    else{
+      const ps=[];
+      if(i===st.left)  ps.push('<span class="ptr-label ptr-L">L</span>');
+      if(i===st.mid && st.mid>=0) ps.push('<span class="ptr-label ptr-M">M</span>');
+      if(i===st.right) ps.push('<span class="ptr-label ptr-R">R</span>');
+      if(ps.length) ptrs.push(ps.join(''));
+      else ptrs.push('<span class="ptr-label"> </span>');
+    }
+
+    const box=document.createElement('div');
+    box.className='cell-box';
+    if(st.done && i===st.left) box.classList.add('is-min');
+    else if(i===st.mid && st.mid>=0) box.classList.add('is-mid');
+    else if(i===st.left)  box.classList.add('is-left');
+    else if(i===st.right) box.classList.add('is-right');
+    else if(i>st.left && i<st.right) box.classList.add('in-range');
+    box.textContent=v;
+
+    const idx=document.createElement('div');
+    idx.className='cell-idx';
+    idx.textContent=i;
+
+    cell.innerHTML=ptrs.join('');
+    cell.appendChild(box);
+    cell.appendChild(idx);
+    wrap.appendChild(cell);
+  });
+}
+
+function renderVars(st){
+  document.getElementById('vLeft').textContent   = st.left;
+  document.getElementById('vRight').textContent  = st.right;
+  document.getElementById('vMid').textContent    = st.mid>=0 ? st.mid : '—';
+  document.getElementById('vNMid').textContent   = st.mid>=0 ? nums[st.mid] : '—';
+  document.getElementById('vNRight').textContent = nums[st.right] ?? '—';
+  document.getElementById('vResult').textContent = st.done ? nums[st.left] : '—';
+}
+
+function renderBar(st){
+  const n=nums.length;
+  const fillL=(st.left/n)*100;
+  const fillW=((st.right-st.left+1)/n)*100;
+  const midPct=st.mid>=0 ? ((st.mid+0.5)/n)*100 : ((st.left+st.right+1)/2/n)*100;
+  document.getElementById('bsFill').style.left=fillL+'%';
+  document.getElementById('bsFill').style.width=fillW+'%';
+  document.getElementById('bsMid').style.left=`calc(${midPct}% - 2px)`;
+}
+
+function renderDecision(st){
+  const box=document.getElementById('decisionBox');
+  box.className='decision-box';
+  box.textContent=st.msg;
+  if(st.done) box.classList.add('done');
+  else if(st.line===9) box.classList.add('go-right');
+  else if(st.line===11) box.classList.add('go-left');
+}
+
+function renderResult(st){
+  const rb=document.getElementById('resultBox');
+  if(st.done){
+    rb.style.display='block';
+    document.getElementById('resultVal').textContent=nums[st.left];
+  } else {
+    rb.style.display='none';
+  }
+}
+
+function addLog(stepIdx, entry){
+  const el=document.getElementById('logScroll');
+  const div=document.createElement('div');
+  div.className=`log-entry ${entry.type}`;
+  div.innerHTML=`<span class="log-step">[${stepIdx}]</span>${entry.text}`;
+  el.appendChild(div);
+  el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){ document.getElementById('logScroll').innerHTML=''; }
+
+function rebuildLog(){
+  clearLog();
+  for(let i=0;i<=cursor;i++) if(steps[i]?.log) addLog(i,steps[i].log);
+}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderArr(st);
+  renderVars(st);
+  renderBar(st);
+  renderDecision(st);
+  renderResult(st);
+  document.getElementById('stepCtr').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){
+    cursor++;
+    if(steps[cursor]?.log) addLog(cursor,steps[cursor].log);
+    renderStep(cursor);
+  }
+}
+function stepBack(){
+  if(cursor>0){ cursor--; rebuildLog(); renderStep(cursor); }
+}
+
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing) runPlay();
+  else clearTimeout(playTimer);
+}
+function runPlay(){
+  if(!playing) return;
+  if(cursor>=steps.length-1){
+    playing=false;
+    document.getElementById('btnPlay').textContent='▶ Play';
+    return;
+  }
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer); playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+
+  const raw=document.getElementById('numsInput').value;
+  nums=raw.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  if(nums.length===0){nums=[3,4,5,6,1,2];}
+
+  steps=buildSteps(nums);
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log) addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
