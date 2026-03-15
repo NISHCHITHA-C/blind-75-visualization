@@ -15,7 +15,7 @@ Visual explanations of Blind 75 LeetCode problems.
 |---------|-----------|
 | Minimum Window Substring | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/03-sliding-window/04-minimum-window-substring.html) |
 
-##04 - Stack
+## 04 - Stack
 
 | Problem | Live Demo |
 |---------|-----------|
