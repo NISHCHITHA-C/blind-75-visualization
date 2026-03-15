@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>33. Search in Rotated Sorted Array</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#080b12;
+  --surface:#0e1219;
+  --card:#141923;
+  --border:#1c2333;
+  --accent:#7ee8fa;
+  --accent2:#f7971e;
+  --green:#39d98a;
+  --red:#ff5c5c;
+  --purple:#c9a0ff;
+  --yellow:#ffd166;
+  --blue:#4ea8de;
+  --text:#cdd6f4;
+  --muted:#45506a;
+  --hl:rgba(126,232,250,0.09);
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  height:100vh;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;gap:14px;
+  padding:8px 18px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;
+}
+.h-num{
+  font-family:'Fira Code',monospace;
+  font-size:1.1rem;font-weight:700;
+  color:var(--accent);letter-spacing:.04em;
+}
+.h-title{font-size:.82rem;font-weight:500;color:var(--muted);}
+.h-badge{
+  font-family:'Fira Code',monospace;font-size:.62rem;
+  padding:2px 8px;border-radius:3px;
+  background:rgba(247,151,30,.12);
+  border:1px solid rgba(247,151,30,.35);
+  color:var(--accent2);
+}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.inp{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);font-family:'Fira Code',monospace;
+  font-size:.78rem;padding:5px 9px;border-radius:5px;
+  outline:none;transition:border-color .2s;
+}
+.inp:focus{border-color:var(--accent);}
+#numsInp{width:220px;}
+#tgtInp{width:68px;}
+.btn{
+  font-family:'Inter',sans-serif;font-weight:600;
+  font-size:.74rem;padding:5px 13px;border-radius:5px;
+  border:none;cursor:pointer;transition:all .15s;
+}
+.btn-p{background:var(--accent);color:#000;}
+.btn-p:hover{opacity:.85;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-g:hover{border-color:var(--accent);color:var(--accent);}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* ── LAYOUT ── */
+main{
+  display:grid;
+  grid-template-columns:390px 1fr 255px;
+  flex:1;overflow:hidden;
+}
+
+/* ── CODE ── */
+.code-panel{
+  border-right:1px solid var(--border);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.plabel{
+  font-size:.62rem;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);
+  padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.code-scroll{overflow-y:auto;flex:1;padding:5px 0;}
+.code-line{
+  display:flex;align-items:stretch;
+  font-family:'Fira Code',monospace;font-size:.75rem;line-height:1.8;
+  position:relative;transition:background .15s;
+}
+.code-line.active{background:var(--hl);}
+.code-line.active::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--accent);border-radius:0 2px 2px 0;
+}
+.ln{
+  width:30px;text-align:right;padding-right:10px;
+  color:var(--muted);font-size:.68rem;flex-shrink:0;
+  user-select:none;line-height:1.8;
+}
+.code-line.active .ln{color:var(--accent);}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}
+.nm{color:#e5c07b;}.st{color:#98c379;}.op{color:#56b6c2;}
+
+/* ── VIZ ── */
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;}
+
+.arr-section{
+  padding:12px 18px 8px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.arr-section .plabel{padding:0 0 7px;border:none;}
+.arr-wrap{display:flex;gap:4px;flex-wrap:wrap;align-items:flex-end;min-height:78px;}
+
+.cell{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;}
+.cell-ptr{
+  font-family:'Fira Code',monospace;font-size:.58rem;font-weight:700;
+  height:13px;line-height:13px;letter-spacing:.02em;
+}
+.ptr-L{color:var(--accent2);}
+.ptr-R{color:var(--purple);}
+.ptr-M{color:var(--yellow);}
+.cell-box{
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fira Code',monospace;font-size:.9rem;font-weight:700;
+  border-radius:7px;border:2px solid var(--border);
+  background:var(--card);color:var(--muted);
+  transition:all .22s;
+}
+.cell-idx{font-family:'Fira Code',monospace;font-size:.58rem;color:var(--muted);}
+
+/* cell states */
+.cell-box.in-range{border-color:rgba(126,232,250,.3);background:rgba(126,232,250,.05);color:var(--text);}
+.cell-box.is-left {border-color:var(--accent2);background:rgba(247,151,30,.14);color:var(--accent2);}
+.cell-box.is-right{border-color:var(--purple);background:rgba(201,160,255,.14);color:var(--purple);}
+.cell-box.is-mid  {border-color:var(--yellow);background:rgba(255,209,102,.14);color:var(--yellow);transform:scale(1.1);box-shadow:0 0 12px rgba(255,209,102,.2);}
+.cell-box.is-left-sorted {border-color:rgba(62,210,158,.5);background:rgba(62,210,158,.08);}
+.cell-box.is-right-sorted{border-color:rgba(78,168,222,.5);background:rgba(78,168,222,.08);}
+.cell-box.found   {border-color:var(--green);background:rgba(57,217,138,.18);color:var(--green);box-shadow:0 0 18px rgba(57,217,138,.35);transform:scale(1.12);}
+.cell-box.notfound{border-color:var(--red);background:rgba(255,92,92,.1);color:var(--red);}
+.cell-box.eliminated{opacity:.25;}
+
+/* vars */
+.vars-row{
+  display:flex;gap:6px;padding:8px 18px;
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.vc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;flex:1;min-width:62px;
+}
+.vn{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.vv{font-family:'Fira Code',monospace;font-size:.95rem;font-weight:700;color:var(--accent);}
+.vc.vl .vv{color:var(--accent2);}
+.vc.vr .vv{color:var(--purple);}
+.vc.vm .vv{color:var(--yellow);}
+.vc.vt .vv{color:var(--blue);}
+.vc.vres .vv{color:var(--green);}
+
+/* sorted half indicator */
+.half-row{
+  display:flex;gap:8px;padding:6px 18px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.half-card{
+  flex:1;padding:6px 10px;border-radius:6px;
+  border:1px solid var(--border);background:var(--card);
+  font-size:.7rem;text-align:center;color:var(--muted);
+  transition:all .2s;
+}
+.half-card.sorted-left {border-color:rgba(62,210,158,.5);background:rgba(62,210,158,.08);color:var(--green);}
+.half-card.sorted-right{border-color:rgba(78,168,222,.5);background:rgba(78,168,222,.08);color:var(--blue);}
+.half-label{font-weight:700;font-size:.75rem;margin-bottom:2px;}
+
+/* decision */
+.decision{
+  margin:6px 18px;padding:8px 12px;border-radius:7px;
+  border:1px solid var(--border);background:var(--card);
+  font-family:'Fira Code',monospace;font-size:.73rem;
+  color:var(--muted);min-height:32px;transition:all .2s;
+}
+.decision.go-left  {border-color:rgba(247,151,30,.45);background:rgba(247,151,30,.07);color:var(--accent2);}
+.decision.go-right {border-color:rgba(78,168,222,.45);background:rgba(78,168,222,.07);color:var(--blue);}
+.decision.found    {border-color:rgba(57,217,138,.5);background:rgba(57,217,138,.08);color:var(--green);}
+.decision.notfound {border-color:rgba(255,92,92,.45);background:rgba(255,92,92,.07);color:var(--red);}
+
+/* result */
+.result-box{
+  margin:0 18px 6px;padding:10px 14px;
+  border-radius:8px;border:2px solid var(--green);
+  background:rgba(57,217,138,.06);
+  display:none;text-align:center;
+}
+.result-box.notfound{border-color:var(--red);background:rgba(255,92,92,.06);}
+.result-box h3{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.result-box.found h3{color:var(--green);}
+.result-box.notfound h3{color:var(--red);}
+.result-val{font-family:'Fira Code',monospace;font-size:1.5rem;font-weight:700;}
+.result-box.found .result-val{color:var(--green);}
+.result-box.notfound .result-val{color:var(--red);}
+
+/* bottom bar */
+.bot{
+  margin-top:auto;display:flex;align-items:center;gap:8px;
+  padding:8px 18px;border-top:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.step-info{font-family:'Fira Code',monospace;font-size:.72rem;color:var(--muted);}
+.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.spd-wrap label{font-size:.7rem;color:var(--muted);}
+input[type=range]{accent-color:var(--accent);width:88px;}
+
+/* ── LOG ── */
+.log-panel{
+  border-left:1px solid var(--border);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.log-panel .plabel{
+  display:flex;align-items:center;justify-content:space-between;padding:6px 12px;
+}
+.log-clear{
+  font-size:.6rem;padding:2px 6px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  color:var(--muted);border-radius:3px;
+  cursor:pointer;font-family:inherit;
+}
+.log-clear:hover{color:var(--text);}
+.log-scroll{
+  flex:1;overflow-y:auto;padding:5px 7px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.log-entry{
+  font-family:'Fira Code',monospace;font-size:.67rem;line-height:1.45;
+  padding:4px 7px;border-radius:5px;
+  border-left:3px solid var(--border);
+  background:var(--card);color:var(--muted);
+  word-break:break-all;
+}
+.log-entry.init    {border-color:var(--accent);   color:var(--accent);}
+.log-entry.mid     {border-color:var(--yellow);    color:var(--yellow);}
+.log-entry.goright {border-color:var(--blue);      color:var(--blue);}
+.log-entry.goleft  {border-color:var(--accent2);   color:var(--accent2);}
+.log-entry.found   {border-color:var(--green);     color:var(--green);font-weight:700;}
+.log-entry.notfound{border-color:var(--red);       color:var(--red);font-weight:700;}
+.log-entry.check   {border-color:var(--purple);    color:var(--purple);}
+.ls{opacity:.38;font-size:.58rem;margin-right:4px;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="h-num">33.</span>
+  <span class="h-title">Search in Rotated Sorted Array</span>
+  <span class="h-badge">O(log n) · Binary Search</span>
+  <div class="h-right">
+    <input class="inp" id="numsInp" type="text" value="3,4,5,6,1,2" placeholder="nums e.g. 3,4,5,6,1,2"/>
+    <input class="inp" id="tgtInp"  type="text" value="1"            placeholder="target"/>
+    <button class="btn btn-p" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- CODE -->
+  <div class="code-panel">
+    <div class="plabel">Source Code</div>
+    <div class="code-scroll" id="codeBlock"></div>
+  </div>
+
+  <!-- VIZ -->
+  <div class="viz-panel">
+    <div class="arr-section">
+      <div class="plabel">Array</div>
+      <div class="arr-wrap" id="arrWrap"></div>
+    </div>
+
+    <div class="vars-row">
+      <div class="vc vl"><div class="vn">left</div><div class="vv" id="vLeft">—</div></div>
+      <div class="vc vr"><div class="vn">right</div><div class="vv" id="vRight">—</div></div>
+      <div class="vc vm"><div class="vn">mid</div><div class="vv" id="vMid">—</div></div>
+      <div class="vc"><div class="vn">nums[mid]</div><div class="vv" id="vNMid">—</div></div>
+      <div class="vc vt"><div class="vn">target</div><div class="vv" id="vTarget">—</div></div>
+      <div class="vc vres"><div class="vn">result</div><div class="vv" id="vResult">—</div></div>
+    </div>
+
+    <div class="half-row">
+      <div class="half-card" id="halfLeft">
+        <div class="half-label">Left Half</div>
+        <div id="halfLeftInfo">—</div>
+      </div>
+      <div class="half-card" id="halfRight">
+        <div class="half-label">Right Half</div>
+        <div id="halfRightInfo">—</div>
+      </div>
+    </div>
+
+    <div class="decision" id="decision">Waiting to start…</div>
+    <div class="result-box" id="resultBox">
+      <h3 id="resultTitle">—</h3>
+      <div class="result-val" id="resultVal">—</div>
+    </div>
+
+    <div class="bot">
+      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-p" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <button class="btn btn-g" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="700" step="100"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-panel">
+    <div class="plabel">
+      Step Log
+      <button class="log-clear" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+// ── CODE LINES ──────────────────────────────────────────────
+const CODE = [
+  {ln:1,  t:`<span class="kw">class</span> <span class="fn">Solution</span>:`},
+  {ln:2,  t:`    <span class="kw">def</span> <span class="fn">search</span>(<span class="nm">self</span>, nums: List[int], target: int) -> int:`},
+  {ln:3,  t:`        left, right = <span class="nm">0</span>, <span class="fn">len</span>(nums) - <span class="nm">1</span>`},
+  {ln:4,  t:`        <span class="kw">while</span> left <= right:`},
+  {ln:5,  t:`            mid = (left + right) <span class="op">//</span> <span class="nm">2</span>`},
+  {ln:6,  t:`            <span class="kw">if</span> nums[mid] == target:`},
+  {ln:7,  t:`                <span class="kw">return</span> mid`},
+  {ln:8,  t:`            <span class="cm"># Left half is sorted</span>`},
+  {ln:9,  t:`            <span class="kw">if</span> nums[left] <= nums[mid]:`},
+  {ln:10, t:`                <span class="kw">if</span> nums[left] <= target < nums[mid]:  <span class="cm"># target in left half</span>`},
+  {ln:11, t:`                    right = mid - <span class="nm">1</span>`},
+  {ln:12, t:`                <span class="kw">else</span>:                                  <span class="cm"># target in right half</span>`},
+  {ln:13, t:`                    left = mid + <span class="nm">1</span>`},
+  {ln:14, t:`            <span class="cm"># Right half is sorted</span>`},
+  {ln:15, t:`            <span class="kw">else</span>:`},
+  {ln:16, t:`                <span class="kw">if</span> nums[mid] < target <= nums[right]:  <span class="cm"># target in right half</span>`},
+  {ln:17, t:`                    left = mid + <span class="nm">1</span>`},
+  {ln:18, t:`                <span class="kw">else</span>:                                   <span class="cm"># target in left half</span>`},
+  {ln:19, t:`                    right = mid - <span class="nm">1</span>`},
+  {ln:20, t:`        <span class="kw">return</span> -<span class="nm">1</span>`},
+];
+
+function buildCode(){
+  document.getElementById('codeBlock').innerHTML =
+    CODE.map((l,i)=>
+      `<div class="code-line" id="cl${i}">
+         <span class="ln">${l.ln}</span>
+         <span class="ct">${l.t||' '}</span>
+       </div>`
+    ).join('');
+}
+
+// ── STEP BUILDER ────────────────────────────────────────────
+let nums=[], target=0, steps=[], cursor=0, playing=false, playTimer=null;
+
+function buildSteps(arr, tgt){
+  const out=[];
+  let left=0, right=arr.length-1;
+
+  const snap=(line,msg,logType,logText,extra={})=>
+    out.push({line,left,right,mid:extra.mid??-1,
+      sortedHalf:extra.sortedHalf??null,
+      direction:extra.direction??null,
+      done:extra.done??false,
+      foundIdx:extra.foundIdx??-1,
+      notFound:extra.notFound??false,
+      msg, log:{type:logType,text:logText}});
+
+  snap(2,'Initialise pointers','init',`left=0  right=${right}  target=${tgt}`);
+  snap(3,'left=0, right='+right,'init',`Array length ${arr.length}, searching for ${tgt}`);
+
+  while(left<=right){
+    snap(4,`left(${left}) <= right(${right}) → enter loop`,'check',`Loop: ${left} ≤ ${right} ✓`);
+
+    const mid=Math.floor((left+right)/2);
+    snap(5,`mid = (${left}+${right})//2 = ${mid}`,
+         'mid',`mid=${mid}  nums[${mid}]=${arr[mid]}  target=${tgt}`,{mid});
+
+    snap(6,`nums[${mid}]=${arr[mid]} == target(${tgt}) ?`,
+         'check',`Check: nums[${mid}]=${arr[mid]} == ${tgt}?`,{mid});
+
+    if(arr[mid]===tgt){
+      snap(7,`✓ Found target ${tgt} at index ${mid}!`,
+           'found',`✓ FOUND! nums[${mid}]=${arr[mid]} == ${tgt} → return ${mid}`,
+           {mid,done:true,foundIdx:mid});
+      return out;
+    }
+
+    // Check which half is sorted
+    snap(9,`nums[left]=${arr[left]} <= nums[mid]=${arr[mid]} → left half sorted?`,
+         'check',`Is left half sorted? nums[${left}]=${arr[left]} ≤ nums[${mid}]=${arr[mid]}`,{mid});
+
+    if(arr[left]<=arr[mid]){
+      snap(9,`YES → Left half [${arr[left]}..${arr[mid]}] is sorted`,
+           'check',`Left half sorted: [${arr[left]} … ${arr[mid]}]`,
+           {mid,sortedHalf:'left'});
+
+      snap(10,`Is ${arr[left]} <= target(${tgt}) < ${arr[mid]}?`,
+           'check',`Target in left range? ${arr[left]} ≤ ${tgt} < ${arr[mid]}`,
+           {mid,sortedHalf:'left'});
+
+      if(arr[left]<=tgt && tgt<arr[mid]){
+        snap(11,`YES → target in left half → right = ${mid-1}`,
+             'goleft',`Target ${tgt} in [${arr[left]},${arr[mid]}) → right = ${mid-1}`,
+             {mid,sortedHalf:'left',direction:'left'});
+        right=mid-1;
+      } else {
+        snap(13,`NO → target in right half → left = ${mid+1}`,
+             'goright',`Target ${tgt} NOT in [${arr[left]},${arr[mid]}) → left = ${mid+1}`,
+             {mid,sortedHalf:'left',direction:'right'});
+        left=mid+1;
+      }
+    } else {
+      snap(15,`Right half [${arr[mid]}..${arr[right]}] is sorted`,
+           'check',`Right half sorted: [${arr[mid]} … ${arr[right]}]`,
+           {mid,sortedHalf:'right'});
+
+      snap(16,`Is ${arr[mid]} < target(${tgt}) <= ${arr[right]}?`,
+           'check',`Target in right range? ${arr[mid]} < ${tgt} ≤ ${arr[right]}`,
+           {mid,sortedHalf:'right'});
+
+      if(arr[mid]<tgt && tgt<=arr[right]){
+        snap(17,`YES → target in right half → left = ${mid+1}`,
+             'goright',`Target ${tgt} in (${arr[mid]},${arr[right]}] → left = ${mid+1}`,
+             {mid,sortedHalf:'right',direction:'right'});
+        left=mid+1;
+      } else {
+        snap(19,`NO → target in left half → right = ${mid-1}`,
+             'goleft',`Target ${tgt} NOT in (${arr[mid]},${arr[right]}] → right = ${mid-1}`,
+             {mid,sortedHalf:'right',direction:'left'});
+        right=mid-1;
+      }
+    }
+  }
+
+  snap(20,`left(${left}) > right(${right}) → return -1`,
+       'notfound',`✗ NOT FOUND — target ${tgt} not in array`,
+       {done:true,notFound:true});
+  return out;
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function highlight(idx){
+  CODE.forEach((_,i)=>document.getElementById('cl'+i)?.classList.remove('active'));
+  if(idx>=0){
+    const el=document.getElementById('cl'+idx);
+    if(el){el.classList.add('active');el.scrollIntoView({block:'nearest'});}
+  }
+}
+
+function renderArr(st){
+  const wrap=document.getElementById('arrWrap');
+  wrap.innerHTML='';
+  nums.forEach((v,i)=>{
+    const cell=document.createElement('div');
+    cell.className='cell';
+
+    // pointer labels
+    const ptrs=[];
+    if(i===st.left)   ptrs.push(`<span class="cell-ptr ptr-L">L</span>`);
+    if(st.mid>=0 && i===st.mid) ptrs.push(`<span class="cell-ptr ptr-M">M</span>`);
+    if(i===st.right)  ptrs.push(`<span class="cell-ptr ptr-R">R</span>`);
+    if(!ptrs.length)  ptrs.push(`<span class="cell-ptr"> </span>`);
+
+    const box=document.createElement('div');
+    box.className='cell-box';
+
+    if(st.foundIdx===i)             box.classList.add('found');
+    else if(st.notFound)            box.classList.add('notfound');
+    else if(st.mid>=0 && i===st.mid)box.classList.add('is-mid');
+    else if(i===st.left)            box.classList.add('is-left');
+    else if(i===st.right)           box.classList.add('is-right');
+    else if(i>st.left && i<st.right)box.classList.add('in-range');
+    else if(i<st.left || i>st.right)box.classList.add('eliminated');
+
+    // sorted half tint (behind other states)
+    if(!st.done && st.sortedHalf==='left' && i>=st.left && st.mid>=0 && i<st.mid && !box.classList.contains('is-mid'))
+      box.classList.add('is-left-sorted');
+    if(!st.done && st.sortedHalf==='right' && st.mid>=0 && i>st.mid && i<=st.right)
+      box.classList.add('is-right-sorted');
+
+    box.textContent=v;
+    const idx=document.createElement('div');
+    idx.className='cell-idx';idx.textContent=i;
+
+    cell.innerHTML=ptrs.join('');
+    cell.appendChild(box);cell.appendChild(idx);
+    wrap.appendChild(cell);
+  });
+}
+
+function renderVars(st){
+  document.getElementById('vLeft').textContent   = st.left;
+  document.getElementById('vRight').textContent  = st.right;
+  document.getElementById('vMid').textContent    = st.mid>=0?st.mid:'—';
+  document.getElementById('vNMid').textContent   = st.mid>=0?nums[st.mid]:'—';
+  document.getElementById('vTarget').textContent = target;
+  document.getElementById('vResult').textContent =
+    st.foundIdx>=0 ? st.foundIdx : (st.notFound ? '-1' : '—');
+}
+
+function renderHalves(st){
+  const lc=document.getElementById('halfLeft');
+  const rc=document.getElementById('halfRight');
+  const li=document.getElementById('halfLeftInfo');
+  const ri=document.getElementById('halfRightInfo');
+  lc.className='half-card'; rc.className='half-card';
+  li.textContent='—'; ri.textContent='—';
+
+  if(!st.done && st.mid>=0){
+    const l=st.left,m=st.mid,r=st.right;
+    li.textContent=`[${nums[l]}…${nums[m]}]`;
+    ri.textContent=`[${nums[m]}…${nums[r]}]`;
+    if(st.sortedHalf==='left'){lc.classList.add('sorted-left');li.textContent+=' ✓ sorted';}
+    if(st.sortedHalf==='right'){rc.classList.add('sorted-right');ri.textContent+=' ✓ sorted';}
+  }
+}
+
+function renderDecision(st){
+  const d=document.getElementById('decision');
+  d.className='decision';
+  d.textContent=st.msg;
+  if(st.direction==='right') d.classList.add('go-right');
+  else if(st.direction==='left') d.classList.add('go-left');
+  else if(st.foundIdx>=0) d.classList.add('found');
+  else if(st.notFound) d.classList.add('notfound');
+}
+
+function renderResult(st){
+  const rb=document.getElementById('resultBox');
+  if(st.done){
+    rb.style.display='block';
+    if(st.foundIdx>=0){
+      rb.className='result-box found';
+      document.getElementById('resultTitle').textContent='Target found at index';
+      document.getElementById('resultVal').textContent=st.foundIdx;
+    } else {
+      rb.className='result-box notfound';
+      document.getElementById('resultTitle').textContent='Target not found';
+      document.getElementById('resultVal').textContent='-1';
+    }
+  } else {
+    rb.style.display='none';
+  }
+}
+
+function addLog(idx,log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');
+  d.className=`log-entry ${log.type}`;
+  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);
+  el.scrollTop=el.scrollHeight;
+}
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+function rebuildLog(){
+  clearLog();
+  for(let i=0;i<=cursor;i++) if(steps[i]?.log) addLog(i,steps[i].log);
+}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderArr(st);
+  renderVars(st);
+  renderHalves(st);
+  renderDecision(st);
+  renderResult(st);
+  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){
+    cursor++;
+    if(steps[cursor]?.log) addLog(cursor,steps[cursor].log);
+    renderStep(cursor);
+  }
+}
+function stepBack(){
+  if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}
+}
+
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing) runPlay(); else clearTimeout(playTimer);
+}
+function runPlay(){
+  if(!playing)return;
+  if(cursor>=steps.length-1){
+    playing=false;
+    document.getElementById('btnPlay').textContent='▶ Play';return;
+  }
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer);playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+
+  const raw=document.getElementById('numsInp').value;
+  nums=raw.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  if(!nums.length) nums=[3,4,5,6,1,2];
+
+  target=parseInt(document.getElementById('tgtInp').value);
+  if(isNaN(target)) target=1;
+
+  steps=buildSteps(nums,target);
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log) addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
