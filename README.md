@@ -13,4 +13,4 @@ Visual explanations of Blind 75 LeetCode problems.
 
 | Problem | Live Demo |
 |---------|-----------|
-| Valid Parentheses | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/04-Stack/valid-parentheses.html) |
+| Valid Parentheses | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/04-Stack/valid-parenthesis.html) |
