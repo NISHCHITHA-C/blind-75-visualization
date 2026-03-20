@@ -23,7 +23,7 @@ Visual explanations of Blind 75 LeetCode problems.
 
 ## 02 - Binary Search
 
-| Problem | Live Demo | examples for better undersatnding |
-|---------|-----------| ----------------------------------------------|
-| Find Min Rotated | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/05-Binary-Search/01-find-min-rotated.html) | 4,5,6,0,1,2,3 |
+| Problem | Live Demo | examples for better undersatnding | quick summary |
+|---------|-----------| ----------------------------------------------| ---- |
+| Find Min Rotated | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/05-Binary-Search/01-find-min-rotated.html) | 4,5,6,0,1,2,3 |[View Spreadsheet](https://docs.google.com/spreadsheets/d/1lXHLqpgGXQznW1DNrWzhHhQhu1mZ1j25BNLT-c2_vto/edit?pli=1&gid=1358485553#gid=1358485553) |
 | Search Rotated Sorted | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/05-Binary-Search/02-search-rotated-sorted.html) | 
