@@ -33,5 +33,8 @@ Visual explanations of Blind 75 LeetCode problems.
 | Problem | Live Demo |
 |---------|-----------|
 | Reverse Linked List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/01-reverse-linked-list.html) |
-| Detect Cycle in Linked List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/02-linked-list-cycle.html) |
 | Merge Two Sorted Lists | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/03-merge-two-sorted-lists.html) |
+| Detect Cycle in Linked List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/02-linked-list-cycle.html) |
+| Reorder List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/04-reorder-list.html) |
+| Remove Nth Node From End of List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/05-remove-nth-node-from-end-of-list.html) |
+| Merge K Sorted Lists | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/06-merge-k-sorted-lists.html) |
