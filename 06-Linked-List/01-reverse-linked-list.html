@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>206. Reverse Linked List</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
+  --prev:#a78bfa;--curr:#3b82f6;--next:#f59e0b;--done:#10b981;
+  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+/* HEADER */
+header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
+.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--prev);}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:200px;}
+.inp:focus{border-color:#3b82f6;}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
+.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* MAIN */
+main{display:grid;grid-template-columns:350px 1fr 240px;flex:1;overflow:hidden;}
+
+/* CODE */
+.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
+.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.74rem;line-height:1.85;position:relative;transition:background .15s;}
+.cl.active{background:rgba(59,130,246,.1);}
+.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
+.ln{width:30px;text-align:right;padding-right:10px;color:var(--muted);font-size:.68rem;flex-shrink:0;user-select:none;line-height:1.85;}
+.cl.active .ln{color:#3b82f6;}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}.op{color:#56b6c2;}
+
+/* VIZ */
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;}
+
+/* BEFORE / AFTER row */
+.ba-row{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ba-col{padding:10px 16px;}
+.ba-col:first-child{border-right:1px solid var(--border);}
+.ba-title{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.mini-list{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.mini-node{
+  width:36px;height:36px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;
+  border:1.5px solid var(--border);background:var(--card);color:var(--muted);
+}
+.mini-node.done{border-color:var(--done);color:var(--done);background:rgba(16,185,129,.1);}
+.mini-arr{color:var(--muted);font-size:.75rem;}
+
+/* MAIN LIST CANVAS */
+.ll-section{padding:14px 18px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ll-section .plabel{padding:0 0 10px;border:none;}
+.ll-canvas{display:flex;align-items:flex-end;gap:0;overflow-x:auto;padding-bottom:36px;min-height:110px;position:relative;}
+
+.node-col{display:flex;flex-direction:column;align-items:center;position:relative;flex-shrink:0;}
+.ptr-row{height:20px;display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:4px;}
+.ptr-tag{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:3px;}
+.ptr-prev{background:rgba(167,139,250,.18);color:var(--prev);}
+.ptr-curr{background:rgba(59,130,246,.18);color:var(--curr);}
+.ptr-next{background:rgba(245,158,11,.18);color:var(--next);}
+
+.node-box{
+  width:50px;height:50px;
+  display:flex;flex-direction:column;
+  border-radius:10px;border:2px solid var(--border);
+  background:var(--card);overflow:hidden;
+  transition:all .3s;flex-shrink:0;
+}
+.node-box.is-prev{border-color:var(--prev);box-shadow:0 0 14px rgba(167,139,250,.25);}
+.node-box.is-curr{border-color:var(--curr);box-shadow:0 0 14px rgba(59,130,246,.25);}
+.node-box.is-next-node{border-color:var(--next);box-shadow:0 0 14px rgba(245,158,11,.2);}
+.node-box.is-done{border-color:var(--done);background:rgba(16,185,129,.06);}
+.node-val{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text);
+}
+.node-box.is-prev .node-val{color:var(--prev);}
+.node-box.is-curr .node-val{color:var(--curr);}
+.node-box.is-next-node .node-val{color:var(--next);}
+.node-box.is-done .node-val{color:var(--done);}
+.node-ptr-bar{
+  height:16px;background:var(--dim);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--muted);
+  border-top:1px solid var(--border);
+}
+.node-idx{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:3px;}
+
+/* arrows */
+.arr-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 2px;padding-bottom:39px;flex-shrink:0;}
+.arr-line{height:2px;width:28px;background:var(--border);position:relative;transition:all .3s;}
+.arr-line::after{content:'▶';position:absolute;right:-9px;top:-8px;font-size:.68rem;color:var(--border);}
+.arr-line.fwd{background:var(--border);}
+.arr-line.rev{background:var(--done);transform:scaleX(-1);}
+.arr-line.rev::after{color:var(--done);}
+.arr-line.curr-arr{background:var(--curr);}.arr-line.curr-arr::after{color:var(--curr);}
+.null-node{display:flex;align-items:center;justify-content:center;padding-bottom:39px;flex-shrink:0;}
+.null-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);padding-left:6px;}
+
+/* TUPLE SWAP SECTION */
+.swap-section{padding:10px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.swap-section .plabel{padding:0 0 8px;border:none;}
+.swap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.swap-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;transition:all .2s;
+}
+.swap-card.active-prev{border-color:var(--prev);background:rgba(167,139,250,.07);}
+.swap-card.active-curr{border-color:var(--curr);background:rgba(59,130,246,.07);}
+.swap-card.active-next{border-color:var(--next);background:rgba(245,158,11,.07);}
+.swap-lhs{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:3px;}
+.swap-eq{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:3px;}
+.swap-rhs{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;}
+.swap-card.active-prev .swap-rhs{color:var(--prev);}
+.swap-card.active-curr .swap-rhs{color:var(--curr);}
+.swap-card.active-next .swap-rhs{color:var(--next);}
+
+/* DECISION */
+.decision{margin:6px 18px;padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);transition:all .2s;flex-shrink:0;}
+.decision.flip{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
+.decision.done{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--done);}
+
+/* RESULT */
+.result-box{margin:6px 18px;padding:10px 14px;border-radius:8px;border:2px solid var(--done);background:rgba(16,185,129,.06);display:none;}
+.result-box h3{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--done);margin-bottom:6px;}
+.res-nodes{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.res-node{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;border:2px solid var(--done);background:rgba(16,185,129,.12);color:var(--done);}
+.res-arr{color:var(--muted);font-size:.8rem;}
+
+/* BOTTOM */
+.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
+.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.spd-wrap label{font-size:.7rem;color:var(--muted);}
+input[type=range]{accent-color:#3b82f6;width:80px;}
+
+/* LOG */
+.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
+.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
+.lc:hover{color:var(--text);}
+.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
+.le{font-family:'JetBrains Mono',monospace;font-size:.66rem;line-height:1.45;padding:4px 7px;border-radius:5px;border-left:3px solid var(--border);background:var(--card);color:var(--muted);word-break:break-all;}
+.le.flip{border-color:var(--curr);color:var(--curr);background:rgba(59,130,246,.07);}
+.le.done{border-color:var(--done);color:var(--done);background:rgba(16,185,129,.07);font-weight:700;}
+.le.init{border-color:var(--prev);color:var(--prev);background:rgba(167,139,250,.07);}
+.ls{opacity:.38;font-size:.58rem;margin-right:4px;}
+
+/* EXTRA */
+.extra{border-top:2px solid var(--border);background:var(--surface);flex-shrink:0;max-height:115px;overflow-y:auto;padding:10px 20px;}
+.extra-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:7px;}
+.extra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;}
+.extra-card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 10px;}
+.ec-title{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-weight:700;}
+.ec-body{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text);line-height:1.6;}
+.ec-body span{opacity:.6;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="h-num">206.</span>
+  <span class="h-title">Reverse Linked List</span>
+  <span class="h-badge">O(n) · In-Place · Tuple Swap</span>
+  <div class="h-right">
+    <input class="inp" id="listInput" type="text" value="0,1,2,3" placeholder="e.g. 0,1,2,3"/>
+    <button class="btn btn-p" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- CODE -->
+  <div class="code-panel">
+    <div class="plabel">Source Code</div>
+    <div class="code-scroll" id="codeBlock"></div>
+  </div>
+
+  <!-- VIZ -->
+  <div class="viz-panel">
+    <!-- BEFORE / AFTER -->
+    <div class="ba-row">
+      <div class="ba-col">
+        <div class="ba-title">Before</div>
+        <div class="mini-list" id="beforeList"></div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-title">After (building…)</div>
+        <div class="mini-list" id="afterList"></div>
+      </div>
+    </div>
+
+    <!-- MAIN LIST -->
+    <div class="ll-section">
+      <div class="plabel">Linked List — pointer state</div>
+      <div class="ll-canvas" id="llCanvas"></div>
+    </div>
+
+    <!-- TUPLE SWAP -->
+    <div class="swap-section">
+      <div class="plabel">Tuple Swap — curr.next, prev, curr = prev, curr, curr.next</div>
+      <div class="swap-grid">
+        <div class="swap-card" id="sc0">
+          <div class="swap-lhs">curr.next =</div>
+          <div class="swap-eq">← was pointing forward</div>
+          <div class="swap-rhs" id="sv0">—</div>
+        </div>
+        <div class="swap-card" id="sc1">
+          <div class="swap-lhs">prev =</div>
+          <div class="swap-eq">← curr becomes new prev</div>
+          <div class="swap-rhs" id="sv1">—</div>
+        </div>
+        <div class="swap-card" id="sc2">
+          <div class="swap-lhs">curr =</div>
+          <div class="swap-eq">← advance to next</div>
+          <div class="swap-rhs" id="sv2">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision" id="decision">Waiting to start…</div>
+    <div class="result-box" id="resultBox">
+      <h3>Reversed list</h3>
+      <div class="res-nodes" id="resNodes"></div>
+    </div>
+
+    <div class="bot">
+      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-p" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <button class="btn btn-g" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="700" step="100"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-panel">
+    <div class="plabel">
+      Step Log
+      <button class="lc" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<!-- EXTRA INFO -->
+<div class="extra">
+  <div class="extra-title">How the 3-pointer dance works</div>
+  <div class="extra-grid">
+    <div class="extra-card">
+      <div class="ec-title">Why tuple swap works</div>
+      <div class="ec-body">Python evaluates ALL right-hand values FIRST, then assigns. So <span>curr.next.next</span> is captured before <span>curr.next</span> is overwritten. No temp variable needed.</div>
+    </div>
+    <div class="extra-card">
+      <div class="ec-title">Why return prev not curr</div>
+      <div class="ec-body">When loop exits, <span>curr = None</span> (went past end). <span>prev</span> holds the last processed node = new head of reversed list.</div>
+    </div>
+    <div class="extra-card">
+      <div class="ec-title">Memory — O(1) space</div>
+      <div class="ec-body">Only 2 pointers (<span>prev</span>, <span>curr</span>) used. No new nodes created. Pointers on existing nodes are flipped in-place. Original nodes stay in memory.</div>
+    </div>
+    <div class="extra-card">
+      <div class="ec-title">Edge cases handled</div>
+      <div class="ec-body">Empty list: <span>head=None</span> → while never runs → returns <span>prev=None</span>. Single node: one iteration flips <span>.next</span> to None, returns that node.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CODE=[
+  {ln:1,t:`<span class="kw">class</span> <span class="fn">Solution</span>:`},
+  {ln:2,t:`    <span class="kw">def</span> <span class="fn">reverseList</span>(<span class="nm">self</span>, head):`},
+  {ln:3,t:`        prev, curr = <span class="nm">None</span>, head`},
+  {ln:4,t:``},
+  {ln:5,t:`        <span class="kw">while</span> curr:`},
+  {ln:6,t:`            curr.next, prev, curr = prev, curr, curr.next`},
+  {ln:7,t:``},
+  {ln:8,t:`        <span class="kw">return</span> prev`},
+];
+
+function buildCode(){
+  document.getElementById('codeBlock').innerHTML=
+    CODE.map((l,i)=>`<div class="cl" id="cl${i}"><span class="ln">${l.ln}</span><span class="ct">${l.t||' '}</span></div>`).join('');
+}
+
+let vals=[],steps=[],cursor=0,playing=false,playTimer=null;
+
+function addr(i){return i==null?'null':`0x${(0xB000+i*64).toString(16).toUpperCase()}`;}
+
+// next[i] = index that node i points to (-1 = None)
+function buildSteps(arr){
+  const n=arr.length;
+  const out=[];
+  // next[i] initially points forward: i→i+1, last→-1
+  // reversed[i] tracks which nodes have been reversed
+  let next=arr.map((_,i)=>i<n-1?i+1:-1);
+  let reversed=new Array(n).fill(false);
+
+  const snap=(line,prevI,currI,msg,logType,logText,extra={})=>{
+    out.push({line,prevIdx:prevI,currIdx:currI,
+      next:[...next],reversed:[...reversed],
+      msg,log:{type:logType,text:logText},...extra});
+  };
+
+  snap(2,-1,0,'prev=None, curr=head','init',`Init: prev=None  curr=node[0] val=${arr[0]}`);
+  snap(3,-1,0,`prev=None, curr=${arr[0]}`,'init',`prev=None  curr=head(val=${arr[0]})`);
+
+  let prevI=-1, currI=0;
+
+  while(currI!==-1){
+    snap(5,prevI,currI,`while curr(val=${arr[currI]}) → true`,'init',
+      `Loop: curr=${arr[currI]}  prev=${prevI>=0?arr[prevI]:'None'}`);
+
+    const nextI=next[currI];
+    const prevVal=prevI>=0?arr[prevI]:'None';
+    const currVal=arr[currI];
+    const nextVal=nextI>=0?arr[nextI]:'None';
+
+    // perform the swap
+    next[currI]=prevI; // curr.next = prev
+    reversed[currI]=true;
+    const newPrevI=currI;
+    const newCurrI=nextI;
+
+    snap(6,newPrevI,newCurrI,
+      `curr.next=${prevVal}, prev=${currVal}, curr=${nextVal}`,
+      'flip',
+      `Flip: [${currVal}].next → ${prevVal}  |  prev→${currVal}  curr→${nextVal}`,
+      {
+        next:[...next],reversed:[...reversed],
+        swapPrev:prevVal,swapCurr:currVal,swapNext:nextVal,
+        prevIdx:newPrevI,currIdx:newCurrI
+      });
+
+    prevI=newPrevI;
+    currI=newCurrI;
+  }
+
+  snap(8,prevI,-1,`return prev (val=${arr[prevI]}) = new head`,'done',
+    `✓ Done! New head = val=${arr[prevI]}`,{done:true,prevIdx:prevI,currIdx:-1,next:[...next]});
+
+  return out;
+}
+
+function highlight(idx){
+  CODE.forEach((_,i)=>document.getElementById('cl'+i)?.classList.remove('active'));
+  if(idx>=0){const el=document.getElementById('cl'+idx);if(el){el.classList.add('active');el.scrollIntoView({block:'nearest'});}}
+}
+
+function renderBefore(){
+  const el=document.getElementById('beforeList');
+  el.innerHTML='';
+  vals.forEach((v,i)=>{
+    const box=document.createElement('div');box.className='mini-node';box.textContent=v;el.appendChild(box);
+    if(i<vals.length-1){const a=document.createElement('span');a.className='mini-arr';a.textContent='→';el.appendChild(a);}
+  });
+  const n=document.createElement('span');n.className='mini-arr';n.textContent='→ NULL';el.appendChild(n);
+}
+
+function renderAfter(st){
+  const el=document.getElementById('afterList');
+  el.innerHTML='';
+  if(!st.done && st.prevIdx<0){el.innerHTML='<span style="font-size:.72rem;color:var(--muted)">building…</span>';return;}
+  // walk reversed chain from prevIdx
+  const chain=[];
+  let ci=st.prevIdx;
+  const vis=new Set();
+  while(ci!==-1&&!vis.has(ci)){vis.add(ci);chain.push(ci);ci=st.next[ci];}
+  chain.forEach((ni,i)=>{
+    const box=document.createElement('div');
+    box.className='mini-node'+(st.done?' done':'');
+    box.textContent=vals[ni];el.appendChild(box);
+    if(i<chain.length-1){const a=document.createElement('span');a.className='mini-arr';a.textContent='→';el.appendChild(a);}
+  });
+  const n=document.createElement('span');n.className='mini-arr';n.textContent='→ NULL';el.appendChild(n);
+}
+
+function renderList(st){
+  const canvas=document.getElementById('llCanvas');
+  canvas.innerHTML='';
+  const n=vals.length;
+
+  // NULL on left (prev side)
+  const nullLeft=document.createElement('div');
+  nullLeft.className='null-node';
+  nullLeft.innerHTML='<span class="null-label">NULL</span>';
+  canvas.appendChild(nullLeft);
+
+  // small arrow from NULL
+  if(n>0){
+    const a=document.createElement('div');a.className='arr-col';
+    const line=document.createElement('div');line.className='arr-line';line.style.width='20px';
+    a.appendChild(line);canvas.appendChild(a);
+  }
+
+  vals.forEach((v,i)=>{
+    const col=document.createElement('div');col.className='node-col';
+
+    // ptr labels
+    const prow=document.createElement('div');prow.className='ptr-row';
+    if(i===st.prevIdx){const t=document.createElement('span');t.className='ptr-tag ptr-prev';t.textContent='prev';prow.appendChild(t);}
+    if(i===st.currIdx){const t=document.createElement('span');t.className='ptr-tag ptr-curr';t.textContent='curr';prow.appendChild(t);}
+    col.appendChild(prow);
+
+    // node box
+    const box=document.createElement('div');box.className='node-box';
+    if(st.done) box.classList.add('is-done');
+    else if(i===st.prevIdx) box.classList.add('is-prev');
+    else if(i===st.currIdx) box.classList.add('is-curr');
+
+    const nv=document.createElement('div');nv.className='node-val';nv.textContent=v;
+    const nb=document.createElement('div');nb.className='node-ptr-bar';
+    const nextI=st.next[i];
+    nb.textContent=nextI>=0?`→ ${addr(nextI).slice(-4)}`:'→ null';
+    box.appendChild(nv);box.appendChild(nb);
+    col.appendChild(box);
+
+    const idx=document.createElement('div');idx.className='node-idx';idx.textContent=`[${i}]`;
+    col.appendChild(idx);
+    canvas.appendChild(col);
+
+    // arrow after node
+    const arrowCol=document.createElement('div');arrowCol.className='arr-col';
+    const line=document.createElement('div');
+    const ni=st.next[i];
+    // determine arrow style
+    if(st.reversed[i]&&ni<i) line.className='arr-line rev'; // reversed pointer going left
+    else if(i===st.prevIdx||i===st.currIdx) line.className='arr-line curr-arr';
+    else line.className='arr-line fwd';
+    line.style.width='28px';
+    arrowCol.appendChild(line);
+    canvas.appendChild(arrowCol);
+  });
+
+  // NULL on right
+  const nullRight=document.createElement('div');
+  nullRight.className='null-node';
+  nullRight.innerHTML='<span class="null-label">NULL</span>';
+  canvas.appendChild(nullRight);
+}
+
+function renderSwap(st){
+  const cards=[
+    {id:'sc0',vid:'sv0',cls:'active-prev'},
+    {id:'sc1',vid:'sv1',cls:'active-curr'},
+    {id:'sc2',vid:'sv2',cls:'active-next'},
+  ];
+  cards.forEach(c=>{
+    document.getElementById(c.id).className='swap-card';
+  });
+  if(st.swapPrev!==undefined){
+    document.getElementById('sv0').textContent=`${st.swapPrev}`;document.getElementById('sc0').className='swap-card active-prev';
+    document.getElementById('sv1').textContent=`${st.swapCurr}`;document.getElementById('sc1').className='swap-card active-curr';
+    document.getElementById('sv2').textContent=`${st.swapNext}`;document.getElementById('sc2').className='swap-card active-next';
+  } else {
+    const pv=st.prevIdx>=0?vals[st.prevIdx]:'None';
+    const cv=st.currIdx>=0?vals[st.currIdx]:'—';
+    const nv=st.currIdx>=0&&st.next[st.currIdx]>=0?vals[st.next[st.currIdx]]:'None';
+    document.getElementById('sv0').textContent=pv;
+    document.getElementById('sv1').textContent=cv;
+    document.getElementById('sv2').textContent=nv;
+  }
+}
+
+function renderDecision(st){
+  const d=document.getElementById('decision');
+  d.className='decision';
+  d.textContent=st.msg;
+  if(st.swapPrev!==undefined) d.classList.add('flip');
+  else if(st.done) d.classList.add('done');
+}
+
+function renderResult(st){
+  const rb=document.getElementById('resultBox');
+  if(st.done){
+    rb.style.display='block';
+    const rn=document.getElementById('resNodes');rn.innerHTML='';
+    let ci=st.prevIdx;const vis=new Set();
+    while(ci!==-1&&!vis.has(ci)){
+      vis.add(ci);
+      const b=document.createElement('div');b.className='res-node';b.textContent=vals[ci];rn.appendChild(b);
+      if(st.next[ci]!==-1){const a=document.createElement('span');a.className='res-arr';a.textContent='→';rn.appendChild(a);}
+      ci=st.next[ci];
+    }
+    const n=document.createElement('span');n.className='res-arr';n.textContent='→ NULL';rn.appendChild(n);
+  } else rb.style.display='none';
+}
+
+function addLog(idx,log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');d.className=`le ${log.type}`;
+  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderList(st);
+  renderAfter(st);
+  renderSwap(st);
+  renderDecision(st);
+  renderResult(st);
+  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
+}
+function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing)runPlay();else clearTimeout(playTimer);
+}
+function runPlay(){
+  if(!playing)return;
+  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer);playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+  const raw=document.getElementById('listInput').value;
+  vals=raw.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  if(!vals.length)vals=[0,1,2,3];
+  renderBefore();
+  steps=buildSteps(vals);
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log)addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
