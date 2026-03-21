@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>141. Linked List Cycle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080b12;
+      --surface: #0e1219;
+      --card: #141923;
+      --border: #1c2333;
+      --accent: #7ee8fa;
+      --accent2: #f7971e;
+      --green: #39d98a;
+      --red: #ff5c5c;
+      --purple: #c9a0ff;
+      --yellow: #ffd166;
+      --blue: #4ea8de;
+      --text: #cdd6f4;
+      --muted: #45506a;
+      --hl: rgba(126,232,250,0.09);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    
+    .h-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'Clash Display', sans-serif;
+    }
+    
+    .h-title {
+      font-size: 18px;
+      font-weight: 600;
+      font-family: 'Clash Display', sans-serif;
+    }
+    
+    .h-badge {
+      background: rgba(57,217,138,0.15);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .h-right {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .inp {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+      width: 180px;
+    }
+    
+    .inp:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--hl);
+    }
+    
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .btn:hover {
+      background: var(--border);
+      transform: translateY(-1px);
+    }
+    
+    .btn-g {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    
+    .btn-g:hover {
+      background: rgba(57,217,138,0.1);
+    }
+    
+    main {
+      display: grid;
+      grid-template-columns: 390px 1fr 255px;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .code-panel, .viz-panel, .log-panel {
+      background: var(--surface);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .code-panel {
+      border-right: 1px solid var(--border);
+    }
+    
+    .log-panel {
+      border-left: 1px solid var(--border);
+    }
+    
+    .panel-label {
+      padding: 12px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    
+    .code-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    
+    .code-line {
+      display: flex;
+      gap: 16px;
+      padding: 4px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      padding-left: 12px;
+    }
+    
+    .code-line.active {
+      background: var(--hl);
+      border-left-color: var(--accent);
+    }
+    
+    .ln {
+      color: var(--muted);
+      user-select: none;
+      min-width: 28px;
+      text-align: right;
+    }
+    
+    .ct {
+      color: var(--text);
+      white-space: pre;
+    }
+    
+    .kw { color: var(--purple); font-weight: 600; }
+    .fn { color: var(--blue); }
+    .cm { color: var(--muted); font-style: italic; }
+    .nm { color: var(--accent2); }
+    .st { color: var(--green); }
+    .op { color: var(--accent); }
+    
+    .viz-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      min-height: 280px;
+      position: relative;
+    }
+    
+    .nodes-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .cycle-visual {
+      width: 100%;
+      height: 100px;
+      position: relative;
+    }
+    
+    .cycle-info {
+      background: rgba(255,209,102,0.1);
+      border: 1px dashed var(--yellow);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--yellow);
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .node-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    
+    .node-box {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .node-box.slow-at {
+      border-color: var(--accent2);
+      box-shadow: 0 0 20px rgba(247,151,30,0.3);
+      transform: scale(1.08);
+    }
+    
+    .node-box.fast-at {
+      border-color: var(--purple);
+      box-shadow: 0 0 20px rgba(201,160,255,0.3);
+      transform: scale(1.08);
+    }
+    
+    .node-box.both-at {
+      border-color: var(--green);
+      box-shadow: 0 0 25px rgba(57,217,138,0.4);
+      transform: scale(1.12);
+      animation: pulse 0.6s ease-in-out;
+    }
+    
+    .node-box.in-cycle {
+      background: rgba(255,209,102,0.08);
+      border-color: var(--yellow);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1.12); }
+      50% { transform: scale(1.18); }
+    }
+    
+    .node-idx {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    
+    .node-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .node-ptr {
+      position: absolute;
+      top: -28px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    
+    .ptr-slow {
+      background: rgba(247,151,30,0.2);
+      color: var(--accent2);
+      left: -10px;
+    }
+    
+    .ptr-fast {
+      background: rgba(201,160,255,0.2);
+      color: var(--purple);
+      right: -10px;
+    }
+    
+    .arrow {
+      color: var(--accent);
+      font-size: 24px;
+      opacity: 0.6;
+    }
+    
+    .arrow.cycle-arrow {
+      color: var(--yellow);
+      opacity: 1;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .vars-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .vc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 140px;
+    }
+    
+    .vn {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    
+    .vv {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+      color: var(--accent);
+    }
+    
+    .msg-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    
+    .result-box {
+      background: var(--card);
+      border: 2px solid var(--green);
+      border-radius: 12px;
+      padding: 18px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--green);
+      text-align: center;
+      display: none;
+    }
+    
+    .result-box.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .result-box.notfound {
+      border-color: var(--red);
+      color: var(--red);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .bot {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    
+    .bot button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .bot button:hover {
+      background: var(--border);
+      transform: translateY(-1px);
+    }
+    
+    #btnPlay {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    
+    #btnPlay:hover {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    
+    .step-info {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .spd-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+    
+    .spd-wrap label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    #speedSlider {
+      width: 100px;
+    }
+    
+    .log-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    
+    .log-entry {
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: 'Fira Code', monospace;
+      border-left: 3px solid var(--border);
+      background: var(--card);
+    }
+    
+    .ls {
+      color: var(--muted);
+      margin-right: 8px;
+      font-weight: 600;
+    }
+    
+    .log-entry.check {
+      border-left-color: var(--blue);
+      background: rgba(78,168,222,0.05);
+    }
+    
+    .log-entry.move {
+      border-left-color: var(--accent2);
+      background: rgba(247,151,30,0.05);
+    }
+    
+    .log-entry.found {
+      border-left-color: var(--green);
+      background: rgba(57,217,138,0.05);
+    }
+    
+    .log-entry.notfound {
+      border-left-color: var(--red);
+      background: rgba(255,92,92,0.05);
+    }
+    
+    .log-entry.init {
+      border-left-color: var(--purple);
+      background: rgba(201,160,255,0.05);
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="h-num">141.</span>
+    <span class="h-title">Linked List Cycle</span>
+    <span class="h-badge">Easy</span>
+    <div class="h-right">
+      <input type="text" id="listInp" class="inp" placeholder="e.g., 3,2,0,-4" value="3,2,0,-4"/>
+      <input type="text" id="posInp" class="inp" placeholder="pos (cycle at)" value="1" style="width:100px"/>
+      <button onclick="init()" class="btn btn-g">Reset</button>
+    </div>
+  </header>
+  
+  <main>
+    <div class="code-panel">
+      <div class="panel-label">Python Code</div>
+      <div class="code-scroll" id="codeScroll">
+        <div class="code-line" data-line="1">
+          <span class="ln">1</span>
+          <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+        </div>
+        <div class="code-line" data-line="2">
+          <span class="ln">2</span>
+          <span class="ct">    <span class="kw">def</span> <span class="fn">hasCycle</span>(<span class="kw">self</span>, head):</span>
+        </div>
+        <div class="code-line" data-line="3">
+          <span class="ln">3</span>
+          <span class="ct">        <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
+        </div>
+        <div class="code-line" data-line="4">
+          <span class="ln">4</span>
+          <span class="ct">            <span class="kw">return</span> <span class="nm">False</span></span>
+        </div>
+        <div class="code-line" data-line="5">
+          <span class="ln">5</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="6">
+          <span class="ln">6</span>
+          <span class="ct">        slow <span class="op">=</span> head</span>
+        </div>
+        <div class="code-line" data-line="7">
+          <span class="ln">7</span>
+          <span class="ct">        fast <span class="op">=</span> head</span>
+        </div>
+        <div class="code-line" data-line="8">
+          <span class="ln">8</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="9">
+          <span class="ln">9</span>
+          <span class="ct">        <span class="kw">while</span> fast <span class="kw">and</span> fast.next:</span>
+        </div>
+        <div class="code-line" data-line="10">
+          <span class="ln">10</span>
+          <span class="ct">            slow <span class="op">=</span> slow.next</span>
+        </div>
+        <div class="code-line" data-line="11">
+          <span class="ln">11</span>
+          <span class="ct">            fast <span class="op">=</span> fast.next.next</span>
+        </div>
+        <div class="code-line" data-line="12">
+          <span class="ln">12</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="13">
+          <span class="ln">13</span>
+          <span class="ct">            <span class="kw">if</span> slow <span class="op">==</span> fast:</span>
+        </div>
+        <div class="code-line" data-line="14">
+          <span class="ln">14</span>
+          <span class="ct">                <span class="kw">return</span> <span class="nm">True</span></span>
+        </div>
+        <div class="code-line" data-line="15">
+          <span class="ln">15</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="16">
+          <span class="ln">16</span>
+          <span class="ct">        <span class="kw">return</span> <span class="nm">False</span></span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="viz-panel">
+      <div class="panel-label">Visualization</div>
+      <div class="viz-content">
+        <div id="listWrap" class="list-container"></div>
+        
+        <div class="vars-row">
+          <div class="vc">
+            <div class="vn">Slow Pointer</div>
+            <div class="vv" id="vSlow">-</div>
+          </div>
+          <div class="vc">
+            <div class="vn">Fast Pointer</div>
+            <div class="vv" id="vFast">-</div>
+          </div>
+          <div class="vc">
+            <div class="vn">Cycle Position</div>
+            <div class="vv" id="vPos">-</div>
+          </div>
+        </div>
+        
+        <div class="msg-box" id="msgBox">Initialize slow and fast pointers at head</div>
+        
+        <div class="result-box" id="resultBox"></div>
+      </div>
+      
+      <div class="bot">
+        <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
+        <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
+        <button id="btnNext" onclick="stepFwd()">Next ►</button>
+        <span class="step-info" id="stepInfo">0 / 0</span>
+        <div class="spd-wrap">
+          <label>Speed</label>
+          <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+        </div>
+      </div>
+    </div>
+    
+    <div class="log-panel">
+      <div class="panel-label">Step Log</div>
+      <div class="log-scroll" id="logScroll"></div>
+    </div>
+  </main>
+  
+  <script>
+    let steps = [];
+    let cursor = 0;
+    let playing = false;
+    let playTimer = null;
+    
+    class ListNode {
+      constructor(val) {
+        this.val = val;
+        this.next = null;
+      }
+    }
+    
+    function buildList(values, pos) {
+      if (!values || values.length === 0) return null;
+      
+      const nodes = values.map(v => new ListNode(v));
+      for (let i = 0; i < nodes.length - 1; i++) {
+        nodes[i].next = nodes[i + 1];
+      }
+      
+      // Create cycle if pos is valid
+      if (pos >= 0 && pos < nodes.length) {
+        nodes[nodes.length - 1].next = nodes[pos];
+      }
+      
+      return { head: nodes[0], nodes };
+    }
+    
+    function buildSteps(values, pos) {
+      const steps = [];
+      const { head, nodes } = buildList(values, pos);
+      
+      function snap(lineNum, msg, logType, logText, slowIdx, fastIdx) {
+        steps.push({
+          line: lineNum,
+          msg: msg,
+          log: { type: logType, text: logText },
+          slowIdx: slowIdx,
+          fastIdx: fastIdx,
+          nodes: nodes,
+          pos: pos
+        });
+      }
+      
+      if (!head || !head.next) {
+        snap(3, 'List is empty or has single node - no cycle possible', 'check', 'Edge case: list too small for cycle', -1, -1);
+        snap(4, 'Return False - no cycle', 'notfound', 'No cycle detected', -1, -1);
+        return steps;
+      }
+      
+      snap(6, 'Initialize slow pointer at head', 'init', 'slow = head (index 0)', 0, -1);
+      snap(7, 'Initialize fast pointer at head', 'init', 'fast = head (index 0)', 0, 0);
+      
+      let slow = head;
+      let fast = head;
+      let slowIdx = 0;
+      let fastIdx = 0;
+      let stepCount = 0;
+      const maxSteps = 50; // Prevent infinite loop in visualization
+      
+      while (fast && fast.next && stepCount < maxSteps) {
+        snap(9, `Check: fast=${nodes.indexOf(fast)}, fast.next exists`, 'check', `While loop iteration ${stepCount + 1}`, slowIdx, fastIdx);
+        
+        slow = slow.next;
+        slowIdx = nodes.indexOf(slow);
+        snap(10, `Move slow pointer: ${slowIdx}`, 'move', `slow moved to index ${slowIdx}`, slowIdx, fastIdx);
+        
+        fast = fast.next.next;
+        fastIdx = nodes.indexOf(fast);
+        snap(11, `Move fast pointer: ${fastIdx}`, 'move', `fast moved to index ${fastIdx}`, slowIdx, fastIdx);
+        
+        snap(13, `Compare: slow=${slowIdx}, fast=${fastIdx}`, 'check', `Checking if slow == fast`, slowIdx, fastIdx);
+        
+        if (slow === fast) {
+          snap(14, 'Pointers met - cycle detected!', 'found', 'Cycle found! Returning True', slowIdx, fastIdx);
+          return steps;
+        }
+        
+        stepCount++;
+      }
+      
+      snap(16, 'Fast reached end - no cycle', 'notfound', 'No cycle found. Returning False', slowIdx, -1);
+      return steps;
+    }
+    
+    function init() {
+      const listInput = document.getElementById('listInp').value.trim();
+      const posInput = document.getElementById('posInp').value.trim();
+      
+      const values = listInput ? listInput.split(',').map(v => parseInt(v.trim())) : [3, 2, 0, -4];
+      const pos = posInput ? parseInt(posInput) : 1;
+      
+      steps = buildSteps(values, pos);
+      cursor = 0;
+      playing = false;
+      
+      clearLog();
+      renderStep(0);
+      updateStepInfo();
+      
+      document.getElementById('btnPlay').textContent = '▶ Play';
+    }
+    
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      
+      const step = steps[idx];
+      
+      // Update active line
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      const activeLine = document.querySelector(`[data-line="${step.line}"]`);
+      if (activeLine) {
+        activeLine.classList.add('active');
+        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // Render linked list
+      const listWrap = document.getElementById('listWrap');
+      listWrap.innerHTML = '';
+      
+      if (step.nodes && step.nodes.length > 0) {
+        // Show cycle info if exists
+        if (step.pos >= 0) {
+          const cycleInfo = document.createElement('div');
+          cycleInfo.className = 'cycle-info';
+          cycleInfo.innerHTML = `⚠️ Cycle detected: Tail connects back to index ${step.pos}`;
+          listWrap.appendChild(cycleInfo);
+        }
+        
+        // Create nodes row
+        const nodesRow = document.createElement('div');
+        nodesRow.className = 'nodes-row';
+        
+        step.nodes.forEach((node, i) => {
+          const nodeWrap = document.createElement('div');
+          nodeWrap.className = 'node-wrap';
+          
+          const nodeBox = document.createElement('div');
+          nodeBox.className = 'node-box';
+          nodeBox.id = `node-${i}`;
+          
+          // Highlight nodes in cycle
+          if (step.pos >= 0 && i >= step.pos) {
+            nodeBox.classList.add('in-cycle');
+          }
+          
+          // Highlight current pointers
+          if (step.slowIdx === i && step.fastIdx === i) {
+            nodeBox.classList.add('both-at');
+          } else if (step.slowIdx === i) {
+            nodeBox.classList.add('slow-at');
+          } else if (step.fastIdx === i) {
+            nodeBox.classList.add('fast-at');
+          }
+          
+          nodeBox.innerHTML = `
+            <div class="node-idx">index ${i}</div>
+            <div class="node-val">${node.val}</div>
+          `;
+          
+          // Add pointer labels
+          if (step.slowIdx === i && step.fastIdx === i) {
+            const ptrLabel = document.createElement('div');
+            ptrLabel.className = 'node-ptr ptr-slow';
+            ptrLabel.textContent = 'SLOW & FAST';
+            ptrLabel.style.background = 'rgba(57,217,138,0.2)';
+            ptrLabel.style.color = 'var(--green)';
+            nodeBox.appendChild(ptrLabel);
+          } else {
+            if (step.slowIdx === i) {
+              const ptrLabel = document.createElement('div');
+              ptrLabel.className = 'node-ptr ptr-slow';
+              ptrLabel.textContent = 'SLOW';
+              nodeBox.appendChild(ptrLabel);
+            }
+            if (step.fastIdx === i) {
+              const ptrLabel = document.createElement('div');
+              ptrLabel.className = 'node-ptr ptr-fast';
+              ptrLabel.textContent = 'FAST';
+              nodeBox.appendChild(ptrLabel);
+            }
+          }
+          
+          nodeWrap.appendChild(nodeBox);
+          
+          // Add forward arrow (except for last node)
+          if (i < step.nodes.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow';
+            arrow.textContent = '→';
+            nodeWrap.appendChild(arrow);
+          }
+          
+          nodesRow.appendChild(nodeWrap);
+        });
+        
+        listWrap.appendChild(nodesRow);
+        
+        // Draw cycle arrow if there's a cycle
+        if (step.pos >= 0) {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('class', 'cycle-visual');
+          svg.setAttribute('viewBox', '0 0 800 100');
+          svg.style.overflow = 'visible';
+          
+          // Calculate positions
+          const numNodes = step.nodes.length;
+          const nodeWidth = 82; // 70px width + 12px gap
+          const startX = 400 + (numNodes - 1) * nodeWidth / 2; // Last node position
+          const endX = 400 - (numNodes - 1) * nodeWidth / 2 + step.pos * nodeWidth; // Cycle target position
+          
+          // Draw curved arrow from last node back to cycle position
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          const midX = (startX + endX) / 2;
+          const curveHeight = 60;
+          
+          path.setAttribute('d', `M ${startX} 10 Q ${midX} ${curveHeight} ${endX} 10`);
+          path.setAttribute('stroke', 'var(--yellow)');
+          path.setAttribute('stroke-width', '3');
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke-dasharray', '8,4');
+          path.setAttribute('marker-end', 'url(#arrowhead)');
+          
+          // Define arrowhead marker
+          const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+          const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+          marker.setAttribute('id', 'arrowhead');
+          marker.setAttribute('markerWidth', '10');
+          marker.setAttribute('markerHeight', '10');
+          marker.setAttribute('refX', '9');
+          marker.setAttribute('refY', '3');
+          marker.setAttribute('orient', 'auto');
+          
+          const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          polygon.setAttribute('points', '0 0, 10 3, 0 6');
+          polygon.setAttribute('fill', 'var(--yellow)');
+          
+          marker.appendChild(polygon);
+          defs.appendChild(marker);
+          svg.appendChild(defs);
+          svg.appendChild(path);
+          
+          // Add label
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', midX);
+          text.setAttribute('y', curveHeight + 15);
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('fill', 'var(--yellow)');
+          text.setAttribute('font-size', '12');
+          text.setAttribute('font-weight', '600');
+          text.textContent = `CYCLE: tail → index ${step.pos}`;
+          svg.appendChild(text);
+          
+          listWrap.appendChild(svg);
+        }
+      }
+      
+      // Update variables
+      document.getElementById('vSlow').textContent = step.slowIdx >= 0 ? step.slowIdx : '-';
+      document.getElementById('vFast').textContent = step.fastIdx >= 0 ? step.fastIdx : '-';
+      document.getElementById('vPos').textContent = step.pos >= 0 ? step.pos : 'None';
+      
+      // Update message
+      document.getElementById('msgBox').textContent = step.msg;
+      
+      // Show result if final step
+      const resultBox = document.getElementById('resultBox');
+      if (step.log.type === 'found') {
+        resultBox.textContent = '✓ Cycle Detected - Return True';
+        resultBox.className = 'result-box show';
+      } else if (step.log.type === 'notfound') {
+        resultBox.textContent = '✗ No Cycle - Return False';
+        resultBox.className = 'result-box show notfound';
+      } else {
+        resultBox.className = 'result-box';
+      }
+    }
+    
+    function stepFwd() {
+      if (cursor < steps.length - 1) {
+        cursor++;
+        addLog(cursor, steps[cursor].log);
+        renderStep(cursor);
+        updateStepInfo();
+      } else {
+        stopPlay();
+      }
+    }
+    
+    function stepBack() {
+      if (cursor > 0) {
+        cursor--;
+        rebuildLog();
+        renderStep(cursor);
+        updateStepInfo();
+      }
+    }
+    
+    function togglePlay() {
+      playing = !playing;
+      const btn = document.getElementById('btnPlay');
+      
+      if (playing) {
+        btn.textContent = '⏸ Pause';
+        autoPlay();
+      } else {
+        btn.textContent = '▶ Play';
+        stopPlay();
+      }
+    }
+    
+    function autoPlay() {
+      if (!playing) return;
+      
+      if (cursor < steps.length - 1) {
+        stepFwd();
+        const speed = parseInt(document.getElementById('speedSlider').value);
+        playTimer = setTimeout(autoPlay, speed);
+      } else {
+        stopPlay();
+      }
+    }
+    
+    function stopPlay() {
+      playing = false;
+      document.getElementById('btnPlay').textContent = '▶ Play';
+      if (playTimer) {
+        clearTimeout(playTimer);
+        playTimer = null;
+      }
+    }
+    
+    function updateStepInfo() {
+      document.getElementById('stepInfo').textContent = `${cursor} / ${steps.length - 1}`;
+    }
+    
+    function addLog(idx, log) {
+      const el = document.getElementById('logScroll');
+      const d = document.createElement('div');
+      d.className = `log-entry ${log.type}`;
+      d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
+      el.appendChild(d);
+      el.scrollTop = el.scrollHeight;
+    }
+    
+    function rebuildLog() {
+      clearLog();
+      for (let i = 0; i <= cursor; i++) {
+        addLog(i, steps[i].log);
+      }
+    }
+    
+    function clearLog() {
+      document.getElementById('logScroll').innerHTML = '';
+    }
+    
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>21. Merge Two Sorted Lists</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080b12;
+      --surface: #0e1219;
+      --card: #141923;
+      --border: #1c2333;
+      --accent: #7ee8fa;
+      --accent2: #f7971e;
+      --green: #39d98a;
+      --red: #ff5c5c;
+      --purple: #c9a0ff;
+      --yellow: #ffd166;
+      --blue: #4ea8de;
+      --text: #cdd6f4;
+      --muted: #45506a;
+      --hl: rgba(126,232,250,0.09);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    
+    .h-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'Clash Display', sans-serif;
+    }
+    
+    .h-title {
+      font-size: 18px;
+      font-weight: 600;
+      font-family: 'Clash Display', sans-serif;
+    }
+    
+    .h-badge {
+      background: rgba(57,217,138,0.15);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .h-right {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .inp {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+      width: 140px;
+    }
+    
+    .inp:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--hl);
+    }
+    
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .btn:hover {
+      background: var(--border);
+      transform: translateY(-1px);
+    }
+    
+    .btn-g {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    
+    .btn-g:hover {
+      background: rgba(57,217,138,0.1);
+    }
+    
+    main {
+      display: grid;
+      grid-template-columns: 390px 1fr 255px;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .code-panel, .viz-panel, .log-panel {
+      background: var(--surface);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .code-panel {
+      border-right: 1px solid var(--border);
+    }
+    
+    .log-panel {
+      border-left: 1px solid var(--border);
+    }
+    
+    .panel-label {
+      padding: 12px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    
+    .code-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    
+    .code-line {
+      display: flex;
+      gap: 16px;
+      padding: 4px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      padding-left: 12px;
+    }
+    
+    .code-line.active {
+      background: var(--hl);
+      border-left-color: var(--accent);
+    }
+    
+    .ln {
+      color: var(--muted);
+      user-select: none;
+      min-width: 28px;
+      text-align: right;
+    }
+    
+    .ct {
+      color: var(--text);
+      white-space: pre;
+    }
+    
+    .kw { color: var(--purple); font-weight: 600; }
+    .fn { color: var(--blue); }
+    .cm { color: var(--muted); font-style: italic; }
+    .nm { color: var(--accent2); }
+    .st { color: var(--green); }
+    .op { color: var(--accent); }
+    
+    .viz-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .list-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .list-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+    }
+    
+    .list-label.list1-label { color: var(--blue); }
+    .list-label.list2-label { color: var(--purple); }
+    .list-label.merged-label { color: var(--green); }
+    
+    .nodes-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: 70px;
+    }
+    
+    .node-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .node-box {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .node-box.from-list1 {
+      border-color: var(--blue);
+      background: rgba(78,168,222,0.08);
+    }
+    
+    .node-box.from-list2 {
+      border-color: var(--purple);
+      background: rgba(201,160,255,0.08);
+    }
+    
+    .node-box.comparing {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255,209,102,0.3);
+      border-color: var(--yellow);
+    }
+    
+    .node-box.selected {
+      transform: scale(1.08);
+      box-shadow: 0 0 18px rgba(57,217,138,0.3);
+      border-color: var(--green);
+    }
+    
+    .node-box.used {
+      opacity: 0.4;
+    }
+    
+    .node-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .node-ptr {
+      position: absolute;
+      top: -26px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
+      background: rgba(126,232,250,0.2);
+      color: var(--accent);
+    }
+    
+    .arrow {
+      color: var(--accent);
+      font-size: 20px;
+      opacity: 0.6;
+    }
+    
+    .vars-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .vc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 120px;
+    }
+    
+    .vn {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    
+    .vv {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+      color: var(--accent);
+    }
+    
+    .msg-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    
+    .result-box {
+      background: var(--card);
+      border: 2px solid var(--green);
+      border-radius: 12px;
+      padding: 18px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--green);
+      text-align: center;
+      display: none;
+    }
+    
+    .result-box.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .bot {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    
+    .bot button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .bot button:hover {
+      background: var(--border);
+      transform: translateY(-1px);
+    }
+    
+    #btnPlay {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    
+    #btnPlay:hover {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    
+    .step-info {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .spd-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+    
+    .spd-wrap label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    #speedSlider {
+      width: 100px;
+    }
+    
+    .log-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    
+    .log-entry {
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: 'Fira Code', monospace;
+      border-left: 3px solid var(--border);
+      background: var(--card);
+    }
+    
+    .ls {
+      color: var(--muted);
+      margin-right: 8px;
+      font-weight: 600;
+    }
+    
+    .log-entry.init {
+      border-left-color: var(--purple);
+      background: rgba(201,160,255,0.05);
+    }
+    
+    .log-entry.compare {
+      border-left-color: var(--yellow);
+      background: rgba(255,209,102,0.05);
+    }
+    
+    .log-entry.select {
+      border-left-color: var(--green);
+      background: rgba(57,217,138,0.05);
+    }
+    
+    .log-entry.append {
+      border-left-color: var(--blue);
+      background: rgba(78,168,222,0.05);
+    }
+    
+    .log-entry.done {
+      border-left-color: var(--green);
+      background: rgba(57,217,138,0.05);
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="h-num">21.</span>
+    <span class="h-title">Merge Two Sorted Lists</span>
+    <span class="h-badge">Easy</span>
+    <div class="h-right">
+      <input type="text" id="list1Inp" class="inp" placeholder="list1" value="1,2,4"/>
+      <input type="text" id="list2Inp" class="inp" placeholder="list2" value="1,3,4"/>
+      <button onclick="init()" class="btn btn-g">Reset</button>
+    </div>
+  </header>
+  
+  <main>
+    <div class="code-panel">
+      <div class="panel-label">Python Code</div>
+      <div class="code-scroll" id="codeScroll">
+        <div class="code-line" data-line="1">
+          <span class="ln">1</span>
+          <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+        </div>
+        <div class="code-line" data-line="2">
+          <span class="ln">2</span>
+          <span class="ct">    <span class="kw">def</span> <span class="fn">mergeTwoLists</span>(<span class="kw">self</span>, list1, list2):</span>
+        </div>
+        <div class="code-line" data-line="3">
+          <span class="ln">3</span>
+          <span class="ct">        dummy <span class="op">=</span> ListNode(<span class="nm">0</span>)</span>
+        </div>
+        <div class="code-line" data-line="4">
+          <span class="ln">4</span>
+          <span class="ct">        current <span class="op">=</span> dummy</span>
+        </div>
+        <div class="code-line" data-line="5">
+          <span class="ln">5</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="6">
+          <span class="ln">6</span>
+          <span class="ct">        <span class="kw">while</span> list1 <span class="kw">and</span> list2:</span>
+        </div>
+        <div class="code-line" data-line="7">
+          <span class="ln">7</span>
+          <span class="ct">            <span class="kw">if</span> list1.val <span class="op"><=</span> list2.val:</span>
+        </div>
+        <div class="code-line" data-line="8">
+          <span class="ln">8</span>
+          <span class="ct">                current.next <span class="op">=</span> list1</span>
+        </div>
+        <div class="code-line" data-line="9">
+          <span class="ln">9</span>
+          <span class="ct">                list1 <span class="op">=</span> list1.next</span>
+        </div>
+        <div class="code-line" data-line="10">
+          <span class="ln">10</span>
+          <span class="ct">            <span class="kw">else</span>:</span>
+        </div>
+        <div class="code-line" data-line="11">
+          <span class="ln">11</span>
+          <span class="ct">                current.next <span class="op">=</span> list2</span>
+        </div>
+        <div class="code-line" data-line="12">
+          <span class="ln">12</span>
+          <span class="ct">                list2 <span class="op">=</span> list2.next</span>
+        </div>
+        <div class="code-line" data-line="13">
+          <span class="ln">13</span>
+          <span class="ct">            current <span class="op">=</span> current.next</span>
+        </div>
+        <div class="code-line" data-line="14">
+          <span class="ln">14</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="15">
+          <span class="ln">15</span>
+          <span class="ct">        current.next <span class="op">=</span> list1 <span class="kw">if</span> list1 <span class="kw">else</span> list2</span>
+        </div>
+        <div class="code-line" data-line="16">
+          <span class="ln">16</span>
+          <span class="ct"></span>
+        </div>
+        <div class="code-line" data-line="17">
+          <span class="ln">17</span>
+          <span class="ct">        <span class="kw">return</span> dummy.next</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="viz-panel">
+      <div class="panel-label">Visualization</div>
+      <div class="viz-content">
+        <div class="list-section">
+          <div class="list-label list1-label">List 1</div>
+          <div id="list1Wrap" class="nodes-row"></div>
+        </div>
+        
+        <div class="list-section">
+          <div class="list-label list2-label">List 2</div>
+          <div id="list2Wrap" class="nodes-row"></div>
+        </div>
+        
+        <div class="list-section">
+          <div class="list-label merged-label">Merged List</div>
+          <div id="mergedWrap" class="nodes-row"></div>
+        </div>
+        
+        <div class="vars-row">
+          <div class="vc">
+            <div class="vn">List1 Val</div>
+            <div class="vv" id="vList1">-</div>
+          </div>
+          <div class="vc">
+            <div class="vn">List2 Val</div>
+            <div class="vv" id="vList2">-</div>
+          </div>
+          <div class="vc">
+            <div class="vn">Selected</div>
+            <div class="vv" id="vSelected">-</div>
+          </div>
+        </div>
+        
+        <div class="msg-box" id="msgBox">Initialize dummy node and current pointer</div>
+        
+        <div class="result-box" id="resultBox"></div>
+      </div>
+      
+      <div class="bot">
+        <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
+        <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
+        <button id="btnNext" onclick="stepFwd()">Next ►</button>
+        <span class="step-info" id="stepInfo">0 / 0</span>
+        <div class="spd-wrap">
+          <label>Speed</label>
+          <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+        </div>
+      </div>
+    </div>
+    
+    <div class="log-panel">
+      <div class="panel-label">Step Log</div>
+      <div class="log-scroll" id="logScroll"></div>
+    </div>
+  </main>
+  
+  <script>
+    let steps = [];
+    let cursor = 0;
+    let playing = false;
+    let playTimer = null;
+    
+    class ListNode {
+      constructor(val) {
+        this.val = val;
+        this.next = null;
+      }
+    }
+    
+    function buildList(values) {
+      if (!values || values.length === 0) return null;
+      const head = new ListNode(values[0]);
+      let current = head;
+      for (let i = 1; i < values.length; i++) {
+        current.next = new ListNode(values[i]);
+        current = current.next;
+      }
+      return head;
+    }
+    
+    function listToArray(head) {
+      const arr = [];
+      while (head) {
+        arr.push(head.val);
+        head = head.next;
+      }
+      return arr;
+    }
+    
+    function buildSteps(vals1, vals2) {
+      const steps = [];
+      const list1Original = vals1.slice();
+      const list2Original = vals2.slice();
+      
+      let list1 = buildList(vals1);
+      let list2 = buildList(vals2);
+      
+      function snap(lineNum, msg, logType, logText, state) {
+        steps.push({
+          line: lineNum,
+          msg: msg,
+          log: { type: logType, text: logText },
+          list1Original: list1Original,
+          list2Original: list2Original,
+          ...state
+        });
+      }
+      
+      snap(3, 'Create dummy node (value 0)', 'init', 'dummy = ListNode(0)', {
+        list1Vals: listToArray(list1),
+        list2Vals: listToArray(list2),
+        mergedVals: [],
+        list1Idx: 0,
+        list2Idx: 0,
+        comparing: [],
+        selected: null,
+        usedList1: [],
+        usedList2: []
+      });
+      
+      snap(4, 'Initialize current pointer to dummy', 'init', 'current = dummy', {
+        list1Vals: listToArray(list1),
+        list2Vals: listToArray(list2),
+        mergedVals: [],
+        list1Idx: 0,
+        list2Idx: 0,
+        comparing: [],
+        selected: null,
+        usedList1: [],
+        usedList2: []
+      });
+      
+      let list1Idx = 0;
+      let list2Idx = 0;
+      const merged = [];
+      const usedList1 = [];
+      const usedList2 = [];
+      
+      while (list1 && list2) {
+        snap(6, `Check: both lists non-empty`, 'compare', `While loop: list1=${list1.val}, list2=${list2.val}`, {
+          list1Vals: listToArray(list1),
+          list2Vals: listToArray(list2),
+          mergedVals: merged.slice(),
+          list1Idx: list1Idx,
+          list2Idx: list2Idx,
+          comparing: [list1Idx, list2Idx],
+          selected: null,
+          usedList1: usedList1.slice(),
+          usedList2: usedList2.slice()
+        });
+        
+        snap(7, `Compare: ${list1.val} vs ${list2.val}`, 'compare', `Comparing list1.val (${list1.val}) <= list2.val (${list2.val})`, {
+          list1Vals: listToArray(list1),
+          list2Vals: listToArray(list2),
+          mergedVals: merged.slice(),
+          list1Idx: list1Idx,
+          list2Idx: list2Idx,
+          comparing: [list1Idx, list2Idx],
+          selected: null,
+          usedList1: usedList1.slice(),
+          usedList2: usedList2.slice()
+        });
+        
+        if (list1.val <= list2.val) {
+          merged.push(list1.val);
+          usedList1.push(list1Idx);
+          
+          snap(8, `Select list1 node (${list1.val}) - smaller/equal`, 'select', `Appending ${list1.val} from list1 to merged`, {
+            list1Vals: listToArray(list1),
+            list2Vals: listToArray(list2),
+            mergedVals: merged.slice(),
+            list1Idx: list1Idx,
+            list2Idx: list2Idx,
+            comparing: [],
+            selected: list1Idx,
+            usedList1: usedList1.slice(),
+            usedList2: usedList2.slice()
+          });
+          
+          list1 = list1.next;
+          list1Idx++;
+          
+          snap(9, `Advance list1 pointer`, 'append', `list1 = list1.next`, {
+            list1Vals: listToArray(list1),
+            list2Vals: listToArray(list2),
+            mergedVals: merged.slice(),
+            list1Idx: list1Idx,
+            list2Idx: list2Idx,
+            comparing: [],
+            selected: null,
+            usedList1: usedList1.slice(),
+            usedList2: usedList2.slice()
+          });
+        } else {
+          merged.push(list2.val);
+          usedList2.push(list2Idx);
+          
+          snap(11, `Select list2 node (${list2.val}) - smaller`, 'select', `Appending ${list2.val} from list2 to merged`, {
+            list1Vals: listToArray(list1),
+            list2Vals: listToArray(list2),
+            mergedVals: merged.slice(),
+            list1Idx: list1Idx,
+            list2Idx: list2Idx,
+            comparing: [],
+            selected: list2Idx + 100,
+            usedList1: usedList1.slice(),
+            usedList2: usedList2.slice()
+          });
+          
+          list2 = list2.next;
+          list2Idx++;
+          
+          snap(12, `Advance list2 pointer`, 'append', `list2 = list2.next`, {
+            list1Vals: listToArray(list1),
+            list2Vals: listToArray(list2),
+            mergedVals: merged.slice(),
+            list1Idx: list1Idx,
+            list2Idx: list2Idx,
+            comparing: [],
+            selected: null,
+            usedList1: usedList1.slice(),
+            usedList2: usedList2.slice()
+          });
+        }
+        
+        snap(13, `Move current pointer forward`, 'append', `current = current.next`, {
+          list1Vals: listToArray(list1),
+          list2Vals: listToArray(list2),
+          mergedVals: merged.slice(),
+          list1Idx: list1Idx,
+          list2Idx: list2Idx,
+          comparing: [],
+          selected: null,
+          usedList1: usedList1.slice(),
+          usedList2: usedList2.slice()
+        });
+      }
+      
+      // Append remaining nodes
+      const remaining = list1 || list2;
+      const remainingVals = listToArray(remaining);
+      if (remainingVals.length > 0) {
+        merged.push(...remainingVals);
+        if (list1) {
+          for (let i = list1Idx; i < list1Original.length; i++) {
+            usedList1.push(i);
+          }
+        } else {
+          for (let i = list2Idx; i < list2Original.length; i++) {
+            usedList2.push(i);
+          }
+        }
+      }
+      
+      snap(15, `Attach remaining nodes: ${remainingVals.join(',')}`, 'append', `Append remaining ${list1 ? 'list1' : list2 ? 'list2' : 'none'}`, {
+        list1Vals: [],
+        list2Vals: [],
+        mergedVals: merged.slice(),
+        list1Idx: -1,
+        list2Idx: -1,
+        comparing: [],
+        selected: null,
+        usedList1: usedList1.slice(),
+        usedList2: usedList2.slice()
+      });
+      
+      snap(17, `Return merged list: [${merged.join(',')}]`, 'done', `Merge complete! Return dummy.next`, {
+        list1Vals: [],
+        list2Vals: [],
+        mergedVals: merged.slice(),
+        list1Idx: -1,
+        list2Idx: -1,
+        comparing: [],
+        selected: null,
+        usedList1: usedList1.slice(),
+        usedList2: usedList2.slice()
+      });
+      
+      return steps;
+    }
+    
+    function init() {
+      const list1Input = document.getElementById('list1Inp').value.trim();
+      const list2Input = document.getElementById('list2Inp').value.trim();
+      
+      const vals1 = list1Input ? list1Input.split(',').map(v => parseInt(v.trim())) : [];
+      const vals2 = list2Input ? list2Input.split(',').map(v => parseInt(v.trim())) : [];
+      
+      steps = buildSteps(vals1, vals2);
+      cursor = 0;
+      playing = false;
+      
+      clearLog();
+      renderStep(0);
+      updateStepInfo();
+      
+      document.getElementById('btnPlay').textContent = '▶ Play';
+    }
+    
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      
+      const step = steps[idx];
+      
+      // Update active line
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      const activeLine = document.querySelector(`[data-line="${step.line}"]`);
+      if (activeLine) {
+        activeLine.classList.add('active');
+        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // Render list1
+      const list1Wrap = document.getElementById('list1Wrap');
+      list1Wrap.innerHTML = '';
+      step.list1Original.forEach((val, i) => {
+        const nodeWrap = document.createElement('div');
+        nodeWrap.className = 'node-wrap';
+        
+        const nodeBox = document.createElement('div');
+        nodeBox.className = 'node-box from-list1';
+        
+        if (step.comparing.includes(i)) {
+          nodeBox.classList.add('comparing');
+        }
+        if (step.selected === i) {
+          nodeBox.classList.add('selected');
+        }
+        if (step.usedList1.includes(i)) {
+          nodeBox.classList.add('used');
+        }
+        
+        nodeBox.innerHTML = `<div class="node-val">${val}</div>`;
+        
+        if (i === step.list1Idx && step.list1Vals.length > 0) {
+          const ptr = document.createElement('div');
+          ptr.className = 'node-ptr';
+          ptr.textContent = 'L1';
+          nodeBox.appendChild(ptr);
+        }
+        
+        nodeWrap.appendChild(nodeBox);
+        
+        if (i < step.list1Original.length - 1) {
+          const arrow = document.createElement('div');
+          arrow.className = 'arrow';
+          arrow.textContent = '→';
+          nodeWrap.appendChild(arrow);
+        }
+        
+        list1Wrap.appendChild(nodeWrap);
+      });
+      
+      // Render list2
+      const list2Wrap = document.getElementById('list2Wrap');
+      list2Wrap.innerHTML = '';
+      step.list2Original.forEach((val, i) => {
+        const nodeWrap = document.createElement('div');
+        nodeWrap.className = 'node-wrap';
+        
+        const nodeBox = document.createElement('div');
+        nodeBox.className = 'node-box from-list2';
+        
+        if (step.comparing.includes(i)) {
+          nodeBox.classList.add('comparing');
+        }
+        if (step.selected === i + 100) {
+          nodeBox.classList.add('selected');
+        }
+        if (step.usedList2.includes(i)) {
+          nodeBox.classList.add('used');
+        }
+        
+        nodeBox.innerHTML = `<div class="node-val">${val}</div>`;
+        
+        if (i === step.list2Idx && step.list2Vals.length > 0) {
+          const ptr = document.createElement('div');
+          ptr.className = 'node-ptr';
+          ptr.textContent = 'L2';
+          nodeBox.appendChild(ptr);
+        }
+        
+        nodeWrap.appendChild(nodeBox);
+        
+        if (i < step.list2Original.length - 1) {
+          const arrow = document.createElement('div');
+          arrow.className = 'arrow';
+          arrow.textContent = '→';
+          nodeWrap.appendChild(arrow);
+        }
+        
+        list2Wrap.appendChild(nodeWrap);
+      });
+      
+      // Render merged list
+      const mergedWrap = document.getElementById('mergedWrap');
+      mergedWrap.innerHTML = '';
+      step.mergedVals.forEach((val, i) => {
+        const nodeWrap = document.createElement('div');
+        nodeWrap.className = 'node-wrap';
+        
+        const nodeBox = document.createElement('div');
+        nodeBox.className = 'node-box';
+        
+        // Color based on origin
+        if (step.list1Original.includes(val)) {
+          nodeBox.classList.add('from-list1');
+        }
+        if (step.list2Original.includes(val)) {
+          nodeBox.classList.add('from-list2');
+        }
+        
+        nodeBox.innerHTML = `<div class="node-val">${val}</div>`;
+        
+        nodeWrap.appendChild(nodeBox);
+        
+        if (i < step.mergedVals.length - 1) {
+          const arrow = document.createElement('div');
+          arrow.className = 'arrow';
+          arrow.textContent = '→';
+          nodeWrap.appendChild(arrow);
+        }
+        
+        mergedWrap.appendChild(nodeWrap);
+      });
+      
+      // Update variables
+      document.getElementById('vList1').textContent = step.list1Vals.length > 0 ? step.list1Vals[0] : 'null';
+      document.getElementById('vList2').textContent = step.list2Vals.length > 0 ? step.list2Vals[0] : 'null';
+      
+      let selected = '-';
+      if (step.selected !== null) {
+        if (step.selected < 100) {
+          selected = step.list1Original[step.selected];
+        } else {
+          selected = step.list2Original[step.selected - 100];
+        }
+      }
+      document.getElementById('vSelected').textContent = selected;
+      
+      // Update message
+      document.getElementById('msgBox').textContent = step.msg;
+      
+      // Show result if done
+      const resultBox = document.getElementById('resultBox');
+      if (step.log.type === 'done') {
+        resultBox.textContent = `✓ Merged List: [${step.mergedVals.join(', ')}]`;
+        resultBox.className = 'result-box show';
+      } else {
+        resultBox.className = 'result-box';
+      }
+    }
+    
+    function stepFwd() {
+      if (cursor < steps.length - 1) {
+        cursor++;
+        addLog(cursor, steps[cursor].log);
+        renderStep(cursor);
+        updateStepInfo();
+      } else {
+        stopPlay();
+      }
+    }
+    
+    function stepBack() {
+      if (cursor > 0) {
+        cursor--;
+        rebuildLog();
+        renderStep(cursor);
+        updateStepInfo();
+      }
+    }
+    
+    function togglePlay() {
+      playing = !playing;
+      const btn = document.getElementById('btnPlay');
+      
+      if (playing) {
+        btn.textContent = '⏸ Pause';
+        autoPlay();
+      } else {
+        btn.textContent = '▶ Play';
+        stopPlay();
+      }
+    }
+    
+    function autoPlay() {
+      if (!playing) return;
+      
+      if (cursor < steps.length - 1) {
+        stepFwd();
+        const speed = parseInt(document.getElementById('speedSlider').value);
+        playTimer = setTimeout(autoPlay, speed);
+      } else {
+        stopPlay();
+      }
+    }
+    
+    function stopPlay() {
+      playing = false;
+      document.getElementById('btnPlay').textContent = '▶ Play';
+      if (playTimer) {
+        clearTimeout(playTimer);
+        playTimer = null;
+      }
+    }
+    
+    function updateStepInfo() {
+      document.getElementById('stepInfo').textContent = `${cursor} / ${steps.length - 1}`;
+    }
+    
+    function addLog(idx, log) {
+      const el = document.getElementById('logScroll');
+      const d = document.createElement('div');
+      d.className = `log-entry ${log.type}`;
+      d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
+      el.appendChild(d);
+      el.scrollTop = el.scrollHeight;
+    }
+    
+    function rebuildLog() {
+      clearLog();
+      for (let i = 0; i <= cursor; i++) {
+        addLog(i, steps[i].log);
+      }
+    }
+    
+    function clearLog() {
+      document.getElementById('logScroll').innerHTML = '';
+    }
+    
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
