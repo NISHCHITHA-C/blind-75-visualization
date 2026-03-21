@@ -33,3 +33,5 @@ Visual explanations of Blind 75 LeetCode problems.
 | Problem | Live Demo |
 |---------|-----------|
 | Reverse Linked List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/01-reverse-linked-list.html) |
+| Detect Cycle in Linked List | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/06-Linked-List/02-linked-list-cycle.html) |
+| Merge Two Sorted Lists | [▶ Open in Browser](https://nishchitha-c.github.io/blind-75-visualization/03-merge-two-sorted-lists.html) |
