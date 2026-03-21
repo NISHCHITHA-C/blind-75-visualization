@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>23. Merge k Sorted Lists - Algorithm Visualization</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080b12;
+  --surface: #0e1219;
+  --card: #141923;
+  --border: #1c2333;
+  --accent: #7ee8fa;
+  --accent2: #f7971e;
+  --green: #39d98a;
+  --red: #ff5c5c;
+  --purple: #c9a0ff;
+  --yellow: #ffd166;
+  --blue: #4ea8de;
+  --text: #cdd6f4;
+  --muted: #45506a;
+  --hl: rgba(126,232,250,0.09);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.h-num {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.h-title {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.h-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 92, 92, 0.12);
+  color: var(--red);
+}
+
+.h-right {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inp {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  width: 280px;
+  transition: all 0.2s;
+}
+
+.inp:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(126,232,250,0.1);
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-g {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-g:hover {
+  background: var(--hl);
+  border-color: var(--accent);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 390px 1fr 255px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.code-panel, .viz-panel, .log-panel {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.log-panel {
+  border-right: none;
+}
+
+.panel-label {
+  background: var(--surface);
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.code-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.code-line {
+  display: flex;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 2px 0;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.code-line.active {
+  background: var(--hl);
+  border-left-color: var(--accent);
+}
+
+.ln {
+  color: var(--muted);
+  min-width: 35px;
+  text-align: right;
+  padding-right: 12px;
+  user-select: none;
+}
+
+.ct {
+  color: var(--text);
+  white-space: pre;
+}
+
+.kw { color: var(--purple); font-weight: 600; }
+.fn { color: var(--blue); }
+.cm { color: var(--muted); font-style: italic; }
+.nm { color: var(--green); }
+.st { color: var(--yellow); }
+.op { color: var(--accent); }
+
+.viz-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.lists-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.list-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 50px;
+}
+
+.node {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  transition: all 0.3s;
+}
+
+.node.consumed {
+  opacity: 0.3;
+  border-color: var(--muted);
+}
+
+.node.current {
+  border-color: var(--accent);
+  background: var(--hl);
+  box-shadow: 0 0 12px rgba(126,232,250,0.25);
+  transform: scale(1.08);
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.heap-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.heap-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 50px;
+}
+
+.heap-node {
+  background: linear-gradient(135deg, rgba(126,232,250,0.12), rgba(78,168,222,0.12));
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+
+.heap-node.popping {
+  border-color: var(--green);
+  color: var(--green);
+  background: linear-gradient(135deg, rgba(57,217,138,0.12), rgba(126,232,250,0.12));
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(57,217,138,0.3);
+}
+
+.heap-node.adding {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: linear-gradient(135deg, rgba(255,209,102,0.12), rgba(247,151,30,0.12));
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.heap-val {
+  font-size: 15px;
+}
+
+.heap-idx {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.result-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.result-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 40px;
+}
+
+.result-node {
+  background: linear-gradient(135deg, rgba(57,217,138,0.12), rgba(126,232,250,0.12));
+  border: 2px solid var(--green);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
+  transition: all 0.3s;
+}
+
+.result-node.latest {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(57,217,138,0.3);
+}
+
+.msg-box {
+  background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(78,168,222,0.08));
+  border: 1px solid rgba(126,232,250,0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.result-box {
+  background: linear-gradient(135deg, rgba(57,217,138,0.1), rgba(126,232,250,0.1));
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.result-val {
+  font-family: 'Fira Code', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.bot {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.bot button {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.bot button:hover {
+  background: var(--hl);
+  border-color: var(--accent);
+}
+
+.bot button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#btnPlay {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+#btnPlay:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.step-info {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.spd-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spd-wrap label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+#speedSlider {
+  width: 120px;
+}
+
+.log-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.log-entry {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+  transition: background 0.15s;
+}
+
+.log-entry:hover {
+  background: var(--hl);
+}
+
+.ls {
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 30px;
+}
+
+.log-entry.init { color: var(--blue); }
+.log-entry.heap { color: var(--accent); }
+.log-entry.pop { color: var(--green); }
+.log-entry.push { color: var(--yellow); }
+.log-entry.done { color: var(--green); font-weight: 600; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <span class="h-num">23.</span>
+  <span class="h-title">Merge k Sorted Lists</span>
+  <span class="h-badge">Hard</span>
+  <div class="h-right">
+    <input type="text" id="listsInp" class="inp" placeholder="e.g. [1,4,5],[1,3,4],[2,6]" value="[1,4,5],[1,3,4],[2,6]"/>
+    <button onclick="init()" class="btn btn-g">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="panel-label">Python Code</div>
+    <div class="code-scroll">
+      <div class="code-line" data-line="1">
+        <span class="ln">1</span>
+        <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+      </div>
+      <div class="code-line" data-line="2">
+        <span class="ln">2</span>
+        <span class="ct">    <span class="kw">def</span> <span class="fn">mergeKLists</span>(<span class="kw">self</span>, lists):</span>
+      </div>
+      <div class="code-line" data-line="3">
+        <span class="ln">3</span>
+        <span class="ct">        <span class="kw">import</span> heapq</span>
+      </div>
+      <div class="code-line" data-line="4">
+        <span class="ln">4</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="5">
+        <span class="ln">5</span>
+        <span class="ct">        heap <span class="op">=</span> []</span>
+      </div>
+      <div class="code-line" data-line="6">
+        <span class="ln">6</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="7">
+        <span class="ln">7</span>
+        <span class="ct">        <span class="cm"># Initialize heap</span></span>
+      </div>
+      <div class="code-line" data-line="8">
+        <span class="ln">8</span>
+        <span class="ct">        <span class="kw">for</span> i, head <span class="kw">in</span> <span class="fn">enumerate</span>(lists):</span>
+      </div>
+      <div class="code-line" data-line="9">
+        <span class="ln">9</span>
+        <span class="ct">            <span class="kw">if</span> head:</span>
+      </div>
+      <div class="code-line" data-line="10">
+        <span class="ln">10</span>
+        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (head.val, i, head))</span>
+      </div>
+      <div class="code-line" data-line="11">
+        <span class="ln">11</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="12">
+        <span class="ln">12</span>
+        <span class="ct">        dummy <span class="op">=</span> <span class="fn">ListNode</span>(<span class="nm">0</span>)</span>
+      </div>
+      <div class="code-line" data-line="13">
+        <span class="ln">13</span>
+        <span class="ct">        curr <span class="op">=</span> dummy</span>
+      </div>
+      <div class="code-line" data-line="14">
+        <span class="ln">14</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="15">
+        <span class="ln">15</span>
+        <span class="ct">        <span class="cm"># Extract min, add next</span></span>
+      </div>
+      <div class="code-line" data-line="16">
+        <span class="ln">16</span>
+        <span class="ct">        <span class="kw">while</span> heap:</span>
+      </div>
+      <div class="code-line" data-line="17">
+        <span class="ln">17</span>
+        <span class="ct">            val, idx, node <span class="op">=</span> heapq.<span class="fn">heappop</span>(heap)</span>
+      </div>
+      <div class="code-line" data-line="18">
+        <span class="ln">18</span>
+        <span class="ct">            curr.next <span class="op">=</span> node</span>
+      </div>
+      <div class="code-line" data-line="19">
+        <span class="ln">19</span>
+        <span class="ct">            curr <span class="op">=</span> curr.next</span>
+      </div>
+      <div class="code-line" data-line="20">
+        <span class="ln">20</span>
+        <span class="ct">            </span>
+      </div>
+      <div class="code-line" data-line="21">
+        <span class="ln">21</span>
+        <span class="ct">            <span class="kw">if</span> node.next:</span>
+      </div>
+      <div class="code-line" data-line="22">
+        <span class="ln">22</span>
+        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (node.next.val, idx, node.next))</span>
+      </div>
+      <div class="code-line" data-line="23">
+        <span class="ln">23</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="24">
+        <span class="ln">24</span>
+        <span class="ct">        <span class="kw">return</span> dummy.next</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="panel-label">Visualization</div>
+    <div class="viz-content" id="vizContent"></div>
+    <div class="bot">
+      <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
+      <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <button id="btnNext" onclick="stepFwd()">Next ►</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="panel-label">Step Log</div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+let steps = [];
+let cursor = 0;
+let playing = false;
+let playTimer = null;
+
+function init() {
+  const inp = document.getElementById('listsInp').value.trim();
+  
+  // Parse input: [1,4,5],[1,3,4],[2,6]
+  const lists = [];
+  const matches = inp.match(/\[([^\]]+)\]/g);
+  
+  if (!matches || matches.length === 0) {
+    alert('Please enter lists in format: [1,4,5],[1,3,4],[2,6]');
+    return;
+  }
+  
+  matches.forEach(m => {
+    const nums = m.replace(/[\[\]]/g, '').split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+    if (nums.length > 0) lists.push(nums);
+  });
+  
+  steps = buildSteps(lists);
+  cursor = 0;
+  playing = false;
+  clearTimeout(playTimer);
+  document.getElementById('btnPlay').textContent = '▶ Play';
+  document.getElementById('logScroll').innerHTML = '';
+  
+  renderStep(0);
+  addLog(0, steps[0].log);
+  updateStepInfo();
+}
+
+function buildSteps(lists) {
+  const steps = [];
+  const k = lists.length;
+  
+  // Track current index in each list
+  const indices = new Array(k).fill(0);
+  
+  function snap(line, msg, logType, logText, heap, result, currentIdx = null, heapAction = null) {
+    const listsState = lists.map((list, i) => ({
+      list: list,
+      consumed: indices[i]
+    }));
+    
+    steps.push({
+      line,
+      msg,
+      log: { type: logType, text: logText },
+      lists: listsState,
+      heap: heap.slice(),
+      result: result.slice(),
+      currentIdx,
+      heapAction
+    });
+  }
+  
+  // Initial state
+  snap(5, 'Initialize empty heap and result', 'init', 'Starting with k sorted lists', [], []);
+  
+  // Build initial heap
+  const heap = [];
+  lists.forEach((list, i) => {
+    if (list.length > 0) {
+      heap.push({ val: list[0], idx: i });
+    }
+  });
+  heap.sort((a, b) => a.val - b.val);
+  
+  snap(10, 'Build initial min-heap from first elements', 'heap', `Heap initialized with ${heap.length} elements`, heap, []);
+  
+  const result = [];
+  
+  // Process heap
+  while (heap.length > 0) {
+    // Pop min
+    heap.sort((a, b) => a.val - b.val);
+    const minNode = heap.shift();
+    const listIdx = minNode.idx;
+    const val = minNode.val;
+    
+    snap(17, `Pop minimum value ${val} from heap`, 'pop', `Extracted min: ${val} from list ${listIdx}`, heap, result, listIdx, 'pop');
+    
+    // Add to result
+    result.push(val);
+    indices[listIdx]++;
+    
+    snap(18, `Add ${val} to merged result`, 'pop', `Result now: [${result.join(', ')}]`, heap, result, listIdx);
+    
+    // Push next from same list
+    if (indices[listIdx] < lists[listIdx].length) {
+      const nextVal = lists[listIdx][indices[listIdx]];
+      heap.push({ val: nextVal, idx: listIdx });
+      heap.sort((a, b) => a.val - b.val);
+      
+      snap(22, `Push next element ${nextVal} from list ${listIdx} to heap`, 'push', `Added ${nextVal} to heap`, heap, result, listIdx, 'push');
+    }
+  }
+  
+  snap(24, 'All lists merged successfully', 'done', `Final merged list: [${result.join(', ')}]`, [], result);
+  
+  return steps;
+}
+
+function renderStep(idx) {
+  const s = steps[idx];
+  const viz = document.getElementById('vizContent');
+  
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const activeLine = document.querySelector(`[data-line="${s.line}"]`);
+  if (activeLine) activeLine.classList.add('active');
+  
+  let html = '';
+  
+  // Input lists
+  html += `<div class="section-label">Input Lists (k = ${s.lists.length})</div>`;
+  html += `<div class="lists-grid">`;
+  s.lists.forEach((listState, i) => {
+    html += `<div class="list-row">`;
+    html += `<span class="list-label">List ${i}:</span>`;
+    listState.list.forEach((val, j) => {
+      const isConsumed = j < listState.consumed;
+      const isCurrent = s.currentIdx === i && j === listState.consumed;
+      html += `<div class="node ${isConsumed ? 'consumed' : ''} ${isCurrent ? 'current' : ''}">${val}</div>`;
+      if (j < listState.list.length - 1) {
+        html += `<span class="arrow">→</span>`;
+      }
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  
+  // Min-Heap
+  html += `<div class="section-label">Min-Heap (size = ${s.heap.length})</div>`;
+  html += `<div class="heap-container">`;
+  html += `<div class="heap-grid">`;
+  if (s.heap.length === 0) {
+    html += `<span style="color: var(--muted); font-size: 13px;">Empty</span>`;
+  } else {
+    s.heap.forEach((node, i) => {
+      const isPop = s.heapAction === 'pop' && i === 0;
+      const isPush = s.heapAction === 'push' && i === s.heap.length - 1;
+      html += `<div class="heap-node ${isPop ? 'popping' : ''} ${isPush ? 'adding' : ''}">`;
+      html += `<span class="heap-val">${node.val}</span>`;
+      html += `<span class="heap-idx">[L${node.idx}]</span>`;
+      html += `</div>`;
+    });
+  }
+  html += `</div>`;
+  html += `</div>`;
+  
+  // Result
+  html += `<div class="section-label">Merged Result</div>`;
+  html += `<div class="result-container">`;
+  html += `<div class="result-list">`;
+  if (s.result.length === 0) {
+    html += `<span style="color: var(--muted); font-size: 13px;">Empty</span>`;
+  } else {
+    s.result.forEach((val, i) => {
+      const isLatest = i === s.result.length - 1 && s.heapAction === 'pop';
+      html += `<div class="result-node ${isLatest ? 'latest' : ''}">${val}</div>`;
+      if (i < s.result.length - 1) {
+        html += `<span class="arrow">→</span>`;
+      }
+    });
+  }
+  html += `</div>`;
+  html += `</div>`;
+  
+  html += `<div class="msg-box">${s.msg}</div>`;
+  
+  if (s.log.type === 'done') {
+    html += `<div class="result-box">`;
+    html += `<div class="result-label">Merge Complete</div>`;
+    html += `<div class="result-val">[${s.result.join(', ')}]</div>`;
+    html += `</div>`;
+  }
+  
+  viz.innerHTML = html;
+  updateStepInfo();
+}
+
+function stepFwd() {
+  if (cursor < steps.length - 1) {
+    cursor++;
+    addLog(cursor, steps[cursor].log);
+    renderStep(cursor);
+  }
+}
+
+function stepBack() {
+  if (cursor > 0) {
+    cursor--;
+    rebuildLog();
+    renderStep(cursor);
+  }
+}
+
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('btnPlay').textContent = playing ? '⏸ Pause' : '▶ Play';
+  if (playing) {
+    playLoop();
+  } else {
+    clearTimeout(playTimer);
+  }
+}
+
+function playLoop() {
+  if (!playing) return;
+  if (cursor < steps.length - 1) {
+    stepFwd();
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    playTimer = setTimeout(playLoop, 1600 - speed);
+  } else {
+    playing = false;
+    document.getElementById('btnPlay').textContent = '▶ Play';
+  }
+}
+
+function addLog(idx, log) {
+  const el = document.getElementById('logScroll');
+  const d = document.createElement('div');
+  d.className = `log-entry ${log.type}`;
+  d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function rebuildLog() {
+  document.getElementById('logScroll').innerHTML = '';
+  for (let i = 0; i <= cursor; i++) {
+    addLog(i, steps[i].log);
+  }
+}
+
+function updateStepInfo() {
+  document.getElementById('stepInfo').textContent = `${cursor} / ${steps.length - 1}`;
+  document.getElementById('btnPrev').disabled = cursor === 0;
+  document.getElementById('btnNext').disabled = cursor === steps.length - 1;
+}
+
+init();
+</script>
+</body>
+</html>

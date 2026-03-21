@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>143. Reorder List - Algorithm Visualization</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080b12;
+  --surface: #0e1219;
+  --card: #141923;
+  --border: #1c2333;
+  --accent: #7ee8fa;
+  --accent2: #f7971e;
+  --green: #39d98a;
+  --red: #ff5c5c;
+  --purple: #c9a0ff;
+  --yellow: #ffd166;
+  --blue: #4ea8de;
+  --text: #cdd6f4;
+  --muted: #45506a;
+  --hl: rgba(126,232,250,0.09);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.h-num {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.h-title {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.h-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 209, 102, 0.12);
+  color: var(--yellow);
+}
+
+.h-right {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inp {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  width: 200px;
+  transition: all 0.2s;
+}
+
+.inp:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(126,232,250,0.1);
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-g {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-g:hover {
+  background: var(--hl);
+  border-color: var(--accent);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 390px 1fr 255px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.code-panel, .viz-panel, .log-panel {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.log-panel {
+  border-right: none;
+}
+
+.panel-label {
+  background: var(--surface);
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.code-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.code-line {
+  display: flex;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 2px 0;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.code-line.active {
+  background: var(--hl);
+  border-left-color: var(--accent);
+}
+
+.ln {
+  color: var(--muted);
+  min-width: 35px;
+  text-align: right;
+  padding-right: 12px;
+  user-select: none;
+}
+
+.ct {
+  color: var(--text);
+  white-space: pre;
+}
+
+.kw { color: var(--purple); font-weight: 600; }
+.fn { color: var(--blue); }
+.cm { color: var(--muted); font-style: italic; }
+.nm { color: var(--green); }
+.st { color: var(--yellow); }
+.op { color: var(--accent); }
+
+.viz-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.phase-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 60px;
+}
+
+.node {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: 'Fira Code', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.node.highlight {
+  border-color: var(--accent);
+  background: var(--hl);
+  box-shadow: 0 0 12px rgba(126,232,250,0.2);
+  transform: scale(1.05);
+}
+
+.node.slow {
+  border-color: var(--yellow);
+  box-shadow: 0 0 12px rgba(255,209,102,0.25);
+}
+
+.node.fast {
+  border-color: var(--purple);
+  box-shadow: 0 0 12px rgba(201,160,255,0.25);
+}
+
+.node.reversed {
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(57,217,138,0.25);
+}
+
+.node.merged {
+  border-color: var(--blue);
+  box-shadow: 0 0 12px rgba(78,168,222,0.25);
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.arrow.reversed {
+  color: var(--green);
+}
+
+.ptr-label {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.ptr-slow {
+  background: rgba(255,209,102,0.15);
+  color: var(--yellow);
+  border: 1px solid var(--yellow);
+}
+
+.ptr-fast {
+  background: rgba(201,160,255,0.15);
+  color: var(--purple);
+  border: 1px solid var(--purple);
+}
+
+.ptr-first {
+  background: rgba(78,168,222,0.15);
+  color: var(--blue);
+  border: 1px solid var(--blue);
+}
+
+.ptr-second {
+  background: rgba(57,217,138,0.15);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+.var-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.vc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.vn {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.vv {
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.msg-box {
+  background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(78,168,222,0.08));
+  border: 1px solid rgba(126,232,250,0.3);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.result-box {
+  background: linear-gradient(135deg, rgba(57,217,138,0.1), rgba(126,232,250,0.1));
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.result-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.result-val {
+  font-family: 'Fira Code', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.bot {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.bot button {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.bot button:hover {
+  background: var(--hl);
+  border-color: var(--accent);
+}
+
+.bot button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#btnPlay {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+#btnPlay:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.step-info {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.spd-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spd-wrap label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+#speedSlider {
+  width: 120px;
+}
+
+.log-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.log-entry {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+  transition: background 0.15s;
+}
+
+.log-entry:hover {
+  background: var(--hl);
+}
+
+.ls {
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 30px;
+}
+
+.log-entry.init { color: var(--blue); }
+.log-entry.find { color: var(--yellow); }
+.log-entry.reverse { color: var(--green); }
+.log-entry.merge { color: var(--purple); }
+.log-entry.done { color: var(--green); font-weight: 600; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <span class="h-num">143.</span>
+  <span class="h-title">Reorder List</span>
+  <span class="h-badge">Medium</span>
+  <div class="h-right">
+    <input type="text" id="listInp" class="inp" placeholder="e.g. 1,2,3,4,5" value="1,2,3,4,5"/>
+    <button onclick="init()" class="btn btn-g">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="panel-label">Python Code</div>
+    <div class="code-scroll">
+      <div class="code-line" data-line="1">
+        <span class="ln">1</span>
+        <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+      </div>
+      <div class="code-line" data-line="2">
+        <span class="ln">2</span>
+        <span class="ct">    <span class="kw">def</span> <span class="fn">reorderList</span>(<span class="kw">self</span>, head):</span>
+      </div>
+      <div class="code-line" data-line="3">
+        <span class="ln">3</span>
+        <span class="ct">        <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
+      </div>
+      <div class="code-line" data-line="4">
+        <span class="ln">4</span>
+        <span class="ct">            <span class="kw">return</span></span>
+      </div>
+      <div class="code-line" data-line="5">
+        <span class="ln">5</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="6">
+        <span class="ln">6</span>
+        <span class="ct">        <span class="cm"># Find middle</span></span>
+      </div>
+      <div class="code-line" data-line="7">
+        <span class="ln">7</span>
+        <span class="ct">        slow, fast <span class="op">=</span> head, head</span>
+      </div>
+      <div class="code-line" data-line="8">
+        <span class="ln">8</span>
+        <span class="ct">        <span class="kw">while</span> fast.next <span class="kw">and</span> fast.next.next:</span>
+      </div>
+      <div class="code-line" data-line="9">
+        <span class="ln">9</span>
+        <span class="ct">            slow <span class="op">=</span> slow.next</span>
+      </div>
+      <div class="code-line" data-line="10">
+        <span class="ln">10</span>
+        <span class="ct">            fast <span class="op">=</span> fast.next.next</span>
+      </div>
+      <div class="code-line" data-line="11">
+        <span class="ln">11</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="12">
+        <span class="ln">12</span>
+        <span class="ct">        <span class="cm"># Reverse second half</span></span>
+      </div>
+      <div class="code-line" data-line="13">
+        <span class="ln">13</span>
+        <span class="ct">        second <span class="op">=</span> slow.next</span>
+      </div>
+      <div class="code-line" data-line="14">
+        <span class="ln">14</span>
+        <span class="ct">        slow.next <span class="op">=</span> <span class="nm">None</span></span>
+      </div>
+      <div class="code-line" data-line="15">
+        <span class="ln">15</span>
+        <span class="ct">        prev <span class="op">=</span> <span class="nm">None</span></span>
+      </div>
+      <div class="code-line" data-line="16">
+        <span class="ln">16</span>
+        <span class="ct">        <span class="kw">while</span> second:</span>
+      </div>
+      <div class="code-line" data-line="17">
+        <span class="ln">17</span>
+        <span class="ct">            temp <span class="op">=</span> second.next</span>
+      </div>
+      <div class="code-line" data-line="18">
+        <span class="ln">18</span>
+        <span class="ct">            second.next <span class="op">=</span> prev</span>
+      </div>
+      <div class="code-line" data-line="19">
+        <span class="ln">19</span>
+        <span class="ct">            prev <span class="op">=</span> second</span>
+      </div>
+      <div class="code-line" data-line="20">
+        <span class="ln">20</span>
+        <span class="ct">            second <span class="op">=</span> temp</span>
+      </div>
+      <div class="code-line" data-line="21">
+        <span class="ln">21</span>
+        <span class="ct">        second <span class="op">=</span> prev</span>
+      </div>
+      <div class="code-line" data-line="22">
+        <span class="ln">22</span>
+        <span class="ct">        </span>
+      </div>
+      <div class="code-line" data-line="23">
+        <span class="ln">23</span>
+        <span class="ct">        <span class="cm"># Merge alternately</span></span>
+      </div>
+      <div class="code-line" data-line="24">
+        <span class="ln">24</span>
+        <span class="ct">        first <span class="op">=</span> head</span>
+      </div>
+      <div class="code-line" data-line="25">
+        <span class="ln">25</span>
+        <span class="ct">        <span class="kw">while</span> second:</span>
+      </div>
+      <div class="code-line" data-line="26">
+        <span class="ln">26</span>
+        <span class="ct">            temp1, temp2 <span class="op">=</span> first.next, second.next</span>
+      </div>
+      <div class="code-line" data-line="27">
+        <span class="ln">27</span>
+        <span class="ct">            first.next <span class="op">=</span> second</span>
+      </div>
+      <div class="code-line" data-line="28">
+        <span class="ln">28</span>
+        <span class="ct">            second.next <span class="op">=</span> temp1</span>
+      </div>
+      <div class="code-line" data-line="29">
+        <span class="ln">29</span>
+        <span class="ct">            first, second <span class="op">=</span> temp1, temp2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="panel-label">Visualization</div>
+    <div class="viz-content" id="vizContent"></div>
+    <div class="bot">
+      <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
+      <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <button id="btnNext" onclick="stepFwd()">Next ►</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed</label>
+        <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="panel-label">Step Log</div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+class ListNode {
+  constructor(val, next = null) {
+    this.val = val;
+    this.next = next;
+  }
+}
+
+let steps = [];
+let cursor = 0;
+let playing = false;
+let playTimer = null;
+
+function init() {
+  const inp = document.getElementById('listInp').value.trim();
+  const vals = inp.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  
+  if (vals.length === 0) {
+    alert('Please enter valid comma-separated numbers');
+    return;
+  }
+  
+  steps = buildSteps(vals);
+  cursor = 0;
+  playing = false;
+  clearTimeout(playTimer);
+  document.getElementById('btnPlay').textContent = '▶ Play';
+  document.getElementById('logScroll').innerHTML = '';
+  
+  renderStep(0);
+  addLog(0, steps[0].log);
+  updateStepInfo();
+}
+
+function buildSteps(vals) {
+  const steps = [];
+  let head = new ListNode(vals[0]);
+  let curr = head;
+  for (let i = 1; i < vals.length; i++) {
+    curr.next = new ListNode(vals[i]);
+    curr = curr.next;
+  }
+  
+  function snap(line, msg, logType, logText, phase, list1, list2 = null, ptrs = {}) {
+    steps.push({
+      line,
+      msg,
+      log: { type: logType, text: logText },
+      phase,
+      list1,
+      list2,
+      ptrs
+    });
+  }
+  
+  // Initial state
+  snap(2, 'Starting reorder process', 'init', 'Initialize with original list', 'original', listToArray(head));
+  
+  // Phase 1: Find middle
+  snap(7, 'Initialize slow and fast pointers', 'find', 'Set slow=head, fast=head', 'find-middle', listToArray(head), null, { slow: 0, fast: 0 });
+  
+  let slow = head, fast = head;
+  let slowIdx = 0, fastIdx = 0;
+  
+  while (fast.next && fast.next.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+    slowIdx++;
+    fastIdx += 2;
+    
+    snap(9, 'Move pointers: slow by 1, fast by 2', 'find', `Slow moved to index ${slowIdx}, fast to ${fastIdx}`, 'find-middle', listToArray(head), null, { slow: slowIdx, fast: fastIdx });
+  }
+  
+  snap(13, 'Middle found, prepare to split', 'find', `Middle at index ${slowIdx}`, 'find-middle', listToArray(head), null, { slow: slowIdx });
+  
+  // Phase 2: Reverse second half
+  let second = slow.next;
+  slow.next = null;
+  const firstHalf = listToArray(head);
+  const secondHalf = listToArray(second);
+  
+  snap(14, 'Split list into two halves', 'reverse', `First half: ${firstHalf.join('→')}, Second half: ${secondHalf.join('→')}`, 'split', firstHalf, secondHalf);
+  
+  let prev = null;
+  let reverseSteps = [];
+  
+  while (second) {
+    const temp = second.next;
+    second.next = prev;
+    prev = second;
+    second = temp;
+    reverseSteps.push(listToArray(prev));
+  }
+  
+  reverseSteps.forEach((reversed, idx) => {
+    snap(18, `Reversing node ${idx + 1}`, 'reverse', `Reversed: ${reversed.join('→')}`, 'reversing', firstHalf, reversed);
+  });
+  
+  second = prev;
+  const reversedSecond = listToArray(second);
+  snap(21, 'Second half reversed', 'reverse', `Reversed second half: ${reversedSecond.join('→')}`, 'reversed', firstHalf, reversedSecond);
+  
+  // Phase 3: Merge
+  snap(24, 'Start merging alternately', 'merge', 'Merge first and reversed second halves', 'merge-start', firstHalf, reversedSecond);
+  
+  let first = head;
+  let mergeResult = [];
+  let f1Idx = 0, f2Idx = 0;
+  
+  while (second) {
+    mergeResult.push(first.val);
+    mergeResult.push(second.val);
+    
+    const temp1 = first.next;
+    const temp2 = second.next;
+    first.next = second;
+    second.next = temp1;
+    first = temp1;
+    second = temp2;
+    
+    snap(27, `Merge step: connect ${mergeResult[mergeResult.length - 2]}→${mergeResult[mergeResult.length - 1]}`, 'merge', `Current merged: ${mergeResult.join('→')}`, 'merging', mergeResult.slice());
+  }
+  
+  if (first) {
+    mergeResult.push(first.val);
+  }
+  
+  snap(29, 'Merging complete', 'done', `Final reordered list: ${mergeResult.join('→')}`, 'done', mergeResult);
+  
+  return steps;
+}
+
+function listToArray(head) {
+  const arr = [];
+  let curr = head;
+  while (curr) {
+    arr.push(curr.val);
+    curr = curr.next;
+  }
+  return arr;
+}
+
+function renderStep(idx) {
+  const s = steps[idx];
+  const viz = document.getElementById('vizContent');
+  
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const activeLine = document.querySelector(`[data-line="${s.line}"]`);
+  if (activeLine) activeLine.classList.add('active');
+  
+  let html = '';
+  
+  if (s.phase === 'original') {
+    html += `<div class="phase-label">Original List</div>`;
+    html += renderList(s.list1);
+  } else if (s.phase === 'find-middle') {
+    html += `<div class="phase-label">Phase 1: Finding Middle</div>`;
+    html += renderList(s.list1, s.ptrs);
+  } else if (s.phase === 'split') {
+    html += `<div class="phase-label">Phase 2: Split into Two Halves</div>`;
+    html += `<div style="margin-bottom: 16px;">`;
+    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">FIRST HALF</div>`;
+    html += renderList(s.list1);
+    html += `</div>`;
+    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">SECOND HALF</div>`;
+    html += renderList(s.list2);
+  } else if (s.phase === 'reversing' || s.phase === 'reversed') {
+    html += `<div class="phase-label">Phase 2: Reversing Second Half</div>`;
+    html += `<div style="margin-bottom: 16px;">`;
+    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">FIRST HALF</div>`;
+    html += renderList(s.list1);
+    html += `</div>`;
+    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">SECOND HALF (${s.phase === 'reversed' ? 'REVERSED' : 'REVERSING...'})</div>`;
+    html += renderList(s.list2, {}, s.phase === 'reversed' ? 'reversed' : 'highlight', true);
+  } else if (s.phase === 'merge-start' || s.phase === 'merging') {
+    html += `<div class="phase-label">Phase 3: Merging Alternately</div>`;
+    html += renderList(s.list1, {}, 'merged');
+  } else if (s.phase === 'done') {
+    html += `<div class="phase-label">Final Result</div>`;
+    html += renderList(s.list1, {}, 'merged');
+    html += `<div class="result-box">`;
+    html += `<div class="result-label">List Reordered Successfully</div>`;
+    html += `<div class="result-val">${s.list1.join(' → ')}</div>`;
+    html += `</div>`;
+  }
+  
+  html += `<div class="msg-box">${s.msg}</div>`;
+  
+  viz.innerHTML = html;
+  updateStepInfo();
+}
+
+function renderList(arr, ptrs = {}, highlight = '', showReversed = false) {
+  let html = '<div class="list-row">';
+  arr.forEach((val, idx) => {
+    let cls = 'node';
+    if (ptrs.slow === idx) cls += ' slow';
+    if (ptrs.fast === idx) cls += ' fast';
+    if (highlight && highlight !== '') cls += ` ${highlight}`;
+    
+    html += `<div class="${cls}" style="position:relative;">`;
+    if (ptrs.slow === idx) html += `<div class="ptr-label ptr-slow">SLOW</div>`;
+    if (ptrs.fast === idx) html += `<div class="ptr-label ptr-fast">FAST</div>`;
+    html += `${val}`;
+    html += `</div>`;
+    
+    if (idx < arr.length - 1) {
+      html += `<span class="arrow${showReversed ? ' reversed' : ''}">→</span>`;
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
+function stepFwd() {
+  if (cursor < steps.length - 1) {
+    cursor++;
+    addLog(cursor, steps[cursor].log);
+    renderStep(cursor);
+  }
+}
+
+function stepBack() {
+  if (cursor > 0) {
+    cursor--;
+    rebuildLog();
+    renderStep(cursor);
+  }
+}
+
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('btnPlay').textContent = playing ? '⏸ Pause' : '▶ Play';
+  if (playing) {
+    playLoop();
+  } else {
+    clearTimeout(playTimer);
+  }
+}
+
+function playLoop() {
+  if (!playing) return;
+  if (cursor < steps.length - 1) {
+    stepFwd();
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    playTimer = setTimeout(playLoop, 1600 - speed);
+  } else {
+    playing = false;
+    document.getElementById('btnPlay').textContent = '▶ Play';
+  }
+}
+
+function addLog(idx, log) {
+  const el = document.getElementById('logScroll');
+  const d = document.createElement('div');
+  d.className = `log-entry ${log.type}`;
+  d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function rebuildLog() {
+  document.getElementById('logScroll').innerHTML = '';
+  for (let i = 0; i <= cursor; i++) {
+    addLog(i, steps[i].log);
+  }
+}
+
+function updateStepInfo() {
+  document.getElementById('stepInfo').textContent = `${cursor} / ${steps.length - 1}`;
+  document.getElementById('btnPrev').disabled = cursor === 0;
+  document.getElementById('btnNext').disabled = cursor === steps.length - 1;
+}
+
+init();
+</script>
+</body>
+</html>
