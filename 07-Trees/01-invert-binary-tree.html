@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>226. Invert Binary Tree</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
+  --curr:#3b82f6;--left:#a78bfa;--right:#f59e0b;--done:#10b981;
+  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
+.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--done);}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:200px;}
+.inp:focus{border-color:#3b82f6;}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
+.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+
+main{display:grid;grid-template-columns:350px 1fr 240px;flex:1;overflow:hidden;}
+
+.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
+.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.74rem;line-height:1.85;position:relative;transition:background .15s;}
+.cl.active{background:rgba(59,130,246,.1);}
+.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
+.ln{width:30px;text-align:right;padding-right:10px;color:var(--muted);font-size:.68rem;flex-shrink:0;user-select:none;line-height:1.85;}
+.cl.active .ln{color:#3b82f6;}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}.op{color:#56b6c2;}
+
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.ba-row{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ba-col{padding:10px 16px;}
+.ba-col:first-child{border-right:1px solid var(--border);}
+.ba-title{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+
+.tree-viz{flex:1;overflow:auto;padding:20px;position:relative;}
+.tree-canvas{min-height:400px;position:relative;}
+
+.tree-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
+.node-circle{width:45px;height:45px;border-radius:50%;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:var(--text);transition:all .3s;}
+.tree-node.active .node-circle{border-color:var(--curr);box-shadow:0 0 14px rgba(59,130,246,.3);color:var(--curr);}
+.tree-node.swapping .node-circle{border-color:var(--left);box-shadow:0 0 14px rgba(167,139,250,.3);color:var(--left);}
+.tree-node.done .node-circle{border-color:var(--done);background:rgba(16,185,129,.06);color:var(--done);}
+.node-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:3px;}
+
+.tree-edge{position:absolute;stroke:var(--border);stroke-width:2;fill:none;transition:all .3s;}
+.tree-edge.active{stroke:var(--curr);stroke-width:3;}
+.tree-edge.done{stroke:var(--done);}
+
+.decision{margin:12px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
+.decision.flip{border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.07);color:var(--left);}
+.decision.done{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--done);}
+
+.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
+.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.spd-wrap label{font-size:.7rem;color:var(--muted);}
+input[type=range]{accent-color:#3b82f6;width:80px;}
+
+.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
+.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
+.lc:hover{color:var(--text);}
+.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
+.le{font-family:'JetBrains Mono',monospace;font-size:.67rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
+.le.info{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
+.le.swap{border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.05);color:var(--left);}
+.le.done{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--done);}
+.ls{color:var(--muted);margin-right:6px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-num">226</div>
+  <div class="h-title">Invert Binary Tree</div>
+  <div class="h-badge">EASY</div>
+  <div class="h-right">
+    <input id="treeInput" class="inp" placeholder="e.g., 4,2,7,1,3,6,9"/>
+    <button class="btn btn-p" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="plabel">Algorithm</div>
+    <div class="code-scroll" id="codePanel"></div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="ba-row">
+      <div class="ba-col">
+        <div class="ba-title">Original Tree</div>
+        <div id="originalTree" style="font-family:'JetBrains Mono';font-size:.75rem;color:var(--muted);"></div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-title">Inverted Tree</div>
+        <div id="invertedTree" style="font-family:'JetBrains Mono';font-size:.75rem;color:var(--muted);"></div>
+      </div>
+    </div>
+    <div class="tree-viz">
+      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
+      <div id="treeCanvas" class="tree-canvas"></div>
+    </div>
+    <div id="decision" class="decision">Inverting binary tree...</div>
+    <div class="bot">
+      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed:</label>
+        <input type="range" id="speedSlider" min="200" max="1400" value="800"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="plabel">
+      Execution Log
+      <button class="lc" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+const code=[
+  {t:'def invertTree(root):',cm:true},
+  {t:'    if not root:',ln:1},
+  {t:'        return None',ln:2},
+  {t:'    ',ln:3},
+  {t:'    # Swap left and right children',cm:true},
+  {t:'    root.left, root.right = root.right, root.left',ln:4},
+  {t:'    ',ln:5},
+  {t:'    # Recursively invert subtrees',cm:true},
+  {t:'    invertTree(root.left)',ln:6},
+  {t:'    invertTree(root.right)',ln:7},
+  {t:'    ',ln:8},
+  {t:'    return root',ln:9}
+];
+
+class TreeNode{
+  constructor(val,left=null,right=null){this.val=val;this.left=left;this.right=right;}
+}
+
+let tree,steps=[],cursor=0,playing=false,playTimer;
+
+function buildCode(){
+  const panel=document.getElementById('codePanel');
+  code.forEach((c,i)=>{
+    const line=document.createElement('div');
+    line.className='cl';
+    line.id=`line${c.ln||i}`;
+    const ln=document.createElement('div');ln.className='ln';
+    ln.textContent=c.ln!==undefined?c.ln:'';
+    const ct=document.createElement('div');ct.className='ct';
+    if(c.cm){
+      ct.innerHTML=`<span class="cm">${c.t}</span>`;
+    }else{
+      ct.innerHTML=c.t
+        .replace(/(def|if|not|return)/g,'<span class="kw">$1</span>')
+        .replace(/(invertTree)/g,'<span class="fn">$1</span>')
+        .replace(/(root|left|right|None)/g,'<span class="nm">$1</span>');
+    }
+    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  });
+}
+
+function highlight(ln){
+  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
+  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
+}
+
+function arrayToTree(arr){
+  if(!arr.length)return null;
+  const root=new TreeNode(arr[0]);
+  const q=[root];
+  let i=1;
+  while(q.length&&i<arr.length){
+    const n=q.shift();
+    if(i<arr.length&&arr[i]!==null){n.left=new TreeNode(arr[i]);q.push(n.left);}
+    i++;
+    if(i<arr.length&&arr[i]!==null){n.right=new TreeNode(arr[i]);q.push(n.right);}
+    i++;
+  }
+  return root;
+}
+
+function treeToArray(root){
+  if(!root)return[];
+  const res=[],q=[root];
+  while(q.length){
+    const n=q.shift();
+    if(n){res.push(n.val);q.push(n.left);q.push(n.right);}
+    else res.push(null);
+  }
+  while(res[res.length-1]===null)res.pop();
+  return res;
+}
+
+function buildSteps(root){
+  const s=[{line:-1,tree:cloneTree(root),msg:'Starting inversion...',nodeId:null,action:'init',log:{type:'info',text:'Begin inverting binary tree'}}];
+  let nodeCounter=0;
+  
+  function assignIds(n){if(n){n.id=nodeCounter++;assignIds(n.left);assignIds(n.right);}}
+  assignIds(root);
+  
+  function invert(node,parent=null){
+    if(!node){
+      s.push({line:2,tree:cloneTree(root),msg:'Null node, returning None',nodeId:null,action:'null',log:{type:'info',text:'Reached null node'}});
+      return;
+    }
+    
+    s.push({line:1,tree:cloneTree(root),msg:`Checking node ${node.val}`,nodeId:node.id,action:'check',log:{type:'info',text:`Processing node ${node.val}`}});
+    
+    if(node.left||node.right){
+      const oldL=node.left?node.left.val:'null';
+      const oldR=node.right?node.right.val:'null';
+      const tmp=node.left;node.left=node.right;node.right=tmp;
+      s.push({line:4,tree:cloneTree(root),msg:`Swapped children of ${node.val}: left=${oldL}→${node.left?node.left.val:'null'}, right=${oldR}→${node.right?node.right.val:'null'}`,nodeId:node.id,action:'swap',log:{type:'swap',text:`Swapped children of node ${node.val}`}});
+    }
+    
+    if(node.left){
+      s.push({line:6,tree:cloneTree(root),msg:`Recursively inverting left subtree of ${node.val}`,nodeId:node.left.id,action:'recurse-left',log:{type:'info',text:`Inverting left subtree of ${node.val}`}});
+      invert(node.left,node);
+    }
+    
+    if(node.right){
+      s.push({line:7,tree:cloneTree(root),msg:`Recursively inverting right subtree of ${node.val}`,nodeId:node.right.id,action:'recurse-right',log:{type:'info',text:`Inverting right subtree of ${node.val}`}});
+      invert(node.right,node);
+    }
+    
+    s.push({line:9,tree:cloneTree(root),msg:`Returning node ${node.val}`,nodeId:node.id,action:'return',log:{type:'done',text:`Completed node ${node.val}`}});
+  }
+  
+  invert(root);
+  s.push({line:9,tree:cloneTree(root),msg:'Inversion complete!',nodeId:null,action:'done',log:{type:'done',text:'Tree inversion completed'}});
+  return s;
+}
+
+function cloneTree(n){
+  if(!n)return null;
+  const c=new TreeNode(n.val);
+  c.id=n.id;
+  c.left=cloneTree(n.left);
+  c.right=cloneTree(n.right);
+  return c;
+}
+
+function layoutTree(root){
+  const positions=new Map();
+  const levelWidth=[];
+  
+  function getWidth(n,level=0){
+    if(!n)return 0;
+    levelWidth[level]=(levelWidth[level]||0)+1;
+    getWidth(n.left,level+1);
+    getWidth(n.right,level+1);
+  }
+  
+  getWidth(root);
+  const maxWidth=Math.max(...levelWidth,1);
+  const hSpace=Math.max(80,600/maxWidth);
+  
+  function layout(n,level=0,offset=0){
+    if(!n)return offset;
+    const leftW=layout(n.left,level+1,offset);
+    positions.set(n.id,{x:leftW*hSpace+300,y:level*90+50});
+    return layout(n.right,level+1,leftW+1);
+  }
+  
+  layout(root);
+  return positions;
+}
+
+function renderTree(st){
+  const canvas=document.getElementById('treeCanvas');
+  const svg=document.getElementById('edgeSvg');
+  canvas.innerHTML='';
+  svg.innerHTML='';
+  
+  if(!st.tree)return;
+  
+  const pos=layoutTree(st.tree);
+  
+  function drawEdges(n){
+    if(!n)return;
+    const p=pos.get(n.id);
+    if(n.left){
+      const lp=pos.get(n.left.id);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d',`M ${p.x} ${p.y+23} Q ${(p.x+lp.x)/2} ${(p.y+lp.y)/2} ${lp.x} ${lp.y-23}`);
+      line.classList.add('tree-edge');
+      if(st.action==='done')line.classList.add('done');
+      svg.appendChild(line);
+      drawEdges(n.left);
+    }
+    if(n.right){
+      const rp=pos.get(n.right.id);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d',`M ${p.x} ${p.y+23} Q ${(p.x+rp.x)/2} ${(p.y+rp.y)/2} ${rp.x} ${rp.y-23}`);
+      line.classList.add('tree-edge');
+      if(st.action==='done')line.classList.add('done');
+      svg.appendChild(line);
+      drawEdges(n.right);
+    }
+  }
+  
+  drawEdges(st.tree);
+  
+  function drawNodes(n){
+    if(!n)return;
+    const p=pos.get(n.id);
+    const nodeDiv=document.createElement('div');
+    nodeDiv.className='tree-node';
+    if(st.nodeId===n.id&&st.action==='check')nodeDiv.classList.add('active');
+    if(st.nodeId===n.id&&st.action==='swap')nodeDiv.classList.add('swapping');
+    if(st.action==='done')nodeDiv.classList.add('done');
+    nodeDiv.style.left=`${p.x-22.5}px`;
+    nodeDiv.style.top=`${p.y-22.5}px`;
+    
+    const circle=document.createElement('div');
+    circle.className='node-circle';
+    circle.textContent=n.val;
+    
+    const label=document.createElement('div');
+    label.className='node-label';
+    label.textContent=`id:${n.id}`;
+    
+    nodeDiv.appendChild(circle);
+    nodeDiv.appendChild(label);
+    canvas.appendChild(nodeDiv);
+    
+    drawNodes(n.left);
+    drawNodes(n.right);
+  }
+  
+  drawNodes(st.tree);
+}
+
+function renderDecision(st){
+  const d=document.getElementById('decision');
+  d.className='decision';
+  d.textContent=st.msg;
+  if(st.action==='swap')d.classList.add('flip');
+  else if(st.action==='done')d.classList.add('done');
+}
+
+function addLog(idx,log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');d.className=`le ${log.type}`;
+  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+
+function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderTree(st);
+  renderDecision(st);
+  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
+}
+
+function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
+
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing)runPlay();else clearTimeout(playTimer);
+}
+
+function runPlay(){
+  if(!playing)return;
+  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer);playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+  
+  const raw=document.getElementById('treeInput').value.trim();
+  let arr=raw?raw.split(',').map(x=>{const n=parseInt(x.trim());return isNaN(n)?null:n;}):[];
+  if(!arr.length)arr=[4,2,7,1,3,6,9];
+  
+  document.getElementById('originalTree').textContent=JSON.stringify(arr);
+  
+  tree=arrayToTree(arr);
+  steps=buildSteps(tree);
+  
+  const inverted=treeToArray(tree);
+  document.getElementById('invertedTree').textContent=JSON.stringify(inverted);
+  
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log)addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
