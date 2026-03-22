@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>62. Unique Paths</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
+  --curr:#3b82f6;--path:#10b981;--computed:#a78bfa;--start:#f59e0b;
+  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
+.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:90px;}
+.inp:focus{border-color:#3b82f6;}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
+.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+
+main{display:grid;grid-template-columns:330px 1fr 240px;flex:1;overflow:hidden;}
+
+.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
+.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.8;position:relative;transition:background .15s;}
+.cl.active{background:rgba(59,130,246,.1);}
+.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
+.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.8;}
+.cl.active .ln{color:#3b82f6;}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.formula{padding:12px 18px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono';font-size:.75rem;color:var(--muted);text-align:center;}
+.formula .highlight{color:var(--curr);font-weight:700;}
+
+.grid-viz{flex:1;overflow:auto;padding:25px;display:flex;align-items:center;justify-content:center;}
+.dp-grid{display:inline-block;border:2px solid var(--border);border-radius:8px;overflow:hidden;}
+.grid-row{display:flex;}
+.grid-cell{width:70px;height:70px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--card);transition:all .3s;position:relative;}
+.cell-coord{font-family:'JetBrains Mono';font-size:.58rem;color:var(--muted);position:absolute;top:3px;left:5px;}
+.cell-val{font-family:'JetBrains Mono';font-size:1.1rem;font-weight:700;color:var(--text);}
+.grid-cell.start{background:rgba(245,158,11,.12);border-color:var(--start);}
+.grid-cell.goal{background:rgba(16,185,129,.12);border-color:var(--path);}
+.grid-cell.curr{background:rgba(59,130,246,.12);border-color:var(--curr);box-shadow:inset 0 0 0 3px rgba(59,130,246,.3);}
+.grid-cell.computed{background:rgba(167,139,250,.08);border-color:var(--computed);}
+.arrow{font-size:.7rem;color:var(--muted);}
+
+.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono';font-size:.73rem;color:var(--muted);flex-shrink:0;}
+.decision.calc{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
+.decision.done{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--path);}
+
+.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.step-info{font-family:'JetBrains Mono';font-size:.72rem;color:var(--muted);}
+.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.spd-wrap label{font-size:.7rem;color:var(--muted);}
+input[type=range]{accent-color:#3b82f6;width:80px;}
+
+.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
+.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
+.lc:hover{color:var(--text);}
+.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
+.le{font-family:'JetBrains Mono';font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
+.le.calc{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
+.le.done{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--path);}
+.ls{color:var(--muted);margin-right:6px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-num">62</div>
+  <div class="h-title">Unique Paths</div>
+  <div class="h-badge">MEDIUM</div>
+  <div class="h-right">
+    <input id="mInput" class="inp" placeholder="m = 3"/>
+    <input id="nInput" class="inp" placeholder="n = 7"/>
+    <button class="btn btn-p" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="plabel">2D Dynamic Programming</div>
+    <div class="code-scroll" id="codePanel"></div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="formula">
+      DP Formula: <span class="highlight">dp[i][j] = dp[i-1][j] + dp[i][j-1]</span>
+    </div>
+    
+    <div class="grid-viz" id="gridViz"></div>
+    
+    <div id="decision" class="decision">Computing unique paths...</div>
+    
+    <div class="bot">
+      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed:</label>
+        <input type="range" id="speedSlider" min="200" max="1400" value="700"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="plabel">
+      DP Log
+      <button class="lc" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+const code=[
+  {t:'def uniquePaths(m, n):',cm:true},
+  {t:'    # Create 2D DP table',cm:true},
+  {t:'    dp = [[0] * n for _ in range(m)]',ln:1},
+  {t:'    ',ln:2},
+  {t:'    # Initialize first row and column',cm:true},
+  {t:'    for i in range(m):',ln:3},
+  {t:'        dp[i][0] = 1',ln:4},
+  {t:'    for j in range(n):',ln:5},
+  {t:'        dp[0][j] = 1',ln:6},
+  {t:'    ',ln:7},
+  {t:'    # Fill the DP table',cm:true},
+  {t:'    for i in range(1, m):',ln:8},
+  {t:'        for j in range(1, n):',ln:9},
+  {t:'            dp[i][j] = dp[i-1][j] + dp[i][j-1]',ln:10},
+  {t:'    ',ln:11},
+  {t:'    return dp[m-1][n-1]',ln:12}
+];
+
+let m,n,steps=[],cursor=0,playing=false,playTimer;
+
+function buildCode(){
+  const panel=document.getElementById('codePanel');
+  code.forEach((c,i)=>{
+    const line=document.createElement('div');
+    line.className='cl';
+    line.id=`line${c.ln||i}`;
+    const ln=document.createElement('div');ln.className='ln';
+    ln.textContent=c.ln!==undefined?c.ln:'';
+    const ct=document.createElement('div');ct.className='ct';
+    if(c.cm){
+      ct.innerHTML=`<span class="cm">${c.t}</span>`;
+    }else{
+      ct.innerHTML=c.t
+        .replace(/(def|for|in|return|range)/g,'<span class="kw">$1</span>')
+        .replace(/(uniquePaths)/g,'<span class="fn">$1</span>')
+        .replace(/(m|n|dp|i|j|_)/g,'<span class="nm">$1</span>');
+    }
+    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  });
+}
+
+function highlight(ln){
+  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
+  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
+}
+
+function buildSteps(m,n){
+  const s=[];
+  const dp=Array(m).fill(0).map(()=>Array(n).fill(0));
+  
+  s.push({line:1,dp:JSON.parse(JSON.stringify(dp)),curr:null,msg:'Initializing 2D DP table...',log:{type:'calc',text:`Created ${m}x${n} DP table`}});
+  
+  // Initialize first column
+  for(let i=0;i<m;i++){
+    dp[i][0]=1;
+    s.push({line:4,dp:JSON.parse(JSON.stringify(dp)),curr:[i,0],msg:`Base case: dp[${i}][0] = 1 (only one way to reach)`,log:{type:'calc',text:`dp[${i}][0] = 1`}});
+  }
+  
+  // Initialize first row
+  for(let j=0;j<n;j++){
+    dp[0][j]=1;
+    s.push({line:6,dp:JSON.parse(JSON.stringify(dp)),curr:[0,j],msg:`Base case: dp[0][${j}] = 1 (only one way to reach)`,log:{type:'calc',text:`dp[0][${j}] = 1`}});
+  }
+  
+  // Fill DP table
+  for(let i=1;i<m;i++){
+    for(let j=1;j<n;j++){
+      const fromTop=dp[i-1][j];
+      const fromLeft=dp[i][j-1];
+      
+      s.push({line:10,dp:JSON.parse(JSON.stringify(dp)),curr:[i,j],prev:[[i-1,j],[i,j-1]],msg:`Computing dp[${i}][${j}] = dp[${i-1}][${j}] + dp[${i}][${j-1}] = ${fromTop} + ${fromLeft}`,log:{type:'calc',text:`dp[${i}][${j}] = ${fromTop} + ${fromLeft}`}});
+      
+      dp[i][j]=fromTop+fromLeft;
+      
+      s.push({line:10,dp:JSON.parse(JSON.stringify(dp)),curr:[i,j],msg:`dp[${i}][${j}] = ${dp[i][j]}`,log:{type:'calc',text:`dp[${i}][${j}] = ${dp[i][j]}`}});
+    }
+  }
+  
+  s.push({line:12,dp:JSON.parse(JSON.stringify(dp)),curr:[m-1,n-1],msg:`Answer: ${dp[m-1][n-1]} unique paths`,done:true,log:{type:'done',text:`Result: ${dp[m-1][n-1]} unique paths`}});
+  
+  return s;
+}
+
+function renderGrid(st){
+  const viz=document.getElementById('gridViz');
+  viz.innerHTML='';
+  
+  const grid=document.createElement('div');
+  grid.className='dp-grid';
+  
+  st.dp.forEach((row,i)=>{
+    const rowDiv=document.createElement('div');
+    rowDiv.className='grid-row';
+    
+    row.forEach((val,j)=>{
+      const cell=document.createElement('div');
+      cell.className='grid-cell';
+      
+      if(i===0&&j===0)cell.classList.add('start');
+      if(i===m-1&&j===n-1)cell.classList.add('goal');
+      if(st.curr&&st.curr[0]===i&&st.curr[1]===j)cell.classList.add('curr');
+      if(val>0&&!(i===0&&j===0))cell.classList.add('computed');
+      
+      const coord=document.createElement('div');
+      coord.className='cell-coord';
+      coord.textContent=`${i},${j}`;
+      
+      const valDiv=document.createElement('div');
+      valDiv.className='cell-val';
+      valDiv.textContent=val||'0';
+      
+      if(st.prev&&st.curr){
+        const arrows=document.createElement('div');
+        arrows.className='arrow';
+        if(st.prev.some(p=>p[0]===i&&p[1]===j)){
+          arrows.textContent=i===st.curr[0]-1?'↓':'→';
+        }
+        cell.appendChild(arrows);
+      }
+      
+      cell.appendChild(coord);
+      cell.appendChild(valDiv);
+      rowDiv.appendChild(cell);
+    });
+    
+    grid.appendChild(rowDiv);
+  });
+  
+  viz.appendChild(grid);
+}
+
+function renderDecision(st){
+  const d=document.getElementById('decision');
+  d.className='decision';
+  d.textContent=st.msg;
+  if(st.curr&&!st.done)d.classList.add('calc');
+  if(st.done)d.classList.add('done');
+}
+
+function addLog(idx,log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');d.className=`le ${log.type}`;
+  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+
+function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderGrid(st);
+  renderDecision(st);
+  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
+}
+
+function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
+
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing)runPlay();else clearTimeout(playTimer);
+}
+
+function runPlay(){
+  if(!playing)return;
+  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer);playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+  
+  const rawM=document.getElementById('mInput').value.trim();
+  m=rawM?parseInt(rawM):3;
+  if(isNaN(m)||m<1)m=3;
+  if(m>7)m=7; // Limit for visualization
+  
+  const rawN=document.getElementById('nInput').value.trim();
+  n=rawN?parseInt(rawN):7;
+  if(isNaN(n)||n<1)n=7;
+  if(n>7)n=7; // Limit for visualization
+  
+  steps=buildSteps(m,n);
+  
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log)addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
