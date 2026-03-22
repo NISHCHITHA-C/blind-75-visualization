@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>39. Combination Sum</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
+  --curr:#3b82f6;--valid:#10b981;--backtrack:#ef4444;--explore:#a78bfa;
+  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
+.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:150px;}
+.inp:focus{border-color:#3b82f6;}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
+.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+
+main{display:grid;grid-template-columns:330px 1fr 260px;flex:1;overflow:hidden;}
+
+.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
+.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
+.cl.active{background:rgba(59,130,246,.1);}
+.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
+.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
+.cl.active .ln{color:#3b82f6;}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.stats{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:20px;}
+.stat{display:flex;flex-direction:column;}
+.stat-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--curr);}
+
+.tree-viz{flex:1;overflow:auto;padding:20px;}
+.recursion-tree{min-height:300px;position:relative;}
+
+.tree-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
+.node-box{min-width:80px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .3s;}
+.node-path{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text);}
+.node-sum{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);}
+.tree-node.active .node-box{border-color:var(--curr);box-shadow:0 0 14px rgba(59,130,246,.3);}
+.tree-node.valid .node-box{border-color:var(--valid);background:rgba(16,185,129,.08);box-shadow:0 0 14px rgba(16,185,129,.3);}
+.tree-node.backtrack .node-box{border-color:var(--backtrack);background:rgba(239,68,68,.06);}
+
+.tree-edge{position:absolute;stroke:var(--border);stroke-width:2;fill:none;transition:all .3s;}
+.tree-edge.active{stroke:var(--curr);stroke-width:3;}
+
+.results{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);flex-shrink:0;}
+.results-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.result-list{display:flex;flex-direction:column;gap:4px;}
+.result-item{font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:4px 8px;border-radius:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);color:var(--valid);}
+
+.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
+.decision.explore{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
+.decision.found{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--valid);}
+.decision.back{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07);color:var(--backtrack);}
+
+.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
+.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.spd-wrap label{font-size:.7rem;color:var(--muted);}
+input[type=range]{accent-color:#3b82f6;width:80px;}
+
+.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
+.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
+.lc:hover{color:var(--text);}
+.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
+.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
+.le.explore{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
+.le.found{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--valid);}
+.le.back{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);color:var(--backtrack);}
+.ls{color:var(--muted);margin-right:6px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-num">39</div>
+  <div class="h-title">Combination Sum</div>
+  <div class="h-badge">MEDIUM</div>
+  <div class="h-right">
+    <input id="candInput" class="inp" placeholder="e.g., 2,3,6,7"/>
+    <input id="targetInput" class="inp" placeholder="target = 7" style="width:100px;"/>
+    <button class="btn btn-p" onclick="init()">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="plabel">Backtracking Algorithm</div>
+    <div class="code-scroll" id="codePanel"></div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Combinations Found</div>
+        <div class="stat-val" id="combCount" style="color:var(--valid);">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Target Sum</div>
+        <div class="stat-val" id="targetVal">7</div>
+      </div>
+    </div>
+    
+    <div class="tree-viz">
+      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
+      <div id="treeCanvas" class="recursion-tree"></div>
+    </div>
+    
+    <div class="results" id="resultsBox">
+      <div class="results-title">Valid Combinations</div>
+      <div class="result-list" id="resultList"></div>
+    </div>
+    
+    <div id="decision" class="decision">Exploring combinations...</div>
+    
+    <div class="bot">
+      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
+      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
+      <span class="step-info" id="stepInfo">0 / 0</span>
+      <div class="spd-wrap">
+        <label>Speed:</label>
+        <input type="range" id="speedSlider" min="200" max="1400" value="700"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="plabel">
+      Backtracking Log
+      <button class="lc" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+const code=[
+  {t:'def combinationSum(candidates, target):',cm:true},
+  {t:'    result = []',ln:1},
+  {t:'    ',ln:2},
+  {t:'    def backtrack(start, path, total):',ln:3},
+  {t:'        if total == target:',ln:4},
+  {t:'            result.append(path[:])  # Found!',ln:5},
+  {t:'            return',ln:6},
+  {t:'        if total > target:',ln:7},
+  {t:'            return  # Exceeded target',ln:8},
+  {t:'        ',ln:9},
+  {t:'        for i in range(start, len(candidates)):',ln:10},
+  {t:'            path.append(candidates[i])',ln:11},
+  {t:'            backtrack(i, path, total + candidates[i])',ln:12},
+  {t:'            path.pop()  # Backtrack',ln:13},
+  {t:'    ',ln:14},
+  {t:'    backtrack(0, [], 0)',ln:15},
+  {t:'    return result',ln:16}
+];
+
+let candidates,target,steps=[],cursor=0,playing=false,playTimer;
+
+function buildCode(){
+  const panel=document.getElementById('codePanel');
+  code.forEach((c,i)=>{
+    const line=document.createElement('div');
+    line.className='cl';
+    line.id=`line${c.ln||i}`;
+    const ln=document.createElement('div');ln.className='ln';
+    ln.textContent=c.ln!==undefined?c.ln:'';
+    const ct=document.createElement('div');ct.className='ct';
+    if(c.cm){
+      ct.innerHTML=`<span class="cm">${c.t}</span>`;
+    }else{
+      ct.innerHTML=c.t
+        .replace(/(def|if|for|in|return|range|len)/g,'<span class="kw">$1</span>')
+        .replace(/(combinationSum|backtrack|append|pop)/g,'<span class="fn">$1</span>')
+        .replace(/(candidates|target|result|start|path|total|i)/g,'<span class="nm">$1</span>');
+    }
+    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  });
+}
+
+function highlight(ln){
+  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
+  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
+}
+
+function buildSteps(cand,tar){
+  const s=[];
+  const result=[];
+  let nodeId=0;
+  const nodes=[];
+  
+  s.push({line:-1,nodes:[],activeNode:null,results:[],msg:'Starting combination search...',log:{type:'explore',text:'Begin backtracking'}});
+  
+  function backtrack(start,path,total,parentId=null,depth=0){
+    const currentId=nodeId++;
+    const node={id:currentId,path:[...path],sum:total,parentId:parentId,depth:depth,children:[]};
+    nodes.push(node);
+    
+    if(parentId!==null){
+      const parent=nodes.find(n=>n.id===parentId);
+      if(parent)parent.children.push(currentId);
+    }
+    
+    s.push({line:4,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Exploring path [${path.join(', ')}], sum=${total}`,log:{type:'explore',text:`Path: [${path.join(', ')}], sum=${total}`}});
+    
+    if(total===tar){
+      result.push([...path]);
+      s.push({line:5,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Found valid combination: [${path.join(', ')}]`,validNode:currentId,log:{type:'found',text:`Valid: [${path.join(', ')}]`}});
+      return;
+    }
+    
+    if(total>tar){
+      s.push({line:8,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Sum ${total} > target, backtracking`,backtrackNode:currentId,log:{type:'back',text:`Exceeded target, backtrack`}});
+      return;
+    }
+    
+    for(let i=start;i<cand.length;i++){
+      path.push(cand[i]);
+      s.push({line:11,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Adding ${cand[i]} to path`,log:{type:'explore',text:`Add ${cand[i]}`}});
+      
+      backtrack(i,path,total+cand[i],currentId,depth+1);
+      
+      path.pop();
+      s.push({line:13,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Backtracking, removed ${cand[i]}`,log:{type:'back',text:`Remove ${cand[i]}, backtrack`}});
+    }
+  }
+  
+  backtrack(0,[],0);
+  s.push({line:16,nodes:[...nodes],activeNode:null,results:[...result],msg:`Found ${result.length} valid combinations`,done:true,log:{type:'found',text:`Total: ${result.length} combinations`}});
+  
+  return s;
+}
+
+function layoutTree(nodes){
+  const positions=new Map();
+  const levelNodes=new Map();
+  
+  nodes.forEach(node=>{
+    if(!levelNodes.has(node.depth))levelNodes.set(node.depth,[]);
+    levelNodes.get(node.depth).push(node);
+  });
+  
+  levelNodes.forEach((nodesAtLevel,depth)=>{
+    const spacing=Math.max(100,900/Math.max(nodesAtLevel.length,1));
+    nodesAtLevel.forEach((node,i)=>{
+      positions.set(node.id,{x:i*spacing+100,y:depth*90+30});
+    });
+  });
+  
+  return positions;
+}
+
+function renderTree(st){
+  const canvas=document.getElementById('treeCanvas');
+  const svg=document.getElementById('edgeSvg');
+  canvas.innerHTML='';
+  svg.innerHTML='';
+  
+  if(!st.nodes.length)return;
+  
+  const positions=layoutTree(st.nodes);
+  
+  // Draw edges
+  st.nodes.forEach(node=>{
+    if(node.parentId!==null){
+      const parentPos=positions.get(node.parentId);
+      const nodePos=positions.get(node.id);
+      if(parentPos&&nodePos){
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',parentPos.x+40);
+        line.setAttribute('y1',parentPos.y+50);
+        line.setAttribute('x2',nodePos.x+40);
+        line.setAttribute('y2',nodePos.y);
+        line.classList.add('tree-edge');
+        if(node.id===st.activeNode)line.classList.add('active');
+        svg.appendChild(line);
+      }
+    }
+  });
+  
+  // Draw nodes
+  st.nodes.forEach(node=>{
+    const pos=positions.get(node.id);
+    const nodeDiv=document.createElement('div');
+    nodeDiv.className='tree-node';
+    if(node.id===st.activeNode)nodeDiv.classList.add('active');
+    if(st.validNode===node.id)nodeDiv.classList.add('valid');
+    if(st.backtrackNode===node.id)nodeDiv.classList.add('backtrack');
+    nodeDiv.style.left=`${pos.x}px`;
+    nodeDiv.style.top=`${pos.y}px`;
+    
+    const box=document.createElement('div');
+    box.className='node-box';
+    
+    const pathDiv=document.createElement('div');
+    pathDiv.className='node-path';
+    pathDiv.textContent=node.path.length?`[${node.path.join(',')}]`:'[]';
+    
+    const sumDiv=document.createElement('div');
+    sumDiv.className='node-sum';
+    sumDiv.textContent=`Σ=${node.sum}`;
+    
+    box.appendChild(pathDiv);
+    box.appendChild(sumDiv);
+    nodeDiv.appendChild(box);
+    canvas.appendChild(nodeDiv);
+  });
+}
+
+function renderResults(st){
+  const list=document.getElementById('resultList');
+  list.innerHTML='';
+  
+  st.results.forEach(combo=>{
+    const item=document.createElement('div');
+    item.className='result-item';
+    item.textContent=`[${combo.join(', ')}]`;
+    list.appendChild(item);
+  });
+  
+  document.getElementById('combCount').textContent=st.results.length;
+}
+
+function renderDecision(st){
+  const d=document.getElementById('decision');
+  d.className='decision';
+  d.textContent=st.msg;
+  if(st.activeNode!==null&&!st.validNode&&!st.backtrackNode)d.classList.add('explore');
+  if(st.validNode)d.classList.add('found');
+  if(st.backtrackNode)d.classList.add('back');
+}
+
+function addLog(idx,log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');d.className=`le ${log.type}`;
+  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+
+function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
+
+function renderStep(idx){
+  const st=steps[idx];
+  highlight(st.line);
+  renderTree(st);
+  renderResults(st);
+  renderDecision(st);
+  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===steps.length-1;
+}
+
+function stepFwd(){
+  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
+}
+
+function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
+
+function togglePlay(){
+  playing=!playing;
+  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
+  if(playing)runPlay();else clearTimeout(playTimer);
+}
+
+function runPlay(){
+  if(!playing)return;
+  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
+  stepFwd();
+  const spd=1600-parseInt(document.getElementById('speedSlider').value);
+  playTimer=setTimeout(runPlay,spd);
+}
+
+function init(){
+  clearTimeout(playTimer);playing=false;
+  document.getElementById('btnPlay').textContent='▶ Play';
+  clearLog();
+  
+  const rawCand=document.getElementById('candInput').value.trim();
+  candidates=rawCand?rawCand.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x)):[];
+  if(!candidates.length)candidates=[2,3,6,7];
+  
+  const rawTarget=document.getElementById('targetInput').value.trim();
+  target=rawTarget?parseInt(rawTarget):7;
+  if(isNaN(target))target=7;
+  
+  document.getElementById('targetVal').textContent=target;
+  
+  steps=buildSteps(candidates,target);
+  
+  cursor=0;
+  highlight(-1);
+  if(steps[0]?.log)addLog(0,steps[0].log);
+  renderStep(0);
+}
+
+buildCode();
+init();
+</script>
+</body>
+</html>
