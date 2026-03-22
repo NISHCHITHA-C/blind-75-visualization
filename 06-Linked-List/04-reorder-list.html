@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>143. Reorder List - Algorithm Visualization</title>
+<title>143. Reorder List - Detailed Memory Visualization</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -18,6 +18,8 @@
   --purple: #c9a0ff;
   --yellow: #ffd166;
   --blue: #4ea8de;
+  --orange: #ff9e64;
+  --pink: #ff79c6;
   --text: #cdd6f4;
   --muted: #45506a;
   --hl: rgba(126,232,250,0.09);
@@ -122,7 +124,7 @@ header {
 
 main {
   display: grid;
-  grid-template-columns: 390px 1fr 255px;
+  grid-template-columns: 320px 1fr 280px;
   flex: 1;
   overflow: hidden;
 }
@@ -159,8 +161,8 @@ main {
 .code-line {
   display: flex;
   font-family: 'Fira Code', monospace;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.7;
   padding: 2px 0;
   border-left: 3px solid transparent;
   transition: all 0.15s;
@@ -173,9 +175,9 @@ main {
 
 .ln {
   color: var(--muted);
-  min-width: 35px;
+  min-width: 30px;
   text-align: right;
-  padding-right: 12px;
+  padding-right: 10px;
   user-select: none;
 }
 
@@ -193,203 +195,356 @@ main {
 
 .viz-content {
   flex: 1;
-  padding: 24px;
+  padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-.phase-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
+/* Memory Visualization Styles */
+.memory-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-
-.list-row {
+  letter-spacing: 1px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-height: 60px;
+  gap: 8px;
 }
 
-.node {
+.section-icon {
+  font-size: 14px;
+}
+
+/* Stack Variables */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.stack-var {
   background: var(--card);
   border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-family: 'Fira Code', monospace;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: all 0.25s;
   position: relative;
-  transition: all 0.3s;
 }
 
-.node.highlight {
+.stack-var.active {
   border-color: var(--accent);
-  background: var(--hl);
-  box-shadow: 0 0 12px rgba(126,232,250,0.2);
-  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(126,232,250,0.25);
+  transform: translateY(-2px);
 }
 
-.node.slow {
+.stack-var.changed {
+  border-color: var(--orange);
+  box-shadow: 0 0 12px rgba(255,158,100,0.3);
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.var-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: 'Fira Code', monospace;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.var-value {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Fira Code', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.var-value.null {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.var-value.slow { color: var(--yellow); }
+.var-value.fast { color: var(--purple); }
+.var-value.first { color: var(--blue); }
+.var-value.second { color: var(--green); }
+.var-value.prev { color: var(--red); }
+.var-value.temp { color: var(--orange); }
+
+.ptr-arrow {
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.mem-addr {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: 'Fira Code', monospace;
+  margin-top: 3px;
+  opacity: 0.7;
+}
+
+/* Heap Nodes */
+.heap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heap-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.heap-node {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  min-width: 100px;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.heap-node.highlighted {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(126,232,250,0.3);
+  transform: scale(1.08);
+  z-index: 10;
+}
+
+.heap-node.slow-ref {
   border-color: var(--yellow);
   box-shadow: 0 0 12px rgba(255,209,102,0.25);
 }
 
-.node.fast {
+.heap-node.fast-ref {
   border-color: var(--purple);
   box-shadow: 0 0 12px rgba(201,160,255,0.25);
 }
 
-.node.reversed {
-  border-color: var(--green);
-  box-shadow: 0 0 12px rgba(57,217,138,0.25);
-}
-
-.node.merged {
+.heap-node.first-ref {
   border-color: var(--blue);
   box-shadow: 0 0 12px rgba(78,168,222,0.25);
 }
 
-.arrow {
+.heap-node.second-ref {
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(57,217,138,0.25);
+}
+
+.heap-node.prev-ref {
+  border-color: var(--red);
+  box-shadow: 0 0 12px rgba(255,92,92,0.25);
+}
+
+.heap-node.temp-ref {
+  border-color: var(--orange);
+  box-shadow: 0 0 12px rgba(255,158,100,0.25);
+}
+
+.node-addr {
+  font-size: 9px;
   color: var(--muted);
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.arrow.reversed {
-  color: var(--green);
-}
-
-.ptr-label {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-
-.ptr-slow {
-  background: rgba(255,209,102,0.15);
-  color: var(--yellow);
-  border: 1px solid var(--yellow);
-}
-
-.ptr-fast {
-  background: rgba(201,160,255,0.15);
-  color: var(--purple);
-  border: 1px solid var(--purple);
-}
-
-.ptr-first {
-  background: rgba(78,168,222,0.15);
-  color: var(--blue);
-  border: 1px solid var(--blue);
-}
-
-.ptr-second {
-  background: rgba(57,217,138,0.15);
-  color: var(--green);
-  border: 1px solid var(--green);
-}
-
-.var-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.vc {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-}
-
-.vn {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-family: 'Fira Code', monospace;
   margin-bottom: 4px;
 }
 
-.vv {
-  font-family: 'Fira Code', monospace;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--accent);
+.node-content {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.msg-box {
-  background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(78,168,222,0.08));
-  border: 1px solid rgba(126,232,250,0.3);
-  border-radius: 8px;
-  padding: 14px 16px;
+.node-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.field-value {
   font-size: 14px;
-  line-height: 1.5;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
   color: var(--text);
 }
 
+.field-value.ptr {
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.field-value.null-ptr {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 11px;
+}
+
+.heap-arrow {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.heap-arrow.reversed {
+  color: var(--green);
+  transform: scaleX(-1);
+}
+
+.ref-labels {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ref-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ref-tag.slow { background: rgba(255,209,102,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+.ref-tag.fast { background: rgba(201,160,255,0.2); color: var(--purple); border: 1px solid var(--purple); }
+.ref-tag.first { background: rgba(78,168,222,0.2); color: var(--blue); border: 1px solid var(--blue); }
+.ref-tag.second { background: rgba(57,217,138,0.2); color: var(--green); border: 1px solid var(--green); }
+.ref-tag.prev { background: rgba(255,92,92,0.2); color: var(--red); border: 1px solid var(--red); }
+.ref-tag.temp { background: rgba(255,158,100,0.2); color: var(--orange); border: 1px solid var(--orange); }
+
+/* Operation Description */
+.operation-box {
+  background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(201,160,255,0.08));
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.op-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.op-desc {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.op-code {
+  font-family: 'Fira Code', monospace;
+  color: var(--yellow);
+  background: rgba(255,209,102,0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Phase Badge */
+.phase-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.phase-badge.find { background: rgba(255,209,102,0.15); color: var(--yellow); }
+.phase-badge.reverse { background: rgba(57,217,138,0.15); color: var(--green); }
+.phase-badge.merge { background: rgba(78,168,222,0.15); color: var(--blue); }
+.phase-badge.done { background: rgba(201,160,255,0.15); color: var(--purple); }
+
+/* Result Box */
 .result-box {
   background: linear-gradient(135deg, rgba(57,217,138,0.1), rgba(126,232,250,0.1));
   border: 2px solid var(--green);
   border-radius: 8px;
-  padding: 16px;
-  text-align: center;
+  padding: 14px;
   margin-top: 12px;
 }
 
-.result-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-
-.result-val {
-  font-family: 'Fira Code', monospace;
-  font-size: 18px;
+.result-title {
+  font-size: 11px;
   font-weight: 700;
   color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
+.result-value {
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Controls */
 .bot {
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding: 14px 24px;
+  padding: 12px 18px;
   display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 12px;
   flex-shrink: 0;
 }
 
 .bot button {
+  padding: 7px 14px;
+  border-radius: 6px;
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
 }
 
-.bot button:hover {
+.bot button:hover:not(:disabled) {
   background: var(--hl);
   border-color: var(--accent);
 }
@@ -399,217 +554,225 @@ main {
   cursor: not-allowed;
 }
 
-#btnPlay {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
-}
-
-#btnPlay:hover {
-  background: var(--blue);
-  border-color: var(--blue);
-}
-
 .step-info {
+  margin-left: auto;
   font-family: 'Fira Code', monospace;
-  font-size: 13px;
+  font-size: 11px;
   color: var(--muted);
-  margin-left: 8px;
+  font-weight: 600;
 }
 
 .spd-wrap {
-  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
 }
 
 .spd-wrap label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-#speedSlider {
-  width: 120px;
+.spd-wrap input {
+  width: 90px;
 }
 
+/* Log Panel */
 .log-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 10px;
 }
 
 .log-entry {
   font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  line-height: 1.8;
-  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 6px 10px;
+  margin-bottom: 5px;
   border-radius: 4px;
-  margin-bottom: 4px;
-  display: flex;
-  gap: 8px;
-  transition: background 0.15s;
+  border-left: 3px solid;
 }
 
-.log-entry:hover {
-  background: var(--hl);
+.log-entry.init {
+  background: rgba(126,232,250,0.05);
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+
+.log-entry.find {
+  background: rgba(255,209,102,0.05);
+  border-left-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.log-entry.reverse {
+  background: rgba(57,217,138,0.05);
+  border-left-color: var(--green);
+  color: var(--green);
+}
+
+.log-entry.merge {
+  background: rgba(78,168,222,0.05);
+  border-left-color: var(--blue);
+  color: var(--blue);
+}
+
+.log-entry.done {
+  background: rgba(201,160,255,0.05);
+  border-left-color: var(--purple);
+  color: var(--purple);
 }
 
 .ls {
   color: var(--muted);
-  font-weight: 600;
-  min-width: 30px;
+  margin-right: 6px;
+  font-weight: 700;
 }
-
-.log-entry.init { color: var(--blue); }
-.log-entry.find { color: var(--yellow); }
-.log-entry.reverse { color: var(--green); }
-.log-entry.merge { color: var(--purple); }
-.log-entry.done { color: var(--green); font-weight: 600; }
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 </style>
 </head>
 <body>
 <header>
-  <span class="h-num">143.</span>
-  <span class="h-title">Reorder List</span>
+  <span class="h-num">143</span>
+  <span class="h-title">Reorder List - Detailed Memory Visualization</span>
   <span class="h-badge">Medium</span>
   <div class="h-right">
-    <input type="text" id="listInp" class="inp" placeholder="e.g. 1,2,3,4,5" value="1,2,3,4,5"/>
-    <button onclick="init()" class="btn btn-g">Reset</button>
+    <input type="text" id="listInp" class="inp" value="1,2,3,4,5" placeholder="e.g. 1,2,3,4,5"/>
+    <button class="btn btn-g" onclick="init()">Run</button>
   </div>
 </header>
 
 <main>
   <div class="code-panel">
-    <div class="panel-label">Python Code</div>
-    <div class="code-scroll">
-      <div class="code-line" data-line="1">
+    <div class="panel-label">📝 Algorithm Code</div>
+    <div class="code-scroll">      <div class="code-line" data-line="1">
         <span class="ln">1</span>
-        <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+        <span class="ct"><span class="kw">def</span> <span class="fn">reorderList</span>(head):</span>
       </div>
       <div class="code-line" data-line="2">
         <span class="ln">2</span>
-        <span class="ct">    <span class="kw">def</span> <span class="fn">reorderList</span>(<span class="kw">self</span>, head):</span>
+        <span class="ct">    <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
       </div>
       <div class="code-line" data-line="3">
         <span class="ln">3</span>
-        <span class="ct">        <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
+        <span class="ct">        <span class="kw">return</span></span>
       </div>
       <div class="code-line" data-line="4">
         <span class="ln">4</span>
-        <span class="ct">            <span class="kw">return</span></span>
+        <span class="ct">    </span>
       </div>
       <div class="code-line" data-line="5">
         <span class="ln">5</span>
-        <span class="ct">        </span>
+        <span class="ct">    <span class="cm"># Phase 1: Find middle</span></span>
       </div>
       <div class="code-line" data-line="6">
         <span class="ln">6</span>
-        <span class="ct">        <span class="cm"># Find middle</span></span>
+        <span class="ct">    <span class="cm"># Initialize pointers</span></span>
       </div>
       <div class="code-line" data-line="7">
         <span class="ln">7</span>
-        <span class="ct">        slow, fast <span class="op">=</span> head, head</span>
+        <span class="ct">    slow, fast <span class="op">=</span> head, head</span>
       </div>
       <div class="code-line" data-line="8">
         <span class="ln">8</span>
-        <span class="ct">        <span class="kw">while</span> fast.next <span class="kw">and</span> fast.next.next:</span>
+        <span class="ct">    <span class="cm"># Move slow by 1, fast by 2</span></span>
       </div>
       <div class="code-line" data-line="9">
         <span class="ln">9</span>
-        <span class="ct">            slow <span class="op">=</span> slow.next</span>
+        <span class="ct">    <span class="kw">while</span> fast.next <span class="kw">and</span> fast.next.next:</span>
       </div>
       <div class="code-line" data-line="10">
         <span class="ln">10</span>
-        <span class="ct">            fast <span class="op">=</span> fast.next.next</span>
+        <span class="ct">        slow <span class="op">=</span> slow.next</span>
       </div>
       <div class="code-line" data-line="11">
         <span class="ln">11</span>
-        <span class="ct">        </span>
+        <span class="ct">        fast <span class="op">=</span> fast.next.next</span>
       </div>
       <div class="code-line" data-line="12">
         <span class="ln">12</span>
-        <span class="ct">        <span class="cm"># Reverse second half</span></span>
+        <span class="ct">    </span>
       </div>
       <div class="code-line" data-line="13">
         <span class="ln">13</span>
-        <span class="ct">        second <span class="op">=</span> slow.next</span>
+        <span class="ct">    <span class="cm"># Phase 2: Reverse second half</span></span>
       </div>
       <div class="code-line" data-line="14">
         <span class="ln">14</span>
-        <span class="ct">        slow.next <span class="op">=</span> <span class="nm">None</span></span>
+        <span class="ct">    second <span class="op">=</span> slow.next</span>
       </div>
       <div class="code-line" data-line="15">
         <span class="ln">15</span>
-        <span class="ct">        prev <span class="op">=</span> <span class="nm">None</span></span>
+        <span class="ct">    slow.next <span class="op">=</span> <span class="kw">None</span></span>
       </div>
       <div class="code-line" data-line="16">
         <span class="ln">16</span>
-        <span class="ct">        <span class="kw">while</span> second:</span>
+        <span class="ct">    prev <span class="op">=</span> <span class="kw">None</span></span>
       </div>
       <div class="code-line" data-line="17">
         <span class="ln">17</span>
-        <span class="ct">            temp <span class="op">=</span> second.next</span>
+        <span class="ct">    <span class="cm"># Reverse the second half</span></span>
       </div>
       <div class="code-line" data-line="18">
         <span class="ln">18</span>
-        <span class="ct">            second.next <span class="op">=</span> prev</span>
+        <span class="ct">    <span class="kw">while</span> second:</span>
       </div>
       <div class="code-line" data-line="19">
         <span class="ln">19</span>
-        <span class="ct">            prev <span class="op">=</span> second</span>
+        <span class="ct">        temp <span class="op">=</span> second.next</span>
       </div>
       <div class="code-line" data-line="20">
         <span class="ln">20</span>
-        <span class="ct">            second <span class="op">=</span> temp</span>
+        <span class="ct">        second.next <span class="op">=</span> prev</span>
       </div>
       <div class="code-line" data-line="21">
         <span class="ln">21</span>
-        <span class="ct">        second <span class="op">=</span> prev</span>
+        <span class="ct">        prev <span class="op">=</span> second</span>
       </div>
       <div class="code-line" data-line="22">
         <span class="ln">22</span>
-        <span class="ct">        </span>
+        <span class="ct">        second <span class="op">=</span> temp</span>
       </div>
       <div class="code-line" data-line="23">
         <span class="ln">23</span>
-        <span class="ct">        <span class="cm"># Merge alternately</span></span>
+        <span class="ct">    </span>
       </div>
       <div class="code-line" data-line="24">
         <span class="ln">24</span>
-        <span class="ct">        first <span class="op">=</span> head</span>
+        <span class="ct">    <span class="cm"># Phase 3: Merge alternately</span></span>
       </div>
       <div class="code-line" data-line="25">
         <span class="ln">25</span>
-        <span class="ct">        <span class="kw">while</span> second:</span>
+        <span class="ct">    first, second <span class="op">=</span> head, prev</span>
       </div>
       <div class="code-line" data-line="26">
         <span class="ln">26</span>
-        <span class="ct">            temp1, temp2 <span class="op">=</span> first.next, second.next</span>
+        <span class="ct">    <span class="kw">while</span> second:</span>
       </div>
       <div class="code-line" data-line="27">
         <span class="ln">27</span>
-        <span class="ct">            first.next <span class="op">=</span> second</span>
+        <span class="ct">        temp1, temp2 <span class="op">=</span> first.next, second.next</span>
       </div>
       <div class="code-line" data-line="28">
         <span class="ln">28</span>
-        <span class="ct">            second.next <span class="op">=</span> temp1</span>
+        <span class="ct">        first.next <span class="op">=</span> second</span>
       </div>
       <div class="code-line" data-line="29">
         <span class="ln">29</span>
-        <span class="ct">            first, second <span class="op">=</span> temp1, temp2</span>
+        <span class="ct">        second.next <span class="op">=</span> temp1</span>
+      </div>
+      <div class="code-line" data-line="30">
+        <span class="ln">30</span>
+        <span class="ct">        first, second <span class="op">=</span> temp1, temp2</span>
       </div>
     </div>
   </div>
 
   <div class="viz-panel">
-    <div class="panel-label">Visualization</div>
+    <div class="panel-label">🔍 Memory Visualization</div>
     <div class="viz-content" id="vizContent"></div>
     <div class="bot">
       <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
@@ -624,16 +787,17 @@ main {
   </div>
 
   <div class="log-panel">
-    <div class="panel-label">Step Log</div>
+    <div class="panel-label">📋 Execution Log</div>
     <div class="log-scroll" id="logScroll"></div>
   </div>
 </main>
 
 <script>
 class ListNode {
-  constructor(val, next = null) {
+  constructor(val, next = null, addr = null) {
     this.val = val;
     this.next = next;
+    this.addr = addr; // Memory address
   }
 }
 
@@ -665,182 +829,408 @@ function init() {
 
 function buildSteps(vals) {
   const steps = [];
-  let head = new ListNode(vals[0]);
+  
+  // Create linked list with memory addresses
+  let head = new ListNode(vals[0], null, `0x${(1000).toString(16).toUpperCase()}`);
   let curr = head;
+  let nodes = [head];
+  
   for (let i = 1; i < vals.length; i++) {
-    curr.next = new ListNode(vals[i]);
+    curr.next = new ListNode(vals[i], null, `0x${(1000 + i * 8).toString(16).toUpperCase()}`);
     curr = curr.next;
+    nodes.push(curr);
   }
   
-  function snap(line, msg, logType, logText, phase, list1, list2 = null, ptrs = {}) {
+  function snap(line, op, desc, logType, logText, phase, vars = {}, changed = [], heapRefs = {}) {
+    // Clone nodes state
+    const nodesState = nodes.map(n => ({
+      val: n.val,
+      addr: n.addr,
+      next: n.next ? n.next.addr : null,
+      nextVal: n.next ? n.next.val : null
+    }));
+    
     steps.push({
       line,
-      msg,
+      operation: op,
+      description: desc,
       log: { type: logType, text: logText },
       phase,
-      list1,
-      list2,
-      ptrs
+      variables: { ...vars },
+      changed,
+      nodes: nodesState,
+      heapRefs
     });
   }
   
   // Initial state
-  snap(2, 'Starting reorder process', 'init', 'Initialize with original list', 'original', listToArray(head));
+  snap(2, 'INITIALIZATION', 'Starting reorder process with linked list', 
+    'init', 'Initialize with original list', 'init',
+    { head: { addr: head.addr, val: head.val } }, [], {});
   
   // Phase 1: Find middle
-  snap(7, 'Initialize slow and fast pointers', 'find', 'Set slow=head, fast=head', 'find-middle', listToArray(head), null, { slow: 0, fast: 0 });
+  snap(7, 'VARIABLE ASSIGNMENT', 'Initialize slow and fast pointers to head',
+    'find', 'slow = head, fast = head', 'find',
+    { 
+      head: { addr: head.addr, val: head.val },
+      slow: { addr: head.addr, val: head.val },
+      fast: { addr: head.addr, val: head.val }
+    }, 
+    ['slow', 'fast'],
+    { slow: head.addr, fast: head.addr });
   
   let slow = head, fast = head;
-  let slowIdx = 0, fastIdx = 0;
   
   while (fast.next && fast.next.next) {
     slow = slow.next;
     fast = fast.next.next;
-    slowIdx++;
-    fastIdx += 2;
     
-    snap(9, 'Move pointers: slow by 1, fast by 2', 'find', `Slow moved to index ${slowIdx}, fast to ${fastIdx}`, 'find-middle', listToArray(head), null, { slow: slowIdx, fast: fastIdx });
+    snap(10, 'POINTER UPDATE', `Move slow to node ${slow.val}, fast to node ${fast.val}`,
+      'find', `slow = slow.next (→${slow.val}), fast = fast.next.next (→${fast.val})`, 'find',
+      {
+        head: { addr: head.addr, val: head.val },
+        slow: { addr: slow.addr, val: slow.val },
+        fast: { addr: fast.addr, val: fast.val }
+      },
+      ['slow', 'fast'],
+      { slow: slow.addr, fast: fast.addr });
   }
   
-  snap(13, 'Middle found, prepare to split', 'find', `Middle at index ${slowIdx}`, 'find-middle', listToArray(head), null, { slow: slowIdx });
+  snap(14, 'POINTER ASSIGNMENT', 'Store reference to second half',
+    'reverse', `second = slow.next (→${slow.next ? slow.next.val : 'null'})`, 'reverse',
+    {
+      head: { addr: head.addr, val: head.val },
+      slow: { addr: slow.addr, val: slow.val },
+      second: slow.next ? { addr: slow.next.addr, val: slow.next.val } : null
+    },
+    ['second'],
+    { slow: slow.addr, second: slow.next ? slow.next.addr : null });
   
-  // Phase 2: Reverse second half
   let second = slow.next;
-  slow.next = null;
-  const firstHalf = listToArray(head);
-  const secondHalf = listToArray(second);
   
-  snap(14, 'Split list into two halves', 'reverse', `First half: ${firstHalf.join('→')}, Second half: ${secondHalf.join('→')}`, 'split', firstHalf, secondHalf);
+  // Break the link
+  slow.next = null;
+  snap(15, 'LINK MODIFICATION', 'Break the list at middle',
+    'reverse', 'slow.next = None (split the list)', 'reverse',
+    {
+      head: { addr: head.addr, val: head.val },
+      slow: { addr: slow.addr, val: slow.val },
+      second: second ? { addr: second.addr, val: second.val } : null
+    },
+    [],
+    { slow: slow.addr, second: second ? second.addr : null });
+  
+  snap(16, 'VARIABLE INITIALIZATION', 'Initialize prev to None for reversal',
+    'reverse', 'prev = None', 'reverse',
+    {
+      head: { addr: head.addr, val: head.val },
+      slow: { addr: slow.addr, val: slow.val },
+      second: second ? { addr: second.addr, val: second.val } : null,
+      prev: null
+    },
+    ['prev'],
+    { slow: slow.addr, second: second ? second.addr : null, prev: null });
   
   let prev = null;
-  let reverseSteps = [];
   
+  // Reverse second half
   while (second) {
     const temp = second.next;
+    
+    snap(19, 'BACKUP POINTER', 'Store next pointer before modifying',
+      'reverse', `temp = second.next (→${temp ? temp.val : 'null'})`, 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        second: { addr: second.addr, val: second.val },
+        prev: prev ? { addr: prev.addr, val: prev.val } : null,
+        temp: temp ? { addr: temp.addr, val: temp.val } : null
+      },
+      ['temp'],
+      { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
+    
     second.next = prev;
+    snap(20, 'REVERSE LINK', `Reverse: node ${second.val} now points to ${prev ? prev.val : 'null'}`,
+      'reverse', `second.next = prev (reverse the link)`, 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        second: { addr: second.addr, val: second.val },
+        prev: prev ? { addr: prev.addr, val: prev.val } : null,
+        temp: temp ? { addr: temp.addr, val: temp.val } : null
+      },
+      [],
+      { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
+    
     prev = second;
+    snap(21, 'MOVE PREV', `Advance prev to node ${prev.val}`,
+      'reverse', `prev = second (→${prev.val})`, 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        second: { addr: second.addr, val: second.val },
+        prev: { addr: prev.addr, val: prev.val },
+        temp: temp ? { addr: temp.addr, val: temp.val } : null
+      },
+      ['prev'],
+      { second: second.addr, prev: prev.addr, temp: temp ? temp.addr : null });
+    
     second = temp;
-    reverseSteps.push(listToArray(prev));
+    snap(22, 'MOVE SECOND', `Advance second to ${second ? 'node ' + second.val : 'null'}`,
+      'reverse', `second = temp (→${second ? second.val : 'null'})`, 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        second: second ? { addr: second.addr, val: second.val } : null,
+        prev: { addr: prev.addr, val: prev.val },
+        temp: null
+      },
+      ['second'],
+      { second: second ? second.addr : null, prev: prev.addr });
   }
   
-  reverseSteps.forEach((reversed, idx) => {
-    snap(18, `Reversing node ${idx + 1}`, 'reverse', `Reversed: ${reversed.join('→')}`, 'reversing', firstHalf, reversed);
-  });
-  
   second = prev;
-  const reversedSecond = listToArray(second);
-  snap(21, 'Second half reversed', 'reverse', `Reversed second half: ${reversedSecond.join('→')}`, 'reversed', firstHalf, reversedSecond);
-  
-  // Phase 3: Merge
-  snap(24, 'Start merging alternately', 'merge', 'Merge first and reversed second halves', 'merge-start', firstHalf, reversedSecond);
+  snap(25, 'PREPARE MERGE', 'Initialize first and second for merging',
+    'merge', `first = head, second = prev (reversed half)`, 'merge',
+    {
+      head: { addr: head.addr, val: head.val },
+      first: { addr: head.addr, val: head.val },
+      second: { addr: second.addr, val: second.val },
+      prev: { addr: prev.addr, val: prev.val }
+    },
+    ['first', 'second'],
+    { first: head.addr, second: second.addr });
   
   let first = head;
-  let mergeResult = [];
-  let f1Idx = 0, f2Idx = 0;
   
   while (second) {
-    mergeResult.push(first.val);
-    mergeResult.push(second.val);
-    
     const temp1 = first.next;
     const temp2 = second.next;
+    
+    snap(27, 'STORE NEXT POINTERS', 'Backup next pointers before reconnecting',
+      'merge', `temp1 = first.next, temp2 = second.next`, 'merge',
+      {
+        head: { addr: head.addr, val: head.val },
+        first: { addr: first.addr, val: first.val },
+        second: { addr: second.addr, val: second.val },
+        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+      },
+      ['temp1', 'temp2'],
+      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+    
     first.next = second;
+    snap(28, 'CONNECT FIRST→SECOND', `Link node ${first.val} → ${second.val}`,
+      'merge', `first.next = second`, 'merge',
+      {
+        head: { addr: head.addr, val: head.val },
+        first: { addr: first.addr, val: first.val },
+        second: { addr: second.addr, val: second.val },
+        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+      },
+      [],
+      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+    
     second.next = temp1;
+    snap(29, 'CONNECT SECOND→TEMP1', `Link node ${second.val} → ${temp1 ? temp1.val : 'null'}`,
+      'merge', `second.next = temp1`, 'merge',
+      {
+        head: { addr: head.addr, val: head.val },
+        first: { addr: first.addr, val: first.val },
+        second: { addr: second.addr, val: second.val },
+        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+      },
+      [],
+      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+    
     first = temp1;
     second = temp2;
     
-    snap(27, `Merge step: connect ${mergeResult[mergeResult.length - 2]}→${mergeResult[mergeResult.length - 1]}`, 'merge', `Current merged: ${mergeResult.join('→')}`, 'merging', mergeResult.slice());
+    snap(30, 'ADVANCE POINTERS', `Move to next pair: first=${first ? first.val : 'null'}, second=${second ? second.val : 'null'}`,
+      'merge', `first = temp1, second = temp2`, 'merge',
+      {
+        head: { addr: head.addr, val: head.val },
+        first: first ? { addr: first.addr, val: first.val } : null,
+        second: second ? { addr: second.addr, val: second.val } : null
+      },
+      ['first', 'second'],
+      { first: first ? first.addr : null, second: second ? second.addr : null });
   }
   
-  if (first) {
-    mergeResult.push(first.val);
-  }
-  
-  snap(29, 'Merging complete', 'done', `Final reordered list: ${mergeResult.join('→')}`, 'done', mergeResult);
-  
-  return steps;
-}
-
-function listToArray(head) {
-  const arr = [];
-  let curr = head;
+  // Get final result
+  let result = [];
+  curr = head;
   while (curr) {
-    arr.push(curr.val);
+    result.push(curr.val);
     curr = curr.next;
   }
-  return arr;
+  
+  snap(30, 'COMPLETE', 'List reordering complete',
+    'done', `Final: [${result.join(', ')}]`, 'done',
+    { head: { addr: head.addr, val: head.val } },
+    [],
+    {});
+  
+  return steps;
 }
 
 function renderStep(idx) {
   const s = steps[idx];
   const viz = document.getElementById('vizContent');
   
+  // Highlight active line
   document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
   const activeLine = document.querySelector(`[data-line="${s.line}"]`);
   if (activeLine) activeLine.classList.add('active');
   
   let html = '';
   
-  if (s.phase === 'original') {
-    html += `<div class="phase-label">Original List</div>`;
-    html += renderList(s.list1);
-  } else if (s.phase === 'find-middle') {
-    html += `<div class="phase-label">Phase 1: Finding Middle</div>`;
-    html += renderList(s.list1, s.ptrs);
-  } else if (s.phase === 'split') {
-    html += `<div class="phase-label">Phase 2: Split into Two Halves</div>`;
-    html += `<div style="margin-bottom: 16px;">`;
-    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">FIRST HALF</div>`;
-    html += renderList(s.list1);
-    html += `</div>`;
-    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">SECOND HALF</div>`;
-    html += renderList(s.list2);
-  } else if (s.phase === 'reversing' || s.phase === 'reversed') {
-    html += `<div class="phase-label">Phase 2: Reversing Second Half</div>`;
-    html += `<div style="margin-bottom: 16px;">`;
-    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">FIRST HALF</div>`;
-    html += renderList(s.list1);
-    html += `</div>`;
-    html += `<div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">SECOND HALF (${s.phase === 'reversed' ? 'REVERSED' : 'REVERSING...'})</div>`;
-    html += renderList(s.list2, {}, s.phase === 'reversed' ? 'reversed' : 'highlight', true);
-  } else if (s.phase === 'merge-start' || s.phase === 'merging') {
-    html += `<div class="phase-label">Phase 3: Merging Alternately</div>`;
-    html += renderList(s.list1, {}, 'merged');
-  } else if (s.phase === 'done') {
-    html += `<div class="phase-label">Final Result</div>`;
-    html += renderList(s.list1, {}, 'merged');
-    html += `<div class="result-box">`;
-    html += `<div class="result-label">List Reordered Successfully</div>`;
-    html += `<div class="result-val">${s.list1.join(' → ')}</div>`;
-    html += `</div>`;
-  }
+  // Phase badge
+  let phaseName = s.phase === 'init' ? 'init' : s.phase === 'find' ? 'find' : s.phase === 'reverse' ? 'reverse' : s.phase === 'merge' ? 'merge' : 'done';
+  html += `<div class="phase-badge ${phaseName}">
+    ${s.phase === 'init' ? '🚀 INITIALIZATION' : s.phase === 'find' ? '🎯 PHASE 1: FIND MIDDLE' : s.phase === 'reverse' ? '🔄 PHASE 2: REVERSE' : s.phase === 'merge' ? '🔗 PHASE 3: MERGE' : '✅ COMPLETE'}
+  </div>`;
   
-  html += `<div class="msg-box">${s.msg}</div>`;
+  // Operation description
+  html += `<div class="operation-box">
+    <div class="op-title">${s.operation}</div>
+    <div class="op-desc">${s.description}</div>
+  </div>`;
+  
+  // Stack Variables (Local Variables)
+  html += `<div class="memory-section">
+    <div class="section-title"><span class="section-icon">📦</span> Stack Frame (Local Variables)</div>
+    <div class="stack-grid">`;
+  
+  const varOrder = ['head', 'slow', 'fast', 'first', 'second', 'prev', 'temp', 'temp1', 'temp2'];
+  const varColors = {
+    slow: 'slow',
+    fast: 'fast',
+    first: 'first',
+    second: 'second',
+    prev: 'prev',
+    temp: 'temp',
+    temp1: 'temp',
+    temp2: 'temp'
+  };
+  
+  varOrder.forEach(varName => {
+    if (s.variables[varName] !== undefined) {
+      const v = s.variables[varName];
+      const isChanged = s.changed.includes(varName);
+      const colorClass = varColors[varName] || '';
+      
+      html += `<div class="stack-var ${isChanged ? 'changed' : ''}">
+        <div class="var-name">${varName}</div>
+        <div class="var-value ${v === null ? 'null' : colorClass}">`;
+      
+      if (v === null) {
+        html += 'null';
+      } else {
+        html += `<span class="ptr-arrow">→</span> Node(${v.val})`;
+      }
+      
+      html += `</div>`;
+      
+      if (v !== null) {
+        html += `<div class="mem-addr">${v.addr}</div>`;
+      }
+      
+      html += `</div>`;
+    }
+  });
+  
+  html += `</div></div>`;
+  
+  // Heap Memory (Linked List Nodes)
+  html += `<div class="memory-section">
+    <div class="section-title"><span class="section-icon">🗄️</span> Heap Memory (ListNode Objects)</div>
+    <div class="heap-container">`;
+  
+  html += `<div class="heap-row">`;
+  
+  s.nodes.forEach((node, idx) => {
+    // Determine which variables reference this node
+    let refs = [];
+    if (s.heapRefs.slow === node.addr) refs.push('slow');
+    if (s.heapRefs.fast === node.addr) refs.push('fast');
+    if (s.heapRefs.first === node.addr) refs.push('first');
+    if (s.heapRefs.second === node.addr) refs.push('second');
+    if (s.heapRefs.prev === node.addr) refs.push('prev');
+    if (s.heapRefs.temp === node.addr) refs.push('temp');
+    if (s.heapRefs.temp1 === node.addr) refs.push('temp1');
+    if (s.heapRefs.temp2 === node.addr) refs.push('temp2');
+    
+    let nodeClass = 'heap-node';
+    if (refs.length > 0) {
+      nodeClass += ' highlighted';
+      refs.forEach(ref => {
+        if (ref === 'slow') nodeClass += ' slow-ref';
+        else if (ref === 'fast') nodeClass += ' fast-ref';
+        else if (ref === 'first') nodeClass += ' first-ref';
+        else if (ref === 'second') nodeClass += ' second-ref';
+        else if (ref === 'prev') nodeClass += ' prev-ref';
+        else nodeClass += ' temp-ref';
+      });
+    }
+    
+    html += `<div class="${nodeClass}" style="position: relative; margin-top: ${refs.length > 0 ? '24px' : '0'};">`;
+    
+    // Reference labels
+    if (refs.length > 0) {
+      html += `<div class="ref-labels">`;
+      refs.forEach(ref => {
+        const refClass = ref === 'temp1' || ref === 'temp2' ? 'temp' : ref;
+        html += `<span class="ref-tag ${refClass}">${ref}</span>`;
+      });
+      html += `</div>`;
+    }
+    
+    html += `<div class="node-addr">${node.addr}</div>
+      <div class="node-content">
+        <div class="node-field">
+          <div class="field-label">val</div>
+          <div class="field-value">${node.val}</div>
+        </div>
+        <div class="node-field">
+          <div class="field-label">next</div>
+          <div class="field-value ${node.next ? 'ptr' : 'null-ptr'}">
+            ${node.next ? node.next : 'null'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+    
+    if (idx < s.nodes.length - 1 && node.next) {
+      html += `<span class="heap-arrow">→</span>`;
+    }
+  });
+  
+  html += `</div>`;
+  html += `</div></div>`;
+  
+  // Result for final step
+  if (s.phase === 'done') {
+    let result = [];
+    let curr = s.nodes[0];
+    let visited = new Set();
+    
+    while (curr && !visited.has(curr.addr)) {
+      result.push(curr.val);
+      visited.add(curr.addr);
+      if (curr.next) {
+        curr = s.nodes.find(n => n.addr === curr.next);
+      } else {
+        curr = null;
+      }
+    }
+    
+    html += `<div class="result-box">
+      <div class="result-title">✨ Final Reordered List</div>
+      <div class="result-value">[${result.join(' → ')}]</div>
+    </div>`;
+  }
   
   viz.innerHTML = html;
   updateStepInfo();
-}
-
-function renderList(arr, ptrs = {}, highlight = '', showReversed = false) {
-  let html = '<div class="list-row">';
-  arr.forEach((val, idx) => {
-    let cls = 'node';
-    if (ptrs.slow === idx) cls += ' slow';
-    if (ptrs.fast === idx) cls += ' fast';
-    if (highlight && highlight !== '') cls += ` ${highlight}`;
-    
-    html += `<div class="${cls}" style="position:relative;">`;
-    if (ptrs.slow === idx) html += `<div class="ptr-label ptr-slow">SLOW</div>`;
-    if (ptrs.fast === idx) html += `<div class="ptr-label ptr-fast">FAST</div>`;
-    html += `${val}`;
-    html += `</div>`;
-    
-    if (idx < arr.length - 1) {
-      html += `<span class="arrow${showReversed ? ' reversed' : ''}">→</span>`;
-    }
-  });
-  html += '</div>';
-  return html;
 }
 
 function stepFwd() {
