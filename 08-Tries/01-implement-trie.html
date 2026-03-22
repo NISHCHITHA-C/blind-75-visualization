@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>208. Implement Trie</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
+  --insert:#3b82f6;--search:#10b981;--prefix:#f59e0b;--end:#a78bfa;
+  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+
+header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
+.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--prefix);}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+main{display:grid;grid-template-columns:320px 1fr 260px;flex:1;overflow:hidden;}
+
+.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
+.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
+.cl.active{background:rgba(59,130,246,.1);}
+.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
+.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
+.cl.active .ln{color:#3b82f6;}
+.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
+.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}.op{color:#56b6c2;}
+
+.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.controls{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;}
+.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:140px;}
+.inp:focus{border-color:#3b82f6;}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;padding:5px 12px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
+.btn-insert{background:var(--insert);color:#fff;}.btn-insert:hover{background:#2563eb;}
+.btn-search{background:var(--search);color:#fff;}.btn-search:hover{background:#059669;}
+.btn-prefix{background:var(--prefix);color:#fff;}.btn-prefix:hover{background:#d97706;}
+
+.trie-viz{flex:1;overflow:auto;padding:20px;}
+.trie-canvas{min-height:300px;position:relative;}
+
+.trie-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
+.node-box{width:40px;height:40px;border-radius:8px;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:var(--text);transition:all .3s;position:relative;}
+.trie-node.active .node-box{border-color:var(--insert);box-shadow:0 0 14px rgba(59,130,246,.3);color:var(--insert);}
+.trie-node.found .node-box{border-color:var(--search);box-shadow:0 0 14px rgba(16,185,129,.3);color:var(--search);}
+.trie-node.is-end .node-box::after{content:'*';position:absolute;top:-8px;right:-8px;width:16px;height:16px;border-radius:50%;background:var(--end);color:#fff;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.edge-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:3px;}
+
+.trie-edge{position:absolute;stroke:var(--border);stroke-width:2;fill:none;transition:all .3s;}
+.trie-edge.active{stroke:var(--insert);stroke-width:3;}
+.trie-edge.found{stroke:var(--search);stroke-width:3;}
+
+.result{margin:12px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
+.result.success{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--search);}
+.result.fail{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07);color:#ef4444;}
+
+.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
+.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
+.lc:hover{color:var(--text);}
+.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
+.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
+.le.insert{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--insert);}
+.le.search{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--search);}
+.le.prefix{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);color:var(--prefix);}
+.ls{color:var(--muted);margin-right:6px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-num">208</div>
+  <div class="h-title">Implement Trie (Prefix Tree)</div>
+  <div class="h-badge">MEDIUM</div>
+</header>
+
+<main>
+  <div class="code-panel">
+    <div class="plabel">Trie Implementation</div>
+    <div class="code-scroll" id="codePanel"></div>
+  </div>
+
+  <div class="viz-panel">
+    <div class="controls">
+      <input id="wordInput" class="inp" placeholder="Enter word..."/>
+      <button class="btn btn-insert" onclick="insertWord()">Insert</button>
+      <button class="btn btn-search" onclick="searchWord()">Search</button>
+      <button class="btn btn-prefix" onclick="searchPrefix()">Prefix</button>
+    </div>
+    <div class="trie-viz">
+      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
+      <div id="trieCanvas" class="trie-canvas"></div>
+    </div>
+    <div id="result" class="result">Ready to insert, search, or check prefixes</div>
+    <div style="margin-top:auto;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);font-family:'JetBrains Mono';font-size:.65rem;color:var(--muted);">
+      Inserted words: <span id="wordList" style="color:var(--text);">[]</span>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="plabel">
+      Operation Log
+      <button class="lc" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-scroll" id="logScroll"></div>
+  </div>
+</main>
+
+<script>
+const code=[
+  {t:'class TrieNode:',cm:true},
+  {t:'    def __init__(self):',ln:1},
+  {t:'        self.children = {}',ln:2},
+  {t:'        self.is_end = False',ln:3},
+  {t:'',ln:4},
+  {t:'class Trie:',cm:true},
+  {t:'    def __init__(self):',ln:5},
+  {t:'        self.root = TrieNode()',ln:6},
+  {t:'    ',ln:7},
+  {t:'    def insert(self, word):',ln:8},
+  {t:'        node = self.root',ln:9},
+  {t:'        for char in word:',ln:10},
+  {t:'            if char not in node.children:',ln:11},
+  {t:'                node.children[char] = TrieNode()',ln:12},
+  {t:'            node = node.children[char]',ln:13},
+  {t:'        node.is_end = True',ln:14},
+  {t:'    ',ln:15},
+  {t:'    def search(self, word):',ln:16},
+  {t:'        node = self.root',ln:17},
+  {t:'        for char in word:',ln:18},
+  {t:'            if char not in node.children:',ln:19},
+  {t:'                return False',ln:20},
+  {t:'            node = node.children[char]',ln:21},
+  {t:'        return node.is_end',ln:22},
+  {t:'    ',ln:23},
+  {t:'    def startsWith(self, prefix):',ln:24},
+  {t:'        node = self.root',ln:25},
+  {t:'        for char in prefix:',ln:26},
+  {t:'            if char not in node.children:',ln:27},
+  {t:'                return False',ln:28},
+  {t:'            node = node.children[char]',ln:29},
+  {t:'        return True',ln:30}
+];
+
+class TrieNode{
+  constructor(){this.children={};this.isEnd=false;this.id=nodeIdCounter++;}
+}
+
+class Trie{
+  constructor(){this.root=new TrieNode();}
+  insert(word){
+    let node=this.root;
+    for(let c of word){
+      if(!node.children[c])node.children[c]=new TrieNode();
+      node=node.children[c];
+    }
+    node.isEnd=true;
+  }
+  search(word){
+    let node=this.root;
+    for(let c of word){
+      if(!node.children[c])return false;
+      node=node.children[c];
+    }
+    return node.isEnd;
+  }
+  startsWith(prefix){
+    let node=this.root;
+    for(let c of prefix){
+      if(!node.children[c])return false;
+      node=node.children[c];
+    }
+    return true;
+  }
+}
+
+let trie,nodeIdCounter=0,insertedWords=[];
+
+function buildCode(){
+  const panel=document.getElementById('codePanel');
+  code.forEach((c,i)=>{
+    const line=document.createElement('div');
+    line.className='cl';
+    line.id=`line${c.ln||i}`;
+    const ln=document.createElement('div');ln.className='ln';
+    ln.textContent=c.ln!==undefined?c.ln:'';
+    const ct=document.createElement('div');ct.className='ct';
+    if(c.cm){
+      ct.innerHTML=`<span class="cm">${c.t}</span>`;
+    }else{
+      ct.innerHTML=c.t
+        .replace(/(class|def|if|not|in|for|return|True|False)/g,'<span class="kw">$1</span>')
+        .replace(/(TrieNode|Trie|insert|search|startsWith)/g,'<span class="fn">$1</span>')
+        .replace(/(self|root|node|children|is_end|word|char|prefix)/g,'<span class="nm">$1</span>');
+    }
+    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  });
+}
+
+function layoutTrie(){
+  const positions=new Map();
+  const levelNodes=[];
+  
+  function traverse(node,level=0,offset=0){
+    if(!levelNodes[level])levelNodes[level]=[];
+    levelNodes[level].push(node);
+    const children=Object.values(node.children);
+    let childOffset=offset;
+    children.forEach(child=>{
+      childOffset=traverse(child,level+1,childOffset);
+    });
+    return Math.max(offset+1,childOffset);
+  }
+  
+  traverse(trie.root);
+  
+  levelNodes.forEach((nodes,level)=>{
+    const spacing=Math.max(70,800/Math.max(nodes.length,1));
+    nodes.forEach((node,i)=>{
+      positions.set(node.id,{x:i*spacing+100,y:level*80+50});
+    });
+  });
+  
+  return positions;
+}
+
+function renderTrie(highlightPath=[]){
+  const canvas=document.getElementById('trieCanvas');
+  const svg=document.getElementById('edgeSvg');
+  canvas.innerHTML='';
+  svg.innerHTML='';
+  
+  const positions=layoutTrie();
+  
+  function drawEdges(node,parentPos=null){
+    const pos=positions.get(node.id);
+    if(parentPos){
+      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d',`M ${parentPos.x+20} ${parentPos.y+40} L ${pos.x+20} ${pos.y}`);
+      line.classList.add('trie-edge');
+      if(highlightPath.includes(node.id))line.classList.add('active');
+      svg.appendChild(line);
+    }
+    Object.values(node.children).forEach(child=>drawEdges(child,pos));
+  }
+  
+  drawEdges(trie.root);
+  
+  function drawNodes(node,char='∅'){
+    const pos=positions.get(node.id);
+    const nodeDiv=document.createElement('div');
+    nodeDiv.className='trie-node';
+    if(node.isEnd)nodeDiv.classList.add('is-end');
+    if(highlightPath.includes(node.id))nodeDiv.classList.add('active');
+    nodeDiv.style.left=`${pos.x}px`;
+    nodeDiv.style.top=`${pos.y}px`;
+    
+    const box=document.createElement('div');
+    box.className='node-box';
+    box.textContent=char;
+    
+    const label=document.createElement('div');
+    label.className='edge-label';
+    label.textContent=`#${node.id}`;
+    
+    nodeDiv.appendChild(box);
+    nodeDiv.appendChild(label);
+    canvas.appendChild(nodeDiv);
+    
+    Object.entries(node.children).forEach(([c,child])=>drawNodes(child,c));
+  }
+  
+  drawNodes(trie.root);
+}
+
+function getPathForWord(word){
+  const path=[trie.root.id];
+  let node=trie.root;
+  for(let c of word){
+    if(!node.children[c])break;
+    node=node.children[c];
+    path.push(node.id);
+  }
+  return path;
+}
+
+function insertWord(){
+  const word=document.getElementById('wordInput').value.trim().toLowerCase();
+  if(!word)return;
+  
+  trie.insert(word);
+  insertedWords.push(word);
+  
+  const path=getPathForWord(word);
+  renderTrie(path);
+  
+  const res=document.getElementById('result');
+  res.className='result success';
+  res.textContent=`Inserted "${word}" successfully`;
+  
+  addLog({type:'insert',text:`Inserted word "${word}"`});
+  
+  document.getElementById('wordList').textContent=JSON.stringify(insertedWords);
+  document.getElementById('wordInput').value='';
+}
+
+function searchWord(){
+  const word=document.getElementById('wordInput').value.trim().toLowerCase();
+  if(!word)return;
+  
+  const found=trie.search(word);
+  const path=found?getPathForWord(word):[];
+  renderTrie(path);
+  
+  const res=document.getElementById('result');
+  if(found){
+    res.className='result success';
+    res.textContent=`Found "${word}" in trie`;
+    addLog({type:'search',text:`Search "${word}": FOUND`});
+  }else{
+    res.className='result fail';
+    res.textContent=`"${word}" not found in trie`;
+    addLog({type:'search',text:`Search "${word}": NOT FOUND`});
+  }
+  
+  document.getElementById('wordInput').value='';
+}
+
+function searchPrefix(){
+  const prefix=document.getElementById('wordInput').value.trim().toLowerCase();
+  if(!prefix)return;
+  
+  const found=trie.startsWith(prefix);
+  const path=found?getPathForWord(prefix):[];
+  renderTrie(path);
+  
+  const res=document.getElementById('result');
+  if(found){
+    res.className='result success';
+    res.textContent=`Prefix "${prefix}" exists in trie`;
+    addLog({type:'prefix',text:`Prefix "${prefix}": EXISTS`});
+  }else{
+    res.className='result fail';
+    res.textContent=`Prefix "${prefix}" does not exist`;
+    addLog({type:'prefix',text:`Prefix "${prefix}": NOT FOUND`});
+  }
+  
+  document.getElementById('wordInput').value='';
+}
+
+function addLog(log){
+  const el=document.getElementById('logScroll');
+  const d=document.createElement('div');d.className=`le ${log.type}`;
+  d.innerHTML=`<span class="ls">[${Date.now()%10000}]</span>${log.text}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function clearLog(){document.getElementById('logScroll').innerHTML='';}
+
+function init(){
+  trie=new Trie();
+  nodeIdCounter=0;
+  insertedWords=[];
+  renderTrie();
+  document.getElementById('wordList').textContent='[]';
+}
+
+buildCode();
+init();
+
+// Sample words for demonstration
+setTimeout(()=>{
+  ['apple','app'].forEach(w=>{
+    document.getElementById('wordInput').value=w;
+    insertWord();
+  });
+},100);
+</script>
+</body>
+</html>
