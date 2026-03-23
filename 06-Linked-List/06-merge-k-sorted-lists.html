@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>23. Merge k Sorted Lists - Algorithm Visualization</title>
+<title>Merge K Sorted Lists - Complete Explanation</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -122,19 +122,21 @@ header {
 
 main {
   display: grid;
-  grid-template-columns: 390px 1fr 255px;
+  grid-template-columns: 380px 1fr 420px;
   flex: 1;
   overflow: hidden;
 }
 
-.code-panel, .viz-panel, .log-panel {
+.code-panel, .viz-panel, .right-panel {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
 
-.log-panel {
+.right-panel {
   border-right: none;
+  display: grid;
+  grid-template-rows: 1fr auto;
 }
 
 .panel-label {
@@ -261,7 +263,7 @@ main {
   font-size: 14px;
 }
 
-.heap-container {
+.heap-array {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -279,62 +281,84 @@ main {
   background: linear-gradient(135deg, rgba(126,232,250,0.12), rgba(78,168,222,0.12));
   border: 2px solid var(--accent);
   border-radius: 6px;
-  padding: 8px 14px;
+  padding: 10px 12px;
   font-family: 'Fira Code', monospace;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--accent);
-  display: flex;
-  align-items: center;
-  gap: 6px;
   transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 90px;
 }
 
 .heap-node.popping {
   border-color: var(--green);
   color: var(--green);
-  background: linear-gradient(135deg, rgba(57,217,138,0.12), rgba(126,232,250,0.12));
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(57,217,138,0.15), rgba(126,232,250,0.12));
+  transform: scale(1.08);
   box-shadow: 0 0 16px rgba(57,217,138,0.3);
 }
 
 .heap-node.adding {
   border-color: var(--yellow);
   color: var(--yellow);
-  background: linear-gradient(135deg, rgba(255,209,102,0.12), rgba(247,151,30,0.12));
+  background: linear-gradient(135deg, rgba(255,209,102,0.15), rgba(247,151,30,0.12));
   animation: pulse 0.5s ease-in-out;
 }
 
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.12); }
 }
 
-.heap-val {
-  font-size: 15px;
+.heap-tuple {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
 }
 
-.heap-idx {
+.tuple-part {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.tuple-val {
+  background: rgba(126,232,250,0.2);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tuple-idx {
+  background: rgba(201,160,255,0.2);
+  color: var(--purple);
+}
+
+.tuple-node {
+  background: rgba(255,209,102,0.2);
+  color: var(--yellow);
   font-size: 10px;
-  color: var(--muted);
 }
 
 .result-container {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 14px;
+  padding: 12px;
 }
 
 .result-list {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
-  min-height: 40px;
+  flex-wrap: wrap;
 }
 
 .result-node {
-  background: linear-gradient(135deg, rgba(57,217,138,0.12), rgba(126,232,250,0.12));
+  background: var(--surface);
   border: 2px solid var(--green);
   border-radius: 6px;
   padding: 6px 12px;
@@ -346,70 +370,210 @@ main {
 }
 
 .result-node.latest {
-  transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(57,217,138,0.3);
+  border-color: var(--yellow);
+  color: var(--yellow);
+  box-shadow: 0 0 12px rgba(255,209,102,0.3);
+  transform: scale(1.08);
 }
 
 .msg-box {
-  background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(78,168,222,0.08));
-  border: 1px solid rgba(126,232,250,0.3);
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: var(--hl);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 16px;
   font-size: 13px;
-  line-height: 1.5;
-  color: var(--text);
+  color: var(--accent);
+  margin-top: 16px;
+  font-weight: 500;
 }
 
-.result-box {
-  background: linear-gradient(135deg, rgba(57,217,138,0.1), rgba(126,232,250,0.1));
-  border: 2px solid var(--green);
-  border-radius: 8px;
+.internals-content {
+  flex: 1;
+  overflow-y: auto;
   padding: 16px;
-  text-align: center;
 }
 
-.result-label {
-  font-size: 12px;
+.op-explain {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.op-explain.push {
+  border-color: var(--yellow);
+  background: rgba(255,209,102,0.05);
+}
+
+.op-explain.pop {
+  border-color: var(--green);
+  background: rgba(57,217,138,0.05);
+}
+
+.op-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.op-code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  margin-bottom: 10px;
+  color: var(--text);
+  overflow-x: auto;
+}
+
+.op-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.op-line {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.op-bullet {
+  color: var(--accent);
+  font-weight: 700;
+  min-width: 12px;
+}
+
+.op-text {
+  color: var(--text);
+  flex: 1;
+}
+
+.op-highlight {
+  color: var(--accent);
   font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-family: 'Fira Code', monospace;
+}
+
+.concept-box {
+  background: var(--card);
+  border: 2px solid var(--purple);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.concept-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--purple);
   margin-bottom: 8px;
 }
 
-.result-val {
+.concept-body {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.concept-body ul {
+  margin: 8px 0;
+  padding-left: 16px;
+}
+
+.concept-body li {
+  margin: 4px 0;
+}
+
+.log-section {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+}
+
+.log-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.log-entry {
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  border-radius: 4px;
   font-family: 'Fira Code', monospace;
-  font-size: 16px;
-  font-weight: 700;
+  background: var(--surface);
+  border-left: 3px solid var(--border);
+}
+
+.log-entry.init {
+  border-left-color: var(--purple);
+  color: var(--purple);
+}
+
+.log-entry.heap {
+  border-left-color: var(--blue);
+  color: var(--blue);
+}
+
+.log-entry.pop {
+  border-left-color: var(--green);
   color: var(--green);
+}
+
+.log-entry.push {
+  border-left-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.log-entry.done {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ls {
+  color: var(--muted);
+  margin-right: 8px;
 }
 
 .bot {
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding: 14px 24px;
+  padding: 12px 16px;
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 12px;
   flex-shrink: 0;
 }
 
 .bot button {
+  padding: 8px 16px;
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 16px;
   border-radius: 6px;
+  cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
 }
 
-.bot button:hover {
+.bot button:hover:not(:disabled) {
   background: var(--hl);
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .bot button:disabled {
@@ -417,89 +581,35 @@ main {
   cursor: not-allowed;
 }
 
-#btnPlay {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
-}
-
-#btnPlay:hover {
-  background: var(--blue);
-  border-color: var(--blue);
-}
-
 .step-info {
-  font-family: 'Fira Code', monospace;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
-  margin-left: 8px;
+  font-family: 'Fira Code', monospace;
+  margin-left: auto;
 }
 
 .spd-wrap {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.spd-wrap label {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-#speedSlider {
-  width: 120px;
-}
-
-.log-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-}
-
-.log-entry {
-  font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  line-height: 1.8;
-  padding: 4px 8px;
-  border-radius: 4px;
-  margin-bottom: 4px;
   display: flex;
   gap: 8px;
-  transition: background 0.15s;
-}
-
-.log-entry:hover {
-  background: var(--hl);
-}
-
-.ls {
+  align-items: center;
+  font-size: 12px;
   color: var(--muted);
-  font-weight: 600;
-  min-width: 30px;
 }
 
-.log-entry.init { color: var(--blue); }
-.log-entry.heap { color: var(--accent); }
-.log-entry.pop { color: var(--green); }
-.log-entry.push { color: var(--yellow); }
-.log-entry.done { color: var(--green); font-weight: 600; }
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+.spd-wrap input {
+  width: 80px;
+}
 </style>
 </head>
 <body>
+
 <header>
   <span class="h-num">23.</span>
-  <span class="h-title">Merge k Sorted Lists</span>
+  <span class="h-title">Merge k Sorted Lists - Complete Heap Explanation</span>
   <span class="h-badge">Hard</span>
   <div class="h-right">
-    <input type="text" id="listsInp" class="inp" placeholder="e.g. [1,4,5],[1,3,4],[2,6]" value="[1,4,5],[1,3,4],[2,6]"/>
-    <button onclick="init()" class="btn btn-g">Reset</button>
+    <input type="text" id="listsInp" class="inp" value="[1,4,5],[1,3,4],[2,6]" placeholder="[1,4,5],[1,3,4],..."/>
+    <button class="btn btn-g" onclick="init()">Initialize</button>
   </div>
 </header>
 
@@ -513,7 +623,7 @@ main {
       </div>
       <div class="code-line" data-line="2">
         <span class="ln">2</span>
-        <span class="ct">    <span class="kw">def</span> <span class="fn">mergeKLists</span>(<span class="kw">self</span>, lists):</span>
+        <span class="ct">    <span class="kw">def</span> <span class="fn">mergeKLists</span>(self, lists):</span>
       </div>
       <div class="code-line" data-line="3">
         <span class="ln">3</span>
@@ -521,86 +631,82 @@ main {
       </div>
       <div class="code-line" data-line="4">
         <span class="ln">4</span>
-        <span class="ct">        </span>
+        <span class="ct">        heap <span class="op">=</span> []</span>
       </div>
       <div class="code-line" data-line="5">
         <span class="ln">5</span>
-        <span class="ct">        heap <span class="op">=</span> []</span>
+        <span class="ct">        </span>
       </div>
       <div class="code-line" data-line="6">
         <span class="ln">6</span>
-        <span class="ct">        </span>
+        <span class="ct">        <span class="cm"># Initialize heap</span></span>
       </div>
       <div class="code-line" data-line="7">
         <span class="ln">7</span>
-        <span class="ct">        <span class="cm"># Initialize heap</span></span>
+        <span class="ct">        <span class="kw">for</span> i, head <span class="kw">in</span> <span class="fn">enumerate</span>(lists):</span>
       </div>
       <div class="code-line" data-line="8">
         <span class="ln">8</span>
-        <span class="ct">        <span class="kw">for</span> i, head <span class="kw">in</span> <span class="fn">enumerate</span>(lists):</span>
+        <span class="ct">            <span class="kw">if</span> head:</span>
       </div>
       <div class="code-line" data-line="9">
         <span class="ln">9</span>
-        <span class="ct">            <span class="kw">if</span> head:</span>
+        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (head.val, i, head))</span>
       </div>
       <div class="code-line" data-line="10">
         <span class="ln">10</span>
-        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (head.val, i, head))</span>
+        <span class="ct">        </span>
       </div>
       <div class="code-line" data-line="11">
         <span class="ln">11</span>
-        <span class="ct">        </span>
+        <span class="ct">        dummy <span class="op">=</span> <span class="fn">ListNode</span>(<span class="nm">0</span>)</span>
       </div>
       <div class="code-line" data-line="12">
         <span class="ln">12</span>
-        <span class="ct">        dummy <span class="op">=</span> <span class="fn">ListNode</span>(<span class="nm">0</span>)</span>
+        <span class="ct">        curr <span class="op">=</span> dummy</span>
       </div>
       <div class="code-line" data-line="13">
         <span class="ln">13</span>
-        <span class="ct">        curr <span class="op">=</span> dummy</span>
+        <span class="ct">        </span>
       </div>
       <div class="code-line" data-line="14">
         <span class="ln">14</span>
-        <span class="ct">        </span>
+        <span class="ct">        <span class="cm"># Extract min, add next</span></span>
       </div>
       <div class="code-line" data-line="15">
         <span class="ln">15</span>
-        <span class="ct">        <span class="cm"># Extract min, add next</span></span>
+        <span class="ct">        <span class="kw">while</span> heap:</span>
       </div>
       <div class="code-line" data-line="16">
         <span class="ln">16</span>
-        <span class="ct">        <span class="kw">while</span> heap:</span>
+        <span class="ct">            val, idx, node <span class="op">=</span> heapq.<span class="fn">heappop</span>(heap)</span>
       </div>
       <div class="code-line" data-line="17">
         <span class="ln">17</span>
-        <span class="ct">            val, idx, node <span class="op">=</span> heapq.<span class="fn">heappop</span>(heap)</span>
+        <span class="ct">            curr.next <span class="op">=</span> node</span>
       </div>
       <div class="code-line" data-line="18">
         <span class="ln">18</span>
-        <span class="ct">            curr.next <span class="op">=</span> node</span>
+        <span class="ct">            curr <span class="op">=</span> curr.next</span>
       </div>
       <div class="code-line" data-line="19">
         <span class="ln">19</span>
-        <span class="ct">            curr <span class="op">=</span> curr.next</span>
+        <span class="ct">            </span>
       </div>
       <div class="code-line" data-line="20">
         <span class="ln">20</span>
-        <span class="ct">            </span>
+        <span class="ct">            <span class="kw">if</span> node.next:</span>
       </div>
       <div class="code-line" data-line="21">
         <span class="ln">21</span>
-        <span class="ct">            <span class="kw">if</span> node.next:</span>
+        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (node.next.val, idx, node.next))</span>
       </div>
       <div class="code-line" data-line="22">
         <span class="ln">22</span>
-        <span class="ct">                heapq.<span class="fn">heappush</span>(heap, (node.next.val, idx, node.next))</span>
+        <span class="ct">        </span>
       </div>
       <div class="code-line" data-line="23">
         <span class="ln">23</span>
-        <span class="ct">        </span>
-      </div>
-      <div class="code-line" data-line="24">
-        <span class="ln">24</span>
         <span class="ct">        <span class="kw">return</span> dummy.next</span>
       </div>
     </div>
@@ -621,9 +727,15 @@ main {
     </div>
   </div>
 
-  <div class="log-panel">
-    <div class="panel-label">Step Log</div>
-    <div class="log-scroll" id="logScroll"></div>
+  <div class="right-panel">
+    <div style="display: flex; flex-direction: column; overflow: hidden;">
+      <div class="panel-label">Heap Internals</div>
+      <div class="internals-content" id="internalsContent"></div>
+    </div>
+    <div class="log-section">
+      <div class="panel-label">Step Log</div>
+      <div class="log-scroll" id="logScroll"></div>
+    </div>
   </div>
 </main>
 
@@ -636,7 +748,6 @@ let playTimer = null;
 function init() {
   const inp = document.getElementById('listsInp').value.trim();
   
-  // Parse input: [1,4,5],[1,3,4],[2,6]
   const lists = [];
   const matches = inp.match(/\[([^\]]+)\]/g);
   
@@ -666,10 +777,9 @@ function buildSteps(lists) {
   const steps = [];
   const k = lists.length;
   
-  // Track current index in each list
   const indices = new Array(k).fill(0);
   
-  function snap(line, msg, logType, logText, heap, result, currentIdx = null, heapAction = null) {
+  function snap(line, msg, logType, logText, heap, result, currentIdx = null, operation = null, operationDetails = null) {
     const listsState = lists.map((list, i) => ({
       list: list,
       consumed: indices[i]
@@ -680,56 +790,102 @@ function buildSteps(lists) {
       msg,
       log: { type: logType, text: logText },
       lists: listsState,
-      heap: heap.slice(),
+      heap: heap.map(h => ({...h})),
       result: result.slice(),
       currentIdx,
-      heapAction
+      operation,
+      operationDetails
     });
   }
   
-  // Initial state
-  snap(5, 'Initialize empty heap and result', 'init', 'Starting with k sorted lists', [], []);
+  // Initial
+  snap(4, 'Initialize empty heap', 'init', 'Starting algorithm with k sorted lists', [], [], null, 'concept', {
+    title: '💡 What is a Min-Heap?',
+    body: `A min-heap is a binary tree where:
+• Parent nodes are always ≤ their children
+• The smallest element is always at the root
+• Python's heapq maintains this automatically
+
+Why use heap for merging?
+• We always need the smallest element
+• Heap gives us O(log k) operations
+• Much better than O(k) scanning all lists`
+  });
   
-  // Build initial heap
+  // Build heap
   const heap = [];
   lists.forEach((list, i) => {
     if (list.length > 0) {
-      heap.push({ val: list[0], idx: i });
+      heap.push({ val: list[0], idx: i, nodeRef: `Node(${list[0]})` });
     }
   });
   heap.sort((a, b) => a.val - b.val);
   
-  snap(10, 'Build initial min-heap from first elements', 'heap', `Heap initialized with ${heap.length} elements`, heap, []);
+  snap(9, 'Building initial heap from first elements', 'heap', `Pushed ${heap.length} tuples to heap`, heap, [], null, 'init-push', {
+    code: `for i, head in enumerate(lists):
+    if head:
+        heapq.heappush(heap, (head.val, i, head))`,
+    explanation: [
+      { label: 'head.val', text: 'Node value - used for comparison' },
+      { label: 'i', text: 'List index - breaks ties when values equal' },
+      { label: 'head', text: 'Reference to the actual ListNode' }
+    ],
+    note: 'Tuples compare element-by-element: (1,0) < (1,1) < (2,0)'
+  });
   
   const result = [];
   
-  // Process heap
+  // Process
   while (heap.length > 0) {
-    // Pop min
     heap.sort((a, b) => a.val - b.val);
-    const minNode = heap.shift();
+    const minNode = heap[0];
     const listIdx = minNode.idx;
     const val = minNode.val;
+    const nodeRef = minNode.nodeRef;
     
-    snap(17, `Pop minimum value ${val} from heap`, 'pop', `Extracted min: ${val} from list ${listIdx}`, heap, result, listIdx, 'pop');
+    snap(16, `Extracting minimum from heap`, 'pop', `heappop returns: val=${val}, idx=${listIdx}`, heap, result, listIdx, 'heappop', {
+      code: `val, idx, node = heapq.heappop(heap)`,
+      tuple: { val, idx: listIdx, node: nodeRef },
+      explanation: [
+        { label: 'heappop', text: 'Removes and returns smallest tuple from heap' },
+        { label: 'Unpacking', text: `val=${val}, idx=${listIdx}, node=${nodeRef}` },
+        { label: 'Auto-rebalance', text: 'Heap reorganizes to maintain min-heap property' }
+      ]
+    });
     
-    // Add to result
+    heap.shift();
     result.push(val);
     indices[listIdx]++;
     
-    snap(18, `Add ${val} to merged result`, 'pop', `Result now: [${result.join(', ')}]`, heap, result, listIdx);
+    snap(17, `Added ${val} to merged result`, 'pop', `Result: [${result.join(', ')}]`, heap, result, listIdx);
     
-    // Push next from same list
     if (indices[listIdx] < lists[listIdx].length) {
       const nextVal = lists[listIdx][indices[listIdx]];
-      heap.push({ val: nextVal, idx: listIdx });
+      const nextNodeRef = `Node(${nextVal})`;
+      
+      snap(21, `Pushing next element from same list`, 'push', `Adding (${nextVal}, ${listIdx}, ${nextNodeRef}) to heap`, heap, result, listIdx, 'heappush-before', {
+        code: `if node.next:
+    heapq.heappush(heap, (node.next.val, idx, node.next))`,
+        newTuple: { val: nextVal, idx: listIdx, node: nextNodeRef },
+        explanation: [
+          { label: 'node.next.val', text: `Next value ${nextVal} from list ${listIdx}` },
+          { label: 'idx', text: `Same list index ${listIdx} (stay in same list)` },
+          { label: 'node.next', text: `Reference to next ListNode in chain` },
+          { label: 'heappush', text: 'Adds element and bubbles up to maintain heap' }
+        ]
+      });
+      
+      heap.push({ val: nextVal, idx: listIdx, nodeRef: nextNodeRef });
       heap.sort((a, b) => a.val - b.val);
       
-      snap(22, `Push next element ${nextVal} from list ${listIdx} to heap`, 'push', `Added ${nextVal} to heap`, heap, result, listIdx, 'push');
+      snap(21, `Heap rebalanced after insertion`, 'push', `Heap size: ${heap.length}`, heap, result, listIdx, 'heappush-after');
     }
   }
   
-  snap(24, 'All lists merged successfully', 'done', `Final merged list: [${result.join(', ')}]`, [], result);
+  snap(23, 'Algorithm complete!', 'done', `Final result: [${result.join(', ')}]`, [], result, null, 'complete', {
+    summary: `Time: O(N log k) where N=total nodes, k=lists
+Space: O(k) for the heap`
+  });
   
   return steps;
 }
@@ -737,14 +893,16 @@ function buildSteps(lists) {
 function renderStep(idx) {
   const s = steps[idx];
   const viz = document.getElementById('vizContent');
+  const internals = document.getElementById('internalsContent');
   
+  // Highlight code line
   document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
   const activeLine = document.querySelector(`[data-line="${s.line}"]`);
   if (activeLine) activeLine.classList.add('active');
   
+  // Main viz
   let html = '';
   
-  // Input lists
   html += `<div class="section-label">Input Lists (k = ${s.lists.length})</div>`;
   html += `<div class="lists-grid">`;
   s.lists.forEach((listState, i) => {
@@ -762,26 +920,28 @@ function renderStep(idx) {
   });
   html += `</div>`;
   
-  // Min-Heap
-  html += `<div class="section-label">Min-Heap (size = ${s.heap.length})</div>`;
-  html += `<div class="heap-container">`;
+  html += `<div class="section-label">Min-Heap (Tuple Structure)</div>`;
+  html += `<div class="heap-array">`;
   html += `<div class="heap-grid">`;
   if (s.heap.length === 0) {
     html += `<span style="color: var(--muted); font-size: 13px;">Empty</span>`;
   } else {
     s.heap.forEach((node, i) => {
-      const isPop = s.heapAction === 'pop' && i === 0;
-      const isPush = s.heapAction === 'push' && i === s.heap.length - 1;
-      html += `<div class="heap-node ${isPop ? 'popping' : ''} ${isPush ? 'adding' : ''}">`;
-      html += `<span class="heap-val">${node.val}</span>`;
-      html += `<span class="heap-idx">[L${node.idx}]</span>`;
+      const isHighlight = (s.operation === 'heappop' && i === 0) || 
+                         (s.operation === 'heappush-after' && i === s.heap.length - 1);
+      html += `<div class="heap-node ${isHighlight ? (s.operation === 'heappop' ? 'popping' : 'adding') : ''}">`;
+      html += `<div class="heap-tuple">`;
+      html += `<span class="tuple-part tuple-val">${node.val}</span>`;
+      html += `<span class="tuple-part tuple-idx">L${node.idx}</span>`;
+      html += `<span class="tuple-part tuple-node">Node</span>`;
+      html += `</div>`;
+      html += `<div style="font-size: 10px; color: var(--muted); margin-top: 4px;">(val, idx, node)</div>`;
       html += `</div>`;
     });
   }
   html += `</div>`;
   html += `</div>`;
   
-  // Result
   html += `<div class="section-label">Merged Result</div>`;
   html += `<div class="result-container">`;
   html += `<div class="result-list">`;
@@ -789,7 +949,7 @@ function renderStep(idx) {
     html += `<span style="color: var(--muted); font-size: 13px;">Empty</span>`;
   } else {
     s.result.forEach((val, i) => {
-      const isLatest = i === s.result.length - 1 && s.heapAction === 'pop';
+      const isLatest = i === s.result.length - 1 && s.line === 17;
       html += `<div class="result-node ${isLatest ? 'latest' : ''}">${val}</div>`;
       if (i < s.result.length - 1) {
         html += `<span class="arrow">→</span>`;
@@ -801,14 +961,93 @@ function renderStep(idx) {
   
   html += `<div class="msg-box">${s.msg}</div>`;
   
-  if (s.log.type === 'done') {
-    html += `<div class="result-box">`;
-    html += `<div class="result-label">Merge Complete</div>`;
-    html += `<div class="result-val">[${s.result.join(', ')}]</div>`;
-    html += `</div>`;
+  viz.innerHTML = html;
+  
+  // Internals panel
+  let intHtml = '';
+  
+  if (s.operation === 'concept' && s.operationDetails) {
+    intHtml += `<div class="concept-box">`;
+    intHtml += `<div class="concept-title">${s.operationDetails.title}</div>`;
+    intHtml += `<div class="concept-body">${s.operationDetails.body.replace(/\n/g, '<br>')}</div>`;
+    intHtml += `</div>`;
   }
   
-  viz.innerHTML = html;
+  if (s.operation === 'init-push' && s.operationDetails) {
+    const d = s.operationDetails;
+    intHtml += `<div class="op-explain push">`;
+    intHtml += `<div class="op-title">📥 Initial heappush</div>`;
+    intHtml += `<div class="op-code">${d.code}</div>`;
+    intHtml += `<div class="op-breakdown">`;
+    d.explanation.forEach(item => {
+      intHtml += `<div class="op-line">`;
+      intHtml += `<span class="op-bullet">•</span>`;
+      intHtml += `<div class="op-text"><span class="op-highlight">${item.label}</span>: ${item.text}</div>`;
+      intHtml += `</div>`;
+    });
+    intHtml += `</div>`;
+    if (d.note) {
+      intHtml += `<div style="margin-top: 10px; padding: 8px; background: rgba(126,232,250,0.08); border-radius: 4px; font-size: 10px; color: var(--accent);">💡 ${d.note}</div>`;
+    }
+    intHtml += `</div>`;
+  }
+  
+  if (s.operation === 'heappop' && s.operationDetails) {
+    const d = s.operationDetails;
+    intHtml += `<div class="op-explain pop">`;
+    intHtml += `<div class="op-title">📤 heappop Operation</div>`;
+    intHtml += `<div class="op-code">${d.code}</div>`;
+    intHtml += `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 10px;">`;
+    intHtml += `<div style="font-size: 10px; color: var(--muted); margin-bottom: 6px;">EXTRACTED TUPLE:</div>`;
+    intHtml += `<div style="display: flex; gap: 6px; align-items: center;">`;
+    intHtml += `<span class="tuple-part tuple-val">${d.tuple.val}</span>`;
+    intHtml += `<span class="tuple-part tuple-idx">L${d.tuple.idx}</span>`;
+    intHtml += `<span class="tuple-part tuple-node">${d.tuple.node}</span>`;
+    intHtml += `</div>`;
+    intHtml += `</div>`;
+    intHtml += `<div class="op-breakdown">`;
+    d.explanation.forEach(item => {
+      intHtml += `<div class="op-line">`;
+      intHtml += `<span class="op-bullet">•</span>`;
+      intHtml += `<div class="op-text"><span class="op-highlight">${item.label}</span>: ${item.text}</div>`;
+      intHtml += `</div>`;
+    });
+    intHtml += `</div>`;
+    intHtml += `</div>`;
+  }
+  
+  if (s.operation === 'heappush-before' && s.operationDetails) {
+    const d = s.operationDetails;
+    intHtml += `<div class="op-explain push">`;
+    intHtml += `<div class="op-title">📥 heappush Next Node</div>`;
+    intHtml += `<div class="op-code">${d.code}</div>`;
+    intHtml += `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 10px;">`;
+    intHtml += `<div style="font-size: 10px; color: var(--muted); margin-bottom: 6px;">NEW TUPLE:</div>`;
+    intHtml += `<div style="display: flex; gap: 6px; align-items: center;">`;
+    intHtml += `<span class="tuple-part tuple-val">${d.newTuple.val}</span>`;
+    intHtml += `<span class="tuple-part tuple-idx">L${d.newTuple.idx}</span>`;
+    intHtml += `<span class="tuple-part tuple-node">${d.newTuple.node}</span>`;
+    intHtml += `</div>`;
+    intHtml += `</div>`;
+    intHtml += `<div class="op-breakdown">`;
+    d.explanation.forEach(item => {
+      intHtml += `<div class="op-line">`;
+      intHtml += `<span class="op-bullet">•</span>`;
+      intHtml += `<div class="op-text"><span class="op-highlight">${item.label}</span>: ${item.text}</div>`;
+      intHtml += `</div>`;
+    });
+    intHtml += `</div>`;
+    intHtml += `</div>`;
+  }
+  
+  if (s.operation === 'complete' && s.operationDetails) {
+    intHtml += `<div class="concept-box" style="border-color: var(--green);">`;
+    intHtml += `<div class="concept-title" style="color: var(--green);">✅ Complete</div>`;
+    intHtml += `<div class="concept-body">${s.operationDetails.summary.replace(/\n/g, '<br>')}</div>`;
+    intHtml += `</div>`;
+  }
+  
+  internals.innerHTML = intHtml;
   updateStepInfo();
 }
 
