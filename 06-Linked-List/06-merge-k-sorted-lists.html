@@ -244,6 +244,7 @@ main {
   font-weight: 600;
   color: var(--text);
   transition: all 0.3s;
+  position: relative;
 }
 
 .node.consumed {
@@ -251,11 +252,32 @@ main {
   border-color: var(--muted);
 }
 
+.node.consumed::after {
+  content: '✓';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 10px;
+  color: var(--green);
+  background: var(--surface);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .node.current {
   border-color: var(--accent);
   background: var(--hl);
   box-shadow: 0 0 12px rgba(126,232,250,0.25);
   transform: scale(1.08);
+}
+
+.node:not(.consumed):not(.current) {
+  border-color: var(--purple);
+  background: rgba(201,160,255,0.05);
 }
 
 .arrow {
@@ -491,6 +513,152 @@ main {
 
 .concept-body li {
   margin: 4px 0;
+}
+
+/* Heap Tree Visualization */
+.tree-section {
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(126,232,250,0.1);
+}
+
+.tree-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.tree-container {
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  justify-content: flex-start;
+}
+
+.tree-container:has(.tree-empty) {
+  justify-content: center;
+  min-height: 160px;
+}
+
+.tree-level {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 45px;
+  position: relative;
+}
+
+.tree-level.level-0 {
+  gap: 0;
+  margin-bottom: 50px;
+}
+
+.tree-level.level-1 {
+  gap: 80px;
+  margin-bottom: 45px;
+}
+
+.tree-level.level-2 {
+  gap: 35px;
+  margin-bottom: 40px;
+}
+
+.tree-node-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tree-node {
+  background: linear-gradient(135deg, rgba(126,232,250,0.15), rgba(78,168,222,0.15));
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.tree-node.highlight-pop {
+  border-color: var(--green);
+  color: var(--green);
+  background: linear-gradient(135deg, rgba(57,217,138,0.25), rgba(126,232,250,0.15));
+  box-shadow: 0 0 20px rgba(57,217,138,0.4);
+  transform: scale(1.15);
+}
+
+.tree-node.highlight-push {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: linear-gradient(135deg, rgba(255,209,102,0.25), rgba(247,151,30,0.15));
+  box-shadow: 0 0 20px rgba(255,209,102,0.4);
+  animation: pulse-tree 0.6s ease-in-out;
+}
+
+@keyframes pulse-tree {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.tree-node-value {
+  font-size: 15px;
+}
+
+.tree-node-list {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Tree connecting lines */
+.tree-line {
+  position: absolute;
+  background: var(--border);
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+.tree-line.active {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(126,232,250,0.3);
+}
+
+.tree-empty {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(126,232,250,0.03);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  margin: 10px;
+}
+
+.tree-info {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
 }
 
 .log-section {
@@ -830,7 +998,15 @@ Why use heap for merging?
       { label: 'i', text: 'List index - breaks ties when values equal' },
       { label: 'head', text: 'Reference to the actual ListNode' }
     ],
-    note: 'Tuples compare element-by-element: (1,0) < (1,1) < (2,0)'
+    note: 'Tuples compare element-by-element: (1,0) < (1,1) < (2,0)',
+    keyInsight: `🔑 KEY INSIGHT: Heap size naturally stays ≤ k!
+
+We DON'T set a size limit. The algorithm naturally maintains this:
+• Start: Push first element from each of k lists → heap has k elements
+• Loop: Pop 1 element, push 1 replacement from same list → still k elements
+• When list empties: Pop 1, push 0 → heap shrinks to k-1, k-2, etc.
+
+This is why it's O(N log k) not O(N log N) - heap operations stay fast!`
   });
   
   const result = [];
@@ -904,6 +1080,11 @@ function renderStep(idx) {
   let html = '';
   
   html += `<div class="section-label">Input Lists (k = ${s.lists.length})</div>`;
+  html += `<div style="font-size: 10px; color: var(--muted); margin-bottom: 8px; font-style: italic;">
+    <span style="color: var(--green);">✓ Consumed</span> · 
+    <span style="color: var(--accent);">● In Heap</span> · 
+    <span style="color: var(--purple);">○ Waiting</span>
+  </div>`;
   html += `<div class="lists-grid">`;
   s.lists.forEach((listState, i) => {
     html += `<div class="list-row">`;
@@ -921,6 +1102,9 @@ function renderStep(idx) {
   html += `</div>`;
   
   html += `<div class="section-label">Min-Heap (Tuple Structure)</div>`;
+  html += `<div style="font-size: 10px; color: var(--accent); margin-bottom: 8px; font-style: italic;">
+    Size naturally stays ≤ k (${s.lists.length}) · Current: ${s.heap.length} ${s.heap.length > 0 ? '· Pop 1, Push 1' : ''}
+  </div>`;
   html += `<div class="heap-array">`;
   html += `<div class="heap-grid">`;
   if (s.heap.length === 0) {
@@ -966,6 +1150,9 @@ function renderStep(idx) {
   // Internals panel
   let intHtml = '';
   
+  // ALWAYS show tree first
+  intHtml += renderHeapTree(s);
+  
   if (s.operation === 'concept' && s.operationDetails) {
     intHtml += `<div class="concept-box">`;
     intHtml += `<div class="concept-title">${s.operationDetails.title}</div>`;
@@ -989,13 +1176,20 @@ function renderStep(idx) {
     if (d.note) {
       intHtml += `<div style="margin-top: 10px; padding: 8px; background: rgba(126,232,250,0.08); border-radius: 4px; font-size: 10px; color: var(--accent);">💡 ${d.note}</div>`;
     }
+    if (d.keyInsight) {
+      intHtml += `<div style="margin-top: 12px; padding: 12px; background: rgba(57,217,138,0.08); border: 1px solid var(--green); border-radius: 6px; font-size: 11px; line-height: 1.6; color: var(--text);">${d.keyInsight.replace(/\n/g, '<br>')}</div>`;
+    }
     intHtml += `</div>`;
   }
   
   if (s.operation === 'heappop' && s.operationDetails) {
     const d = s.operationDetails;
+    const currentSize = s.heap.length;
     intHtml += `<div class="op-explain pop">`;
     intHtml += `<div class="op-title">📤 heappop Operation</div>`;
+    intHtml += `<div style="font-size: 10px; color: var(--green); margin-bottom: 8px; font-weight: 600;">
+      Heap size: ${currentSize} → ${currentSize - 1} (removing minimum)
+    </div>`;
     intHtml += `<div class="op-code">${d.code}</div>`;
     intHtml += `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 10px;">`;
     intHtml += `<div style="font-size: 10px; color: var(--muted); margin-bottom: 6px;">EXTRACTED TUPLE:</div>`;
@@ -1018,8 +1212,12 @@ function renderStep(idx) {
   
   if (s.operation === 'heappush-before' && s.operationDetails) {
     const d = s.operationDetails;
+    const currentSize = s.heap.length;
     intHtml += `<div class="op-explain push">`;
     intHtml += `<div class="op-title">📥 heappush Next Node</div>`;
+    intHtml += `<div style="font-size: 10px; color: var(--yellow); margin-bottom: 8px; font-weight: 600;">
+      Heap size: ${currentSize} → ${currentSize + 1} (adding 1 replacement)
+    </div>`;
     intHtml += `<div class="op-code">${d.code}</div>`;
     intHtml += `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 10px;">`;
     intHtml += `<div style="font-size: 10px; color: var(--muted); margin-bottom: 6px;">NEW TUPLE:</div>`;
@@ -1049,6 +1247,114 @@ function renderStep(idx) {
   
   internals.innerHTML = intHtml;
   updateStepInfo();
+}
+
+function renderHeapTree(s) {
+  let html = `<div class="tree-section">`;
+  html += `<div class="tree-title">🌳 Heap Binary Tree Structure</div>`;
+  html += `<div class="tree-container" id="treeContainer">`;
+  
+  if (s.heap.length === 0) {
+    html += `<div class="tree-empty">`;
+    html += `<div style="font-size: 24px; margin-bottom: 10px;">🌱</div>`;
+    html += `<div>Heap is empty</div>`;
+    html += `<div style="font-size: 10px; margin-top: 8px; color: var(--accent);">Tree will grow as elements are pushed</div>`;
+    html += `</div>`;
+  } else {
+    // Calculate levels needed
+    const maxLevels = Math.floor(Math.log2(s.heap.length)) + 1;
+    
+    for (let level = 0; level < maxLevels; level++) {
+      const startIdx = Math.pow(2, level) - 1;
+      const endIdx = Math.min(Math.pow(2, level + 1) - 1, s.heap.length);
+      
+      html += `<div class="tree-level level-${level}">`;
+      
+      for (let i = startIdx; i < endIdx; i++) {
+        if (i < s.heap.length) {
+          const node = s.heap[i];
+          const isHighlight = (s.operation === 'heappop' && i === 0) || 
+                             (s.operation === 'heappush-after' && i === s.heap.length - 1);
+          const highlightClass = isHighlight ? (s.operation === 'heappop' ? 'highlight-pop' : 'highlight-push') : '';
+          
+          html += `<div class="tree-node-wrapper">`;
+          html += `<div class="tree-node ${highlightClass}" data-idx="${i}">`;
+          html += `<div class="tree-node-value">${node.val}</div>`;
+          html += `<div class="tree-node-list">L${node.idx}</div>`;
+          html += `</div>`;
+          html += `</div>`;
+        }
+      }
+      
+      html += `</div>`;
+    }
+    
+    html += `<div class="tree-info">Parent ≤ Children (min-heap property) · Heap size: ${s.heap.length}/${s.lists.length}</div>`;
+  }
+  
+  html += `</div>`;
+  html += `</div>`;
+  
+  // After rendering, draw lines (will be done in a setTimeout to ensure DOM is ready)
+  setTimeout(() => drawTreeLines(s), 10);
+  
+  return html;
+}
+
+function drawTreeLines(s) {
+  const container = document.getElementById('treeContainer');
+  if (!container) return;
+  
+  // Remove existing lines
+  container.querySelectorAll('.tree-line').forEach(el => el.remove());
+  
+  const nodes = container.querySelectorAll('.tree-node');
+  
+  s.heap.forEach((_, idx) => {
+    if (idx === 0) return; // Root has no parent
+    
+    const parentIdx = Math.floor((idx - 1) / 2);
+    const childNode = nodes[idx];
+    const parentNode = nodes[parentIdx];
+    
+    if (!childNode || !parentNode) return;
+    
+    const parentRect = parentNode.getBoundingClientRect();
+    const childRect = childNode.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // Calculate positions relative to container
+    const parentX = parentRect.left + parentRect.width / 2 - containerRect.left;
+    const parentY = parentRect.bottom - containerRect.top;
+    const childX = childRect.left + childRect.width / 2 - containerRect.left;
+    const childY = childRect.top - containerRect.top;
+    
+    // Calculate line dimensions
+    const deltaX = childX - parentX;
+    const deltaY = childY - parentY;
+    const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+    
+    // Create line element
+    const line = document.createElement('div');
+    line.className = 'tree-line';
+    line.style.width = `${length}px`;
+    line.style.height = '2px';
+    line.style.left = `${parentX}px`;
+    line.style.top = `${parentY}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    line.style.transformOrigin = '0 0';
+    
+    // Highlight line if parent or child is highlighted
+    const isParentHighlight = s.operation === 'heappop' && parentIdx === 0;
+    const isChildHighlight = (s.operation === 'heappop' && idx === 0) || 
+                            (s.operation === 'heappush-after' && idx === s.heap.length - 1);
+    if (isParentHighlight || isChildHighlight) {
+      line.classList.add('active');
+    }
+    
+    container.appendChild(line);
+  });
 }
 
 function stepFwd() {
