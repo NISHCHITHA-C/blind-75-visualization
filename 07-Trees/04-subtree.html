@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtree Recursion Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .tree-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tree-node {
+            text-align: center;
+            position: relative;
+        }
+
+        .node-value {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 10px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .node-value.highlighted {
+            background: #ff6b6b;
+            transform: scale(1.2);
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.5);
+        }
+
+        .node-value.success {
+            background: #51cf66;
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .node-value.comparing {
+            background: #ffd43b;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .node-children {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            position: relative;
+            padding-top: 20px;
+        }
+
+        .node-children::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: #dee2e6;
+        }
+
+        .call-stack {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .call-item {
+            background: #e7f5ff;
+            border-left: 4px solid #339af0;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .call-item.active {
+            background: #fff3bf;
+            border-left-color: #ffd43b;
+            transform: translateX(5px);
+        }
+
+        .call-item.completed {
+            background: #d3f9d8;
+            border-left-color: #51cf66;
+            opacity: 0.7;
+        }
+
+        .call-item .return-value {
+            color: #51cf66;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .call-item .return-value.false {
+            color: #ff6b6b;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ced4da;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .status {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #dee2e6;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .status-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-help {
+            font-size: 12px;
+            color: #868e96;
+            margin-top: 5px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control input[type="range"] {
+            flex: 1;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .explanation {
+            background: #e7f5ff;
+            border-left: 4px solid #339af0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .code-line {
+            padding: 2px 0;
+        }
+
+        .code-line.highlight {
+            background: rgba(255, 212, 59, 0.2);
+            border-left: 3px solid #ffd43b;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌲 Subtree Recursion Visualizer</h1>
+            <p>Watch how isSubtree() and same() recursively check if one tree is a subtree of another</p>
+        </div>
+
+        <div class="content">
+            <div class="panel full-width">
+                <h2>📝 Input Trees</h2>
+                <div class="input-section">
+                    <div class="input-group">
+                        <label>Main Tree (root):</label>
+                        <input type="text" id="rootInput" value="[3,4,5,1,2]" placeholder="e.g., [3,4,5,1,2]">
+                        <div class="input-help">Enter array representation (level-order, use null for empty nodes)</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Subtree to Find (subRoot):</label>
+                        <input type="text" id="subRootInput" value="[4,1,2]" placeholder="e.g., [4,1,2]">
+                    </div>
+                    <div class="controls">
+                        <button onclick="buildTrees()">🔨 Build Trees</button>
+                        <button onclick="startVisualization()" id="startBtn" disabled>▶️ Start Visualization</button>
+                        <button onclick="stepForward()" id="stepBtn" disabled>⏭️ Next Step</button>
+                        <button onclick="reset()">🔄 Reset</button>
+                    </div>
+                    <div class="speed-control">
+                        <label>Speed:</label>
+                        <input type="range" id="speedControl" min="500" max="3000" value="1500" step="100">
+                        <span id="speedLabel">1.5s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🌳 Main Tree (root)</h2>
+                <div class="tree-container" id="rootTree"></div>
+            </div>
+
+            <div class="panel">
+                <h2>🎯 Subtree (subRoot)</h2>
+                <div class="tree-container" id="subRootTree"></div>
+            </div>
+
+            <div class="panel full-width">
+                <h2>📚 Call Stack & Execution Trace</h2>
+                <div class="call-stack" id="callStack"></div>
+            </div>
+
+            <div class="panel full-width">
+                <h2>ℹ️ Current Status</h2>
+                <div class="status" id="status">
+                    <div class="status-item">
+                        <span class="status-label">Current Function:</span>
+                        <span class="status-value" id="currentFunc">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Checking Nodes:</span>
+                        <span class="status-value" id="checkingNodes">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Step:</span>
+                        <span class="status-value" id="stepCount">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Result:</span>
+                        <span class="status-value" id="result">-</span>
+                    </div>
+                </div>
+                <div class="explanation" id="explanation">
+                    Build trees and start visualization to see detailed explanation of each recursive call.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+            }
+        }
+
+        let root = null;
+        let subRoot = null;
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+
+        function arrayToTree(arr) {
+            if (!arr || arr.length === 0) return null;
+            
+            const root = new TreeNode(arr[0]);
+            const queue = [root];
+            let i = 1;
+            
+            while (queue.length > 0 && i < arr.length) {
+                const node = queue.shift();
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.left = new TreeNode(arr[i]);
+                    queue.push(node.left);
+                }
+                i++;
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.right = new TreeNode(arr[i]);
+                    queue.push(node.right);
+                }
+                i++;
+            }
+            
+            return root;
+        }
+
+        function buildTrees() {
+            try {
+                const rootArr = JSON.parse(document.getElementById('rootInput').value);
+                const subRootArr = JSON.parse(document.getElementById('subRootInput').value);
+                
+                root = arrayToTree(rootArr);
+                subRoot = arrayToTree(subRootArr);
+                
+                renderTree(root, 'rootTree');
+                renderTree(subRoot, 'subRootTree');
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stepBtn').disabled = false;
+                
+                reset();
+            } catch (e) {
+                alert('Invalid input! Please use format like [3,4,5,1,2]');
+            }
+        }
+
+        function renderTree(node, containerId, highlightNode = null, compareNode = null) {
+            const container = document.getElementById(containerId);
+            if (!node) {
+                container.innerHTML = '<div style="color: #868e96;">Empty Tree</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            const treeDiv = createTreeHTML(node, highlightNode, compareNode);
+            container.appendChild(treeDiv);
+        }
+
+        function createTreeHTML(node, highlightNode, compareNode) {
+            if (!node) return null;
+            
+            const div = document.createElement('div');
+            div.className = 'tree-node';
+            
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'node-value';
+            
+            if (highlightNode && node === highlightNode) {
+                valueDiv.classList.add('highlighted');
+            }
+            if (compareNode && node === compareNode) {
+                valueDiv.classList.add('comparing');
+            }
+            
+            valueDiv.textContent = node.val;
+            div.appendChild(valueDiv);
+            
+            if (node.left || node.right) {
+                const childrenDiv = document.createElement('div');
+                childrenDiv.className = 'node-children';
+                
+                if (node.left) {
+                    childrenDiv.appendChild(createTreeHTML(node.left, highlightNode, compareNode));
+                } else {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.style.width = '40px';
+                    childrenDiv.appendChild(emptyDiv);
+                }
+                
+                if (node.right) {
+                    childrenDiv.appendChild(createTreeHTML(node.right, highlightNode, compareNode));
+                } else {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.style.width = '40px';
+                    childrenDiv.appendChild(emptyDiv);
+                }
+                
+                div.appendChild(childrenDiv);
+            }
+            
+            return div;
+        }
+
+        function generateSteps(r, s) {
+            steps = [];
+            isSubtreeWithSteps(r, s, 0);
+            return steps;
+        }
+
+        function isSubtreeWithSteps(r, s, depth) {
+            steps.push({
+                type: 'isSubtree',
+                node: r,
+                subNode: s,
+                depth: depth,
+                description: `isSubtree(${r ? r.val : 'null'}, ${s ? s.val : 'null'})`,
+                explanation: r === null 
+                    ? 'Base case: root is null, return False' 
+                    : s === null 
+                    ? 'Base case: subRoot is null, return True (empty tree is subtree of any tree)'
+                    : `Checking if subtree starting at ${s.val} exists in tree at node ${r.val}`
+            });
+            
+            if (s === null) {
+                steps.push({
+                    type: 'return',
+                    value: true,
+                    description: 'return True',
+                    explanation: 'Empty tree is always a subtree'
+                });
+                return true;
+            }
+            
+            if (r === null) {
+                steps.push({
+                    type: 'return',
+                    value: false,
+                    description: 'return False',
+                    explanation: 'Cannot find subtree in empty tree'
+                });
+                return false;
+            }
+            
+            // Check if current trees are same
+            steps.push({
+                type: 'check',
+                node: r,
+                subNode: s,
+                description: `Calling same(${r.val}, ${s.val})`,
+                explanation: `First, check if the tree rooted at ${r.val} is identical to subRoot`
+            });
+            
+            const isSame = sameWithSteps(r, s, depth + 1);
+            
+            if (isSame) {
+                steps.push({
+                    type: 'return',
+                    value: true,
+                    description: 'return True',
+                    explanation: `Found! Tree at node ${r.val} matches the subRoot`
+                });
+                return true;
+            }
+            
+            steps.push({
+                type: 'continue',
+                description: 'Trees not same, checking left and right subtrees',
+                explanation: `Tree at ${r.val} doesn't match. Now recursively check left and right children.`
+            });
+            
+            // Check left subtree
+            steps.push({
+                type: 'recurse',
+                direction: 'left',
+                node: r.left,
+                description: `Checking left subtree: isSubtree(${r.left ? r.left.val : 'null'}, ${s.val})`,
+                explanation: `Moving to left child of ${r.val}`
+            });
+            
+            const leftResult = isSubtreeWithSteps(r.left, s, depth + 1);
+            
+            if (leftResult) {
+                steps.push({
+                    type: 'return',
+                    value: true,
+                    description: 'return True (found in left subtree)',
+                    explanation: 'Subtree found in left branch!'
+                });
+                return true;
+            }
+            
+            // Check right subtree
+            steps.push({
+                type: 'recurse',
+                direction: 'right',
+                node: r.right,
+                description: `Checking right subtree: isSubtree(${r.right ? r.right.val : 'null'}, ${s.val})`,
+                explanation: `Not in left, moving to right child of ${r.val}`
+            });
+            
+            const rightResult = isSubtreeWithSteps(r.right, s, depth + 1);
+            
+            steps.push({
+                type: 'return',
+                value: rightResult,
+                description: `return ${rightResult}`,
+                explanation: rightResult ? 'Subtree found in right branch!' : 'Subtree not found in this branch'
+            });
+            
+            return rightResult;
+        }
+
+        function sameWithSteps(r, s, depth) {
+            steps.push({
+                type: 'same',
+                node: r,
+                subNode: s,
+                depth: depth,
+                description: `same(${r ? r.val : 'null'}, ${s ? s.val : 'null'})`,
+                explanation: `Checking if two trees are identical`
+            });
+            
+            if (r === null && s === null) {
+                steps.push({
+                    type: 'return',
+                    value: true,
+                    description: 'return True (both null)',
+                    explanation: 'Both nodes are null - trees match at this position'
+                });
+                return true;
+            }
+            
+            if (r && s && r.val === s.val) {
+                steps.push({
+                    type: 'match',
+                    node: r,
+                    subNode: s,
+                    description: `Values match (${r.val} == ${s.val}), checking children`,
+                    explanation: `Node values match! Now need to check both left and right subtrees`
+                });
+                
+                const leftSame = sameWithSteps(r.left, s.left, depth + 1);
+                const rightSame = sameWithSteps(r.right, s.right, depth + 1);
+                
+                const result = leftSame && rightSame;
+                steps.push({
+                    type: 'return',
+                    value: result,
+                    description: `return ${result} (left: ${leftSame}, right: ${rightSame})`,
+                    explanation: result 
+                        ? 'Both subtrees match - trees are identical!' 
+                        : 'Subtrees don\'t match - trees are different'
+                });
+                
+                return result;
+            }
+            
+            steps.push({
+                type: 'return',
+                value: false,
+                description: 'return False (structure/value mismatch)',
+                explanation: 'Nodes don\'t match (different values or one is null)'
+            });
+            
+            return false;
+        }
+
+        function startVisualization() {
+            if (isPlaying) {
+                stopVisualization();
+                return;
+            }
+            
+            if (currentStep === 0) {
+                steps = generateSteps(root, subRoot);
+            }
+            
+            isPlaying = true;
+            document.getElementById('startBtn').textContent = '⏸️ Pause';
+            
+            const speed = parseInt(document.getElementById('speedControl').value);
+            playInterval = setInterval(() => {
+                if (currentStep >= steps.length) {
+                    stopVisualization();
+                    return;
+                }
+                stepForward();
+            }, speed);
+        }
+
+        function stopVisualization() {
+            isPlaying = false;
+            document.getElementById('startBtn').textContent = '▶️ Start Visualization';
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+
+        function stepForward() {
+            if (currentStep >= steps.length) {
+                stopVisualization();
+                return;
+            }
+            
+            const step = steps[currentStep];
+            displayStep(step);
+            currentStep++;
+            
+            document.getElementById('stepCount').textContent = currentStep;
+            
+            if (currentStep >= steps.length) {
+                stopVisualization();
+                document.getElementById('result').textContent = step.value !== undefined ? step.value.toString() : 'Completed';
+            }
+        }
+
+        function displayStep(step) {
+            // Update current function
+            document.getElementById('currentFunc').textContent = step.type === 'same' ? 'same()' : 'isSubtree()';
+            
+            // Update checking nodes
+            const nodeStr = step.node ? step.node.val : 'null';
+            const subNodeStr = step.subNode ? step.subNode.val : 'null';
+            document.getElementById('checkingNodes').textContent = `root: ${nodeStr}, subRoot: ${subNodeStr}`;
+            
+            // Update explanation
+            document.getElementById('explanation').innerHTML = `
+                <strong>${step.description}</strong><br>
+                ${step.explanation}
+            `;
+            
+            // Highlight nodes
+            renderTree(root, 'rootTree', step.node, step.subNode);
+            renderTree(subRoot, 'subRootTree', step.subNode);
+            
+            // Add to call stack
+            const callStack = document.getElementById('callStack');
+            const callItem = document.createElement('div');
+            callItem.className = 'call-item active';
+            callItem.innerHTML = `
+                <div>${step.description}</div>
+                <div style="color: #868e96; font-size: 12px; margin-top: 5px;">${step.explanation}</div>
+                ${step.value !== undefined ? `<div class="return-value ${step.value ? '' : 'false'}">→ ${step.value}</div>` : ''}
+            `;
+            
+            // Mark previous items as completed
+            const allItems = callStack.querySelectorAll('.call-item');
+            allItems.forEach(item => {
+                item.classList.remove('active');
+                if (step.type === 'return') {
+                    item.classList.add('completed');
+                }
+            });
+            
+            callStack.appendChild(callItem);
+            callStack.scrollTop = callStack.scrollHeight;
+        }
+
+        function reset() {
+            stopVisualization();
+            currentStep = 0;
+            steps = [];
+            document.getElementById('callStack').innerHTML = '';
+            document.getElementById('currentFunc').textContent = '-';
+            document.getElementById('checkingNodes').textContent = '-';
+            document.getElementById('stepCount').textContent = '0';
+            document.getElementById('result').textContent = '-';
+            document.getElementById('explanation').textContent = 'Build trees and start visualization to see detailed explanation of each recursive call.';
+            
+            if (root) renderTree(root, 'rootTree');
+            if (subRoot) renderTree(subRoot, 'subRootTree');
+        }
+
+        // Speed control
+        document.getElementById('speedControl').addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById('speedLabel').textContent = (value / 1000).toFixed(1) + 's';
+            
+            if (isPlaying) {
+                stopVisualization();
+                startVisualization();
+            }
+        });
+
+        // Initialize with default trees
+        buildTrees();
+    </script>
+</body>
+</html>
