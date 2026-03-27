@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>102. Binary Tree Level Order Traversal - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --code-bg: #0f1419;
+            --highlight: rgba(251, 191, 36, 0.15);
+            --accent: #60a5fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .problem-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            width: 200px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Panels */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Code Panel */
+        .code-panel {
+            width: 30%;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.active {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .code-content {
+            flex: 1;
+            white-space: pre;
+            color: inherit;
+        }
+
+        pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        /* Visualization Panel */
+        .viz-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+        }
+
+        #visualization {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .speed-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .speed-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .step-indicator {
+            margin-left: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Log Panel */
+        .log-panel {
+            width: 20%;
+        }
+
+        .log-content {
+            padding: 16px;
+        }
+
+        .step-info {
+            margin-bottom: 16px;
+        }
+
+        .step-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .step-description {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .variables-section {
+            margin-bottom: 16px;
+        }
+
+        .variables-section h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .variable {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .variable-name {
+            color: var(--accent);
+        }
+
+        .history-section h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .history-item.current {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Resizer */
+        .resizer {
+            width: 4px;
+            cursor: col-resize;
+            background: var(--border);
+            position: relative;
+        }
+
+        .resizer:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="header">
+        <div class="problem-title">102. Binary Tree Level Order Traversal</div>
+        <div class="header-controls">
+            <div class="input-group">
+                <label>Input:</label>
+                <input type="text" id="inputField" value="[3,9,20,null,null,15,7]" />
+            </div>
+            <button class="btn" onclick="parseAndRun()">Run</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel code-panel">
+            <div class="panel-header">Solution Code</div>
+            <div class="panel-content" id="codePanel"></div>
+        </div>
+
+        <div class="resizer" data-direction="horizontal"></div>
+
+        <div class="panel viz-panel">
+            <div class="panel-header">Visualization</div>
+            <div class="viz-content">
+                <svg id="visualization" viewBox="0 0 800 600"></svg>
+            </div>
+            <div class="controls-bar">
+                <button class="control-btn" onclick="reset()" title="Reset">⏮</button>
+                <button class="control-btn" onclick="stepBackward()" title="Step Back">⏪</button>
+                <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()" title="Play/Pause">▶</button>
+                <button class="control-btn" onclick="stepForward()" title="Step Forward">⏩</button>
+                <div class="speed-selector">
+                    <button class="speed-btn" onclick="setSpeed(0.5)">0.5x</button>
+                    <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+                    <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+                    <button class="speed-btn" onclick="setSpeed(4)">4x</button>
+                </div>
+                <div class="step-indicator" id="stepIndicator">Step 0 / 0</div>
+            </div>
+        </div>
+
+        <div class="resizer" data-direction="horizontal"></div>
+
+        <div class="panel log-panel">
+            <div class="panel-header">Step Log</div>
+            <div class="panel-content log-content" id="logPanel"></div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let speed = 1;
+        let playInterval = null;
+        let theme = 'dark';
+
+        // Solution code
+        const solutionCode = `from collections import deque
+from typing import Optional, List
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def level_order(root):
+    """
+    BFS approach using queue
+    Time: O(n), Space: O(n)
+    """
+    result = []
+    
+    if not root:
+        return result
+    
+    queue = deque([root])
+    
+    while queue:
+        level_size = len(queue)
+        current_level = []
+        
+        for i in range(level_size):
+            node = queue.popleft()
+            current_level.append(node.val)
+            
+            if node.left:
+                queue.append(node.left)
+            
+            if node.right:
+                queue.append(node.right)
+        
+        result.append(current_level)
+    
+    return result`;
+
+        // Parse array input to tree
+        function arrayToTree(arr) {
+            if (!arr || arr.length === 0) return null;
+            
+            const root = { val: arr[0], left: null, right: null };
+            const queue = [root];
+            let i = 1;
+            
+            while (queue.length > 0 && i < arr.length) {
+                const node = queue.shift();
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.left = { val: arr[i], left: null, right: null };
+                    queue.push(node.left);
+                }
+                i++;
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.right = { val: arr[i], left: null, right: null };
+                    queue.push(node.right);
+                }
+                i++;
+            }
+            
+            return root;
+        }
+
+        // BFS solution with tracing
+        function levelOrderWithTracing(root) {
+            const steps = [];
+            const result = [];
+            
+            if (!root) {
+                steps.push({
+                    line: 17,
+                    vars: { root: null, result: [] },
+                    description: 'Root is None, returning empty result',
+                    tree_state: null,
+                    queue: [],
+                    current_level: [],
+                    current_node: null
+                });
+                return { result, steps };
+            }
+            
+            const queue = [root];
+            steps.push({
+                line: 20,
+                vars: { root: root.val, queue: [root.val], result: [] },
+                description: 'Initialize queue with root node',
+                tree_state: root,
+                queue: [root.val],
+                current_level: [],
+                current_node: null
+            });
+            
+            while (queue.length > 0) {
+                const levelSize = queue.length;
+                const currentLevel = [];
+                
+                steps.push({
+                    line: 22,
+                    vars: { level_size: levelSize, current_level: [], result: [...result] },
+                    description: `Processing level with ${levelSize} node(s)`,
+                    tree_state: root,
+                    queue: queue.map(n => n.val),
+                    current_level: [],
+                    current_node: null
+                });
+                
+                for (let i = 0; i < levelSize; i++) {
+                    const node = queue.shift();
+                    currentLevel.push(node.val);
+                    
+                    steps.push({
+                        line: 27,
+                        vars: { node: node.val, current_level: [...currentLevel], i },
+                        description: `Dequeue node ${node.val}, add to current level`,
+                        tree_state: root,
+                        queue: queue.map(n => n.val),
+                        current_level: [...currentLevel],
+                        current_node: node.val
+                    });
+                    
+                    if (node.left) {
+                        queue.push(node.left);
+                        steps.push({
+                            line: 30,
+                            vars: { node: node.val, left: node.left.val },
+                            description: `Enqueue left child ${node.left.val}`,
+                            tree_state: root,
+                            queue: queue.map(n => n.val),
+                            current_level: [...currentLevel],
+                            current_node: node.val
+                        });
+                    }
+                    
+                    if (node.right) {
+                        queue.push(node.right);
+                        steps.push({
+                            line: 33,
+                            vars: { node: node.val, right: node.right.val },
+                            description: `Enqueue right child ${node.right.val}`,
+                            tree_state: root,
+                            queue: queue.map(n => n.val),
+                            current_level: [...currentLevel],
+                            current_node: node.val
+                        });
+                    }
+                }
+                
+                result.push(currentLevel);
+                steps.push({
+                    line: 36,
+                    vars: { current_level: [...currentLevel], result: [...result] },
+                    description: `Complete level: [${currentLevel}]`,
+                    tree_state: root,
+                    queue: queue.map(n => n.val),
+                    current_level: [...currentLevel],
+                    current_node: null
+                });
+            }
+            
+            steps.push({
+                line: 38,
+                vars: { result },
+                description: 'All levels processed, return result',
+                tree_state: root,
+                queue: [],
+                current_level: [],
+                current_node: null
+            });
+            
+            return { result, steps };
+        }
+
+        // Render code with highlighting
+        function renderCode() {
+            const lines = solutionCode.split('\n');
+            const codePanel = document.getElementById('codePanel');
+            
+            const pre = document.createElement('pre');
+            pre.style.margin = '0';
+            pre.style.padding = '16px';
+            
+            lines.forEach((line, i) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'code-line';
+                lineDiv.id = `line-${i}`;
+                
+                const lineNum = document.createElement('span');
+                lineNum.className = 'line-number';
+                lineNum.textContent = i + 1;
+                
+                const codeContent = document.createElement('code');
+                codeContent.className = 'code-content';
+                codeContent.textContent = line || ' ';
+                
+                lineDiv.appendChild(lineNum);
+                lineDiv.appendChild(codeContent);
+                pre.appendChild(lineDiv);
+            });
+            
+            codePanel.innerHTML = '';
+            codePanel.appendChild(pre);
+        }
+
+        // Update code highlighting
+        function updateCodeHighlight(lineIndex) {
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.classList.remove('active');
+            });
+            
+            if (lineIndex !== null && lineIndex >= 0) {
+                const lineElement = document.getElementById(`line-${lineIndex}`);
+                if (lineElement) {
+                    lineElement.classList.add('active');
+                    lineElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        // Calculate tree layout positions
+        function calculateTreeLayout(root) {
+            if (!root) return { nodes: [], edges: [] };
+            
+            const nodes = [];
+            const edges = [];
+            const levelWidth = 800;
+            const levelHeight = 100;
+            
+            function traverse(node, depth, leftBound, rightBound) {
+                if (!node) return;
+                
+                const x = (leftBound + rightBound) / 2;
+                const y = 50 + depth * levelHeight;
+                
+                nodes.push({ ...node, x, y, depth });
+                
+                const mid = (leftBound + rightBound) / 2;
+                const quarterWidth = (rightBound - leftBound) / 4;
+                
+                if (node.left) {
+                    const leftX = leftBound + quarterWidth;
+                    const leftY = y + levelHeight;
+                    edges.push({ 
+                        from: { x, y }, 
+                        to: { x: leftX, y: leftY },
+                        highlighted: false 
+                    });
+                    traverse(node.left, depth + 1, leftBound, mid);
+                }
+                
+                if (node.right) {
+                    const rightX = mid + quarterWidth;
+                    const rightY = y + levelHeight;
+                    edges.push({ 
+                        from: { x, y }, 
+                        to: { x: rightX, y: rightY },
+                        highlighted: false 
+                    });
+                    traverse(node.right, depth + 1, mid, rightBound);
+                }
+            }
+            
+            traverse(root, 0, 0, levelWidth);
+            return { nodes, edges };
+        }
+
+        // Render tree visualization
+        function renderVisualization(step) {
+            const svg = document.getElementById('visualization');
+            svg.innerHTML = '';
+            
+            if (!step || !step.tree_state) {
+                return;
+            }
+            
+            const { nodes, edges } = calculateTreeLayout(step.tree_state);
+            const currentNode = step.current_node;
+            
+            // Draw edges
+            edges.forEach((edge, i) => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', edge.from.x);
+                line.setAttribute('y1', edge.from.y);
+                line.setAttribute('x2', edge.to.x);
+                line.setAttribute('y2', edge.to.y);
+                line.setAttribute('stroke', theme === 'dark' ? '#6b7280' : '#9ca3af');
+                line.setAttribute('stroke-width', '2');
+                svg.appendChild(line);
+            });
+            
+            // Draw nodes
+            nodes.forEach((node, i) => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', '24');
+                
+                const isCurrentNode = node.val === currentNode;
+                const isInQueue = step.queue && step.queue.includes(node.val);
+                const isInLevel = step.current_level && step.current_level.includes(node.val);
+                
+                if (isCurrentNode) {
+                    circle.setAttribute('fill', '#3b82f6');
+                    circle.setAttribute('stroke', '#60a5fa');
+                    circle.setAttribute('stroke-width', '3');
+                } else if (isInQueue) {
+                    circle.setAttribute('fill', '#10b981');
+                    circle.setAttribute('stroke', '#34d399');
+                    circle.setAttribute('stroke-width', '2');
+                } else if (isInLevel) {
+                    circle.setAttribute('fill', '#8b5cf6');
+                    circle.setAttribute('stroke', '#a78bfa');
+                    circle.setAttribute('stroke-width', '2');
+                } else {
+                    circle.setAttribute('fill', theme === 'dark' ? '#374151' : '#e5e7eb');
+                    circle.setAttribute('stroke', theme === 'dark' ? '#4b5563' : '#d1d5db');
+                    circle.setAttribute('stroke-width', '2');
+                }
+                
+                g.appendChild(circle);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', isCurrentNode || isInQueue || isInLevel ? '#ffffff' : (theme === 'dark' ? '#f9fafb' : '#111827'));
+                text.setAttribute('font-size', '14');
+                text.setAttribute('font-weight', '500');
+                text.textContent = node.val;
+                g.appendChild(text);
+                
+                svg.appendChild(g);
+            });
+            
+            // Draw queue visualization
+            if (step.queue && step.queue.length > 0) {
+                const queueY = 540;
+                const queueStartX = 50;
+                
+                const queueLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                queueLabel.setAttribute('x', queueStartX);
+                queueLabel.setAttribute('y', queueY - 20);
+                queueLabel.setAttribute('fill', '#fbbf24');
+                queueLabel.setAttribute('font-size', '13');
+                queueLabel.setAttribute('font-weight', '600');
+                queueLabel.textContent = 'Queue:';
+                svg.appendChild(queueLabel);
+                
+                step.queue.forEach((val, i) => {
+                    const x = queueStartX + i * 60;
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', x);
+                    rect.setAttribute('y', queueY);
+                    rect.setAttribute('width', '50');
+                    rect.setAttribute('height', '40');
+                    rect.setAttribute('fill', '#10b981');
+                    rect.setAttribute('stroke', '#34d399');
+                    rect.setAttribute('stroke-width', '2');
+                    rect.setAttribute('rx', '4');
+                    svg.appendChild(rect);
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', x + 25);
+                    text.setAttribute('y', queueY + 20);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('fill', '#ffffff');
+                    text.setAttribute('font-size', '14');
+                    text.setAttribute('font-weight', '500');
+                    text.textContent = val;
+                    svg.appendChild(text);
+                });
+            }
+        }
+
+        // Render step log
+        function renderStepLog(step, stepIndex) {
+            const logPanel = document.getElementById('logPanel');
+            logPanel.innerHTML = '';
+            
+            if (!step) return;
+            
+            // Current step info
+            const stepInfo = document.createElement('div');
+            stepInfo.className = 'step-info';
+            
+            const stepTitle = document.createElement('h3');
+            stepTitle.textContent = `Step ${stepIndex + 1} of ${steps.length}`;
+            stepInfo.appendChild(stepTitle);
+            
+            const stepDesc = document.createElement('p');
+            stepDesc.className = 'step-description';
+            stepDesc.textContent = step.description;
+            stepInfo.appendChild(stepDesc);
+            
+            logPanel.appendChild(stepInfo);
+            
+            // Variables
+            const varsSection = document.createElement('div');
+            varsSection.className = 'variables-section';
+            
+            const varsTitle = document.createElement('h4');
+            varsTitle.textContent = 'Variables';
+            varsSection.appendChild(varsTitle);
+            
+            Object.entries(step.vars || {}).forEach(([name, value]) => {
+                const varDiv = document.createElement('div');
+                varDiv.className = 'variable';
+                
+                const varName = document.createElement('span');
+                varName.className = 'variable-name';
+                varName.textContent = name;
+                
+                const separator = document.createTextNode(': ');
+                
+                const varValue = document.createElement('span');
+                varValue.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
+                
+                varDiv.appendChild(varName);
+                varDiv.appendChild(separator);
+                varDiv.appendChild(varValue);
+                varsSection.appendChild(varDiv);
+            });
+            
+            logPanel.appendChild(varsSection);
+            
+            // History
+            const historySection = document.createElement('div');
+            historySection.className = 'history-section';
+            
+            const historyTitle = document.createElement('h4');
+            historyTitle.textContent = 'History';
+            historySection.appendChild(historyTitle);
+            
+            steps.slice(0, stepIndex + 1).forEach((s, i) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                if (i === stepIndex) {
+                    historyItem.classList.add('current');
+                }
+                historyItem.textContent = `${i + 1}. ${s.description}`;
+                historySection.appendChild(historyItem);
+            });
+            
+            logPanel.appendChild(historySection);
+        }
+
+        // Update display
+        function updateDisplay() {
+            const step = steps[currentStep];
+            
+            updateCodeHighlight(step ? step.line : null);
+            renderVisualization(step);
+            renderStepLog(step, currentStep);
+            
+            document.getElementById('stepIndicator').textContent = 
+                `Step ${currentStep + 1} / ${steps.length}`;
+        }
+
+        // Playback controls
+        function reset() {
+            currentStep = 0;
+            stopPlaying();
+            updateDisplay();
+        }
+
+        function stepForward() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateDisplay();
+            }
+        }
+
+        function stepBackward() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateDisplay();
+            }
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                stopPlaying();
+            } else {
+                startPlaying();
+            }
+        }
+
+        function startPlaying() {
+            isPlaying = true;
+            document.getElementById('playPauseBtn').textContent = '⏸';
+            
+            playInterval = setInterval(() => {
+                if (currentStep < steps.length - 1) {
+                    stepForward();
+                } else {
+                    stopPlaying();
+                }
+            }, 1000 / speed);
+        }
+
+        function stopPlaying() {
+            isPlaying = false;
+            document.getElementById('playPauseBtn').textContent = '▶';
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+
+        function setSpeed(newSpeed) {
+            speed = newSpeed;
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (isPlaying) {
+                stopPlaying();
+                startPlaying();
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '🌙' : '☀️';
+            updateDisplay();
+        }
+
+        // Parse and run
+        function parseAndRun() {
+            const input = document.getElementById('inputField').value;
+            
+            try {
+                // Parse array input
+                const arr = JSON.parse(input);
+                const root = arrayToTree(arr);
+                
+                // Run solution with tracing
+                const { result, steps: newSteps } = levelOrderWithTracing(root);
+                
+                steps = newSteps;
+                currentStep = 0;
+                stopPlaying();
+                updateDisplay();
+                
+                console.log('Result:', result);
+            } catch (error) {
+                alert('Invalid input format. Expected: [3,9,20,null,null,15,7]');
+                console.error(error);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlayPause();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                stepForward();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                stepBackward();
+            }
+        });
+
+        // Initialize
+        renderCode();
+        parseAndRun();
+    </script>
+</body>
+</html>
