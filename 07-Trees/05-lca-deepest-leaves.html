@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1123. Lowest Common Ancestor of Deepest Leaves - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            
+            /* Light mode syntax colors - GitHub-inspired */
+            --keyword: #af00db;
+            --function: #795e26;
+            --string: #a31515;
+            --number: #098658;
+            --type: #267f99;
+            --comment: #008000;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --code-bg: #0f1419;
+            --highlight: rgba(251, 191, 36, 0.15);
+            --accent: #60a5fa;
+            
+            /* Dark mode syntax colors - Dracula-inspired */
+            --keyword: #ff79c6;
+            --function: #50fa7b;
+            --string: #f1fa8c;
+            --number: #bd93f9;
+            --type: #8be9fd;
+            --comment: #6a9955;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+        }
+
+        .input-section {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-field {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            width: 200px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 65px);
+            overflow: hidden;
+        }
+
+        .panel {
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .code-panel {
+            width: 30%;
+        }
+
+        .viz-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-panel {
+            width: 20%;
+            border-right: none;
+        }
+
+        .code-display {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+            overflow: auto;
+            height: 100%;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.active {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-content {
+            flex: 1;
+            white-space: pre;
+            color: inherit;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: var(--keyword); font-weight: 500; }
+        .function { color: var(--function); font-weight: 500; }
+        .string { color: var(--string); }
+        .number { color: var(--number); }
+        .type { color: var(--type); }
+        .comment { color: var(--comment); font-style: italic; }
+
+        .viz-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .controls {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            background: var(--bg-secondary);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-selector {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .step-info {
+            padding: 16px;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .variables-section {
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .variable-item {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .variable-name {
+            color: var(--accent);
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .history-item.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .history-item:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .tree-node {
+            transition: all 0.3s ease;
+        }
+
+        .tree-node.current {
+            fill: #3b82f6;
+        }
+
+        .tree-node.deepest {
+            fill: #10b981;
+        }
+
+        .tree-node.lca {
+            fill: #f59e0b;
+        }
+
+        .tree-edge {
+            transition: stroke 0.3s ease;
+        }
+
+        .tree-edge.active {
+            stroke: var(--accent);
+            stroke-width: 3;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="header">
+        <h1>1123. Lowest Common Ancestor of Deepest Leaves</h1>
+        <div class="header-controls">
+            <div class="input-section">
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="treeInput" 
+                    placeholder="[3,5,1,6,2,0,8,null,null,7,4]"
+                    value="[3,5,1,6,2,0,8,null,null,7,4]"
+                />
+                <button class="btn" id="runBtn">Run</button>
+            </div>
+            <button class="theme-toggle" id="themeToggle">☀️ Light Mode</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel code-panel">
+            <div class="panel-header">Code</div>
+            <div class="panel-content">
+                <div class="code-display" id="codeDisplay"></div>
+            </div>
+        </div>
+
+        <div class="panel viz-panel">
+            <div class="panel-header">Visualization</div>
+            <div class="viz-content" id="vizContent">
+                <svg id="treeSvg" viewBox="0 0 1000 600"></svg>
+            </div>
+            <div class="controls">
+                <button class="control-btn" id="resetBtn">⏮ Reset</button>
+                <button class="control-btn" id="prevBtn">◀ Prev</button>
+                <button class="control-btn" id="playBtn">▶ Play</button>
+                <button class="control-btn" id="nextBtn">Next ▶</button>
+                <select class="speed-selector" id="speedSelect">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel log-panel">
+            <div class="panel-header">Step Log</div>
+            <div class="panel-content">
+                <div class="step-info" id="stepInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Python code with syntax highlighting
+        const pythonCode = `class Solution:
+    def lcaDeepestLeaves(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        def dfs(node):
+            """
+            Returns: (depth, lca_node)
+            - depth: maximum depth from this node to its deepest leaf
+            - lca_node: LCA of deepest leaves in this subtree
+            """
+            if not node:
+                return (0, None)
+            
+            # Post-order traversal: process children first
+            left_depth, left_lca = dfs(node.left)
+            right_depth, right_lca = dfs(node.right)
+            
+            # If both subtrees have same depth, current node is LCA
+            if left_depth == right_depth:
+                return (left_depth + 1, node)
+            
+            # Return the deeper subtree's LCA
+            if left_depth > right_depth:
+                return (left_depth + 1, left_lca)
+            else:
+                return (right_depth + 1, right_lca)
+        
+        return dfs(root)[1]`;
+
+        // State
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let speed = 1;
+        let tree = null;
+
+        // Tree node class
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+            }
+        }
+
+        // Build tree from array
+        function buildTree(arr) {
+            if (!arr || arr.length === 0) return null;
+            
+            const root = new TreeNode(arr[0]);
+            const queue = [root];
+            let i = 1;
+            
+            while (queue.length > 0 && i < arr.length) {
+                const node = queue.shift();
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.left = new TreeNode(arr[i]);
+                    queue.push(node.left);
+                }
+                i++;
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.right = new TreeNode(arr[i]);
+                    queue.push(node.right);
+                }
+                i++;
+            }
+            
+            return root;
+        }
+
+        // Solution with tracing
+        function solutionWithTracing(root) {
+            const steps = [];
+            let stepNum = 0;
+            
+            function logStep(lineNo, vars, description) {
+                steps.push({
+                    line: lineNo,
+                    vars: JSON.parse(JSON.stringify(vars)),
+                    description: description,
+                    stepNum: stepNum++
+                });
+            }
+            
+            function dfs(node, path = []) {
+                logStep(10, { 
+                    current_node: node ? node.val : 'None',
+                    path: path.join(' → ')
+                }, node ? `Exploring node ${node.val}` : 'Reached null node');
+                
+                if (!node) {
+                    logStep(11, { 
+                        return_value: '(0, None)' 
+                    }, 'Base case: returning (depth=0, lca=None)');
+                    return [0, null];
+                }
+                
+                logStep(14, { 
+                    current_node: node.val,
+                    action: 'Exploring left subtree'
+                }, `Processing left child of node ${node.val}`);
+                
+                const [leftDepth, leftLca] = dfs(node.left, [...path, `${node.val}L`]);
+                
+                logStep(14, { 
+                    current_node: node.val,
+                    left_depth: leftDepth,
+                    left_lca: leftLca ? leftLca.val : 'None'
+                }, `Left subtree returned: depth=${leftDepth}, lca=${leftLca ? leftLca.val : 'None'}`);
+                
+                logStep(15, { 
+                    current_node: node.val,
+                    action: 'Exploring right subtree'
+                }, `Processing right child of node ${node.val}`);
+                
+                const [rightDepth, rightLca] = dfs(node.right, [...path, `${node.val}R`]);
+                
+                logStep(15, { 
+                    current_node: node.val,
+                    right_depth: rightDepth,
+                    right_lca: rightLca ? rightLca.val : 'None'
+                }, `Right subtree returned: depth=${rightDepth}, lca=${rightLca ? rightLca.val : 'None'}`);
+                
+                logStep(18, {
+                    current_node: node.val,
+                    left_depth: leftDepth,
+                    right_depth: rightDepth,
+                    comparison: leftDepth === rightDepth ? 'equal' : (leftDepth > rightDepth ? 'left deeper' : 'right deeper')
+                }, `Comparing depths: left=${leftDepth}, right=${rightDepth}`);
+                
+                if (leftDepth === rightDepth) {
+                    logStep(19, {
+                        current_node: node.val,
+                        return_depth: leftDepth + 1,
+                        return_lca: node.val
+                    }, `Depths are equal! Node ${node.val} is the LCA. Returning (${leftDepth + 1}, ${node.val})`);
+                    return [leftDepth + 1, node];
+                }
+                
+                if (leftDepth > rightDepth) {
+                    logStep(22, {
+                        current_node: node.val,
+                        return_depth: leftDepth + 1,
+                        return_lca: leftLca ? leftLca.val : 'None'
+                    }, `Left is deeper. Returning (${leftDepth + 1}, ${leftLca ? leftLca.val : 'None'})`);
+                    return [leftDepth + 1, leftLca];
+                } else {
+                    logStep(24, {
+                        current_node: node.val,
+                        return_depth: rightDepth + 1,
+                        return_lca: rightLca ? rightLca.val : 'None'
+                    }, `Right is deeper. Returning (${rightDepth + 1}, ${rightLca ? rightLca.val : 'None'})`);
+                    return [rightDepth + 1, rightLca];
+                }
+            }
+            
+            logStep(26, {}, 'Starting DFS from root');
+            const result = dfs(root, ['root']);
+            logStep(26, { 
+                final_result: result[1] ? result[1].val : 'None',
+                max_depth: result[0]
+            }, `Final answer: LCA of deepest leaves is node ${result[1] ? result[1].val : 'None'} at depth ${result[0]}`);
+            
+            return { result: result[1], steps };
+        }
+
+        // Syntax highlighting
+        function highlightPythonLine(line) {
+            // Handle empty lines
+            if (!line || line.trim() === '') {
+                return '&nbsp;';
+            }
+            
+            // Comments - handle first to avoid conflicts
+            if (line.trim().startsWith('#')) {
+                return `<span class="comment">${escapeHtml(line)}</span>`;
+            }
+            
+            // Docstrings
+            if (line.trim().startsWith('"""') || line.trim().startsWith("'''")) {
+                return `<span class="string">${escapeHtml(line)}</span>`;
+            }
+            
+            // Start with escaped HTML to prevent XSS
+            let result = line;
+            
+            // Escape HTML characters but preserve structure for highlighting
+            const parts = [];
+            let currentIndex = 0;
+            
+            // Process line character by character, applying highlights
+            // Simple approach: escape first, then selectively highlight
+            result = escapeHtml(line);
+            
+            // Keywords - must be word boundaries
+            const keywords = ['class', 'def', 'if', 'elif', 'else', 'while', 'for', 'return', 'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None'];
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b(${kw})\\b`, 'g');
+                result = result.replace(regex, '<span class="keyword">$1</span>');
+            });
+            
+            // Types
+            const types = ['Optional', 'TreeNode', 'List', 'int', 'str'];
+            types.forEach(type => {
+                const regex = new RegExp(`\\b(${type})\\b`, 'g');
+                result = result.replace(regex, '<span class="type">$1</span>');
+            });
+            
+            // Function names
+            result = result.replace(/\b(lcaDeepestLeaves|dfs)\b/g, '<span class="function">$1</span>');
+            
+            // Strings - must come after keywords to avoid conflicts
+            result = result.replace(/((?:&quot;|&#39;).*?(?:&quot;|&#39;))/g, '<span class="string">$1</span>');
+            
+            // Numbers
+            result = result.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+            
+            return result;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render code with highlighting
+        function renderCode() {
+            const lines = pythonCode.split('\n');
+            const codeDisplay = document.getElementById('codeDisplay');
+            
+            // Clear existing content
+            codeDisplay.innerHTML = '';
+            
+            // Create pre wrapper
+            const pre = document.createElement('pre');
+            pre.style.margin = '0';
+            pre.style.padding = '16px';
+            
+            lines.forEach((line, i) => {
+                const isActive = currentStep < steps.length && steps[currentStep].line === i;
+                
+                // Create line div
+                const lineDiv = document.createElement('div');
+                lineDiv.className = `code-line ${isActive ? 'active' : ''}`;
+                
+                // Create line number span
+                const lineNum = document.createElement('span');
+                lineNum.className = 'line-number';
+                lineNum.textContent = i + 1;
+                
+                // Create code span
+                const codeSpan = document.createElement('code');
+                codeSpan.className = 'line-content';
+                codeSpan.innerHTML = highlightPythonLine(line) || '&nbsp;';
+                
+                lineDiv.appendChild(lineNum);
+                lineDiv.appendChild(codeSpan);
+                pre.appendChild(lineDiv);
+            });
+            
+            codeDisplay.appendChild(pre);
+        }
+
+        // Layout tree nodes
+        function layoutTree(node, depth = 0, index = 0, offset = 500) {
+            if (!node) return { nodes: [], edges: [], width: 0 };
+            
+            const nodeSize = 40;
+            const levelHeight = 80;
+            
+            const leftLayout = layoutTree(node.left, depth + 1, index * 2, offset / 2);
+            const rightLayout = layoutTree(node.right, depth + 1, index * 2 + 1, offset / 2);
+            
+            const x = 500 + (index - Math.pow(2, depth) / 2 + 0.5) * offset;
+            const y = 50 + depth * levelHeight;
+            
+            const currentNode = {
+                val: node.val,
+                x: x,
+                y: y,
+                node: node
+            };
+            
+            const nodes = [currentNode, ...leftLayout.nodes, ...rightLayout.nodes];
+            const edges = [...leftLayout.edges, ...rightLayout.edges];
+            
+            if (node.left) {
+                const leftNode = leftLayout.nodes[0];
+                edges.push({
+                    from: currentNode,
+                    to: leftNode,
+                    highlighted: false
+                });
+            }
+            
+            if (node.right) {
+                const rightNode = rightLayout.nodes[0];
+                edges.push({
+                    from: currentNode,
+                    to: rightNode,
+                    highlighted: false
+                });
+            }
+            
+            return { nodes, edges };
+        }
+
+        // Get deepest leaves
+        function getDeepestLeaves(node, depth = 0) {
+            if (!node) return { depth: 0, leaves: [] };
+            
+            if (!node.left && !node.right) {
+                return { depth: depth, leaves: [node] };
+            }
+            
+            const left = getDeepestLeaves(node.left, depth + 1);
+            const right = getDeepestLeaves(node.right, depth + 1);
+            
+            if (left.depth > right.depth) {
+                return left;
+            } else if (right.depth > left.depth) {
+                return right;
+            } else {
+                return { depth: left.depth, leaves: [...left.leaves, ...right.leaves] };
+            }
+        }
+
+        // Render tree
+        function renderTree() {
+            if (!tree) return;
+            
+            const svg = document.getElementById('treeSvg');
+            const layout = layoutTree(tree);
+            
+            const currentVars = currentStep < steps.length ? steps[currentStep].vars : {};
+            const currentNode = currentVars.current_node;
+            const lcaNode = currentVars.return_lca;
+            
+            const deepestInfo = getDeepestLeaves(tree);
+            const deepestValues = deepestInfo.leaves.map(n => n.val);
+            
+            let svgContent = '';
+            
+            // Draw edges
+            layout.edges.forEach(edge => {
+                svgContent += `<line 
+                    x1="${edge.from.x}" y1="${edge.from.y}" 
+                    x2="${edge.to.x}" y2="${edge.to.y}" 
+                    stroke="${edge.highlighted ? '#3b82f6' : '#6b7280'}" 
+                    stroke-width="2" 
+                    class="tree-edge"/>`;
+            });
+            
+            // Draw nodes
+            layout.nodes.forEach(node => {
+                const isCurrent = currentNode == node.val || currentNode === node.val;
+                const isLca = lcaNode == node.val || lcaNode === node.val;
+                const isDeepest = deepestValues.includes(node.val);
+                
+                let fillColor = '#374151';
+                if (isLca) fillColor = '#f59e0b';
+                else if (isCurrent) fillColor = '#3b82f6';
+                else if (isDeepest) fillColor = '#10b981';
+                
+                svgContent += `<g class="tree-node ${isCurrent ? 'current' : ''} ${isDeepest ? 'deepest' : ''} ${isLca ? 'lca' : ''}">
+                    <circle cx="${node.x}" cy="${node.y}" r="24" 
+                        fill="${fillColor}" 
+                        stroke="#60a5fa" 
+                        stroke-width="${isCurrent || isLca ? 3 : 1}"/>
+                    <text x="${node.x}" y="${node.y}" 
+                        text-anchor="middle" 
+                        dominant-baseline="middle" 
+                        fill="#fff" 
+                        font-size="14" 
+                        font-weight="600">
+                        ${node.val}
+                    </text>
+                </g>`;
+            });
+            
+            // Legend
+            svgContent += `<g transform="translate(20, 500)">
+                <circle cx="10" cy="0" r="8" fill="#3b82f6"/>
+                <text x="25" y="0" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Current Node</text>
+                
+                <circle cx="10" cy="25" r="8" fill="#10b981"/>
+                <text x="25" y="25" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Deepest Leaf</text>
+                
+                <circle cx="10" cy="50" r="8" fill="#f59e0b"/>
+                <text x="25" y="50" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">LCA Result</text>
+            </g>`;
+            
+            svg.innerHTML = svgContent;
+        }
+
+        // Render step log
+        function renderStepLog() {
+            const stepInfo = document.getElementById('stepInfo');
+            
+            if (steps.length === 0) {
+                stepInfo.innerHTML = '<div class="step-description">Run the algorithm to see execution steps</div>';
+                return;
+            }
+            
+            const step = steps[currentStep];
+            
+            let html = `
+                <div class="step-title">Step ${currentStep + 1} of ${steps.length}</div>
+                <div class="step-description">${step.description}</div>
+                
+                <div class="variables-section">
+                    <div class="section-title">Variables</div>
+                    ${Object.entries(step.vars).map(([name, value]) => `
+                        <div class="variable-item">
+                            <span class="variable-name">${name}</span>: ${
+                                typeof value === 'object' ? JSON.stringify(value) : value
+                            }
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="variables-section">
+                    <div class="section-title">History</div>
+                    ${steps.slice(0, currentStep + 1).map((s, i) => `
+                        <div class="history-item ${i === currentStep ? 'active' : ''}">
+                            ${i + 1}. ${s.description}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            stepInfo.innerHTML = html;
+        }
+
+        // Update UI
+        function updateUI() {
+            renderCode();
+            renderTree();
+            renderStepLog();
+            
+            document.getElementById('prevBtn').disabled = currentStep === 0;
+            document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+        }
+
+        // Playback controls
+        function play() {
+            if (isPlaying) return;
+            isPlaying = true;
+            document.getElementById('playBtn').innerHTML = '⏸ Pause';
+            
+            playInterval = setInterval(() => {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    updateUI();
+                } else {
+                    pause();
+                }
+            }, 1000 / speed);
+        }
+
+        function pause() {
+            isPlaying = false;
+            document.getElementById('playBtn').innerHTML = '▶ Play';
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+
+        function stepForward() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function stepBackward() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        }
+
+        function reset() {
+            pause();
+            currentStep = 0;
+            updateUI();
+        }
+
+        // Run algorithm
+        function runAlgorithm() {
+            pause();
+            
+            const input = document.getElementById('treeInput').value;
+            try {
+                const arr = JSON.parse(input);
+                tree = buildTree(arr);
+                
+                const { result, steps: newSteps } = solutionWithTracing(tree);
+                steps = newSteps;
+                currentStep = 0;
+                
+                updateUI();
+            } catch (e) {
+                alert('Invalid input format. Please use format like: [3,5,1,6,2,0,8,null,null,7,4]');
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.textContent = '🌙 Dark Mode';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️ Light Mode';
+            }
+            
+            updateUI();
+        }
+
+        // Event listeners
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (isPlaying) {
+                pause();
+            } else {
+                play();
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', stepForward);
+        document.getElementById('prevBtn').addEventListener('click', stepBackward);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.getElementById('runBtn').addEventListener('click', runAlgorithm);
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        document.getElementById('speedSelect').addEventListener('change', (e) => {
+            speed = parseFloat(e.target.value);
+            if (isPlaying) {
+                pause();
+                play();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isPlaying) {
+                    pause();
+                } else {
+                    play();
+                }
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                stepForward();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                stepBackward();
+            }
+        });
+
+        // Initialize
+        runAlgorithm();
+    </script>
+</body>
+</html>
