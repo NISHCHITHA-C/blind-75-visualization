@@ -64,6 +64,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | 3 | Same Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/03-same-tree.html) | 🔜 Coming Soon |
 | 4 | Subtree of Another Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/04-subtree.html) | ✅ Available |
 | 5 | Lowest Common Ancestor of BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/05-lca-bst.html) | 🔜 Coming Soon |
+| 5a | Lowest Common Ancestor of deepest tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/05-lca-deepest-leaves.html) | ✅ Available |
 | 6 | Binary Tree Level Order Traversal | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/06-level-order.html) | 🔜 Coming Soon |
 | 7 | Validate Binary Search Tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/07-validate-bst.html) | 🔜 Coming Soon |
 | 8 | Kth Smallest Element in BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-kth-smallest-bst.html) | 🔜 Coming Soon |
