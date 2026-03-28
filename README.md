@@ -62,7 +62,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | 1 | Invert Binary Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/01-invert-binary-tree.html) | ✅ Available |
 | 2 | Maximum Depth of Binary Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/02-maximum-depth.html) | ✅ Available |
 | 3 | Same Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/03-same-tree.html) | 🔜 Coming Soon |
-| 4 | Subtree of Another Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/04-subtree.html) | 🔜 Coming Soon |
+| 4 | Subtree of Another Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/04-subtree.html) | ✅ Available |
 | 5 | Lowest Common Ancestor of BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/05-lca-bst.html) | 🔜 Coming Soon |
 | 6 | Binary Tree Level Order Traversal | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/06-level-order.html) | 🔜 Coming Soon |
 | 7 | Validate Binary Search Tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/07-validate-bst.html) | 🔜 Coming Soon |
