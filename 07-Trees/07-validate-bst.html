@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>98. Validate Binary Search Tree - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --border: #dee2e6;
+            --code-bg: #f8f9fa;
+            --highlight: #fff3cd;
+            --accent: #0d6efd;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            
+            /* Syntax highlighting - Light mode (GitHub-inspired) */
+            --syntax-keyword: #d73a49;
+            --syntax-function: #6f42c1;
+            --syntax-string: #032f62;
+            --syntax-number: #005cc5;
+            --syntax-comment: #6a737d;
+            --syntax-type: #22863a;
+            --syntax-builtin: #e36209;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1d23;
+            --bg-secondary: #0f1419;
+            --bg-tertiary: #282c34;
+            --text-primary: #e6edf3;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border: #30363d;
+            --code-bg: #0d1117;
+            --highlight: #3d2a00;
+            --accent: #58a6ff;
+            --success: #3fb950;
+            --danger: #f85149;
+            --warning: #d29922;
+            
+            /* Syntax highlighting - Dark mode (Dracula-inspired) */
+            --syntax-keyword: #ff79c6;
+            --syntax-function: #50fa7b;
+            --syntax-string: #f1fa8c;
+            --syntax-number: #bd93f9;
+            --syntax-comment: #6272a4;
+            --syntax-type: #8be9fd;
+            --syntax-builtin: #ffb86c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .title .number {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border);
+        }
+
+        .input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-section label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-field {
+            flex: 1;
+            max-width: 400px;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .run-button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .run-button:hover {
+            opacity: 0.9;
+        }
+
+        .run-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .panels {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            background: var(--bg-primary);
+        }
+
+        /* Code Panel */
+        .code-display {
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+            overflow: auto;
+            height: 100%;
+        }
+
+        .code-display pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.highlight {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-muted);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-content {
+            flex: 1;
+            white-space: pre;
+            color: inherit;
+        }
+
+        /* Syntax highlighting classes */
+        .keyword { color: var(--syntax-keyword); font-weight: 600; }
+        .function { color: var(--syntax-function); font-weight: 500; }
+        .string { color: var(--syntax-string); }
+        .number { color: var(--syntax-number); }
+        .comment { color: var(--syntax-comment); font-style: italic; }
+        .type { color: var(--syntax-type); font-weight: 500; }
+        .builtin { color: var(--syntax-builtin); }
+
+        /* Visualization Panel */
+        .viz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .viz-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .viz-controls {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .control-button {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-button:hover:not(:disabled) {
+            background: var(--border);
+        }
+
+        .control-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .control-button.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .speed-option {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .speed-option.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Step Log Panel */
+        .step-log {
+            padding: 16px;
+        }
+
+        .step-info {
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .variables-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .variable-item {
+            margin: 6px 0;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .variable-name {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            margin: 6px 0;
+            border-radius: 6px;
+            font-size: 12px;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .history-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .result-badge.success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .result-badge.danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        /* Resizer */
+        .resizer {
+            width: 4px;
+            background: var(--border);
+            cursor: col-resize;
+            transition: background 0.2s;
+        }
+
+        .resizer:hover {
+            background: var(--accent);
+        }
+
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1 class="title"><span class="number">98.</span> Validate Binary Search Tree</h1>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+            </div>
+            <div class="input-section">
+                <label>Test Case:</label>
+                <input type="text" class="input-field" id="inputField" value="[2,1,3]" placeholder="e.g., [2,1,3] or [5,1,4,null,null,3,6]">
+                <button class="run-button" onclick="runVisualization()">▶ Run</button>
+            </div>
+        </div>
+
+        <div class="panels">
+            <!-- Code Panel -->
+            <div class="panel" style="width: 30%;" id="codePanel">
+                <div class="panel-header">Solution Code</div>
+                <div class="panel-content">
+                    <div class="code-display" id="codeDisplay"></div>
+                </div>
+            </div>
+
+            <div class="resizer" onmousedown="initResize(event, 'codePanel')"></div>
+
+            <!-- Visualization Panel -->
+            <div class="panel" style="width: 50%;" id="vizPanel">
+                <div class="panel-header">Tree Visualization</div>
+                <div class="panel-content">
+                    <div class="viz-container">
+                        <div class="viz-main" id="vizMain">
+                            <svg id="treeSvg" viewBox="0 0 800 600"></svg>
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-button" onclick="resetVisualization()">⟲ Reset</button>
+                            <button class="control-button" onclick="stepBackward()" id="stepBackBtn">◀ Step Back</button>
+                            <button class="control-button primary" onclick="togglePlay()" id="playBtn">▶ Play</button>
+                            <button class="control-button" onclick="stepForward()" id="stepForwardBtn">Step Forward ▶</button>
+                            <div class="speed-selector">
+                                <button class="speed-option" onclick="setSpeed(0.5)">0.5x</button>
+                                <button class="speed-option active" onclick="setSpeed(1)">1x</button>
+                                <button class="speed-option" onclick="setSpeed(2)">2x</button>
+                                <button class="speed-option" onclick="setSpeed(4)">4x</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resizer" onmousedown="initResize(event, 'vizPanel')"></div>
+
+            <!-- Step Log Panel -->
+            <div class="panel" style="width: 20%;">
+                <div class="panel-header">Execution Log</div>
+                <div class="panel-content">
+                    <div class="step-log" id="stepLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let speed = 1;
+        let theme = 'dark';
+
+        // Tree structure
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+            }
+        }
+
+        // Build tree from array
+        function buildTree(arr) {
+            if (!arr || arr.length === 0) return null;
+            
+            const root = new TreeNode(arr[0]);
+            const queue = [root];
+            let i = 1;
+            
+            while (queue.length > 0 && i < arr.length) {
+                const node = queue.shift();
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.left = new TreeNode(arr[i]);
+                    queue.push(node.left);
+                }
+                i++;
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.right = new TreeNode(arr[i]);
+                    queue.push(node.right);
+                }
+                i++;
+            }
+            
+            return root;
+        }
+
+        // Solution with step tracking
+        function isValidBSTWithSteps(root) {
+            steps = [];
+            let stepNum = 0;
+            
+            function logStep(line, vars, description) {
+                steps.push({
+                    line: line,
+                    vars: JSON.parse(JSON.stringify(vars)),
+                    description: description,
+                    stepNum: stepNum++
+                });
+            }
+            
+            logStep(1, { root: root ? root.val : null }, "Starting validation with root");
+            
+            if (!root) {
+                logStep(2, { root: null }, "Root is null, returning True");
+                return true;
+            }
+            
+            function dfs(node, minVal, maxVal, path = "root") {
+                logStep(4, { 
+                    node: node ? node.val : null, 
+                    min_val: minVal === -Infinity ? '-∞' : minVal,
+                    max_val: maxVal === Infinity ? '+∞' : maxVal,
+                    path: path
+                }, `Checking ${path}: node=${node ? node.val : 'null'}, range=(${minVal === -Infinity ? '-∞' : minVal}, ${maxVal === Infinity ? '+∞' : maxVal})`);
+                
+                if (!node) {
+                    logStep(5, { 
+                        node: null,
+                        result: true
+                    }, `${path} is null, returning True`);
+                    return true;
+                }
+                
+                if (node.val >= maxVal || node.val <= minVal) {
+                    logStep(7, { 
+                        node: node.val,
+                        min_val: minVal === -Infinity ? '-∞' : minVal,
+                        max_val: maxVal === Infinity ? '+∞' : maxVal,
+                        valid: false
+                    }, `${path} value ${node.val} violates range (${minVal === -Infinity ? '-∞' : minVal}, ${maxVal === Infinity ? '+∞' : maxVal}) ❌`);
+                    return false;
+                }
+                
+                logStep(7, { 
+                    node: node.val,
+                    min_val: minVal === -Infinity ? '-∞' : minVal,
+                    max_val: maxVal === Infinity ? '+∞' : maxVal,
+                    valid: true
+                }, `${path} value ${node.val} is valid in range (${minVal === -Infinity ? '-∞' : minVal}, ${maxVal === Infinity ? '+∞' : maxVal}) ✓`);
+                
+                logStep(9, { 
+                    node: node.val,
+                    exploring: 'left subtree'
+                }, `Exploring left subtree of ${path}`);
+                const leftValid = dfs(node.left, minVal, node.val, `${path}→left`);
+                
+                logStep(10, { 
+                    node: node.val,
+                    left_valid: leftValid,
+                    exploring: 'right subtree'
+                }, `Left subtree of ${path} is ${leftValid ? 'valid ✓' : 'invalid ❌'}. Exploring right subtree`);
+                const rightValid = dfs(node.right, node.val, maxVal, `${path}→right`);
+                
+                const result = leftValid && rightValid;
+                logStep(11, { 
+                    node: node.val,
+                    left_valid: leftValid,
+                    right_valid: rightValid,
+                    result: result
+                }, `Subtree at ${path}: left=${leftValid}, right=${rightValid}, overall=${result ? '✓' : '❌'}`);
+                
+                return result;
+            }
+            
+            const result = dfs(root, -Infinity, Infinity);
+            logStep(12, { 
+                final_result: result 
+            }, `Final result: Tree is ${result ? 'a valid BST ✓' : 'NOT a valid BST ❌'}`);
+            
+            return result;
+        }
+
+        // Code highlighting
+        const codeText = `class Solution:
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        if not root:
+            return True
+        def dfs(root, min_val, max_val):
+            if not root:
+                return True
+            if root.val >= max_val or root.val <= min_val:
+                return False
+            left_valid = dfs(root.left, min_val, root.val)
+            right_valid = dfs(root.right, root.val, max_val)
+            return left_valid and right_valid
+        return dfs(root, float('-inf'), float('inf'))`;
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function highlightPythonLine(line) {
+            // First escape HTML
+            let escaped = escapeHtml(line);
+            
+            // Handle comments (must be before other highlighting)
+            if (escaped.trim().startsWith('#')) {
+                return `<span class="comment">${escaped}</span>`;
+            }
+            
+            // Highlight strings (with escaped quotes)
+            escaped = escaped.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;)/g, '<span class="string">$1</span>');
+            
+            // Keywords
+            const keywords = ['class', 'def', 'if', 'elif', 'else', 'while', 'for', 'return', 'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None'];
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b${kw}\\b`, 'g');
+                escaped = escaped.replace(regex, `<span class="keyword">${kw}</span>`);
+            });
+            
+            // Built-in functions
+            const builtins = ['float', 'int', 'str', 'len', 'range', 'print'];
+            builtins.forEach(fn => {
+                const regex = new RegExp(`\\b${fn}\\b`, 'g');
+                escaped = escaped.replace(regex, `<span class="builtin">${fn}</span>`);
+            });
+            
+            // Types (after keywords to avoid conflicts)
+            const types = ['Optional', 'TreeNode', 'List', 'Dict', 'Set'];
+            types.forEach(type => {
+                const regex = new RegExp(`\\b${type}\\b`, 'g');
+                escaped = escaped.replace(regex, `<span class="type">${type}</span>`);
+            });
+            
+            // Function names (matches word before opening parenthesis)
+            escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, '<span class="function">$1</span>(');
+            
+            // Numbers
+            escaped = escaped.replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>');
+            
+            return escaped;
+        }
+
+        function renderCode() {
+            const lines = codeText.split('\n');
+            const codeDisplay = document.getElementById('codeDisplay');
+            
+            let html = '<pre>';
+            lines.forEach((line, i) => {
+                const isHighlight = steps.length > 0 && steps[currentStep] && steps[currentStep].line === i + 1;
+                const highlightedLine = highlightPythonLine(line || ' ');
+                
+                html += `<div class="code-line ${isHighlight ? 'highlight' : ''}">`;
+                html += `<span class="line-number">${i + 1}</span>`;
+                html += `<code class="line-content">${highlightedLine}</code>`;
+                html += '</div>';
+            });
+            html += '</pre>';
+            
+            codeDisplay.innerHTML = html;
+        }
+
+        // Tree visualization
+        function layoutTree(root) {
+            if (!root) return { nodes: [], edges: [] };
+            
+            const nodes = [];
+            const edges = [];
+            const levelWidth = 80;
+            const levelHeight = 80;
+            
+            function traverse(node, x, y, level, minVal, maxVal, path) {
+                if (!node) return;
+                
+                nodes.push({ 
+                    val: node.val, 
+                    x, 
+                    y, 
+                    level,
+                    minVal,
+                    maxVal,
+                    path,
+                    isValid: node.val > minVal && node.val < maxVal
+                });
+                
+                const offset = levelWidth * Math.pow(0.6, level);
+                
+                if (node.left) {
+                    edges.push({ 
+                        from: { x, y }, 
+                        to: { x: x - offset, y: y + levelHeight },
+                        type: 'left'
+                    });
+                    traverse(node.left, x - offset, y + levelHeight, level + 1, minVal, node.val, `${path}→L`);
+                }
+                
+                if (node.right) {
+                    edges.push({ 
+                        from: { x, y }, 
+                        to: { x: x + offset, y: y + levelHeight },
+                        type: 'right'
+                    });
+                    traverse(node.right, x + offset, y + levelHeight, level + 1, node.val, maxVal, `${path}→R`);
+                }
+            }
+            
+            traverse(root, 400, 50, 0, -Infinity, Infinity, 'root');
+            return { nodes, edges };
+        }
+
+        function renderTree(root) {
+            const svg = document.getElementById('treeSvg');
+            const { nodes, edges } = layoutTree(root);
+            
+            let svgContent = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#6b7280" /></marker></defs>';
+            
+            // Get current node from step
+            const currentNodePath = steps[currentStep]?.vars?.path || '';
+            const currentNodeVal = steps[currentStep]?.vars?.node;
+            
+            // Draw edges
+            edges.forEach(edge => {
+                svgContent += `<line x1="${edge.from.x}" y1="${edge.from.y}" x2="${edge.to.x}" y2="${edge.to.y}" stroke="${theme === 'dark' ? '#6b7280' : '#9ca3af'}" stroke-width="2" />`;
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const isCurrentNode = currentNodeVal !== null && currentNodeVal !== undefined && node.val === currentNodeVal;
+                const nodeColor = !node.isValid ? '#dc3545' : isCurrentNode ? '#ffc107' : (theme === 'dark' ? '#374151' : '#e5e7eb');
+                const strokeColor = !node.isValid ? '#dc3545' : isCurrentNode ? '#ff9800' : '#60a5fa';
+                const strokeWidth = isCurrentNode ? 3 : 1;
+                
+                svgContent += `<circle cx="${node.x}" cy="${node.y}" r="24" fill="${nodeColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />`;
+                svgContent += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" fill="${theme === 'dark' ? '#fff' : '#000'}" font-size="14" font-weight="600">${node.val}</text>`;
+                
+                // Show range as small text below node
+                const minStr = node.minVal === -Infinity ? '-∞' : node.minVal;
+                const maxStr = node.maxVal === Infinity ? '+∞' : node.maxVal;
+                svgContent += `<text x="${node.x}" y="${node.y + 40}" text-anchor="middle" fill="${theme === 'dark' ? '#9ca3af' : '#6b7280'}" font-size="10">(${minStr}, ${maxStr})</text>`;
+            });
+            
+            svg.innerHTML = svgContent;
+        }
+
+        // Step log
+        function renderStepLog() {
+            const stepLog = document.getElementById('stepLog');
+            if (steps.length === 0) {
+                stepLog.innerHTML = '<div style="color: var(--text-muted); font-size: 13px;">Run a test case to see execution steps</div>';
+                return;
+            }
+            
+            const currentStepData = steps[currentStep];
+            
+            let html = `
+                <div class="step-info">
+                    <div class="step-number">Step ${currentStep + 1} of ${steps.length}</div>
+                    <div class="step-description">${currentStepData.description}</div>
+                </div>
+                
+                <div class="variables-section">
+                    <div class="section-title">Variables</div>
+            `;
+            
+            Object.entries(currentStepData.vars).forEach(([name, value]) => {
+                const displayValue = typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
+                html += `<div class="variable-item"><span class="variable-name">${name}</span>: ${displayValue}</div>`;
+            });
+            
+            html += `</div><div class="history-section"><div class="section-title">History</div>`;
+            
+            steps.slice(0, currentStep + 1).forEach((step, i) => {
+                html += `<div class="history-item ${i === currentStep ? 'active' : ''}">${i + 1}. ${step.description}</div>`;
+            });
+            
+            // Show final result
+            if (currentStep === steps.length - 1) {
+                const finalResult = currentStepData.vars.final_result;
+                html += `<div class="result-badge ${finalResult ? 'success' : 'danger'}">
+                    ${finalResult ? '✓ Valid BST' : '❌ Invalid BST'}
+                </div>`;
+            }
+            
+            html += '</div>';
+            stepLog.innerHTML = html;
+        }
+
+        // Controls
+        function runVisualization() {
+            const input = document.getElementById('inputField').value;
+            try {
+                const arr = JSON.parse(input);
+                const root = buildTree(arr);
+                isValidBSTWithSteps(root);
+                currentStep = 0;
+                updateVisualization();
+            } catch (e) {
+                alert('Invalid input format. Use array notation like [2,1,3] or [5,1,4,null,null,3,6]');
+            }
+        }
+
+        function resetVisualization() {
+            currentStep = 0;
+            stopPlay();
+            updateVisualization();
+        }
+
+        function stepForward() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateVisualization();
+            }
+        }
+
+        function stepBackward() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateVisualization();
+            }
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopPlay();
+            } else {
+                startPlay();
+            }
+        }
+
+        function startPlay() {
+            isPlaying = true;
+            document.getElementById('playBtn').innerHTML = '⏸ Pause';
+            playInterval = setInterval(() => {
+                if (currentStep < steps.length - 1) {
+                    stepForward();
+                } else {
+                    stopPlay();
+                }
+            }, 1000 / speed);
+        }
+
+        function stopPlay() {
+            isPlaying = false;
+            document.getElementById('playBtn').innerHTML = '▶ Play';
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+
+        function setSpeed(newSpeed) {
+            speed = newSpeed;
+            document.querySelectorAll('.speed-option').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (isPlaying) {
+                stopPlay();
+                startPlay();
+            }
+        }
+
+        function updateVisualization() {
+            renderCode();
+            if (steps.length > 0) {
+                const input = document.getElementById('inputField').value;
+                const arr = JSON.parse(input);
+                const root = buildTree(arr);
+                renderTree(root);
+            }
+            renderStepLog();
+            
+            // Update button states
+            document.getElementById('stepBackBtn').disabled = currentStep === 0;
+            document.getElementById('stepForwardBtn').disabled = currentStep === steps.length - 1;
+        }
+
+        function toggleTheme() {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️ Toggle Theme' : '🌙 Toggle Theme';
+            updateVisualization();
+        }
+
+        // Panel resizing
+        let isResizing = false;
+        let currentPanel = null;
+
+        function initResize(e, panelId) {
+            isResizing = true;
+            currentPanel = document.getElementById(panelId);
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function resize(e) {
+            if (!isResizing || !currentPanel) return;
+            const containerWidth = document.querySelector('.panels').offsetWidth;
+            const newWidth = (e.clientX / containerWidth) * 100;
+            if (newWidth > 15 && newWidth < 70) {
+                currentPanel.style.width = newWidth + '%';
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            currentPanel = null;
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                stepForward();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                stepBackward();
+            }
+        });
+
+        // Initialize
+        document.documentElement.setAttribute('data-theme', 'dark');
+        renderCode();
+        renderStepLog();
+        runVisualization(); // Auto-run with default input
+    </script>
+</body>
+</html>
