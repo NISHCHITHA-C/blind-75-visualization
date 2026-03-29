@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>124. Binary Tree Maximum Path Sum - Intuition Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f29;
+            --bg-tertiary: #252b37;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --accent: #60a5fa;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            
+            /* Syntax highlighting */
+            --keyword: #ff79c6;
+            --function: #50fa7b;
+            --string: #f1fa8c;
+            --number: #bd93f9;
+            --type: #8be9fd;
+            --comment: #6272a4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border);
+            padding: 20px 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .thought-panel {
+            width: 50%;
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+        }
+
+        .code-panel {
+            width: 50%;
+            background: var(--bg-secondary);
+            border-left: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .thought-section {
+            margin-bottom: 48px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .thought-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .thought-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .thought-step {
+            font-size: 32px;
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--accent);
+        }
+
+        .thought-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        .thought-content strong {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .thought-content code {
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--function);
+        }
+
+        .example-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+
+        .tree-visual {
+            margin: 20px 0;
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(16, 185, 129, 0.1));
+            border-left: 4px solid var(--success);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .insight-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--success);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .code-editor {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+            margin-bottom: 8px;
+        }
+
+        .code-block.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .code-line {
+            padding: 4px 0;
+            white-space: pre;
+        }
+
+        .code-annotation {
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--warning);
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.4s ease;
+        }
+
+        .code-annotation.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .keyword { color: var(--keyword); font-weight: 500; }
+        .function { color: var(--function); }
+        .string { color: var(--string); }
+        .number { color: var(--number); }
+        .type { color: var(--type); }
+        .comment { color: var(--comment); font-style: italic; }
+
+        .controls {
+            padding: 20px 32px;
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--border);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 24px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .node-circle {
+            transition: all 0.5s ease;
+        }
+
+        .edge-line {
+            transition: all 0.5s ease;
+        }
+
+        .path-highlight {
+            animation: pathPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pathPulse {
+            0%, 100% { opacity: 1; stroke-width: 3; }
+            50% { opacity: 0.6; stroke-width: 5; }
+        }
+
+        .value-label {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .thinking-animation {
+            display: inline-block;
+            animation: thinking 1.5s ease-in-out infinite;
+        }
+
+        @keyframes thinking {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .code-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 16px;
+            background: var(--accent);
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .highlight-box {
+            background: rgba(251, 191, 36, 0.15);
+            border-radius: 4px;
+            padding: 2px 4px;
+            animation: highlight 0.5s ease;
+        }
+
+        @keyframes highlight {
+            0% { background: rgba(251, 191, 36, 0.3); }
+            100% { background: rgba(251, 191, 36, 0.15); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Binary Tree Maximum Path Sum - Intuition Builder</h1>
+            <p>Watch how a senior engineer thinks through this problem, step by step</p>
+        </div>
+
+        <div class="main-content">
+            <div class="thought-panel" id="thoughtPanel">
+                <!-- Thought process will be injected here -->
+            </div>
+
+            <div class="code-panel">
+                <div class="code-editor" id="codeEditor">
+                    <!-- Code will be built progressively here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" onclick="previousStep()" disabled>← Previous</button>
+            <button id="nextBtn" onclick="nextStep()" class="primary">Next Step →</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="step-indicator" id="stepIndicator">Step 1 of 12</div>
+            <button onclick="restart()">↻ Restart</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStepIndex = 0;
+
+        const intuitionSteps = [
+            {
+                title: "Understanding the Problem",
+                content: `
+                    <p>Let's start with the problem statement: <strong>find the maximum sum of any path in a binary tree</strong>.</p>
+                    <p>A path doesn't have to go through the root. It can be any sequence of nodes connected by edges.</p>
+                    <div class="example-box">
+                        <div class="example-title">🤔 First Question: What counts as a path?</div>
+                        <p style="margin-top: 12px;">A path must be continuous - you can't "teleport" between nodes. You move along edges.</p>
+                        <p style="margin-top: 8px;">Examples of valid paths:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.8;">
+                            <li>Single node: <code>[5]</code></li>
+                            <li>Parent to child: <code>[5, 3]</code></li>
+                            <li>Left-parent-right: <code>[3, 5, 7]</code></li>
+                            <li>Going down multiple levels: <code>[5, 3, 2, 1]</code></li>
+                        </ul>
+                    </div>
+                `,
+                visualization: () => drawSimplePath(),
+                code: null
+            },
+            {
+                title: "Building Intuition with Simple Cases",
+                content: `
+                    <p>Let's think about the simplest case first: <strong>a tree with just one node</strong>.</p>
+                    <div class="example-box">
+                        <div class="example-title">Example 1: Single Node</div>
+                        <div id="viz1"></div>
+                        <p style="margin-top: 16px;">The maximum path sum is just the node's value: <code>5</code></p>
+                        <p style="margin-top: 8px; color: var(--text-secondary);">Easy! But what about two nodes?</p>
+                    </div>
+                `,
+                visualization: () => drawSingleNode(),
+                code: null
+            },
+            {
+                title: "Two Nodes: The First Decision",
+                content: `
+                    <p>With two nodes, we have our first <strong>decision point</strong>.</p>
+                    <div class="example-box">
+                        <div class="example-title">Example 2: Parent and Child</div>
+                        <div id="viz2"></div>
+                        <p style="margin-top: 16px;">We have three possible paths:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.8;">
+                            <li>Just the parent: <code>5</code></li>
+                            <li>Just the child: <code>3</code></li>
+                            <li>Both together: <code>5 + 3 = 8</code> ✓ (maximum)</li>
+                        </ul>
+                    </div>
+                    <div class="insight-box">
+                        <div class="label">💡 Key Insight #1</div>
+                        <p>If a child helps increase the sum, include it. Otherwise, don't!</p>
+                        <p style="margin-top: 8px;">This is why we'll use <code>max(0, child_value)</code> later.</p>
+                    </div>
+                `,
+                visualization: () => drawTwoNodes(),
+                code: null
+            },
+            {
+                title: "The Negative Child Problem",
+                content: `
+                    <p>What if the child has a <strong>negative value</strong>?</p>
+                    <div class="example-box">
+                        <div class="example-title">Example 3: Negative Child</div>
+                        <div id="viz3"></div>
+                        <p style="margin-top: 16px;">Paths and their sums:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.8;">
+                            <li>Just the parent: <code>5</code> ✓ (maximum)</li>
+                            <li>Just the child: <code>-10</code></li>
+                            <li>Both together: <code>5 + (-10) = -5</code></li>
+                        </ul>
+                        <p style="margin-top: 16px; color: var(--warning);">The negative child makes things worse! We should ignore it.</p>
+                    </div>
+                    <div class="insight-box">
+                        <div class="label">💡 Key Insight #2</div>
+                        <p><code>max(0, child_contribution)</code> means: "only include the child if it helps"</p>
+                    </div>
+                `,
+                visualization: () => drawNegativeChild(),
+                code: null
+            },
+            {
+                title: "Three Nodes: The Critical Realization",
+                content: `
+                    <p>Now let's add complexity: <strong>a node with BOTH left and right children</strong>.</p>
+                    <div class="example-box">
+                        <div class="example-title">Example 4: V-Shape Path</div>
+                        <div id="viz4"></div>
+                        <p style="margin-top: 16px;">This is where it gets interesting! The maximum path is:</p>
+                        <p style="margin-top: 8px; text-align: center; font-size: 18px; color: var(--success);">
+                            <strong>4 + 5 + 3 = 12</strong>
+                        </p>
+                        <p style="margin-top: 16px;">This path goes: left child → parent → right child (a "V" shape)</p>
+                    </div>
+                    <div class="insight-box">
+                        <div class="label">💡 Key Insight #3</div>
+                        <p>At any node, we can form a path using BOTH children: <code>left + node + right</code></p>
+                        <p style="margin-top: 8px;">But there's a catch...</p>
+                    </div>
+                `,
+                visualization: () => drawThreeNodes(),
+                code: null
+            },
+            {
+                title: "The Parent's Dilemma",
+                content: `
+                    <p>Here's the <strong>crucial insight</strong> that makes this problem tricky:</p>
+                    <div class="example-box">
+                        <div class="example-title">The Two Different Perspectives</div>
+                        <p style="margin-top: 12px;"><strong>When we're AT a node:</strong></p>
+                        <p style="margin-left: 20px; margin-top: 8px;">We can use BOTH children: <code class="highlight-box">left + node.val + right</code></p>
+                        <p style="margin-top: 16px;"><strong>When we RETURN to parent:</strong></p>
+                        <p style="margin-left: 20px; margin-top: 8px;">We can only use ONE child: <code class="highlight-box">node.val + max(left, right)</code></p>
+                        <div id="viz5" style="margin-top: 20px;"></div>
+                        <p style="margin-top: 16px; color: var(--warning);">Why? Because the parent needs a <strong>single branch</strong>, not a V-shape!</p>
+                    </div>
+                    <div class="insight-box">
+                        <div class="label">💡 Key Insight #4</div>
+                        <p>Each node calculates TWO things:</p>
+                        <p style="margin-top: 8px;">1. <strong>Local maximum</strong> (using both children) - update global max</p>
+                        <p>2. <strong>Return value</strong> (using best child) - give to parent</p>
+                    </div>
+                `,
+                visualization: () => drawParentDilemma(),
+                code: null
+            },
+            {
+                title: "The Recursive Pattern Emerges",
+                content: `
+                    <p>Now we can see the <strong>recursive structure</strong>:</p>
+                    <div class="example-box">
+                        <div class="example-title">What Each Node Must Do</div>
+                        <ol style="margin-left: 20px; margin-top: 12px; line-height: 2;">
+                            <li><strong>Get contributions from children</strong> (recursive calls)</li>
+                            <li><strong>Calculate local maximum</strong> (path through this node)</li>
+                            <li><strong>Update global maximum</strong> if local is better</li>
+                            <li><strong>Return single branch</strong> to parent</li>
+                        </ol>
+                    </div>
+                    <div class="insight-box">
+                        <div class="label">💡 Key Insight #5</div>
+                        <p>This is a <strong>post-order DFS</strong> traversal pattern:</p>
+                        <p style="margin-top: 8px;">1. Process left subtree</p>
+                        <p>2. Process right subtree</p>
+                        <p>3. Process current node</p>
+                    </div>
+                `,
+                visualization: () => drawRecursivePattern(),
+                code: null
+            },
+            {
+                title: "Let's Start Coding - The Structure",
+                content: `
+                    <p>Now that we understand the intuition, let's build the solution!</p>
+                    <p style="margin-top: 16px;">We'll start with the <strong>basic structure</strong>:</p>
+                    <div class="insight-box" style="margin-top: 20px;">
+                        <div class="label">🎯 What We Need</div>
+                        <p>1. A variable to track the global maximum</p>
+                        <p style="margin-top: 4px;">2. A helper function that processes each node</p>
+                        <p style="margin-top: 4px;">3. Return the global maximum at the end</p>
+                    </div>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+<span class="keyword">class</span> <span class="type">Solution</span>:
+    <span class="keyword">def</span> <span class="function">maxPathSum</span>(<span class="keyword">self</span>, root):
+        <span class="comment"># We'll fill this in...</span>
+        <span class="keyword">pass</span>
+</div>`
+            },
+            {
+                title: "Adding the Global Maximum",
+                content: `
+                    <p>First, we need to track the <strong>global maximum</strong> across all paths.</p>
+                    <p style="margin-top: 16px;">We initialize it to <strong>negative infinity</strong> because:</p>
+                    <ul style="margin-left: 20px; margin-top: 12px; line-height: 1.8;">
+                        <li>Tree values can be negative</li>
+                        <li>We want to ensure any valid path will update it</li>
+                    </ul>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+<span class="keyword">class</span> <span class="type">Solution</span>:
+    <span class="keyword">def</span> <span class="function">maxPathSum</span>(<span class="keyword">self</span>, root):
+</div>
+<div class="code-block" data-delay="500">
+        <span class="comment"># Track the maximum path sum found so far</span>
+        <span class="keyword">self</span>.max_sum = <span class="function">float</span>(<span class="string">'-inf'</span>)
+</div>
+<div class="code-annotation" data-delay="1000">
+💭 Why -infinity? Because even a single negative node is better than -infinity!
+</div>`
+            },
+            {
+                title: "The Helper Function - Base Case",
+                content: `
+                    <p>Now let's create our <strong>recursive helper function</strong>.</p>
+                    <p style="margin-top: 16px;">Every recursion needs a <strong>base case</strong>:</p>
+                    <div class="insight-box" style="margin-top: 20px;">
+                        <div class="label">🛑 Base Case</div>
+                        <p>If the node is None (null), what should we return?</p>
+                        <p style="margin-top: 8px; color: var(--success);"><strong>Return 0</strong> - a null node contributes nothing to the path sum!</p>
+                    </div>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+<span class="keyword">class</span> <span class="type">Solution</span>:
+    <span class="keyword">def</span> <span class="function">maxPathSum</span>(<span class="keyword">self</span>, root):
+        <span class="keyword">self</span>.max_sum = <span class="function">float</span>(<span class="string">'-inf'</span>)
+</div>
+<div class="code-block" data-delay="500">
+        
+        <span class="keyword">def</span> <span class="function">max_gain</span>(node):
+            <span class="comment"># Base case: empty node contributes 0</span>
+</div>
+<div class="code-block" data-delay="1000">
+            <span class="keyword">if not</span> node:
+                <span class="keyword">return</span> <span class="number">0</span>
+</div>`
+            },
+            {
+                title: "Getting Child Contributions",
+                content: `
+                    <p>Now for the <strong>recursive calls</strong>!</p>
+                    <p style="margin-top: 16px;">Remember Key Insight #2? We only want to include children if they help:</p>
+                    <div class="insight-box" style="margin-top: 20px;">
+                        <div class="label">🎯 The max(0, ...) Pattern</div>
+                        <p><code>left_gain = max(0, max_gain(node.left))</code></p>
+                        <p style="margin-top: 12px;">This means:</p>
+                        <p style="margin-top: 8px;">✓ If child returns positive value → use it</p>
+                        <p>✓ If child returns negative value → use 0 instead (ignore it)</p>
+                    </div>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+        <span class="keyword">def</span> <span class="function">max_gain</span>(node):
+            <span class="keyword">if not</span> node:
+                <span class="keyword">return</span> <span class="number">0</span>
+</div>
+<div class="code-block" data-delay="500">
+            
+            <span class="comment"># Get max sum from left subtree (or 0 if negative)</span>
+</div>
+<div class="code-block" data-delay="1000">
+            left_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.left))
+</div>
+<div class="code-block" data-delay="1500">
+            
+            <span class="comment"># Get max sum from right subtree (or 0 if negative)</span>
+</div>
+<div class="code-block" data-delay="2000">
+            right_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.right))
+</div>
+<div class="code-annotation" data-delay="2500">
+💭 Post-order traversal! We process children before the current node.
+</div>`
+            },
+            {
+                title: "Calculating Local Maximum & Returning",
+                content: `
+                    <p>Finally, the <strong>two critical calculations</strong>:</p>
+                    <div class="example-box" style="margin-top: 20px;">
+                        <div class="example-title">1. Local Maximum (V-shape path)</div>
+                        <p style="margin-top: 12px;"><code>current_path_sum = node.val + left_gain + right_gain</code></p>
+                        <p style="margin-top: 8px; color: var(--text-secondary);">This uses BOTH children - the V-shape!</p>
+                    </div>
+                    <div class="example-box" style="margin-top: 16px;">
+                        <div class="example-title">2. Return Value (single branch)</div>
+                        <p style="margin-top: 12px;"><code>return node.val + max(left_gain, right_gain)</code></p>
+                        <p style="margin-top: 8px; color: var(--text-secondary);">This uses BEST child - what the parent needs!</p>
+                    </div>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+            left_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.left))
+            right_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.right))
+</div>
+<div class="code-block" data-delay="500">
+            
+            <span class="comment"># Path through current node (can use both children)</span>
+</div>
+<div class="code-block" data-delay="1000">
+            current_path_sum = node.val + left_gain + right_gain
+</div>
+<div class="code-block" data-delay="1500">
+            
+            <span class="comment"># Update global maximum</span>
+</div>
+<div class="code-block" data-delay="2000">
+            <span class="keyword">self</span>.max_sum = <span class="function">max</span>(<span class="keyword">self</span>.max_sum, current_path_sum)
+</div>
+<div class="code-block" data-delay="2500">
+            
+            <span class="comment"># Return max single branch to parent (can only use one child)</span>
+</div>
+<div class="code-block" data-delay="3000">
+            <span class="keyword">return</span> node.val + <span class="function">max</span>(left_gain, right_gain)
+</div>
+<div class="code-annotation" data-delay="3500">
+💡 Two different values: one for ourselves (both children), one for parent (best child)!
+</div>`
+            },
+            {
+                title: "Complete Solution",
+                content: `
+                    <p><strong>That's it!</strong> Let's see the complete solution:</p>
+                    <div class="insight-box" style="margin-top: 20px;">
+                        <div class="label">✅ Complete Algorithm</div>
+                        <p><strong>Time Complexity:</strong> O(n) - visit each node exactly once</p>
+                        <p style="margin-top: 4px;"><strong>Space Complexity:</strong> O(h) - recursion stack depth = tree height</p>
+                    </div>
+                    <div class="example-box" style="margin-top: 20px;">
+                        <div class="example-title">🎯 Key Takeaways</div>
+                        <ol style="margin-left: 20px; margin-top: 12px; line-height: 2;">
+                            <li>Use <code>max(0, child)</code> to ignore negative contributions</li>
+                            <li>Calculate local max using BOTH children</li>
+                            <li>Return to parent using BEST child only</li>
+                            <li>Track global maximum across all nodes</li>
+                        </ol>
+                    </div>
+                `,
+                visualization: null,
+                code: `<div class="code-block" data-delay="0">
+<span class="keyword">class</span> <span class="type">Solution</span>:
+    <span class="keyword">def</span> <span class="function">maxPathSum</span>(<span class="keyword">self</span>, root):
+        <span class="keyword">self</span>.max_sum = <span class="function">float</span>(<span class="string">'-inf'</span>)
+        
+        <span class="keyword">def</span> <span class="function">max_gain</span>(node):
+            <span class="keyword">if not</span> node:
+                <span class="keyword">return</span> <span class="number">0</span>
+            
+            left_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.left))
+            right_gain = <span class="function">max</span>(<span class="number">0</span>, <span class="function">max_gain</span>(node.right))
+            
+            current_path_sum = node.val + left_gain + right_gain
+            <span class="keyword">self</span>.max_sum = <span class="function">max</span>(<span class="keyword">self</span>.max_sum, current_path_sum)
+            
+            <span class="keyword">return</span> node.val + <span class="function">max</span>(left_gain, right_gain)
+        
+        <span class="function">max_gain</span>(root)
+        <span class="keyword">return</span> <span class="keyword">self</span>.max_sum
+</div>
+<div class="code-annotation" data-delay="500">
+🎉 Beautiful! Notice how clean this is - the intuition led us to elegant code.
+</div>`
+            }
+        ];
+
+        // Visualization functions
+        function drawSimplePath() {
+            const viz = `
+                <svg viewBox="0 0 400 200" style="width: 100%; max-width: 400px;">
+                    <line x1="100" y1="80" x2="200" y2="80" stroke="var(--success)" stroke-width="3" class="path-highlight"/>
+                    <line x1="200" y1="80" x2="300" y2="80" stroke="var(--success)" stroke-width="3" class="path-highlight"/>
+                    
+                    <circle cx="100" cy="80" r="20" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="100" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-weight="600">3</text>
+                    
+                    <circle cx="200" cy="80" r="20" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="200" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-weight="600">5</text>
+                    
+                    <circle cx="300" cy="80" r="20" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="300" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-weight="600">7</text>
+                    
+                    <text x="200" y="150" text-anchor="middle" fill="var(--success)" font-size="16" font-weight="600">
+                        Valid path: 3 → 5 → 7 (sum = 15)
+                    </text>
+                </svg>
+            `;
+            setTimeout(() => {
+                const container = document.querySelector('.example-box');
+                if (container) {
+                    const vizDiv = document.createElement('div');
+                    vizDiv.innerHTML = viz;
+                    container.appendChild(vizDiv);
+                }
+            }, 300);
+        }
+
+        function drawSingleNode() {
+            return `
+                <svg viewBox="0 0 200 150" style="width: 100%; max-width: 200px;">
+                    <circle cx="100" cy="60" r="30" fill="var(--accent)" stroke="var(--accent)" stroke-width="3"/>
+                    <text x="100" y="68" text-anchor="middle" fill="white" font-size="20" font-weight="700">5</text>
+                    
+                    <text x="100" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14">
+                        Max sum = 5
+                    </text>
+                </svg>
+            `;
+        }
+
+        function drawTwoNodes() {
+            return `
+                <svg viewBox="0 0 250 180" style="width: 100%; max-width: 250px;">
+                    <line x1="125" y1="55" x2="125" y2="105" stroke="var(--success)" stroke-width="3" class="path-highlight"/>
+                    
+                    <circle cx="125" cy="40" r="28" fill="var(--accent)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="125" y="48" text-anchor="middle" fill="white" font-size="18" font-weight="700">5</text>
+                    
+                    <circle cx="125" cy="120" r="28" fill="var(--accent)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="125" y="128" text-anchor="middle" fill="white" font-size="18" font-weight="700">3</text>
+                    
+                    <text x="125" y="165" text-anchor="middle" fill="var(--success)" font-size="15" font-weight="600">
+                        Best path: 5 + 3 = 8
+                    </text>
+                </svg>
+            `;
+        }
+
+        function drawNegativeChild() {
+            return `
+                <svg viewBox="0 0 250 180" style="width: 100%; max-width: 250px;">
+                    <line x1="125" y1="55" x2="125" y2="105" stroke="var(--danger)" stroke-width="2" stroke-dasharray="5,5"/>
+                    
+                    <circle cx="125" cy="40" r="28" fill="var(--success)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="125" y="48" text-anchor="middle" fill="white" font-size="18" font-weight="700">5</text>
+                    <text x="170" y="45" fill="var(--success)" font-size="12">✓ Take this</text>
+                    
+                    <circle cx="125" cy="120" r="28" fill="var(--bg-tertiary)" stroke="var(--danger)" stroke-width="3"/>
+                    <text x="125" y="128" text-anchor="middle" fill="var(--danger)" font-size="16" font-weight="700">-10</text>
+                    <text x="170" y="125" fill="var(--danger)" font-size="12">✗ Skip this</text>
+                    
+                    <text x="125" y="165" text-anchor="middle" fill="var(--success)" font-size="15" font-weight="600">
+                        Best: just take 5 (ignore -10)
+                    </text>
+                </svg>
+            `;
+        }
+
+        function drawThreeNodes() {
+            return `
+                <svg viewBox="0 0 300 200" style="width: 100%; max-width: 300px;">
+                    <line x1="150" y1="55" x2="90" y2="115" stroke="var(--success)" stroke-width="3" class="path-highlight"/>
+                    <line x1="150" y1="55" x2="210" y2="115" stroke="var(--success)" stroke-width="3" class="path-highlight"/>
+                    
+                    <circle cx="90" cy="130" r="26" fill="var(--accent)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="90" y="138" text-anchor="middle" fill="white" font-size="18" font-weight="700">4</text>
+                    
+                    <circle cx="150" cy="40" r="26" fill="var(--accent)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="150" y="48" text-anchor="middle" fill="white" font-size="18" font-weight="700">5</text>
+                    
+                    <circle cx="210" cy="130" r="26" fill="var(--accent)" stroke="var(--success)" stroke-width="3"/>
+                    <text x="210" y="138" text-anchor="middle" fill="white" font-size="18" font-weight="700">3</text>
+                    
+                    <text x="150" y="180" text-anchor="middle" fill="var(--success)" font-size="15" font-weight="600">
+                        V-shape path: 4 + 5 + 3 = 12
+                    </text>
+                </svg>
+            `;
+        }
+
+        function drawParentDilemma() {
+            return `
+                <svg viewBox="0 0 400 250" style="width: 100%; max-width: 400px;">
+                    <!-- Left side: Local calculation (both children) -->
+                    <text x="90" y="25" text-anchor="middle" fill="var(--warning)" font-size="13" font-weight="600">At this node:</text>
+                    <line x1="90" y1="75" x2="50" y2="135" stroke="var(--success)" stroke-width="3"/>
+                    <line x1="90" y1="75" x2="130" y2="135" stroke="var(--success)" stroke-width="3"/>
+                    
+                    <circle cx="50" cy="150" r="22" fill="var(--accent)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="50" y="157" text-anchor="middle" fill="white" font-size="14" font-weight="600">4</text>
+                    
+                    <circle cx="90" cy="60" r="22" fill="var(--accent)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="90" y="67" text-anchor="middle" fill="white" font-size="14" font-weight="600">5</text>
+                    
+                    <circle cx="130" cy="150" r="22" fill="var(--accent)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="130" y="157" text-anchor="middle" fill="white" font-size="14" font-weight="600">3</text>
+                    
+                    <text x="90" y="195" text-anchor="middle" fill="var(--success)" font-size="12">Use BOTH: 4+5+3=12</text>
+                    <text x="90" y="210" text-anchor="middle" fill="var(--text-secondary)" font-size="11">Update global max</text>
+                    
+                    <!-- Right side: Return value (one child) -->
+                    <text x="290" y="25" text-anchor="middle" fill="var(--warning)" font-size="13" font-weight="600">Return to parent:</text>
+                    <line x1="290" y1="30" x2="290" y2="50" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="3,3"/>
+                    <line x1="290" y1="75" x2="250" y2="135" stroke="var(--accent)" stroke-width="3"/>
+                    <line x1="290" y1="75" x2="330" y2="135" stroke="var(--text-secondary)" stroke-width="1" stroke-dasharray="5,5"/>
+                    
+                    <circle cx="250" cy="150" r="22" fill="var(--accent)" stroke="var(--accent)" stroke-width="2"/>
+                    <text x="250" y="157" text-anchor="middle" fill="white" font-size="14" font-weight="600">4</text>
+                    <text x="235" y="175" fill="var(--success)" font-size="10">✓ Best</text>
+                    
+                    <circle cx="290" cy="60" r="22" fill="var(--bg-tertiary)" stroke="var(--text-secondary)" stroke-width="2"/>
+                    <text x="290" y="67" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-weight="600">5</text>
+                    
+                    <circle cx="330" cy="150" r="22" fill="var(--bg-tertiary)" stroke="var(--text-secondary)" stroke-width="2"/>
+                    <text x="330" y="157" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-weight="600">3</text>
+                    
+                    <text x="290" y="195" text-anchor="middle" fill="var(--accent)" font-size="12">Return: 5+max(4,3)=9</text>
+                    <text x="290" y="210" text-anchor="middle" fill="var(--text-secondary)" font-size="11">Single branch only!</text>
+                </svg>
+            `;
+        }
+
+        function drawRecursivePattern() {
+            return `
+                <svg viewBox="0 0 400 280" style="width: 100%; max-width: 400px;">
+                    <!-- Tree structure -->
+                    <line x1="200" y1="60" x2="120" y2="130" stroke="var(--accent)" stroke-width="2"/>
+                    <line x1="200" y1="60" x2="280" y2="130" stroke="var(--accent)" stroke-width="2"/>
+                    <line x1="120" y1="145" x2="80" y2="215" stroke="var(--accent)" stroke-width="2"/>
+                    <line x1="120" y1="145" x2="160" y2="215" stroke="var(--accent)" stroke-width="2"/>
+                    
+                    <!-- Step numbers -->
+                    <circle cx="80" cy="230" r="18" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="80" y="236" text-anchor="middle" fill="var(--success)" font-size="12" font-weight="700">①</text>
+                    
+                    <circle cx="160" cy="230" r="18" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="160" y="236" text-anchor="middle" fill="var(--success)" font-size="12" font-weight="700">②</text>
+                    
+                    <circle cx="120" cy="145" r="20" fill="var(--bg-tertiary)" stroke="var(--warning)" stroke-width="2"/>
+                    <text x="120" y="152" text-anchor="middle" fill="var(--warning)" font-size="12" font-weight="700">③</text>
+                    
+                    <circle cx="280" cy="145" r="18" fill="var(--bg-tertiary)" stroke="var(--success)" stroke-width="2"/>
+                    <text x="280" y="151" text-anchor="middle" fill="var(--success)" font-size="12" font-weight="700">④</text>
+                    
+                    <circle cx="200" cy="45" r="22" fill="var(--bg-tertiary)" stroke="var(--accent)" stroke-width="2"/>
+                    <text x="200" y="52" text-anchor="middle" fill="var(--accent)" font-size="12" font-weight="700">⑤</text>
+                    
+                    <!-- Labels -->
+                    <text x="200" y="260" text-anchor="middle" fill="var(--text-secondary)" font-size="13">
+                        Post-order: Left → Right → Current
+                    </text>
+                </svg>
+            `;
+        }
+
+        function renderStep(stepIndex) {
+            const step = intuitionSteps[stepIndex];
+            const thoughtPanel = document.getElementById('thoughtPanel');
+            const codeEditor = document.getElementById('codeEditor');
+
+            // Clear previous content
+            thoughtPanel.innerHTML = '';
+            codeEditor.innerHTML = '';
+
+            // Render thought content
+            const section = document.createElement('div');
+            section.className = 'thought-section';
+            section.innerHTML = `
+                <div class="thought-title">
+                    <div class="thought-step">${stepIndex + 1}</div>
+                    <span>${step.title}</span>
+                </div>
+                <div class="thought-content">
+                    ${step.content}
+                </div>
+            `;
+            thoughtPanel.appendChild(section);
+
+            // Trigger animations
+            setTimeout(() => {
+                section.classList.add('visible');
+                
+                // Render visualization if exists
+                if (step.visualization) {
+                    setTimeout(() => {
+                        const vizContainers = thoughtPanel.querySelectorAll('[id^="viz"]');
+                        vizContainers.forEach((container, idx) => {
+                            const vizFunctions = [
+                                drawSingleNode,
+                                drawTwoNodes,
+                                drawNegativeChild,
+                                drawThreeNodes,
+                                drawParentDilemma
+                            ];
+                            if (vizFunctions[idx]) {
+                                container.innerHTML = vizFunctions[idx]();
+                            }
+                        });
+                        step.visualization();
+                    }, 300);
+                }
+            }, 100);
+
+            // Render code if exists
+            if (step.code) {
+                codeEditor.innerHTML = step.code;
+                
+                // Animate code blocks
+                const codeBlocks = codeEditor.querySelectorAll('.code-block');
+                codeBlocks.forEach((block, idx) => {
+                    const delay = parseInt(block.getAttribute('data-delay') || 0);
+                    setTimeout(() => {
+                        block.classList.add('visible');
+                    }, delay);
+                });
+
+                // Animate annotations
+                const annotations = codeEditor.querySelectorAll('.code-annotation');
+                annotations.forEach((annotation, idx) => {
+                    const delay = parseInt(annotation.getAttribute('data-delay') || 0);
+                    setTimeout(() => {
+                        annotation.classList.add('visible');
+                    }, delay);
+                });
+            }
+
+            // Update controls
+            updateControls();
+        }
+
+        function updateControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepIndicator = document.getElementById('stepIndicator');
+            const progressFill = document.getElementById('progressFill');
+
+            prevBtn.disabled = currentStepIndex === 0;
+            nextBtn.disabled = currentStepIndex === intuitionSteps.length - 1;
+            
+            if (currentStepIndex === intuitionSteps.length - 1) {
+                nextBtn.textContent = '✓ Complete';
+            } else {
+                nextBtn.textContent = 'Next Step →';
+            }
+
+            stepIndicator.textContent = `Step ${currentStepIndex + 1} of ${intuitionSteps.length}`;
+            
+            const progress = ((currentStepIndex + 1) / intuitionSteps.length) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        function nextStep() {
+            if (currentStepIndex < intuitionSteps.length - 1) {
+                currentStepIndex++;
+                renderStep(currentStepIndex);
+            }
+        }
+
+        function previousStep() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep(currentStepIndex);
+            }
+        }
+
+        function restart() {
+            currentStepIndex = 0;
+            renderStep(currentStepIndex);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousStep();
+            }
+        });
+
+        // Initialize
+        renderStep(0);
+    </script>
+</body>
+</html>
