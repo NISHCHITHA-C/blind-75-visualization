@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>124. Binary Tree Maximum Path Sum - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            
+            /* Syntax highlighting - Light */
+            --keyword: #af00db;
+            --function: #795e26;
+            --string: #a31515;
+            --number: #098658;
+            --type: #267f99;
+            --comment: #008000;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --code-bg: #0f1419;
+            --highlight: rgba(251, 191, 36, 0.15);
+            --accent: #60a5fa;
+            
+            /* Syntax highlighting - Dark (Dracula-inspired) */
+            --keyword: #ff79c6;
+            --function: #50fa7b;
+            --string: #f1fa8c;
+            --number: #bd93f9;
+            --type: #8be9fd;
+            --comment: #6272a4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        button {
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .theme-toggle {
+            margin-left: auto;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 120px);
+            max-width: 1800px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .panel {
+            overflow: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        .code-panel {
+            width: 30%;
+            min-width: 300px;
+        }
+
+        .viz-panel {
+            width: 50%;
+            min-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-panel {
+            width: 20%;
+            min-width: 250px;
+            border-right: none;
+        }
+
+        .code-container {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+            height: 100%;
+        }
+
+        .code-container pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.current {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-content {
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax highlighting classes */
+        .keyword { color: var(--keyword); font-weight: 500; }
+        .function { color: var(--function); }
+        .string { color: var(--string); }
+        .number { color: var(--number); }
+        .type { color: var(--type); }
+        .comment { color: var(--comment); font-style: italic; }
+
+        .viz-content {
+            flex: 1;
+            padding: 24px;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .viz-controls {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .speed-select {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .log-content {
+            padding: 16px;
+        }
+
+        .step-info {
+            margin-bottom: 16px;
+        }
+
+        .step-info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .variables-section h4,
+        .history-section h4 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .variable-item {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .variable-name {
+            color: var(--accent);
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .history-item.current {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .history-item:not(.current) {
+            color: var(--text-secondary);
+        }
+
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .node-circle {
+            transition: all 0.3s ease;
+        }
+
+        .node-text {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .edge-line {
+            transition: all 0.3s ease;
+        }
+
+        .path-highlight {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="header">
+        <div class="header-content">
+            <h1>
+                124. Binary Tree Maximum Path Sum
+                <span class="complexity-badge">Time: O(n)</span>
+                <span class="complexity-badge">Space: O(h)</span>
+            </h1>
+            <div class="header-controls">
+                <div class="input-group">
+                    <label>Test Case:</label>
+                    <input type="text" id="testInput" value="[-10,9,20,null,null,15,7]" placeholder="e.g., [1,2,3]">
+                    <button onclick="runVisualization()">Run</button>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel code-panel">
+            <div class="code-container" id="codePanel"></div>
+        </div>
+
+        <div class="panel viz-panel">
+            <div class="viz-content" id="vizContent">
+                <svg id="treeSvg" viewBox="0 0 800 600"></svg>
+            </div>
+            <div class="viz-controls">
+                <div class="control-group">
+                    <button onclick="reset()">⏮ Reset</button>
+                    <button onclick="stepBack()">⏪ Back</button>
+                    <button id="playBtn" onclick="togglePlay()">▶️ Play</button>
+                    <button onclick="stepForward()">⏩ Forward</button>
+                </div>
+                <select class="speed-select" id="speedSelect" onchange="updateSpeed()">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel log-panel">
+            <div class="log-content" id="logPanel"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let speed = 1;
+        let playInterval = null;
+        let treeData = null;
+
+        // Python code with syntax highlighting
+        const pythonCode = `# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        """
+        Find the maximum path sum in a binary tree.
+        
+        Strategy:
+        - Use DFS with post-order traversal
+        - At each node, calculate the max path sum that can pass through it
+        - Track global maximum across all possible paths
+        - Return max single-branch sum for parent nodes to use
+        
+        Time Complexity: O(n) - visit each node once
+        Space Complexity: O(h) - recursion stack, where h is tree height
+        """
+        # Initialize with smallest possible value
+        self.max_sum = float('-inf')
+        
+        def max_gain(node: Optional[TreeNode]) -> int:
+            """
+            Calculate maximum sum of path starting from this node going down.
+            Updates global max_sum if path through this node is better.
+            
+            Returns: Maximum sum from this node to any leaf (single branch)
+            """
+            if not node:
+                return 0
+            
+            # Recursively get max sum from left and right subtrees
+            # Use max(0, ...) to ignore negative paths (better to not include them)
+            left_gain = max(0, max_gain(node.left))
+            right_gain = max(0, max_gain(node.right))
+            
+            # Calculate max path sum that passes through current node
+            # This could be: node only, node + left, node + right, or node + both
+            current_path_sum = node.val + left_gain + right_gain
+            
+            # Update global maximum if current path is better
+            self.max_sum = max(self.max_sum, current_path_sum)
+            
+            # Return max sum of single branch (node + best child path)
+            # Parent can only use one branch, not both
+            return node.val + max(left_gain, right_gain)
+        
+        max_gain(root)
+        return self.max_sum`;
+
+        // Syntax highlighting function
+        function highlightPythonLine(line) {
+            const div = document.createElement('div');
+            
+            // Handle comments
+            if (line.trim().startsWith('#')) {
+                div.innerHTML = '<span class="comment">' + escapeHtml(line) + '</span>';
+                return div.innerHTML;
+            }
+
+            // Handle docstrings
+            if (line.trim().startsWith('"""') || line.trim().startsWith("'''")) {
+                div.innerHTML = '<span class="string">' + escapeHtml(line) + '</span>';
+                return div.innerHTML;
+            }
+
+            let highlighted = escapeHtml(line);
+
+            // Highlight strings (including docstrings)
+            highlighted = highlighted.replace(
+                /(&#39;&#39;&#39;|&quot;&quot;&quot;|&#39;[^&#39;]*&#39;|&quot;[^&quot;]*&quot;)/g,
+                '<span class="string">$1</span>'
+            );
+
+            // Highlight keywords
+            const keywords = ['class', 'def', 'return', 'if', 'not', 'self', 'for', 'in', 'import', 'from', 'as'];
+            keywords.forEach(kw => {
+                const regex = new RegExp('\\b' + kw + '\\b', 'g');
+                highlighted = highlighted.replace(regex, '<span class="keyword">' + kw + '</span>');
+            });
+
+            // Highlight function names (after def or function calls)
+            highlighted = highlighted.replace(
+                /(<span class="keyword">def<\/span>)\s+(\w+)/g,
+                '$1 <span class="function">$2</span>'
+            );
+            highlighted = highlighted.replace(
+                /\b(max|float|max_gain)\s*\(/g,
+                '<span class="function">$1</span>('
+            );
+
+            // Highlight types
+            highlighted = highlighted.replace(
+                /\b(Optional|TreeNode|int)\b/g,
+                '<span class="type">$1</span>'
+            );
+
+            // Highlight numbers
+            highlighted = highlighted.replace(
+                /\b(\d+)\b/g,
+                '<span class="number">$1</span>'
+            );
+
+            return highlighted;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render code panel
+        function renderCode(currentLine = -1) {
+            const lines = pythonCode.split('\n');
+            const codePanel = document.getElementById('codePanel');
+            
+            let html = '<pre>';
+            lines.forEach((line, i) => {
+                const isCurrentLine = i === currentLine;
+                const lineClass = isCurrentLine ? 'code-line current' : 'code-line';
+                const lineNum = i + 1;
+                const highlightedContent = highlightPythonLine(line);
+                
+                html += `<div class="${lineClass}">`;
+                html += `<span class="line-number">${lineNum}</span>`;
+                html += `<code class="line-content">${highlightedContent || ' '}</code>`;
+                html += `</div>`;
+            });
+            html += '</pre>';
+            
+            codePanel.innerHTML = html;
+        }
+
+        // Tree node class
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+                this.id = Math.random().toString(36).substr(2, 9);
+            }
+        }
+
+        // Parse array to tree
+        function arrayToTree(arr) {
+            if (!arr || arr.length === 0) return null;
+            
+            const root = new TreeNode(arr[0]);
+            const queue = [root];
+            let i = 1;
+            
+            while (queue.length > 0 && i < arr.length) {
+                const node = queue.shift();
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.left = new TreeNode(arr[i]);
+                    queue.push(node.left);
+                }
+                i++;
+                
+                if (i < arr.length && arr[i] !== null) {
+                    node.right = new TreeNode(arr[i]);
+                    queue.push(node.right);
+                }
+                i++;
+            }
+            
+            return root;
+        }
+
+        // Algorithm with tracing
+        function maxPathSumWithTracing(root) {
+            const executionSteps = [];
+            let maxSum = -Infinity;
+            let stepNum = 0;
+
+            function logStep(line, vars, description, highlightNodes = [], highlightPath = []) {
+                executionSteps.push({
+                    line,
+                    vars: JSON.parse(JSON.stringify(vars)),
+                    description,
+                    stepNum: stepNum++,
+                    highlightNodes,
+                    highlightPath
+                });
+            }
+
+            logStep(23, { maxSum }, 'Initialize max_sum to negative infinity', [], []);
+
+            function maxGain(node, path = []) {
+                if (!node) {
+                    logStep(32, { node: 'null', returning: 0 }, 'Base case: node is null, return 0', [], path);
+                    return 0;
+                }
+
+                const currentPath = [...path, node.id];
+                logStep(32, { node: node.val }, `Visiting node ${node.val}`, [node.id], currentPath);
+
+                // Left subtree
+                logStep(36, { node: node.val }, `Exploring left subtree of ${node.val}`, [node.id], currentPath);
+                const leftGain = Math.max(0, maxGain(node.left, currentPath));
+                logStep(36, { node: node.val, leftGain }, `Left gain for ${node.val}: ${leftGain}`, [node.id], currentPath);
+
+                // Right subtree
+                logStep(37, { node: node.val, leftGain }, `Exploring right subtree of ${node.val}`, [node.id], currentPath);
+                const rightGain = Math.max(0, maxGain(node.right, currentPath));
+                logStep(37, { node: node.val, leftGain, rightGain }, `Right gain for ${node.val}: ${rightGain}`, [node.id], currentPath);
+
+                // Current path sum
+                const currentPathSum = node.val + leftGain + rightGain;
+                logStep(41, { node: node.val, leftGain, rightGain, currentPathSum }, 
+                    `Path through ${node.val}: ${node.val} + ${leftGain} + ${rightGain} = ${currentPathSum}`, 
+                    [node.id], currentPath);
+
+                // Update global max
+                const oldMax = maxSum;
+                maxSum = Math.max(maxSum, currentPathSum);
+                if (maxSum !== oldMax) {
+                    logStep(44, { node: node.val, maxSum, currentPathSum }, 
+                        `New maximum found! Updated from ${oldMax} to ${maxSum}`, 
+                        [node.id], currentPath);
+                } else {
+                    logStep(44, { node: node.val, maxSum, currentPathSum }, 
+                        `Max remains ${maxSum} (current: ${currentPathSum})`, 
+                        [node.id], currentPath);
+                }
+
+                // Return max single branch
+                const returnValue = node.val + Math.max(leftGain, rightGain);
+                logStep(48, { node: node.val, returning: returnValue }, 
+                    `Return single branch max for ${node.val}: ${node.val} + max(${leftGain}, ${rightGain}) = ${returnValue}`, 
+                    [node.id], currentPath);
+
+                return returnValue;
+            }
+
+            logStep(25, {}, 'Start DFS traversal from root', [], []);
+            maxGain(root);
+            logStep(51, { maxSum }, `Algorithm complete! Maximum path sum: ${maxSum}`, [], []);
+
+            return { result: maxSum, steps: executionSteps };
+        }
+
+        // Calculate tree layout
+        function calculateTreeLayout(root) {
+            if (!root) return { nodes: [], edges: [] };
+
+            const nodes = [];
+            const edges = [];
+            const levelGap = 80;
+            const minNodeGap = 60;
+
+            function getTreeWidth(node) {
+                if (!node) return 0;
+                if (!node.left && !node.right) return 1;
+                return getTreeWidth(node.left) + getTreeWidth(node.right);
+            }
+
+            function traverse(node, x, y, width) {
+                if (!node) return;
+
+                nodes.push({ id: node.id, val: node.val, x, y });
+
+                const leftWidth = getTreeWidth(node.left);
+                const rightWidth = getTreeWidth(node.right);
+                const totalWidth = leftWidth + rightWidth || 1;
+
+                if (node.left) {
+                    const leftX = x - (width * rightWidth / totalWidth) / 2;
+                    const leftY = y + levelGap;
+                    edges.push({ from: { x, y }, to: { x: leftX, y: leftY }, fromId: node.id, toId: node.left.id });
+                    traverse(node.left, leftX, leftY, width * leftWidth / totalWidth);
+                }
+
+                if (node.right) {
+                    const rightX = x + (width * leftWidth / totalWidth) / 2;
+                    const rightY = y + levelGap;
+                    edges.push({ from: { x, y }, to: { x: rightX, y: rightY }, fromId: node.id, toId: node.right.id });
+                    traverse(node.right, rightX, rightY, width * rightWidth / totalWidth);
+                }
+            }
+
+            const treeWidth = getTreeWidth(root);
+            const totalWidth = Math.max(treeWidth * minNodeGap, 400);
+            traverse(root, 400, 50, totalWidth);
+
+            return { nodes, edges };
+        }
+
+        // Render tree visualization
+        function renderTree(highlightNodes = [], highlightPath = []) {
+            const svg = document.getElementById('treeSvg');
+            const layout = calculateTreeLayout(treeData);
+            
+            const theme = document.body.getAttribute('data-theme');
+            const nodeColor = theme === 'dark' ? '#374151' : '#e5e7eb';
+            const highlightColor = theme === 'dark' ? '#3b82f6' : '#2563eb';
+            const pathColor = theme === 'dark' ? '#10b981' : '#059669';
+            const edgeColor = theme === 'dark' ? '#6b7280' : '#9ca3af';
+            const textColor = theme === 'dark' ? '#f9fafb' : '#111827';
+
+            let svgContent = '';
+
+            // Draw edges
+            layout.edges.forEach(edge => {
+                const isInPath = highlightPath.includes(edge.fromId) && highlightPath.includes(edge.toId);
+                const stroke = isInPath ? pathColor : edgeColor;
+                const strokeWidth = isInPath ? 3 : 2;
+                svgContent += `<line x1="${edge.from.x}" y1="${edge.from.y}" x2="${edge.to.x}" y2="${edge.to.y}" 
+                    stroke="${stroke}" stroke-width="${strokeWidth}" class="edge-line"/>`;
+            });
+
+            // Draw nodes
+            layout.nodes.forEach(node => {
+                const isHighlighted = highlightNodes.includes(node.id);
+                const isInPath = highlightPath.includes(node.id);
+                const fill = isHighlighted ? highlightColor : (isInPath ? pathColor : nodeColor);
+                const strokeColor = isHighlighted || isInPath ? highlightColor : '#60a5fa';
+                const strokeWidth = isHighlighted ? 3 : 1;
+                const className = isInPath ? 'node-circle path-highlight' : 'node-circle';
+
+                svgContent += `<circle cx="${node.x}" cy="${node.y}" r="24" fill="${fill}" 
+                    stroke="${strokeColor}" stroke-width="${strokeWidth}" class="${className}"/>`;
+                svgContent += `<text x="${node.x}" y="${node.y}" text-anchor="middle" 
+                    dominant-baseline="middle" fill="${textColor}" class="node-text">${node.val}</text>`;
+            });
+
+            svg.innerHTML = svgContent;
+        }
+
+        // Render step log
+        function renderStepLog() {
+            if (steps.length === 0) return;
+
+            const step = steps[currentStep];
+            const logPanel = document.getElementById('logPanel');
+
+            let html = '<div class="step-info">';
+            html += `<h3>Step ${currentStep + 1} of ${steps.length}</h3>`;
+            html += `<div class="step-description">${step.description}</div>`;
+            html += '</div>';
+
+            html += '<div class="variables-section">';
+            html += '<h4>Variables</h4>';
+            Object.entries(step.vars).forEach(([name, value]) => {
+                const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                html += `<div class="variable-item"><span class="variable-name">${name}</span>: ${displayValue}</div>`;
+            });
+            html += '</div>';
+
+            html += '<div class="history-section" style="margin-top: 16px;">';
+            html += '<h4>History</h4>';
+            steps.slice(0, currentStep + 1).forEach((s, i) => {
+                const className = i === currentStep ? 'history-item current' : 'history-item';
+                html += `<div class="${className}">${i + 1}. ${s.description}</div>`;
+            });
+            html += '</div>';
+
+            logPanel.innerHTML = html;
+        }
+
+        // Update visualization
+        function updateVisualization() {
+            if (steps.length === 0) return;
+
+            const step = steps[currentStep];
+            renderCode(step.line);
+            renderTree(step.highlightNodes || [], step.highlightPath || []);
+            renderStepLog();
+        }
+
+        // Playback controls
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playBtn');
+            
+            if (isPlaying) {
+                btn.textContent = '⏸ Pause';
+                playInterval = setInterval(() => {
+                    if (currentStep < steps.length - 1) {
+                        stepForward();
+                    } else {
+                        togglePlay();
+                    }
+                }, 1000 / speed);
+            } else {
+                btn.textContent = '▶️ Play';
+                if (playInterval) {
+                    clearInterval(playInterval);
+                    playInterval = null;
+                }
+            }
+        }
+
+        function stepForward() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateVisualization();
+            }
+        }
+
+        function stepBack() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateVisualization();
+            }
+        }
+
+        function reset() {
+            if (isPlaying) togglePlay();
+            currentStep = 0;
+            updateVisualization();
+        }
+
+        function updateSpeed() {
+            const select = document.getElementById('speedSelect');
+            speed = parseFloat(select.value);
+            
+            if (isPlaying) {
+                togglePlay();
+                togglePlay();
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            
+            if (steps.length > 0) {
+                updateVisualization();
+            } else {
+                renderCode();
+            }
+        }
+
+        function runVisualization() {
+            try {
+                const input = document.getElementById('testInput').value;
+                const arr = JSON.parse(input);
+                
+                treeData = arrayToTree(arr);
+                if (!treeData) {
+                    alert('Invalid input: tree is empty');
+                    return;
+                }
+
+                const result = maxPathSumWithTracing(treeData);
+                steps = result.steps;
+                currentStep = 0;
+                
+                if (isPlaying) togglePlay();
+                updateVisualization();
+            } catch (e) {
+                alert('Invalid input format. Use array notation: [-10,9,20,null,null,15,7]');
+                console.error(e);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                stepForward();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                stepBack();
+            }
+        });
+
+        // Initialize
+        renderCode();
+        runVisualization();
+    </script>
+</body>
+</html>
