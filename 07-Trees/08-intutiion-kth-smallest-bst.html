@@ -1,0 +1,506 @@
+create_file('/mnt/user-data/outputs/senior_engineer_coding.html', '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior Engineer Writing Code - Animated</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #a0aec0;
+            font-size: 14px;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .thinking-panel {
+            background: #f7fafc;
+            padding: 30px;
+            border-right: 2px solid #e2e8f0;
+        }
+        
+        .code-panel {
+            background: #1a202c;
+            padding: 30px;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .thought-bubble {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .thought-bubble.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .thought-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .thought-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .thought-content {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .code-line {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.4s ease;
+            margin: 5px 0;
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .code-line.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .code-line.highlight {
+            background: rgba(102, 126, 234, 0.2);
+            margin-left: -10px;
+            padding-left: 50px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .line-number {
+            position: absolute;
+            left: 0;
+            color: #4a5568;
+            width: 30px;
+            text-align: right;
+        }
+        
+        .keyword { color: #f687b3; }
+        .function { color: #63b3ed; }
+        .string { color: #68d391; }
+        .comment { color: #718096; font-style: italic; }
+        .variable { color: #fbb6ce; }
+        
+        .controls {
+            padding: 20px 30px;
+            background: #edf2f7;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .progress {
+            flex: 1;
+            text-align: center;
+            color: #4a5568;
+            font-weight: bold;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background: #667eea;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .tree-visual {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Senior Engineer's Thought Process</h1>
+            <p>Watch how an experienced developer approaches the "Kth Smallest in BST" problem</p>
+        </div>
+        
+        <div class="content">
+            <div class="thinking-panel" id="thinkingPanel">
+                <!-- Thoughts will be added here dynamically -->
+            </div>
+            
+            <div class="code-panel" id="codePanel">
+                <!-- Code will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-primary" id="startBtn" onclick="startAnimation()">▶ Start Animation</button>
+            <button class="btn-secondary" id="nextBtn" onclick="nextStep()" disabled>Next Step →</button>
+            <button class="btn-secondary" id="resetBtn" onclick="resetAnimation()">↻ Reset</button>
+            <div class="progress" id="progress">Step 0 / 10</div>
+        </div>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                thought: {
+                    number: 1,
+                    title: "🎯 Understanding the Problem",
+                    content: "Kth smallest in BST... I know BST in-order traversal gives sorted values. So if I do in-order, the kth element I visit will be my answer. Let me start with the function signature."
+                },
+                code: [
+                    { line: 1, text: '<span class="keyword">class</span> <span class="function">Solution</span>:', indent: 0 },
+                    { line: 2, text: '<span class="keyword">def</span> <span class="function">kthSmallest</span>(<span class="variable">self</span>, <span class="variable">root</span>: Optional[TreeNode], <span class="variable">k</span>: <span class="keyword">int</span>) -> <span class="keyword">int</span>:', indent: 1 }
+                ],
+                highlight: [1, 2]
+            },
+            {
+                thought: {
+                    number: 2,
+                    title: "💭 Planning the Approach",
+                    content: "I need to track two things: (1) how many nodes I've visited (count), and (2) the result when I find the kth node. I'll use instance variables so my helper function can access them."
+                },
+                code: [
+                    { line: 3, text: '<span class="variable">self</span>.count = <span class="string">0</span>', indent: 2 },
+                    { line: 4, text: '<span class="variable">self</span>.result = <span class="keyword">None</span>', indent: 2 }
+                ],
+                highlight: [3, 4],
+                tree: `Tracking state:
+count = 0  (nodes visited)
+result = None  (answer)`
+            },
+            {
+                thought: {
+                    number: 3,
+                    title: "🔧 Setting Up Helper Function",
+                    content: "I'll create an in-order traversal helper. The pattern is simple: go left, process node, go right. Let me start with the function definition and base case."
+                },
+                code: [
+                    { line: 5, text: '', indent: 2 },
+                    { line: 6, text: '<span class="keyword">def</span> <span class="function">inorder</span>(<span class="variable">node</span>):', indent: 2 }
+                ],
+                highlight: [6]
+            },
+            {
+                thought: {
+                    number: 4,
+                    title: "🛑 Base Case First",
+                    content: "Two stopping conditions: (1) hit a null node, or (2) already found the answer. Early termination is key for optimization - no point continuing once we have the kth element!"
+                },
+                code: [
+                    { line: 7, text: '<span class="keyword">if not</span> <span class="variable">node</span> <span class="keyword">or</span> <span class="variable">self</span>.result <span class="keyword">is not</span> <span class="keyword">None</span>:', indent: 3 },
+                    { line: 8, text: '<span class="keyword">return</span>', indent: 4 }
+                ],
+                highlight: [7, 8],
+                tree: `Base cases:
+✓ node is None → return
+✓ result found → return (optimization!)`
+            },
+            {
+                thought: {
+                    number: 5,
+                    title: "⬅️ Go Left First",
+                    content: "In-order traversal: LEFT → NODE → RIGHT. This ensures we visit nodes in ascending order for a BST. Start by recursing left to get to the smallest values first."
+                },
+                code: [
+                    { line: 9, text: '', indent: 3 },
+                    { line: 10, text: '<span class="comment"># In-order: Left → Node → Right (gives sorted order in BST)</span>', indent: 3 },
+                    { line: 11, text: '<span class="function">inorder</span>(<span class="variable">node</span>.left)', indent: 3 }
+                ],
+                highlight: [11],
+                tree: `In-order pattern:
+1. Process LEFT subtree ← 
+2. Process CURRENT node
+3. Process RIGHT subtree`
+            },
+            {
+                thought: {
+                    number: 6,
+                    title: "📍 Process Current Node",
+                    content: "After visiting all smaller values (left subtree), now I process the current node. Increment count because we're visiting one more node in sorted order."
+                },
+                code: [
+                    { line: 12, text: '', indent: 3 },
+                    { line: 13, text: '<span class="comment"># Process current node</span>', indent: 3 },
+                    { line: 14, text: '<span class="variable">self</span>.count += <span class="string">1</span>', indent: 3 }
+                ],
+                highlight: [14],
+                tree: `Processing node:
+count++  (1st, 2nd, 3rd... visited)`
+            },
+            {
+                thought: {
+                    number: 7,
+                    title: "✅ Check if Found",
+                    content: "Is this the kth node? If count equals k, we found it! Store the value and return early. No need to visit remaining nodes - this is the optimization that makes it O(H + k) instead of O(N)."
+                },
+                code: [
+                    { line: 15, text: '<span class="keyword">if</span> <span class="variable">self</span>.count == <span class="variable">k</span>:', indent: 3 },
+                    { line: 16, text: '<span class="variable">self</span>.result = <span class="variable">node</span>.val', indent: 4 },
+                    { line: 17, text: '<span class="keyword">return</span>  <span class="comment"># Early termination</span>', indent: 4 }
+                ],
+                highlight: [15, 16, 17],
+                tree: `Found check:
+if count == k:
+  ✓ Save result
+  ✓ Stop traversal`
+            },
+            {
+                thought: {
+                    number: 8,
+                    title: "➡️ Continue Right",
+                    content: "Haven't found it yet? Continue to the right subtree. This will visit larger values. The recursion will continue until we hit the kth element or run out of nodes."
+                },
+                code: [
+                    { line: 18, text: '', indent: 3 },
+                    { line: 19, text: '<span class="function">inorder</span>(<span class="variable">node</span>.right)', indent: 3 }
+                ],
+                highlight: [19],
+                tree: `In-order pattern:
+1. Process LEFT subtree ✓
+2. Process CURRENT node ✓
+3. Process RIGHT subtree ← `
+            },
+            {
+                thought: {
+                    number: 9,
+                    title: "🚀 Kick Off Traversal",
+                    content: "Now I call the helper function with the root to start the in-order traversal. This will recursively visit nodes in sorted order."
+                },
+                code: [
+                    { line: 20, text: '', indent: 2 },
+                    { line: 21, text: '<span class="function">inorder</span>(<span class="variable">root</span>)', indent: 2 }
+                ],
+                highlight: [21]
+            },
+            {
+                thought: {
+                    number: 10,
+                    title: "🎁 Return the Answer",
+                    content: "After the traversal completes (or terminates early), self.result contains the kth smallest value. Return it! Clean and efficient - O(H + k) time, O(H) space for recursion stack."
+                },
+                code: [
+                    { line: 22, text: '<span class="keyword">return</span> <span class="variable">self</span>.result', indent: 2 }
+                ],
+                highlight: [22],
+                tree: `Final step:
+✓ Traversal complete
+✓ Return self.result
+✓ Time: O(H + k)
+✓ Space: O(H)`
+            }
+        ];
+
+        let currentStep = -1;
+        let allCodeLines = [];
+
+        function startAnimation() {
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
+            nextStep();
+        }
+
+        function nextStep() {
+            if (currentStep >= steps.length - 1) return;
+            
+            currentStep++;
+            updateProgress();
+            
+            const step = steps[currentStep];
+            
+            // Add thought bubble
+            addThought(step.thought);
+            
+            // Add code lines
+            addCodeLines(step.code, step.highlight, step.tree);
+            
+            if (currentStep >= steps.length - 1) {
+                document.getElementById('nextBtn').disabled = true;
+            }
+        }
+
+        function addThought(thought) {
+            const thinkingPanel = document.getElementById('thinkingPanel');
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'thought-bubble';
+            bubble.innerHTML = `
+                <div>
+                    <span class="thought-number">${thought.number}</span>
+                    <span class="thought-title">${thought.title}</span>
+                </div>
+                <div class="thought-content">${thought.content}</div>
+            `;
+            
+            thinkingPanel.appendChild(bubble);
+            
+            setTimeout(() => {
+                bubble.classList.add('active');
+            }, 50);
+            
+            // Scroll to bottom
+            thinkingPanel.scrollTop = thinkingPanel.scrollHeight;
+        }
+
+        function addCodeLines(newLines, highlight = [], tree = null) {
+            const codePanel = document.getElementById('codePanel');
+            
+            newLines.forEach((lineData, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'code-line';
+                
+                if (highlight.includes(lineData.line)) {
+                    lineDiv.classList.add('highlight');
+                }
+                
+                const indent = '    '.repeat(lineData.indent);
+                lineDiv.innerHTML = `
+                    <span class="line-number">${lineData.line}</span>
+                    ${indent}${lineData.text}<span class="cursor"></span>
+                `;
+                
+                allCodeLines.push(lineDiv);
+                codePanel.appendChild(lineDiv);
+                
+                setTimeout(() => {
+                    lineDiv.classList.add('active');
+                }, index * 100);
+            });
+            
+            // Add tree visual if provided
+            if (tree) {
+                const treeDiv = document.createElement('div');
+                treeDiv.className = 'tree-visual';
+                treeDiv.textContent = tree;
+                codePanel.appendChild(treeDiv);
+            }
+            
+            // Scroll to bottom
+            setTimeout(() => {
+                codePanel.scrollTop = codePanel.scrollHeight;
+            }, newLines.length * 100);
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = `Step ${currentStep + 1} / ${steps.length}`;
+        }
+
+        function resetAnimation() {
+            currentStep = -1;
+            allCodeLines = [];
+            document.getElementById('thinkingPanel').innerHTML = '';
+            document.getElementById('codePanel').innerHTML = '';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = true;
+            updateProgress();
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>''')
