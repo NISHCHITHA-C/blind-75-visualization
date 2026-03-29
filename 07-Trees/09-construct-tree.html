@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>105. Construct Binary Tree from Preorder and Inorder Traversal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            
+            /* Light mode syntax colors (GitHub-inspired) */
+            --syn-keyword: #d73a49;
+            --syn-function: #6f42c1;
+            --syn-string: #032f62;
+            --syn-comment: #6a737d;
+            --syn-type: #005cc5;
+            --syn-number: #005cc5;
+            --syn-decorator: #e36209;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --code-bg: #0f1419;
+            --highlight: rgba(251, 191, 36, 0.15);
+            --accent: #60a5fa;
+            
+            /* Dark mode syntax colors (Dracula-inspired) */
+            --syn-keyword: #ff79c6;
+            --syn-function: #50fa7b;
+            --syn-string: #f1fa8c;
+            --syn-comment: #6272a4;
+            --syn-type: #8be9fd;
+            --syn-number: #bd93f9;
+            --syn-decorator: #ffb86c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .input-section {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-field {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            width: 200px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Code Panel */
+        .code-container {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+            height: 100%;
+        }
+
+        .code-container pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.highlight {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-content {
+            flex: 1;
+            white-space: pre;
+            color: inherit;
+        }
+
+        /* Syntax highlighting classes */
+        .syn-keyword { color: var(--syn-keyword); font-weight: 500; }
+        .syn-function { color: var(--syn-function); font-weight: 500; }
+        .syn-string { color: var(--syn-string); }
+        .syn-comment { color: var(--syn-comment); font-style: italic; }
+        .syn-type { color: var(--syn-type); }
+        .syn-number { color: var(--syn-number); }
+        .syn-decorator { color: var(--syn-decorator); }
+        .syn-builtin { color: var(--syn-type); font-weight: 500; }
+
+        /* Visualization Panel */
+        .viz-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .viz-svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .playback-controls {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-selector {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Step Log Panel */
+        .step-log-content {
+            padding: 16px;
+        }
+
+        .current-step-info {
+            margin-bottom: 16px;
+        }
+
+        .step-title {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            margin: 0 0 16px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .variables-section {
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .variable-item {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .var-name {
+            color: var(--accent);
+        }
+
+        .history-section {
+            margin-top: 16px;
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .history-item.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .history-item:not(.active) {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        /* Resizer */
+        .resizer {
+            width: 4px;
+            background: var(--border);
+            cursor: col-resize;
+            transition: background 0.2s;
+        }
+
+        .resizer:hover {
+            background: var(--accent);
+        }
+
+        /* SVG Tree Styles */
+        .tree-node {
+            transition: all 0.3s ease;
+        }
+
+        .tree-edge {
+            transition: all 0.3s ease;
+        }
+
+        .node-text {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Array Visualization */
+        .array-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .array-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 80px;
+        }
+
+        .array-items {
+            display: flex;
+            gap: 2px;
+        }
+
+        .array-cell {
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .array-cell.highlight {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .array-cell.used {
+            background: var(--bg-secondary);
+            opacity: 0.5;
+        }
+
+        .array-index {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <h1 class="title">105. Construct Binary Tree from Preorder and Inorder Traversal</h1>
+                <div class="controls-row">
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        🌙 Toggle Theme
+                    </button>
+                </div>
+            </div>
+            <div class="input-section">
+                <div class="input-group">
+                    <span class="input-label">Preorder:</span>
+                    <input type="text" class="input-field" id="preorderInput" value="3,9,20,15,7">
+                </div>
+                <div class="input-group">
+                    <span class="input-label">Inorder:</span>
+                    <input type="text" class="input-field" id="inorderInput" value="9,3,15,20,7">
+                </div>
+                <button class="btn" onclick="runVisualization()">Run Visualization</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Code Panel -->
+            <div class="panel" id="codePanel" style="width: 30%;">
+                <div class="panel-header">Solution Code</div>
+                <div class="panel-content">
+                    <div class="code-container" id="codeContainer"></div>
+                </div>
+            </div>
+
+            <div class="resizer" id="resizer1"></div>
+
+            <!-- Visualization Panel -->
+            <div class="panel viz-panel" id="vizPanel" style="width: 50%;">
+                <div class="panel-header">Tree Construction Visualization</div>
+                <div class="viz-content" id="vizContent">
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        Click "Run Visualization" to start
+                    </div>
+                </div>
+                <div class="playback-controls">
+                    <button class="control-btn" onclick="resetVisualization()">⏮ Reset</button>
+                    <button class="control-btn" onclick="stepBackward()" id="stepBackBtn">⏪ Step Back</button>
+                    <button class="control-btn" onclick="togglePlayPause()" id="playPauseBtn">▶️ Play</button>
+                    <button class="control-btn" onclick="stepForward()" id="stepForwardBtn">Step Forward ⏩</button>
+                    <select class="speed-selector" id="speedSelector" onchange="updateSpeed()">
+                        <option value="0.5">0.5x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="2">2x</option>
+                        <option value="4">4x</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="resizer" id="resizer2"></div>
+
+            <!-- Step Log Panel -->
+            <div class="panel" id="stepLogPanel" style="width: 20%;">
+                <div class="panel-header">Execution Log</div>
+                <div class="panel-content">
+                    <div class="step-log-content" id="stepLogContent">
+                        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                            No steps yet
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentTheme = 'dark';
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let speed = 1;
+
+        // Solution code
+        const solutionCode = `class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        # Optimization: HashMap for O(1) inorder index lookup
+        inorder_map = {val: idx for idx, val in enumerate(inorder)}
+        self.preorder_idx = 0
+        
+        def build(left, right):
+            # Base case: no elements to construct the tree
+            if left > right:
+                return None
+            
+            # The first element in preorder is always the root
+            root_val = preorder[self.preorder_idx]
+            root = TreeNode(root_val)
+            self.preorder_idx += 1
+            
+            # Find root position in inorder to split left/right subtrees
+            inorder_idx = inorder_map[root_val]
+            
+            # Build left subtree first (preorder: root → left → right)
+            # Elements before inorder_idx belong to left subtree
+            root.left = build(left, inorder_idx - 1)
+            
+            # Build right subtree
+            # Elements after inorder_idx belong to right subtree
+            root.right = build(inorder_idx + 1, right)
+            
+            return root
+        
+        return build(0, len(inorder) - 1)`;
+
+        // Theme toggle
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', currentTheme);
+        }
+
+        // Enhanced syntax highlighting
+        function highlightPythonLine(line) {
+            const div = document.createElement('div');
+            div.textContent = line;
+            let html = div.innerHTML;
+
+            // Skip if it's a blank line
+            if (!line.trim()) {
+                return html;
+            }
+
+            // Comments (must be first to avoid highlighting keywords in comments)
+            if (line.trim().startsWith('#')) {
+                return `<span class="syn-comment">${html}</span>`;
+            }
+
+            // Strings (triple quotes first)
+            html = html.replace(/(&quot;&quot;&quot;[\s\S]*?&quot;&quot;&quot;|&#39;&#39;&#39;[\s\S]*?&#39;&#39;&#39;)/g, 
+                '<span class="syn-string">$1</span>');
+            
+            // Regular strings
+            html = html.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;|&#39;(?:[^&]|&(?!#39;))*&#39;)/g, 
+                '<span class="syn-string">$1</span>');
+
+            // Keywords
+            const keywords = ['class', 'def', 'return', 'if', 'else', 'for', 'in', 'import', 
+                            'from', 'while', 'break', 'continue', 'pass', 'yield', 'with', 
+                            'as', 'try', 'except', 'finally', 'raise', 'lambda', 'None', 
+                            'True', 'False', 'and', 'or', 'not', 'is', 'self'];
+            
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b(${kw})\\b`, 'g');
+                html = html.replace(regex, '<span class="syn-keyword">$1</span>');
+            });
+
+            // Built-in functions
+            const builtins = ['len', 'range', 'enumerate', 'zip', 'map', 'filter', 'list', 
+                            'dict', 'set', 'tuple', 'str', 'int', 'float', 'bool', 'print'];
+            
+            builtins.forEach(fn => {
+                const regex = new RegExp(`\\b(${fn})\\b(?=\\s*\\()`, 'g');
+                html = html.replace(regex, '<span class="syn-builtin">$1</span>');
+            });
+
+            // Type hints
+            const types = ['List', 'Dict', 'Set', 'Tuple', 'Optional', 'Union', 'Any', 'TreeNode'];
+            types.forEach(type => {
+                const regex = new RegExp(`\\b(${type})\\b`, 'g');
+                html = html.replace(regex, '<span class="syn-type">$1</span>');
+            });
+
+            // Function definitions
+            html = html.replace(/\b(def)\s+(\w+)/g, 
+                '<span class="syn-keyword">$1</span> <span class="syn-function">$2</span>');
+
+            // Numbers
+            html = html.replace(/\b(\d+)\b/g, '<span class="syn-number">$1</span>');
+
+            return html;
+        }
+
+        // Render code with highlighting
+        function renderCode(currentLineNum = -1) {
+            const lines = solutionCode.split('\n');
+            const container = document.getElementById('codeContainer');
+            
+            let html = '<pre>';
+            lines.forEach((line, i) => {
+                const isHighlight = i === currentLineNum;
+                const lineClass = isHighlight ? 'code-line highlight' : 'code-line';
+                const lineNumber = i + 1;
+                const highlightedContent = highlightPythonLine(line);
+                
+                html += `<div class="${lineClass}">`;
+                html += `<span class="line-number">${lineNumber}</span>`;
+                html += `<code class="line-content">${highlightedContent || ' '}</code>`;
+                html += `</div>`;
+            });
+            html += '</pre>';
+            
+            container.innerHTML = html;
+        }
+
+        // Tree node class
+        class TreeNode {
+            constructor(val) {
+                this.val = val;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        // Build tree with step tracking
+        function buildTreeWithSteps(preorder, inorder) {
+            const steps = [];
+            const inorderMap = {};
+            inorder.forEach((val, idx) => {
+                inorderMap[val] = idx;
+            });
+
+            let preorderIdx = 0;
+            let stepNum = 0;
+
+            function logStep(lineNo, description, vars) {
+                steps.push({
+                    step: stepNum++,
+                    line: lineNo,
+                    description: description,
+                    vars: JSON.parse(JSON.stringify(vars)),
+                    tree: cloneTree(rootRef),
+                    preorderUsed: preorderIdx,
+                    currentRange: vars.currentRange || null
+                });
+            }
+
+            let rootRef = null;
+
+            function build(left, right, depth = 0) {
+                logStep(10, `Checking range [${left}, ${right}]`, {
+                    left, right, depth, preorderIdx,
+                    currentRange: [left, right]
+                });
+
+                if (left > right) {
+                    logStep(12, `Base case: left (${left}) > right (${right}), return None`, {
+                        left, right, depth, preorderIdx,
+                        currentRange: [left, right]
+                    });
+                    return null;
+                }
+
+                const rootVal = preorder[preorderIdx];
+                logStep(15, `Creating node with value ${rootVal} from preorder[${preorderIdx}]`, {
+                    rootVal, preorderIdx, left, right, depth,
+                    currentRange: [left, right]
+                });
+
+                const root = new TreeNode(rootVal);
+                if (rootRef === null) rootRef = root;
+                
+                preorderIdx++;
+
+                const inorderIdx = inorderMap[rootVal];
+                logStep(20, `Found ${rootVal} at inorder index ${inorderIdx}, splitting subtrees`, {
+                    rootVal, inorderIdx, left, right, depth, preorderIdx,
+                    leftRange: [left, inorderIdx - 1],
+                    rightRange: [inorderIdx + 1, right],
+                    currentRange: [left, right]
+                });
+
+                logStep(24, `Building left subtree for range [${left}, ${inorderIdx - 1}]`, {
+                    rootVal, left, right: inorderIdx - 1, depth: depth + 1, preorderIdx,
+                    currentRange: [left, inorderIdx - 1]
+                });
+                root.left = build(left, inorderIdx - 1, depth + 1);
+
+                logStep(28, `Building right subtree for range [${inorderIdx + 1}, ${right}]`, {
+                    rootVal, left: inorderIdx + 1, right, depth: depth + 1, preorderIdx,
+                    currentRange: [inorderIdx + 1, right]
+                });
+                root.right = build(inorderIdx + 1, right, depth + 1);
+
+                logStep(31, `Completed node ${rootVal}, returning to parent`, {
+                    rootVal, left, right, depth, preorderIdx,
+                    currentRange: [left, right]
+                });
+
+                return root;
+            }
+
+            const result = build(0, inorder.length - 1);
+            
+            logStep(34, `Tree construction complete!`, {
+                totalNodes: preorder.length,
+                preorderIdx,
+                currentRange: null
+            });
+
+            return { tree: result, steps };
+        }
+
+        // Clone tree for step visualization
+        function cloneTree(node) {
+            if (!node) return null;
+            const newNode = new TreeNode(node.val);
+            newNode.left = cloneTree(node.left);
+            newNode.right = cloneTree(node.right);
+            return newNode;
+        }
+
+        // Calculate tree layout positions
+        function calculateTreeLayout(root) {
+            if (!root) return [];
+
+            const positions = [];
+            const edges = [];
+            
+            function getHeight(node) {
+                if (!node) return 0;
+                return 1 + Math.max(getHeight(node.left), getHeight(node.right));
+            }
+
+            function layout(node, x, y, level, offset) {
+                if (!node) return;
+
+                positions.push({ val: node.val, x, y, level });
+
+                const verticalGap = 80;
+                const nextY = y + verticalGap;
+
+                if (node.left) {
+                    const leftX = x - offset;
+                    edges.push({ from: { x, y }, to: { x: leftX, y: nextY } });
+                    layout(node.left, leftX, nextY, level + 1, offset / 2);
+                }
+
+                if (node.right) {
+                    const rightX = x + offset;
+                    edges.push({ from: { x, y }, to: { x: rightX, y: nextY } });
+                    layout(node.right, rightX, nextY, level + 1, offset / 2);
+                }
+            }
+
+            const height = getHeight(root);
+            const initialOffset = Math.pow(2, height - 1) * 30;
+            layout(root, 400, 50, 0, initialOffset);
+
+            return { nodes: positions, edges };
+        }
+
+        // Render tree visualization
+        function renderTree(tree, preorderUsed, currentRange, preorder, inorder) {
+            const vizContent = document.getElementById('vizContent');
+            
+            if (!tree) {
+                vizContent.innerHTML = '<div style="color: var(--text-secondary);">Empty tree</div>';
+                return;
+            }
+
+            const layout = calculateTreeLayout(tree);
+            
+            let svg = `
+                <div style="width: 100%; display: flex; flex-direction: column; gap: 20px;">
+                    <svg class="viz-svg" viewBox="0 0 800 600" style="min-height: 400px;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                    refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#6b7280" />
+                            </marker>
+                        </defs>
+            `;
+
+            // Draw edges
+            layout.edges.forEach(edge => {
+                svg += `<line x1="${edge.from.x}" y1="${edge.from.y}" 
+                             x2="${edge.to.x}" y2="${edge.to.y}" 
+                             stroke="#6b7280" stroke-width="2" class="tree-edge"/>`;
+            });
+
+            // Draw nodes
+            layout.nodes.forEach(node => {
+                svg += `
+                    <g class="tree-node">
+                        <circle cx="${node.x}" cy="${node.y}" r="24" 
+                                fill="#374151" stroke="#60a5fa" stroke-width="2"/>
+                        <text x="${node.x}" y="${node.y}" 
+                              text-anchor="middle" dominant-baseline="middle" 
+                              fill="#fff" class="node-text">
+                            ${node.val}
+                        </text>
+                    </g>
+                `;
+            });
+
+            svg += '</svg>';
+
+            // Add array visualizations
+            svg += '<div style="padding: 0 20px;">';
+            
+            // Preorder array
+            svg += '<div class="array-container">';
+            svg += '<div class="array-label">Preorder:</div>';
+            svg += '<div class="array-items">';
+            preorder.forEach((val, idx) => {
+                const isUsed = idx < preorderUsed;
+                const classes = isUsed ? 'array-cell used' : 'array-cell';
+                svg += `
+                    <div style="text-align: center;">
+                        <div class="${classes}">${val}</div>
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            svg += '</div></div>';
+
+            // Inorder array with range highlight
+            svg += '<div class="array-container">';
+            svg += '<div class="array-label">Inorder:</div>';
+            svg += '<div class="array-items">';
+            inorder.forEach((val, idx) => {
+                let classes = 'array-cell';
+                if (currentRange && idx >= currentRange[0] && idx <= currentRange[1]) {
+                    classes += ' highlight';
+                }
+                svg += `
+                    <div style="text-align: center;">
+                        <div class="${classes}">${val}</div>
+                        <div class="array-index">${idx}</div>
+                    </div>
+                `;
+            });
+            svg += '</div></div>';
+
+            svg += '</div></div>';
+
+            vizContent.innerHTML = svg;
+        }
+
+        // Update step log display
+        function updateStepLog() {
+            const content = document.getElementById('stepLogContent');
+            const step = steps[currentStep];
+
+            if (!step) {
+                content.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No steps yet</div>';
+                return;
+            }
+
+            let html = `
+                <div class="current-step-info">
+                    <h3 class="step-title">Step ${currentStep + 1} of ${steps.length}</h3>
+                    <p class="step-description">${step.description}</p>
+                </div>
+
+                <div class="variables-section">
+                    <h4 class="section-title">Variables</h4>
+            `;
+
+            for (const [key, value] of Object.entries(step.vars)) {
+                const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+                html += `
+                    <div class="variable-item">
+                        <span class="var-name">${key}</span>: ${displayValue}
+                    </div>
+                `;
+            }
+
+            html += `
+                </div>
+                <div class="history-section">
+                    <h4 class="section-title">History</h4>
+            `;
+
+            steps.slice(0, currentStep + 1).forEach((s, i) => {
+                const classes = i === currentStep ? 'history-item active' : 'history-item';
+                html += `<div class="${classes}">${i + 1}. ${s.description}</div>`;
+            });
+
+            html += '</div>';
+
+            content.innerHTML = html;
+        }
+
+        // Update visualization to current step
+        function updateVisualization() {
+            const step = steps[currentStep];
+            if (!step) return;
+
+            renderCode(step.line);
+            renderTree(
+                step.tree, 
+                step.preorderUsed, 
+                step.vars.currentRange,
+                currentPreorder,
+                currentInorder
+            );
+            updateStepLog();
+
+            // Update button states
+            document.getElementById('stepBackBtn').disabled = currentStep === 0;
+            document.getElementById('stepForwardBtn').disabled = currentStep === steps.length - 1;
+        }
+
+        // Playback controls
+        function stepForward() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateVisualization();
+            }
+        }
+
+        function stepBackward() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateVisualization();
+            }
+        }
+
+        function resetVisualization() {
+            currentStep = 0;
+            if (isPlaying) {
+                togglePlayPause();
+            }
+            updateVisualization();
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playPauseBtn');
+            
+            if (isPlaying) {
+                btn.textContent = '⏸ Pause';
+                playInterval = setInterval(() => {
+                    if (currentStep < steps.length - 1) {
+                        stepForward();
+                    } else {
+                        togglePlayPause();
+                    }
+                }, 1000 / speed);
+            } else {
+                btn.textContent = '▶️ Play';
+                if (playInterval) {
+                    clearInterval(playInterval);
+                    playInterval = null;
+                }
+            }
+        }
+
+        function updateSpeed() {
+            speed = parseFloat(document.getElementById('speedSelector').value);
+            if (isPlaying) {
+                togglePlayPause();
+                togglePlayPause();
+            }
+        }
+
+        // Run visualization with inputs
+        let currentPreorder = [];
+        let currentInorder = [];
+
+        function runVisualization() {
+            const preorderInput = document.getElementById('preorderInput').value;
+            const inorderInput = document.getElementById('inorderInput').value;
+
+            try {
+                currentPreorder = preorderInput.split(',').map(x => parseInt(x.trim()));
+                currentInorder = inorderInput.split(',').map(x => parseInt(x.trim()));
+
+                if (currentPreorder.length !== currentInorder.length) {
+                    alert('Preorder and inorder arrays must have the same length');
+                    return;
+                }
+
+                const result = buildTreeWithSteps(currentPreorder, currentInorder);
+                steps = result.steps;
+                currentStep = 0;
+
+                if (isPlaying) {
+                    togglePlayPause();
+                }
+
+                updateVisualization();
+            } catch (error) {
+                alert('Error parsing input: ' + error.message);
+            }
+        }
+
+        // Panel resizing
+        function initResizers() {
+            const resizer1 = document.getElementById('resizer1');
+            const resizer2 = document.getElementById('resizer2');
+            const codePanel = document.getElementById('codePanel');
+            const vizPanel = document.getElementById('vizPanel');
+            const stepLogPanel = document.getElementById('stepLogPanel');
+
+            let isResizing = false;
+            let currentResizer = null;
+
+            function startResize(e, resizer) {
+                isResizing = true;
+                currentResizer = resizer;
+                e.preventDefault();
+            }
+
+            function resize(e) {
+                if (!isResizing) return;
+
+                const containerWidth = document.querySelector('.main-content').offsetWidth;
+                const mouseX = e.clientX;
+
+                if (currentResizer === resizer1) {
+                    const codeWidth = (mouseX / containerWidth) * 100;
+                    if (codeWidth > 15 && codeWidth < 50) {
+                        codePanel.style.width = codeWidth + '%';
+                    }
+                } else if (currentResizer === resizer2) {
+                    const stepLogWidth = ((containerWidth - mouseX) / containerWidth) * 100;
+                    if (stepLogWidth > 15 && stepLogWidth < 40) {
+                        stepLogPanel.style.width = stepLogWidth + '%';
+                    }
+                }
+            }
+
+            function stopResize() {
+                isResizing = false;
+                currentResizer = null;
+            }
+
+            resizer1.addEventListener('mousedown', (e) => startResize(e, resizer1));
+            resizer2.addEventListener('mousedown', (e) => startResize(e, resizer2));
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlayPause();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                stepForward();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                stepBackward();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            renderCode();
+            initResizers();
+        });
+    </script>
+</body>
+</html>
