@@ -57,8 +57,8 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 
 ## 07 - Trees
 
-| # | Problem | Difficulty | Live Demo | Status |
-|---|---------|------------|-----------|--------|
+| # | Problem | Difficulty | Live Demo | Status | Intution |
+|---|---------|------------|-----------|--------|----------|
 | 1 | Invert Binary Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/01-invert-binary-tree.html) | ✅ Available |
 | 2 | Maximum Depth of Binary Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/02-maximum-depth.html) | ✅ Available |
 | 3 | Same Tree | 🟢 Easy | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/03-same-tree.html) | 🔜 Coming Soon |
@@ -67,7 +67,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | 5a | Lowest Common Ancestor of deepest tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/05-lca-deepest-leaves.html) | ✅ Available |
 | 6 | Binary Tree Level Order Traversal | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/06-level-order.html) | ✅ Available |
 | 7 | Validate Binary Search Tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/07-validate-bst.html) | ✅ Available |
-| 8 | Kth Smallest Element in BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-kth-smallest-bst.html) | ✅ Available |
+| 8 | Kth Smallest Element in BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-kth-smallest-bst.html) | ✅ Available | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-intutiion-kth-smallest-bst.html) |
 | 9 | Construct Binary Tree from Preorder and Inorder | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/09-construct-tree.html) | 🔜 Coming Soon |
 | 10 | Binary Tree Maximum Path Sum | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/10-max-path-sum.html) | 🔜 Coming Soon |
 | 11 | Serialize and Deserialize Binary Tree | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/11-serialize-deserialize.html) | 🔜 Coming Soon |
