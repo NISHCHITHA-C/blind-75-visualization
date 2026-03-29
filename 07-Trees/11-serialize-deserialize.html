@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>297. Serialize and Deserialize Binary Tree - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            
+            /* Syntax highlighting - Light mode (GitHub inspired) */
+            --syn-keyword: #d73a49;
+            --syn-function: #6f42c1;
+            --syn-string: #032f62;
+            --syn-comment: #6a737d;
+            --syn-type: #005cc5;
+            --syn-number: #005cc5;
+            --syn-builtin: #e36209;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #374151;
+            --code-bg: #0f1419;
+            --highlight: rgba(251, 191, 36, 0.15);
+            --accent: #60a5fa;
+            
+            /* Syntax highlighting - Dark mode (Dracula inspired) */
+            --syn-keyword: #ff79c6;
+            --syn-function: #50fa7b;
+            --syn-string: #f1fa8c;
+            --syn-comment: #6272a4;
+            --syn-type: #8be9fd;
+            --syn-number: #bd93f9;
+            --syn-builtin: #ffb86c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header-top h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-section label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .input-section input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .input-section button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .input-section button:hover {
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .panel {
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Code Panel */
+        .code-panel {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--code-bg);
+            color: var(--text-primary);
+        }
+
+        .code-panel pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 22px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.highlighted {
+            background: var(--highlight);
+        }
+
+        [data-theme="dark"] .code-line.highlighted {
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-code {
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax highlighting classes */
+        .syn-keyword { color: var(--syn-keyword); font-weight: 500; }
+        .syn-function { color: var(--syn-function); }
+        .syn-string { color: var(--syn-string); }
+        .syn-comment { color: var(--syn-comment); font-style: italic; }
+        .syn-type { color: var(--syn-type); }
+        .syn-number { color: var(--syn-number); }
+        .syn-builtin { color: var(--syn-builtin); }
+
+        /* Visualization Panel */
+        .viz-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+        }
+
+        .viz-controls {
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            background: var(--bg-secondary);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .control-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 80px;
+            transition: opacity 0.2s;
+        }
+
+        .control-btn:hover {
+            opacity: 0.8;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-control {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .speed-control label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .speed-control select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Step Log Panel */
+        .step-log {
+            padding: 16px;
+        }
+
+        .step-info {
+            margin-bottom: 16px;
+        }
+
+        .step-info h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .step-info p {
+            margin: 0 0 16px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .variables-section h4,
+        .history-section h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .variable-item {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .variable-name {
+            color: var(--accent);
+        }
+
+        .history-section {
+            margin-top: 16px;
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .history-item.current {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .history-item:not(.current) {
+            color: var(--text-secondary);
+        }
+
+        /* SVG Styles */
+        .tree-node {
+            transition: all 0.3s ease;
+        }
+
+        .tree-edge {
+            transition: stroke 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        const pythonCode = `class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Codec:
+    """
+    Optimized solution using preorder traversal (DFS).
+    Time Complexity: O(n) for both serialize and deserialize
+    Space Complexity: O(n) for storing the tree + O(h) recursion stack
+    """
+    def serialize(self, root):
+        """Encodes a tree to a single string."""
+        def dfs(node):
+            if not node:
+                result.append('#')
+                return
+            result.append(str(node.val))
+            dfs(node.left)
+            dfs(node.right)
+        
+        result = []
+        dfs(root)
+        return ','.join(result)
+    
+    def deserialize(self, data):
+        """Decodes your encoded data to tree."""
+        def dfs():
+            val = next(vals)
+            if val == '#':
+                return None
+            
+            node = TreeNode(int(val))
+            node.left = dfs()
+            node.right = dfs()
+            return node
+        
+        vals = iter(data.split(','))
+        return dfs()`;
+
+        // Main App Component
+        class App {
+            constructor() {
+                this.state = {
+                    theme: 'dark',
+                    currentStep: 0,
+                    isPlaying: false,
+                    speed: 1,
+                    steps: [],
+                    panelWidths: [30, 50, 20],
+                    inputValue: '[1,2,3,null,null,4,5]',
+                    mode: 'serialize'
+                };
+                
+                this.playInterval = null;
+                this.init();
+            }
+
+            init() {
+                document.documentElement.setAttribute('data-theme', this.state.theme);
+                this.render();
+                this.attachEventListeners();
+                this.runVisualization();
+            }
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', this.state.theme);
+                this.render();
+            }
+
+            highlightPythonLine(line) {
+                // Create a div to safely escape HTML
+                const div = document.createElement('div');
+                div.textContent = line;
+                let html = div.innerHTML;
+
+                // Skip if empty or just whitespace
+                if (!html.trim()) {
+                    return html || ' ';
+                }
+
+                // Handle comments (must be first to preserve them)
+                if (html.trim().startsWith('#')) {
+                    return `<span class="syn-comment">${html}</span>`;
+                }
+
+                // Handle docstrings (triple quotes)
+                if (html.includes('"""') || html.includes("'''")) {
+                    return `<span class="syn-string">${html}</span>`;
+                }
+
+                // Handle strings with proper escaping
+                // Single quotes
+                html = html.replace(/&#39;((?:(?!&#39;).)*?)&#39;/g, '<span class="syn-string">&#39;$1&#39;</span>');
+                // Double quotes
+                html = html.replace(/&quot;((?:(?!&quot;).)*?)&quot;/g, '<span class="syn-string">&quot;$1&quot;</span>');
+
+                // Keywords
+                const keywords = ['class', 'def', 'if', 'not', 'return', 'None', 'self', 'import', 'from', 'for', 'in', 'while', 'and', 'or'];
+                keywords.forEach(kw => {
+                    const regex = new RegExp(`\\b${kw}\\b`, 'g');
+                    html = html.replace(regex, `<span class="syn-keyword">${kw}</span>`);
+                });
+
+                // Built-in functions
+                const builtins = ['str', 'int', 'iter', 'next', 'len', 'append', 'split', 'join', 'range'];
+                builtins.forEach(fn => {
+                    const regex = new RegExp(`\\b${fn}\\b`, 'g');
+                    html = html.replace(regex, `<span class="syn-builtin">${fn}</span>`);
+                });
+
+                // Types (class names)
+                const types = ['TreeNode', 'Codec'];
+                types.forEach(type => {
+                    const regex = new RegExp(`\\b${type}\\b`, 'g');
+                    html = html.replace(regex, `<span class="syn-type">${type}</span>`);
+                });
+
+                // Function definitions (after 'def' keyword)
+                html = html.replace(/(<span class="syn-keyword">def<\/span>)\s+(\w+)/g, 
+                    '$1 <span class="syn-function">$2</span>');
+
+                // Numbers
+                html = html.replace(/\b(\d+)\b/g, '<span class="syn-number">$1</span>');
+
+                return html || ' ';
+            }
+
+            runVisualization() {
+                const steps = [];
+                const input = this.state.inputValue;
+
+                try {
+                    // Parse input to create tree
+                    const root = this.parseTreeFromArray(input);
+                    
+                    // Run serialize
+                    const serializeSteps = this.simulateSerialize(root);
+                    steps.push(...serializeSteps);
+
+                    this.state.steps = steps;
+                    this.state.currentStep = 0;
+                    this.render();
+                } catch (error) {
+                    console.error('Visualization error:', error);
+                }
+            }
+
+            parseTreeFromArray(input) {
+                try {
+                    const arr = JSON.parse(input);
+                    if (!arr || arr.length === 0) return null;
+
+                    const root = { val: arr[0], left: null, right: null, id: 0 };
+                    const queue = [root];
+                    let i = 1;
+                    let nodeId = 1;
+
+                    while (queue.length > 0 && i < arr.length) {
+                        const node = queue.shift();
+
+                        if (i < arr.length && arr[i] !== null) {
+                            node.left = { val: arr[i], left: null, right: null, id: nodeId++ };
+                            queue.push(node.left);
+                        }
+                        i++;
+
+                        if (i < arr.length && arr[i] !== null) {
+                            node.right = { val: arr[i], left: null, right: null, id: nodeId++ };
+                            queue.push(node.right);
+                        }
+                        i++;
+                    }
+
+                    return root;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            simulateSerialize(root) {
+                const steps = [];
+                const result = [];
+                let stepNum = 0;
+
+                const dfs = (node, depth = 0) => {
+                    if (!node) {
+                        result.push('#');
+                        steps.push({
+                            line: 17,
+                            description: `Visit null node - append '#' to result`,
+                            vars: {
+                                result: [...result],
+                                depth: depth
+                            },
+                            tree: this.cloneTree(root),
+                            currentNodeId: null,
+                            stepNum: stepNum++
+                        });
+                        return;
+                    }
+
+                    result.push(node.val.toString());
+                    steps.push({
+                        line: 20,
+                        description: `Visit node ${node.val} - append '${node.val}' to result`,
+                        vars: {
+                            node_val: node.val,
+                            result: [...result],
+                            depth: depth
+                        },
+                        tree: this.cloneTree(root),
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+
+                    steps.push({
+                        line: 21,
+                        description: `Explore left subtree of node ${node.val}`,
+                        vars: {
+                            node_val: node.val,
+                            result: [...result],
+                            depth: depth
+                        },
+                        tree: this.cloneTree(root),
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+
+                    dfs(node.left, depth + 1);
+
+                    steps.push({
+                        line: 22,
+                        description: `Explore right subtree of node ${node.val}`,
+                        vars: {
+                            node_val: node.val,
+                            result: [...result],
+                            depth: depth
+                        },
+                        tree: this.cloneTree(root),
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+
+                    dfs(node.right, depth + 1);
+                };
+
+                steps.push({
+                    line: 24,
+                    description: 'Initialize empty result array',
+                    vars: {
+                        result: [],
+                        root_val: root ? root.val : null
+                    },
+                    tree: this.cloneTree(root),
+                    currentNodeId: null,
+                    stepNum: stepNum++
+                });
+
+                steps.push({
+                    line: 25,
+                    description: 'Start DFS traversal from root',
+                    vars: {
+                        result: [],
+                        root_val: root ? root.val : null
+                    },
+                    tree: this.cloneTree(root),
+                    currentNodeId: null,
+                    stepNum: stepNum++
+                });
+
+                dfs(root);
+
+                const serialized = result.join(',');
+                steps.push({
+                    line: 26,
+                    description: `Serialization complete! Return: "${serialized}"`,
+                    vars: {
+                        result: result,
+                        serialized: serialized
+                    },
+                    tree: this.cloneTree(root),
+                    currentNodeId: null,
+                    stepNum: stepNum++
+                });
+
+                return steps;
+            }
+
+            cloneTree(node) {
+                if (!node) return null;
+                return {
+                    val: node.val,
+                    id: node.id,
+                    left: this.cloneTree(node.left),
+                    right: this.cloneTree(node.right)
+                };
+            }
+
+            play() {
+                if (this.state.isPlaying) {
+                    this.pause();
+                    return;
+                }
+
+                this.state.isPlaying = true;
+                this.render();
+
+                const delay = 1000 / this.state.speed;
+                this.playInterval = setInterval(() => {
+                    if (this.state.currentStep < this.state.steps.length - 1) {
+                        this.state.currentStep++;
+                        this.render();
+                    } else {
+                        this.pause();
+                    }
+                }, delay);
+            }
+
+            pause() {
+                this.state.isPlaying = false;
+                if (this.playInterval) {
+                    clearInterval(this.playInterval);
+                    this.playInterval = null;
+                }
+                this.render();
+            }
+
+            stepForward() {
+                if (this.state.currentStep < this.state.steps.length - 1) {
+                    this.state.currentStep++;
+                    this.render();
+                }
+            }
+
+            stepBack() {
+                if (this.state.currentStep > 0) {
+                    this.state.currentStep--;
+                    this.render();
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.state.currentStep = 0;
+                this.render();
+            }
+
+            changeSpeed(speed) {
+                this.state.speed = parseFloat(speed);
+                if (this.state.isPlaying) {
+                    this.pause();
+                    this.play();
+                }
+            }
+
+            render() {
+                const app = document.getElementById('app');
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="header-top">
+                            <h1>297. Serialize and Deserialize Binary Tree</h1>
+                            <button class="theme-toggle" onclick="app.toggleTheme()">
+                                ${this.state.theme === 'dark' ? '☀️ Light' : '🌙 Dark'} Mode
+                            </button>
+                        </div>
+                        <div class="input-section">
+                            <label>Input (Tree Array):</label>
+                            <input type="text" id="treeInput" value="${this.state.inputValue}" />
+                            <button onclick="app.updateInput()">Run Visualization</button>
+                        </div>
+                    </div>
+                    <div class="main-content">
+                        ${this.renderCodePanel()}
+                        ${this.renderVizPanel()}
+                        ${this.renderStepPanel()}
+                    </div>
+                `;
+            }
+
+            renderCodePanel() {
+                const lines = pythonCode.split('\n');
+                const currentLine = this.state.steps[this.state.currentStep]?.line || -1;
+
+                const linesHTML = lines.map((line, i) => {
+                    const highlighted = i === currentLine ? 'highlighted' : '';
+                    const lineHTML = this.highlightPythonLine(line);
+                    
+                    return `<div class="code-line ${highlighted}"><span class="line-number">${i + 1}</span><code class="line-code">${lineHTML}</code></div>`;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: ${this.state.panelWidths[0]}%">
+                        <div class="panel-header">Code</div>
+                        <div class="panel-content code-panel">
+                            <pre>${linesHTML}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderVizPanel() {
+                const step = this.state.steps[this.state.currentStep];
+                const tree = step?.tree;
+
+                return `
+                    <div class="panel viz-panel" style="width: ${this.state.panelWidths[1]}%">
+                        <div class="panel-header">Visualization</div>
+                        <div class="viz-content">
+                            ${tree ? this.renderTree(tree, step.currentNodeId) : '<p>No tree data</p>'}
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-btn" onclick="app.reset()">⏮ Reset</button>
+                            <button class="control-btn" onclick="app.stepBack()" ${this.state.currentStep === 0 ? 'disabled' : ''}>⏪ Back</button>
+                            <button class="control-btn" onclick="app.play()">
+                                ${this.state.isPlaying ? '⏸ Pause' : '▶ Play'}
+                            </button>
+                            <button class="control-btn" onclick="app.stepForward()" ${this.state.currentStep >= this.state.steps.length - 1 ? 'disabled' : ''}>⏩ Forward</button>
+                            <div class="speed-control">
+                                <label>Speed:</label>
+                                <select onchange="app.changeSpeed(this.value)">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1" ${this.state.speed === 1 ? 'selected' : ''}>1x</option>
+                                    <option value="2" ${this.state.speed === 2 ? 'selected' : ''}>2x</option>
+                                    <option value="4" ${this.state.speed === 4 ? 'selected' : ''}>4x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderTree(root, currentNodeId) {
+                if (!root) return '<p>Empty tree</p>';
+
+                const positions = this.calculateTreeLayout(root);
+                const width = 800;
+                const height = 500;
+
+                const edgesHTML = positions.edges.map(edge => `
+                    <line 
+                        x1="${edge.from.x}" y1="${edge.from.y}"
+                        x2="${edge.to.x}" y2="${edge.to.y}"
+                        stroke="${edge.highlighted ? '#60a5fa' : '#6b7280'}"
+                        stroke-width="2"
+                        class="tree-edge"
+                    />
+                `).join('');
+
+                const nodesHTML = positions.nodes.map(node => `
+                    <g class="tree-node">
+                        <circle
+                            cx="${node.x}" cy="${node.y}" r="24"
+                            fill="${node.id === currentNodeId ? '#3b82f6' : '#374151'}"
+                            stroke="#60a5fa"
+                            stroke-width="${node.id === currentNodeId ? 3 : 1}"
+                        />
+                        <text
+                            x="${node.x}" y="${node.y}"
+                            text-anchor="middle"
+                            dominant-baseline="middle"
+                            fill="#fff"
+                            font-size="14"
+                            font-weight="500"
+                        >
+                            ${node.val}
+                        </text>
+                    </g>
+                `).join('');
+
+                return `
+                    <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 100%; max-height: 500px;">
+                        ${edgesHTML}
+                        ${nodesHTML}
+                    </svg>
+                `;
+            }
+
+            calculateTreeLayout(root) {
+                const positions = { nodes: [], edges: [] };
+                const width = 800;
+                const levelHeight = 80;
+
+                const traverse = (node, x, y, level, horizontalSpacing) => {
+                    if (!node) return;
+
+                    positions.nodes.push({ ...node, x, y });
+
+                    const childSpacing = horizontalSpacing / 2;
+
+                    if (node.left) {
+                        const leftX = x - childSpacing;
+                        const leftY = y + levelHeight;
+                        positions.edges.push({
+                            from: { x, y },
+                            to: { x: leftX, y: leftY },
+                            highlighted: false
+                        });
+                        traverse(node.left, leftX, leftY, level + 1, childSpacing);
+                    }
+
+                    if (node.right) {
+                        const rightX = x + childSpacing;
+                        const rightY = y + levelHeight;
+                        positions.edges.push({
+                            from: { x, y },
+                            to: { x: rightX, y: rightY },
+                            highlighted: false
+                        });
+                        traverse(node.right, rightX, rightY, level + 1, childSpacing);
+                    }
+                };
+
+                traverse(root, width / 2, 60, 0, width / 4);
+                return positions;
+            }
+
+            renderStepPanel() {
+                const step = this.state.steps[this.state.currentStep];
+                if (!step) {
+                    return `
+                        <div class="panel" style="width: ${this.state.panelWidths[2]}%">
+                            <div class="panel-header">Step Log</div>
+                            <div class="panel-content step-log">
+                                <p>No steps available</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const varsHTML = Object.entries(step.vars).map(([name, value]) => `
+                    <div class="variable-item">
+                        <span class="variable-name">${name}</span>: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </div>
+                `).join('');
+
+                const historyHTML = this.state.steps.slice(0, this.state.currentStep + 1).map((s, i) => `
+                    <div class="history-item ${i === this.state.currentStep ? 'current' : ''}">
+                        ${i + 1}. ${s.description}
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="panel" style="width: ${this.state.panelWidths[2]}%">
+                        <div class="panel-header">Step Log</div>
+                        <div class="panel-content step-log">
+                            <div class="step-info">
+                                <h3>Step ${this.state.currentStep + 1} of ${this.state.steps.length}</h3>
+                                <p>${step.description}</p>
+                            </div>
+                            <div class="variables-section">
+                                <h4>Variables</h4>
+                                ${varsHTML}
+                            </div>
+                            <div class="history-section">
+                                <h4>History</h4>
+                                ${historyHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateInput() {
+                const input = document.getElementById('treeInput');
+                this.state.inputValue = input.value;
+                this.pause();
+                this.runVisualization();
+            }
+
+            attachEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.play();
+                    }
+                });
+            }
+        }
+
+        // Initialize app
+        const app = new App();
+    </script>
+</body>
+</html>
