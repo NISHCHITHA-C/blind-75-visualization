@@ -70,7 +70,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | 8 | Kth Smallest Element in BST | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-kth-smallest-bst.html) | ✅ Available | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/08-intutiion-kth-smallest-bst.html) |
 | 9 | Construct Binary Tree from Preorder and Inorder | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/09-construct-tree.html) | ✅ Available |
 | 10 | Binary Tree Maximum Path Sum | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/10-max-path-sum.html) | ✅ Available | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/10-intution-max-path-sum.html) |
-| 11 | Serialize and Deserialize Binary Tree | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/11-serialize-deserialize.html) | 🔜 Coming Soon |
+| 11 | Serialize and Deserialize Binary Tree | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/07-Trees/11-serialize-deserialize.html) | ✅ Available |
 
 ## 08 - Tries
 
