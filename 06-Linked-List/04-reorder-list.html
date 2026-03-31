@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>143. Reorder List - Detailed Memory Visualization</title>
+<title>143. Reorder List - Dual Mode Visualizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -25,11 +25,7 @@
   --hl: rgba(126,232,250,0.09);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -44,128 +40,178 @@ body {
 header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 16px 24px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.h-top {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 0.5rem;
 }
 
 .h-num {
   font-family: 'Clash Display', sans-serif;
-  font-size: 22px;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--accent);
 }
 
 .h-title {
   font-family: 'Clash Display', sans-serif;
-  font-size: 18px;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text);
+  flex: 1;
 }
 
 .h-badge {
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: rgba(255, 209, 102, 0.12);
+  background: rgba(255,209,102,0.15);
   color: var(--yellow);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .h-right {
-  margin-left: auto;
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   align-items: center;
+}
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--card);
+  padding: 0.35rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.45rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.mode-btn:hover { color: var(--text); }
+.mode-btn.active {
+  background: var(--accent);
+  color: var(--bg);
 }
 
 .inp {
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
   font-family: 'Fira Code', monospace;
-  font-size: 13px;
-  width: 200px;
-  transition: all 0.2s;
+  width: 180px;
 }
 
 .inp:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(126,232,250,0.1);
 }
 
 .btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
-}
-
-.btn-g {
-  background: transparent;
+  background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
+  padding: 0.4rem 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
 }
 
-.btn-g:hover {
-  background: var(--hl);
+.btn:hover { background: var(--border); }
+.btn-g {
+  background: transparent;
   border-color: var(--accent);
+  color: var(--accent);
 }
+.btn-g:hover { background: var(--hl); }
 
 main {
-  display: grid;
-  grid-template-columns: 320px 1fr 280px;
   flex: 1;
   overflow: hidden;
+  display: flex;
 }
 
-.code-panel, .viz-panel, .log-panel {
+/* EXECUTION MODE LAYOUT */
+.exec-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr 255px;
+  flex: 1;
+}
+
+/* INTUITION MODE LAYOUT */
+.intuit-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+}
+
+.panel {
+  background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.log-panel {
-  border-right: none;
-}
+.panel:last-child { border-right: none; }
 
-.panel-label {
-  background: var(--surface);
-  padding: 10px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--muted);
+.panel-hdr {
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  text-transform: uppercase;
   flex-shrink: 0;
 }
 
-.code-scroll {
+.panel-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  background: var(--surface);
+  padding: 0.75rem;
 }
 
+.panel-body::-webkit-scrollbar { width: 8px; }
+.panel-body::-webkit-scrollbar-track { background: var(--surface); }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* CODE PANEL */
 .code-line {
   display: flex;
   font-family: 'Fira Code', monospace;
-  font-size: 12px;
-  line-height: 1.7;
-  padding: 2px 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  padding: 0.1rem 0;
   border-left: 3px solid transparent;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 
 .code-line.active {
@@ -175,10 +221,11 @@ main {
 
 .ln {
   color: var(--muted);
-  min-width: 30px;
+  width: 30px;
   text-align: right;
-  padding-right: 10px;
+  padding-right: 0.75rem;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .ct {
@@ -186,72 +233,71 @@ main {
   white-space: pre;
 }
 
-.kw { color: var(--purple); font-weight: 600; }
-.fn { color: var(--blue); }
+.kw { color: #c586c0; font-weight: 600; }
+.fn { color: #dcdcaa; }
 .cm { color: var(--muted); font-style: italic; }
-.nm { color: var(--green); }
-.st { color: var(--yellow); }
-.op { color: var(--accent); }
+.nm { color: #b5cea8; }
+.st { color: #ce9178; }
+.op { color: var(--text); }
+
+/* VIZ PANEL */
+.viz-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 .viz-content {
   flex: 1;
-  padding: 20px;
   overflow-y: auto;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0.75rem;
 }
 
-/* Memory Visualization Styles */
+.viz-content::-webkit-scrollbar { width: 8px; }
+.viz-content::-webkit-scrollbar-track { background: var(--surface); }
+.viz-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Memory Visualization */
 .memory-section {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 12px;
+  border-radius: 6px;
+  padding: 0.65rem;
+  margin-bottom: 0.5rem;
 }
 
 .section-title {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.4rem;
 }
 
-.section-icon {
-  font-size: 14px;
-}
-
-/* Stack Variables */
 .stack-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.4rem;
 }
 
 .stack-var {
   background: var(--card);
   border: 2px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 5px;
+  padding: 0.4rem 0.5rem;
   transition: all 0.25s;
-  position: relative;
-}
-
-.stack-var.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(126,232,250,0.25);
-  transform: translateY(-2px);
 }
 
 .stack-var.changed {
   border-color: var(--orange);
-  box-shadow: 0 0 12px rgba(255,158,100,0.3);
+  box-shadow: 0 0 10px rgba(255,158,100,0.3);
   animation: pulse 0.5s ease-in-out;
 }
 
@@ -261,29 +307,25 @@ main {
 }
 
 .var-name {
-  font-size: 10px;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   font-family: 'Fira Code', monospace;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   letter-spacing: 0.5px;
 }
 
 .var-value {
-  font-size: 13px;
+  font-size: 0.82rem;
   font-weight: 600;
   font-family: 'Fira Code', monospace;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.3rem;
 }
 
-.var-value.null {
-  color: var(--muted);
-  font-style: italic;
-}
-
+.var-value.null { color: var(--muted); font-style: italic; }
 .var-value.slow { color: var(--yellow); }
 .var-value.fast { color: var(--purple); }
 .var-value.first { color: var(--blue); }
@@ -291,16 +333,13 @@ main {
 .var-value.prev { color: var(--red); }
 .var-value.temp { color: var(--orange); }
 
-.ptr-arrow {
-  font-size: 11px;
-  color: var(--accent);
-}
+.ptr-arrow { font-size: 0.7rem; color: var(--accent); }
 
 .mem-addr {
-  font-size: 9px;
+  font-size: 0.65rem;
   color: var(--muted);
   font-family: 'Fira Code', monospace;
-  margin-top: 3px;
+  margin-top: 0.15rem;
   opacity: 0.7;
 }
 
@@ -308,73 +347,50 @@ main {
 .heap-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.4rem;
 }
 
 .heap-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.35rem;
   flex-wrap: wrap;
 }
 
 .heap-node {
   background: var(--card);
   border: 2px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 14px;
-  min-width: 100px;
+  border-radius: 5px;
+  padding: 0.5rem 0.65rem;
+  min-width: 90px;
   transition: all 0.25s;
   position: relative;
 }
 
 .heap-node.highlighted {
   border-color: var(--accent);
-  box-shadow: 0 0 16px rgba(126,232,250,0.3);
-  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(126,232,250,0.3);
+  transform: scale(1.05);
   z-index: 10;
 }
 
-.heap-node.slow-ref {
-  border-color: var(--yellow);
-  box-shadow: 0 0 12px rgba(255,209,102,0.25);
-}
-
-.heap-node.fast-ref {
-  border-color: var(--purple);
-  box-shadow: 0 0 12px rgba(201,160,255,0.25);
-}
-
-.heap-node.first-ref {
-  border-color: var(--blue);
-  box-shadow: 0 0 12px rgba(78,168,222,0.25);
-}
-
-.heap-node.second-ref {
-  border-color: var(--green);
-  box-shadow: 0 0 12px rgba(57,217,138,0.25);
-}
-
-.heap-node.prev-ref {
-  border-color: var(--red);
-  box-shadow: 0 0 12px rgba(255,92,92,0.25);
-}
-
-.heap-node.temp-ref {
-  border-color: var(--orange);
-  box-shadow: 0 0 12px rgba(255,158,100,0.25);
-}
+.heap-node.slow-ref { border-color: var(--yellow); box-shadow: 0 0 10px rgba(255,209,102,0.25); }
+.heap-node.fast-ref { border-color: var(--purple); box-shadow: 0 0 10px rgba(201,160,255,0.25); }
+.heap-node.first-ref { border-color: var(--blue); box-shadow: 0 0 10px rgba(78,168,222,0.25); }
+.heap-node.second-ref { border-color: var(--green); box-shadow: 0 0 10px rgba(57,217,138,0.25); }
+.heap-node.prev-ref { border-color: var(--red); box-shadow: 0 0 10px rgba(255,92,92,0.25); }
+.heap-node.temp-ref { border-color: var(--orange); box-shadow: 0 0 10px rgba(255,158,100,0.25); }
 
 .node-addr {
-  font-size: 9px;
+  font-size: 0.65rem;
   color: var(--muted);
   font-family: 'Fira Code', monospace;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .node-content {
   display: flex;
-  gap: 8px;
+  gap: 0.4rem;
   align-items: center;
 }
 
@@ -384,57 +400,40 @@ main {
 }
 
 .field-label {
-  font-size: 9px;
+  font-size: 0.65rem;
   color: var(--muted);
   text-transform: uppercase;
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 0.15rem;
 }
 
 .field-value {
-  font-size: 14px;
+  font-size: 0.85rem;
   font-weight: 700;
   font-family: 'Fira Code', monospace;
   color: var(--text);
 }
 
-.field-value.ptr {
-  color: var(--accent);
-  font-size: 12px;
-}
+.field-value.ptr { color: var(--accent); font-size: 0.75rem; }
+.field-value.null-ptr { color: var(--muted); font-style: italic; font-size: 0.7rem; }
 
-.field-value.null-ptr {
-  color: var(--muted);
-  font-style: italic;
-  font-size: 11px;
-}
-
-.heap-arrow {
-  font-size: 16px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.heap-arrow.reversed {
-  color: var(--green);
-  transform: scaleX(-1);
-}
+.heap-arrow { font-size: 0.95rem; color: var(--muted); font-weight: 600; }
 
 .ref-labels {
   position: absolute;
-  top: -22px;
+  top: -18px;
   left: 0;
   right: 0;
   display: flex;
-  gap: 4px;
+  gap: 0.25rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .ref-tag {
-  font-size: 9px;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 0.15rem 0.4rem;
   border-radius: 3px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -451,45 +450,45 @@ main {
 .operation-box {
   background: linear-gradient(135deg, rgba(126,232,250,0.08), rgba(201,160,255,0.08));
   border-left: 3px solid var(--accent);
-  border-radius: 6px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
+  border-radius: 5px;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .op-title {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 0.35rem;
   letter-spacing: 0.5px;
 }
 
 .op-desc {
-  font-size: 13px;
+  font-size: 0.82rem;
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .op-code {
   font-family: 'Fira Code', monospace;
   color: var(--yellow);
   background: rgba(255,209,102,0.1);
-  padding: 2px 6px;
+  padding: 0.15rem 0.4rem;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 /* Phase Badge */
 .phase-badge {
   display: inline-block;
-  font-size: 10px;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
 }
 
 .phase-badge.find { background: rgba(255,209,102,0.15); color: var(--yellow); }
@@ -501,295 +500,449 @@ main {
 .result-box {
   background: linear-gradient(135deg, rgba(57,217,138,0.1), rgba(126,232,250,0.1));
   border: 2px solid var(--green);
-  border-radius: 8px;
-  padding: 14px;
-  margin-top: 12px;
+  border-radius: 6px;
+  padding: 0.65rem;
+  margin-top: 0.5rem;
 }
 
 .result-title {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--green);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 0.4rem;
 }
 
 .result-value {
   font-family: 'Fira Code', monospace;
-  font-size: 15px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
 }
 
 /* Controls */
 .bot {
-  background: var(--surface);
+  background: var(--card);
   border-top: 1px solid var(--border);
-  padding: 12px 18px;
+  padding: 0.5rem 0.75rem;
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
 .bot button {
-  padding: 7px 14px;
-  border-radius: 6px;
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 12px;
-  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.2s;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
 }
 
-.bot button:hover:not(:disabled) {
-  background: var(--hl);
-  border-color: var(--accent);
-}
-
+.bot button:hover { background: var(--border); }
 .bot button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.step-info {
-  margin-left: auto;
-  font-family: 'Fira Code', monospace;
-  font-size: 11px;
-  color: var(--muted);
+#btnPlay {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
   font-weight: 600;
+}
+
+#btnPlay:hover {
+  background: var(--accent);
+  opacity: 0.9;
+}
+
+.step-info {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-left: auto;
 }
 
 .spd-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-left: 14px;
-  border-left: 1px solid var(--border);
+  gap: 0.4rem;
 }
 
 .spd-wrap label {
-  font-size: 11px;
+  font-size: 0.7rem;
   color: var(--muted);
-  font-weight: 600;
 }
 
-.spd-wrap input {
-  width: 90px;
+.spd-wrap input[type="range"] {
+  width: 85px;
+  accent-color: var(--accent);
 }
 
-/* Log Panel */
+/* LOG PANEL */
 .log-scroll {
-  flex: 1;
+  max-height: 100%;
   overflow-y: auto;
-  padding: 10px;
 }
+
+.log-scroll::-webkit-scrollbar { width: 6px; }
+.log-scroll::-webkit-scrollbar-track { background: var(--surface); }
+.log-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .log-entry {
-  font-family: 'Fira Code', monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  padding: 6px 10px;
-  margin-bottom: 5px;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-left: 3px solid var(--border);
+  background: var(--card);
   border-radius: 4px;
-  border-left: 3px solid;
-}
-
-.log-entry.init {
-  background: rgba(126,232,250,0.05);
-  border-left-color: var(--accent);
-  color: var(--accent);
-}
-
-.log-entry.find {
-  background: rgba(255,209,102,0.05);
-  border-left-color: var(--yellow);
-  color: var(--yellow);
-}
-
-.log-entry.reverse {
-  background: rgba(57,217,138,0.05);
-  border-left-color: var(--green);
-  color: var(--green);
-}
-
-.log-entry.merge {
-  background: rgba(78,168,222,0.05);
-  border-left-color: var(--blue);
-  color: var(--blue);
-}
-
-.log-entry.done {
-  background: rgba(201,160,255,0.05);
-  border-left-color: var(--purple);
-  color: var(--purple);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  font-family: 'Fira Code', monospace;
 }
 
 .ls {
   color: var(--muted);
-  margin-right: 6px;
-  font-weight: 700;
+  margin-right: 0.4rem;
 }
+
+.log-entry.init { border-left-color: var(--blue); }
+.log-entry.find { border-left-color: var(--yellow); }
+.log-entry.reverse { border-left-color: var(--green); }
+.log-entry.merge { border-left-color: var(--blue); }
+.log-entry.done { border-left-color: var(--purple); }
+
+/* INTUITION PANEL STYLES */
+.intuit-content {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.intuit-content::-webkit-scrollbar { width: 8px; }
+.intuit-content::-webkit-scrollbar-track { background: var(--surface); }
+.intuit-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.stage {
+  margin-bottom: 1.5rem;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.stage.active { opacity: 1; }
+.stage.past { opacity: 0.6; }
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.stage-num {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--accent);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.stage.active .stage-num {
+  border-color: var(--accent);
+  background: var(--hl);
+}
+
+.stage-title {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.thought-bubble {
+  background: rgba(126,232,250,0.08);
+  border-left: 3px solid var(--accent);
+  padding: 0.65rem 0.85rem;
+  border-radius: 5px;
+  margin: 0.65rem 0;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 0.88rem;
+}
+
+.thought-bubble::before {
+  content: '💭 ';
+  font-style: normal;
+}
+
+.stage-content {
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+  font-size: 0.88rem;
+}
+
+.stage-content p {
+  margin-bottom: 0.5rem;
+}
+
+.stage-content ul {
+  margin-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.stage-content li {
+  margin-bottom: 0.35rem;
+}
+
+.stage-content strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.stage-content code {
+  background: var(--card);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85em;
+  color: var(--yellow);
+}
+
+.key-insight {
+  background: rgba(57,217,138,0.08);
+  border-left: 3px solid var(--green);
+  padding: 0.65rem 0.85rem;
+  border-radius: 5px;
+  margin-top: 0.65rem;
+}
+
+.key-insight-title {
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.key-insight-title::before {
+  content: '💡';
+}
+
+.key-insight-text {
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 0.88rem;
+}
+
+.intuit-viz-area {
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.intuit-viz-area::-webkit-scrollbar { width: 8px; }
+.intuit-viz-area::-webkit-scrollbar-track { background: var(--surface); }
+.intuit-viz-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.demo-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem;
+}
+
+.demo-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.65rem;
+  font-size: 0.9rem;
+}
+
+.intuit-nav {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.intuit-nav button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.4rem 0.85rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.intuit-nav button:hover { background: var(--border); }
+.intuit-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.intuit-nav .stage-info {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.approach-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem;
+  transition: all 0.2s;
+  margin-bottom: 0.65rem;
+}
+
+.approach-card.rejected {
+  border-color: rgba(255,92,92,0.3);
+  background: rgba(255,92,92,0.05);
+}
+
+.approach-card.chosen {
+  border-color: rgba(57,217,138,0.5);
+  background: rgba(57,217,138,0.05);
+}
+
+.approach-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.approach-card.rejected .approach-title {
+  color: var(--red);
+}
+
+.approach-card.chosen .approach-title {
+  color: var(--green);
+}
+
+.approach-detail {
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 0.84rem;
+}
+
+.approach-detail div {
+  margin-bottom: 0.35rem;
+}
+
+.list-viz {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.node-box {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  min-width: 50px;
+  text-align: center;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.node-box.slow-ptr { border-color: var(--yellow); box-shadow: 0 0 10px rgba(255,209,102,0.25); }
+.node-box.fast-ptr { border-color: var(--purple); box-shadow: 0 0 10px rgba(201,160,255,0.25); }
+.node-box.first-ptr { border-color: var(--blue); box-shadow: 0 0 10px rgba(78,168,222,0.25); }
+.node-box.second-ptr { border-color: var(--green); box-shadow: 0 0 10px rgba(57,217,138,0.25); }
+
+.node-val {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.node-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.ptr-label {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
+.ptr-label.slow { color: var(--yellow); border-color: var(--yellow); }
+.ptr-label.fast { color: var(--purple); border-color: var(--purple); }
+.ptr-label.first { color: var(--blue); border-color: var(--blue); }
+.ptr-label.second { color: var(--green); border-color: var(--green); }
 </style>
 </head>
 <body>
 <header>
-  <span class="h-num">143</span>
-  <span class="h-title">Reorder List - Detailed Memory Visualization</span>
-  <span class="h-badge">Medium</span>
-  <div class="h-right">
-    <input type="text" id="listInp" class="inp" value="1,2,3,4,5" placeholder="e.g. 1,2,3,4,5"/>
-    <button class="btn btn-g" onclick="init()">Run</button>
+  <div class="h-top">
+    <span class="h-num">143.</span>
+    <span class="h-title">Reorder List</span>
+    <span class="h-badge">MEDIUM</span>
+    <div class="h-right">
+      <input type="text" id="listInp" class="inp" placeholder="e.g., 1,2,3,4,5" value="1,2,3,4,5"/>
+      <button onclick="app.init()" class="btn btn-g">Reset</button>
+    </div>
+  </div>
+  
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn" id="btnIntuitMode" onclick="app.setMode('intuition')">
+      💡 Intuition & Thought Process
+    </button>
+    <button class="mode-btn active" id="btnExecMode" onclick="app.setMode('execution')">
+      ▶️ Step-by-Step Execution
+    </button>
   </div>
 </header>
 
-<main>
-  <div class="code-panel">
-    <div class="panel-label">📝 Algorithm Code</div>
-    <div class="code-scroll">      <div class="code-line" data-line="1">
-        <span class="ln">1</span>
-        <span class="ct"><span class="kw">def</span> <span class="fn">reorderList</span>(head):</span>
-      </div>
-      <div class="code-line" data-line="2">
-        <span class="ln">2</span>
-        <span class="ct">    <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
-      </div>
-      <div class="code-line" data-line="3">
-        <span class="ln">3</span>
-        <span class="ct">        <span class="kw">return</span></span>
-      </div>
-      <div class="code-line" data-line="4">
-        <span class="ln">4</span>
-        <span class="ct">    </span>
-      </div>
-      <div class="code-line" data-line="5">
-        <span class="ln">5</span>
-        <span class="ct">    <span class="cm"># Phase 1: Find middle</span></span>
-      </div>
-      <div class="code-line" data-line="6">
-        <span class="ln">6</span>
-        <span class="ct">    <span class="cm"># Initialize pointers</span></span>
-      </div>
-      <div class="code-line" data-line="7">
-        <span class="ln">7</span>
-        <span class="ct">    slow, fast <span class="op">=</span> head, head</span>
-      </div>
-      <div class="code-line" data-line="8">
-        <span class="ln">8</span>
-        <span class="ct">    <span class="cm"># Move slow by 1, fast by 2</span></span>
-      </div>
-      <div class="code-line" data-line="9">
-        <span class="ln">9</span>
-        <span class="ct">    <span class="kw">while</span> fast.next <span class="kw">and</span> fast.next.next:</span>
-      </div>
-      <div class="code-line" data-line="10">
-        <span class="ln">10</span>
-        <span class="ct">        slow <span class="op">=</span> slow.next</span>
-      </div>
-      <div class="code-line" data-line="11">
-        <span class="ln">11</span>
-        <span class="ct">        fast <span class="op">=</span> fast.next.next</span>
-      </div>
-      <div class="code-line" data-line="12">
-        <span class="ln">12</span>
-        <span class="ct">    </span>
-      </div>
-      <div class="code-line" data-line="13">
-        <span class="ln">13</span>
-        <span class="ct">    <span class="cm"># Phase 2: Reverse second half</span></span>
-      </div>
-      <div class="code-line" data-line="14">
-        <span class="ln">14</span>
-        <span class="ct">    second <span class="op">=</span> slow.next</span>
-      </div>
-      <div class="code-line" data-line="15">
-        <span class="ln">15</span>
-        <span class="ct">    slow.next <span class="op">=</span> <span class="kw">None</span></span>
-      </div>
-      <div class="code-line" data-line="16">
-        <span class="ln">16</span>
-        <span class="ct">    prev <span class="op">=</span> <span class="kw">None</span></span>
-      </div>
-      <div class="code-line" data-line="17">
-        <span class="ln">17</span>
-        <span class="ct">    <span class="cm"># Reverse the second half</span></span>
-      </div>
-      <div class="code-line" data-line="18">
-        <span class="ln">18</span>
-        <span class="ct">    <span class="kw">while</span> second:</span>
-      </div>
-      <div class="code-line" data-line="19">
-        <span class="ln">19</span>
-        <span class="ct">        temp <span class="op">=</span> second.next</span>
-      </div>
-      <div class="code-line" data-line="20">
-        <span class="ln">20</span>
-        <span class="ct">        second.next <span class="op">=</span> prev</span>
-      </div>
-      <div class="code-line" data-line="21">
-        <span class="ln">21</span>
-        <span class="ct">        prev <span class="op">=</span> second</span>
-      </div>
-      <div class="code-line" data-line="22">
-        <span class="ln">22</span>
-        <span class="ct">        second <span class="op">=</span> temp</span>
-      </div>
-      <div class="code-line" data-line="23">
-        <span class="ln">23</span>
-        <span class="ct">    </span>
-      </div>
-      <div class="code-line" data-line="24">
-        <span class="ln">24</span>
-        <span class="ct">    <span class="cm"># Phase 3: Merge alternately</span></span>
-      </div>
-      <div class="code-line" data-line="25">
-        <span class="ln">25</span>
-        <span class="ct">    first, second <span class="op">=</span> head, prev</span>
-      </div>
-      <div class="code-line" data-line="26">
-        <span class="ln">26</span>
-        <span class="ct">    <span class="kw">while</span> second:</span>
-      </div>
-      <div class="code-line" data-line="27">
-        <span class="ln">27</span>
-        <span class="ct">        temp1, temp2 <span class="op">=</span> first.next, second.next</span>
-      </div>
-      <div class="code-line" data-line="28">
-        <span class="ln">28</span>
-        <span class="ct">        first.next <span class="op">=</span> second</span>
-      </div>
-      <div class="code-line" data-line="29">
-        <span class="ln">29</span>
-        <span class="ct">        second.next <span class="op">=</span> temp1</span>
-      </div>
-      <div class="code-line" data-line="30">
-        <span class="ln">30</span>
-        <span class="ct">        first, second <span class="op">=</span> temp1, temp2</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="viz-panel">
-    <div class="panel-label">🔍 Memory Visualization</div>
-    <div class="viz-content" id="vizContent"></div>
-    <div class="bot">
-      <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
-      <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
-      <button id="btnNext" onclick="stepFwd()">Next ►</button>
-      <span class="step-info" id="stepInfo">0 / 0</span>
-      <div class="spd-wrap">
-        <label>Speed</label>
-        <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="log-panel">
-    <div class="panel-label">📋 Execution Log</div>
-    <div class="log-scroll" id="logScroll"></div>
-  </div>
+<main id="mainContent">
+  <!-- Content will be rendered here based on mode -->
 </main>
 
 <script>
@@ -797,503 +950,1424 @@ class ListNode {
   constructor(val, next = null, addr = null) {
     this.val = val;
     this.next = next;
-    this.addr = addr; // Memory address
+    this.addr = addr;
   }
 }
 
-let steps = [];
-let cursor = 0;
-let playing = false;
-let playTimer = null;
-
-function init() {
-  const inp = document.getElementById('listInp').value.trim();
-  const vals = inp.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-  
-  if (vals.length === 0) {
-    alert('Please enter valid comma-separated numbers');
-    return;
-  }
-  
-  steps = buildSteps(vals);
-  cursor = 0;
-  playing = false;
-  clearTimeout(playTimer);
-  document.getElementById('btnPlay').textContent = '▶ Play';
-  document.getElementById('logScroll').innerHTML = '';
-  
-  renderStep(0);
-  addLog(0, steps[0].log);
-  updateStepInfo();
-}
-
-function buildSteps(vals) {
-  const steps = [];
-  
-  // Create linked list with memory addresses
-  let head = new ListNode(vals[0], null, `0x${(1000).toString(16).toUpperCase()}`);
-  let curr = head;
-  let nodes = [head];
-  
-  for (let i = 1; i < vals.length; i++) {
-    curr.next = new ListNode(vals[i], null, `0x${(1000 + i * 8).toString(16).toUpperCase()}`);
-    curr = curr.next;
-    nodes.push(curr);
-  }
-  
-  function snap(line, op, desc, logType, logText, phase, vars = {}, changed = [], heapRefs = {}) {
-    // Clone nodes state
-    const nodesState = nodes.map(n => ({
-      val: n.val,
-      addr: n.addr,
-      next: n.next ? n.next.addr : null,
-      nextVal: n.next ? n.next.val : null
-    }));
+class App {
+  constructor() {
+    this.mode = 'execution';
+    this.execCursor = 0;
+    this.intuitCursor = 0;
+    this.playing = false;
+    this.playTimer = null;
+    this.execSteps = [];
     
-    steps.push({
-      line,
-      operation: op,
-      description: desc,
-      log: { type: logType, text: logText },
-      phase,
-      variables: { ...vars },
-      changed,
-      nodes: nodesState,
-      heapRefs
-    });
-  }
-  
-  // Initial state
-  snap(2, 'INITIALIZATION', 'Starting reorder process with linked list', 
-    'init', 'Initialize with original list', 'init',
-    { head: { addr: head.addr, val: head.val } }, [], {});
-  
-  // Phase 1: Find middle
-  snap(7, 'VARIABLE ASSIGNMENT', 'Initialize slow and fast pointers to head',
-    'find', 'slow = head, fast = head', 'find',
-    { 
-      head: { addr: head.addr, val: head.val },
-      slow: { addr: head.addr, val: head.val },
-      fast: { addr: head.addr, val: head.val }
-    }, 
-    ['slow', 'fast'],
-    { slow: head.addr, fast: head.addr });
-  
-  let slow = head, fast = head;
-  
-  while (fast.next && fast.next.next) {
-    slow = slow.next;
-    fast = fast.next.next;
-    
-    snap(10, 'POINTER UPDATE', `Move slow to node ${slow.val}, fast to node ${fast.val}`,
-      'find', `slow = slow.next (→${slow.val}), fast = fast.next.next (→${fast.val})`, 'find',
+    this.intuitionStages = [
       {
-        head: { addr: head.addr, val: head.val },
-        slow: { addr: slow.addr, val: slow.val },
-        fast: { addr: fast.addr, val: fast.val }
+        title: "Stage 1: Understanding the Problem",
+        thought: "Hmm, reorder means L₀→L₁→L₂→...→Lₙ becomes L₀→Lₙ→L₁→Lₙ₋₁→L₂→Lₙ₋₂... That's alternating from both ends!",
+        content: `<p>The reordering pattern shows we need to:</p>
+        
+        <ul>
+          <li>Take the first node, then the last node</li>
+          <li>Then the second node, then the second-to-last node</li>
+          <li>Continue alternating until we've used all nodes</li>
+        </ul>
+        
+        <p><strong>The challenge:</strong> In a singly linked list, we can only move forward. We can't easily access "the last node" or "second-to-last node" without traversing from the start each time.</p>
+        
+        <p><strong>Key observation:</strong> If we could reverse the second half of the list, then we'd have two lists pointing in opposite directions that we could merge alternately!</p>`,
+        insight: "The trick is to transform the problem: instead of trying to reach backwards, we can reverse the second half and then merge two forward-moving pointers.",
+        visualization: "problem"
       },
-      ['slow', 'fast'],
-      { slow: slow.addr, fast: fast.addr });
-  }
-  
-  snap(14, 'POINTER ASSIGNMENT', 'Store reference to second half',
-    'reverse', `second = slow.next (→${slow.next ? slow.next.val : 'null'})`, 'reverse',
-    {
-      head: { addr: head.addr, val: head.val },
-      slow: { addr: slow.addr, val: slow.val },
-      second: slow.next ? { addr: slow.next.addr, val: slow.next.val } : null
-    },
-    ['second'],
-    { slow: slow.addr, second: slow.next ? slow.next.addr : null });
-  
-  let second = slow.next;
-  
-  // Break the link
-  slow.next = null;
-  snap(15, 'LINK MODIFICATION', 'Break the list at middle',
-    'reverse', 'slow.next = None (split the list)', 'reverse',
-    {
-      head: { addr: head.addr, val: head.val },
-      slow: { addr: slow.addr, val: slow.val },
-      second: second ? { addr: second.addr, val: second.val } : null
-    },
-    [],
-    { slow: slow.addr, second: second ? second.addr : null });
-  
-  snap(16, 'VARIABLE INITIALIZATION', 'Initialize prev to None for reversal',
-    'reverse', 'prev = None', 'reverse',
-    {
-      head: { addr: head.addr, val: head.val },
-      slow: { addr: slow.addr, val: slow.val },
-      second: second ? { addr: second.addr, val: second.val } : null,
-      prev: null
-    },
-    ['prev'],
-    { slow: slow.addr, second: second ? second.addr : null, prev: null });
-  
-  let prev = null;
-  
-  // Reverse second half
-  while (second) {
-    const temp = second.next;
-    
-    snap(19, 'BACKUP POINTER', 'Store next pointer before modifying',
-      'reverse', `temp = second.next (→${temp ? temp.val : 'null'})`, 'reverse',
-      {
-        head: { addr: head.addr, val: head.val },
-        second: { addr: second.addr, val: second.val },
-        prev: prev ? { addr: prev.addr, val: prev.val } : null,
-        temp: temp ? { addr: temp.addr, val: temp.val } : null
-      },
-      ['temp'],
-      { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
-    
-    second.next = prev;
-    snap(20, 'REVERSE LINK', `Reverse: node ${second.val} now points to ${prev ? prev.val : 'null'}`,
-      'reverse', `second.next = prev (reverse the link)`, 'reverse',
-      {
-        head: { addr: head.addr, val: head.val },
-        second: { addr: second.addr, val: second.val },
-        prev: prev ? { addr: prev.addr, val: prev.val } : null,
-        temp: temp ? { addr: temp.addr, val: temp.val } : null
-      },
-      [],
-      { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
-    
-    prev = second;
-    snap(21, 'MOVE PREV', `Advance prev to node ${prev.val}`,
-      'reverse', `prev = second (→${prev.val})`, 'reverse',
-      {
-        head: { addr: head.addr, val: head.val },
-        second: { addr: second.addr, val: second.val },
-        prev: { addr: prev.addr, val: prev.val },
-        temp: temp ? { addr: temp.addr, val: temp.val } : null
-      },
-      ['prev'],
-      { second: second.addr, prev: prev.addr, temp: temp ? temp.addr : null });
-    
-    second = temp;
-    snap(22, 'MOVE SECOND', `Advance second to ${second ? 'node ' + second.val : 'null'}`,
-      'reverse', `second = temp (→${second ? second.val : 'null'})`, 'reverse',
-      {
-        head: { addr: head.addr, val: head.val },
-        second: second ? { addr: second.addr, val: second.val } : null,
-        prev: { addr: prev.addr, val: prev.val },
-        temp: null
-      },
-      ['second'],
-      { second: second ? second.addr : null, prev: prev.addr });
-  }
-  
-  second = prev;
-  snap(25, 'PREPARE MERGE', 'Initialize first and second for merging',
-    'merge', `first = head, second = prev (reversed half)`, 'merge',
-    {
-      head: { addr: head.addr, val: head.val },
-      first: { addr: head.addr, val: head.val },
-      second: { addr: second.addr, val: second.val },
-      prev: { addr: prev.addr, val: prev.val }
-    },
-    ['first', 'second'],
-    { first: head.addr, second: second.addr });
-  
-  let first = head;
-  
-  while (second) {
-    const temp1 = first.next;
-    const temp2 = second.next;
-    
-    snap(27, 'STORE NEXT POINTERS', 'Backup next pointers before reconnecting',
-      'merge', `temp1 = first.next, temp2 = second.next`, 'merge',
-      {
-        head: { addr: head.addr, val: head.val },
-        first: { addr: first.addr, val: first.val },
-        second: { addr: second.addr, val: second.val },
-        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
-        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
-      },
-      ['temp1', 'temp2'],
-      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
-    
-    first.next = second;
-    snap(28, 'CONNECT FIRST→SECOND', `Link node ${first.val} → ${second.val}`,
-      'merge', `first.next = second`, 'merge',
-      {
-        head: { addr: head.addr, val: head.val },
-        first: { addr: first.addr, val: first.val },
-        second: { addr: second.addr, val: second.val },
-        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
-        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
-      },
-      [],
-      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
-    
-    second.next = temp1;
-    snap(29, 'CONNECT SECOND→TEMP1', `Link node ${second.val} → ${temp1 ? temp1.val : 'null'}`,
-      'merge', `second.next = temp1`, 'merge',
-      {
-        head: { addr: head.addr, val: head.val },
-        first: { addr: first.addr, val: first.val },
-        second: { addr: second.addr, val: second.val },
-        temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
-        temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
-      },
-      [],
-      { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
-    
-    first = temp1;
-    second = temp2;
-    
-    snap(30, 'ADVANCE POINTERS', `Move to next pair: first=${first ? first.val : 'null'}, second=${second ? second.val : 'null'}`,
-      'merge', `first = temp1, second = temp2`, 'merge',
-      {
-        head: { addr: head.addr, val: head.val },
-        first: first ? { addr: first.addr, val: first.val } : null,
-        second: second ? { addr: second.addr, val: second.val } : null
-      },
-      ['first', 'second'],
-      { first: first ? first.addr : null, second: second ? second.addr : null });
-  }
-  
-  // Get final result
-  let result = [];
-  curr = head;
-  while (curr) {
-    result.push(curr.val);
-    curr = curr.next;
-  }
-  
-  snap(30, 'COMPLETE', 'List reordering complete',
-    'done', `Final: [${result.join(', ')}]`, 'done',
-    { head: { addr: head.addr, val: head.val } },
-    [],
-    {});
-  
-  return steps;
-}
-
-function renderStep(idx) {
-  const s = steps[idx];
-  const viz = document.getElementById('vizContent');
-  
-  // Highlight active line
-  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
-  const activeLine = document.querySelector(`[data-line="${s.line}"]`);
-  if (activeLine) activeLine.classList.add('active');
-  
-  let html = '';
-  
-  // Phase badge
-  let phaseName = s.phase === 'init' ? 'init' : s.phase === 'find' ? 'find' : s.phase === 'reverse' ? 'reverse' : s.phase === 'merge' ? 'merge' : 'done';
-  html += `<div class="phase-badge ${phaseName}">
-    ${s.phase === 'init' ? '🚀 INITIALIZATION' : s.phase === 'find' ? '🎯 PHASE 1: FIND MIDDLE' : s.phase === 'reverse' ? '🔄 PHASE 2: REVERSE' : s.phase === 'merge' ? '🔗 PHASE 3: MERGE' : '✅ COMPLETE'}
-  </div>`;
-  
-  // Operation description
-  html += `<div class="operation-box">
-    <div class="op-title">${s.operation}</div>
-    <div class="op-desc">${s.description}</div>
-  </div>`;
-  
-  // Stack Variables (Local Variables)
-  html += `<div class="memory-section">
-    <div class="section-title"><span class="section-icon">📦</span> Stack Frame (Local Variables)</div>
-    <div class="stack-grid">`;
-  
-  const varOrder = ['head', 'slow', 'fast', 'first', 'second', 'prev', 'temp', 'temp1', 'temp2'];
-  const varColors = {
-    slow: 'slow',
-    fast: 'fast',
-    first: 'first',
-    second: 'second',
-    prev: 'prev',
-    temp: 'temp',
-    temp1: 'temp',
-    temp2: 'temp'
-  };
-  
-  varOrder.forEach(varName => {
-    if (s.variables[varName] !== undefined) {
-      const v = s.variables[varName];
-      const isChanged = s.changed.includes(varName);
-      const colorClass = varColors[varName] || '';
       
-      html += `<div class="stack-var ${isChanged ? 'changed' : ''}">
-        <div class="var-name">${varName}</div>
-        <div class="var-value ${v === null ? 'null' : colorClass}">`;
+      {
+        title: "Stage 2: The Three-Phase Strategy",
+        thought: "I need to split this into manageable steps. First find the middle, then reverse one half, then merge. That's three distinct operations!",
+        content: `<p>Breaking down the solution into three phases:</p>
+        
+        <p><strong>Phase 1: Find the Middle</strong><br>
+        Split the list into two halves at the midpoint. For odd-length lists, the first half gets the extra node.</p>
+        
+        <p><strong>Phase 2: Reverse Second Half</strong><br>
+        Reverse the second half so it points backwards. Now both halves point "outward" from the middle.</p>
+        
+        <p><strong>Phase 3: Merge Alternately</strong><br>
+        Weave the two halves together by alternating nodes from each half.</p>
+        
+        <p>Example: <code>[1,2,3,4,5]</code></p>
+        <ul>
+          <li>After Phase 1: <code>[1,2,3]</code> and <code>[4,5]</code></li>
+          <li>After Phase 2: <code>[1,2,3]</code> and <code>[5,4]</code> (reversed)</li>
+          <li>After Phase 3: <code>[1,5,2,4,3]</code></li>
+        </ul>`,
+        insight: "Divide and conquer! Each phase has a single, clear responsibility. This makes the algorithm easier to implement and debug.",
+        visualization: "phases"
+      },
       
-      if (v === null) {
-        html += 'null';
-      } else {
-        html += `<span class="ptr-arrow">→</span> Node(${v.val})`;
-      }
+      {
+        title: "Stage 3: Phase 1 - Finding the Middle with Two Pointers",
+        thought: "How do I find the middle in one pass? If one pointer moves twice as fast... when the fast one reaches the end, the slow one will be at the middle!",
+        content: `<p>The <strong>two-pointer technique</strong> (slow/fast) finds the middle efficiently:</p>
+        
+        <p><strong>Initial setup:</strong></p>
+        <ul>
+          <li><code>slow = head</code> — moves 1 step at a time</li>
+          <li><code>fast = head</code> — moves 2 steps at a time</li>
+        </ul>
+        
+        <p><strong>Why initialize both at head?</strong> We want <code>slow</code> to land at the end of the first half. Starting both at the same position creates the right offset.</p>
+        
+        <p><strong>The loop condition:</strong> <code>while fast.next and fast.next.next</code></p>
+        <ul>
+          <li>Checks <code>fast.next</code> to ensure we can move fast forward once</li>
+          <li>Checks <code>fast.next.next</code> to ensure we can move fast forward twice</li>
+          <li>When this fails, <code>slow</code> is at the last node of the first half</li>
+        </ul>
+        
+        <p><strong>For even length [1,2,3,4]:</strong> slow ends at 2, fast at 4</p>
+        <p><strong>For odd length [1,2,3,4,5]:</strong> slow ends at 3, fast at 5</p>`,
+        insight: "The fast pointer acts as a 'scout' that travels at 2x speed. When it reaches the end, the slow pointer is guaranteed to be at the middle — no counting needed!",
+        visualization: "findmiddle"
+      },
       
-      html += `</div>`;
-      
-      if (v !== null) {
-        html += `<div class="mem-addr">${v.addr}</div>`;
-      }
-      
-      html += `</div>`;
-    }
-  });
-  
-  html += `</div></div>`;
-  
-  // Heap Memory (Linked List Nodes)
-  html += `<div class="memory-section">
-    <div class="section-title"><span class="section-icon">🗄️</span> Heap Memory (ListNode Objects)</div>
-    <div class="heap-container">`;
-  
-  html += `<div class="heap-row">`;
-  
-  s.nodes.forEach((node, idx) => {
-    // Determine which variables reference this node
-    let refs = [];
-    if (s.heapRefs.slow === node.addr) refs.push('slow');
-    if (s.heapRefs.fast === node.addr) refs.push('fast');
-    if (s.heapRefs.first === node.addr) refs.push('first');
-    if (s.heapRefs.second === node.addr) refs.push('second');
-    if (s.heapRefs.prev === node.addr) refs.push('prev');
-    if (s.heapRefs.temp === node.addr) refs.push('temp');
-    if (s.heapRefs.temp1 === node.addr) refs.push('temp1');
-    if (s.heapRefs.temp2 === node.addr) refs.push('temp2');
-    
-    let nodeClass = 'heap-node';
-    if (refs.length > 0) {
-      nodeClass += ' highlighted';
-      refs.forEach(ref => {
-        if (ref === 'slow') nodeClass += ' slow-ref';
-        else if (ref === 'fast') nodeClass += ' fast-ref';
-        else if (ref === 'first') nodeClass += ' first-ref';
-        else if (ref === 'second') nodeClass += ' second-ref';
-        else if (ref === 'prev') nodeClass += ' prev-ref';
-        else nodeClass += ' temp-ref';
-      });
-    }
-    
-    html += `<div class="${nodeClass}" style="position: relative; margin-top: ${refs.length > 0 ? '24px' : '0'};">`;
-    
-    // Reference labels
-    if (refs.length > 0) {
-      html += `<div class="ref-labels">`;
-      refs.forEach(ref => {
-        const refClass = ref === 'temp1' || ref === 'temp2' ? 'temp' : ref;
-        html += `<span class="ref-tag ${refClass}">${ref}</span>`;
-      });
-      html += `</div>`;
-    }
-    
-    html += `<div class="node-addr">${node.addr}</div>
-      <div class="node-content">
-        <div class="node-field">
-          <div class="field-label">val</div>
-          <div class="field-value">${node.val}</div>
+      {
+        title: "Stage 4: Phase 2 - Why These Variables for Reversal?",
+        thought: "To reverse a linked list, I need to redirect pointers. But I can't lose track of where I'm going next...",
+        content: `<p><strong>The reversal needs three variables:</strong></p>
+        
+        <p><strong>1. <code>second = slow.next</code></strong><br>
+        This is where the second half begins. We start reversing from here.</p>
+        
+        <p><strong>2. <code>slow.next = None</code></strong><br>
+        Break the connection! This separates the two halves. Now the first half ends cleanly at <code>slow</code>.</p>
+        
+        <p><strong>3. <code>prev = None</code></strong><br>
+        The reversed list will end with <code>None</code>. Initially, there's nothing behind us, so <code>prev</code> starts as <code>None</code>.</p>
+        
+        <p><strong>The reversal loop pattern:</strong></p>
+        <div style="background: var(--card); padding: 0.65rem; border-radius: 5px; font-family: 'Fira Code', monospace; margin: 0.5rem 0; font-size: 0.8rem;">
+while second:<br>
+&nbsp;&nbsp;temp = second.next&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Save next before we lose it<br>
+&nbsp;&nbsp;second.next = prev&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Reverse the pointer<br>
+&nbsp;&nbsp;prev = second&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move prev forward<br>
+&nbsp;&nbsp;second = temp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to next node
         </div>
-        <div class="node-field">
-          <div class="field-label">next</div>
-          <div class="field-value ${node.next ? 'ptr' : 'null-ptr'}">
-            ${node.next ? node.next : 'null'}
+        
+        <p><strong>Why <code>temp</code>?</strong> Once we change <code>second.next</code> to point backwards, we lose the reference to the rest of the list. <code>temp</code> saves it before we modify anything.</p>`,
+        insight: "Reversing requires exactly three pointers: where we are (second), where we came from (prev), and where we're going (temp). It's like walking backwards while holding the hand of the person behind you.",
+        visualization: "reverse"
+      },
+      
+      {
+        title: "Stage 5: Phase 3 - The Merge Strategy",
+        thought: "Now I have two lists: [1,2,3] and [5,4]. I need to interleave them. But I can't lose track of either list while rewiring!",
+        content: `<p><strong>Initial setup for merging:</strong></p>
+        
+        <p><strong><code>first = head</code></strong><br>
+        Start of the original first half. This hasn't changed.</p>
+        
+        <p><strong><code>second = prev</code></strong><br>
+        After reversal, <code>prev</code> points to what's now the head of the reversed second half. This is our second list.</p>
+        
+        <p><strong>Why loop <code>while second</code>?</strong><br>
+        The second half is always shorter or equal length. When we run out of <code>second</code> nodes, we're done. The first half's tail can just stay where it is.</p>
+        
+        <p><strong>The merge pattern requires two temps:</strong></p>
+        <div style="background: var(--card); padding: 0.65rem; border-radius: 5px; font-family: 'Fira Code', monospace; margin: 0.5rem 0; font-size: 0.8rem;">
+temp1 = first.next&nbsp;&nbsp;&nbsp;# Save first's next<br>
+temp2 = second.next&nbsp;&nbsp;# Save second's next<br>
+first.next = second&nbsp;&nbsp;# Connect first → second<br>
+second.next = temp1&nbsp;&nbsp;# Connect second → temp1<br>
+first = temp1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Advance first<br>
+second = temp2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Advance second
+        </div>
+        
+        <p><strong>Why both <code>temp1</code> and <code>temp2</code>?</strong><br>
+        We're rewiring <em>both</em> <code>first.next</code> and <code>second.next</code>, so we need to save both original next pointers before we modify anything.</p>`,
+        insight: "Merging is like a zipper: first→second→first→second. We need both temps because we're changing two pointers and can't afford to lose either reference.",
+        visualization: "merge"
+      },
+      
+      {
+        title: "Stage 6: Why Not Other Approaches?",
+        thought: "Could I solve this differently? Let me think through alternatives...",
+        content: `<p>Let's evaluate other approaches:</p>
+        
+        <div style="margin-top: 0.65rem;">
+          <p><strong>❌ Approach 1: Use an Array</strong></p>
+          <ul>
+            <li>Convert list → array</li>
+            <li>Rebuild list using array indices</li>
+            <li><strong>Problem:</strong> O(n) extra space</li>
+            <li>Violates the constraint if asked for O(1) space</li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: 0.65rem;">
+          <p><strong>❌ Approach 2: Stack for Reversal</strong></p>
+          <ul>
+            <li>Push second half onto stack</li>
+            <li>Pop and merge with first half</li>
+            <li><strong>Problem:</strong> O(n) extra space for stack</li>
+            <li>Same space issue as array approach</li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: 0.65rem;">
+          <p><strong>✅ Approach 3: In-place Reversal + Merge</strong></p>
+          <ul>
+            <li>No extra space (O(1))</li>
+            <li>One pass to find middle</li>
+            <li>One pass to reverse</li>
+            <li>One pass to merge</li>
+            <li>Total: O(n) time, O(1) space — optimal!</li>
+          </ul>
+        </div>`,
+        insight: "The three-phase approach is optimal: O(n) time with O(1) space. Any solution that copies the list to another data structure uses extra space unnecessarily.",
+        visualization: "approaches"
+      },
+      
+      {
+        title: "Stage 7: Edge Cases and Why They Work",
+        thought: "What about edge cases? Empty list? Single node? Two nodes?",
+        content: `<p><strong>Edge Case 1: Empty list or single node</strong></p>
+        <div style="background: var(--card); padding: 0.65rem; border-radius: 5px; font-family: 'Fira Code', monospace; margin: 0.5rem 0; font-size: 0.8rem;">
+if not head or not head.next:<br>
+&nbsp;&nbsp;return
+        </div>
+        <p>Nothing to reorder! Early return saves us from edge case bugs.</p>
+        
+        <p><strong>Edge Case 2: Two nodes [1,2]</strong></p>
+        <ul>
+          <li>Phase 1: slow=1, fast=2 (loop doesn't run)</li>
+          <li>Phase 2: second=2, reverse to get [2]</li>
+          <li>Phase 3: merge gives [1,2] — unchanged!</li>
+        </ul>
+        
+        <p><strong>Edge Case 3: Three nodes [1,2,3]</strong></p>
+        <ul>
+          <li>Phase 1: slow ends at 2</li>
+          <li>Phase 2: reverse [3] → still [3]</li>
+          <li>Phase 3: [1,2] merge [3] → [1,3,2]</li>
+        </ul>
+        
+        <p><strong>Edge Case 4: Even vs odd length</strong></p>
+        <p>Even [1,2,3,4]: splits to [1,2] and [4,3]<br>
+        Odd [1,2,3,4,5]: splits to [1,2,3] and [5,4]</p>
+        <p>Both work! The first half gets the extra node in odd-length lists, which is exactly what we want for the merge to work cleanly.</p>`,
+        insight: "The algorithm handles edge cases naturally because each phase is robust: two-pointer works for any length, reversal works for single nodes, and merge stops when the shorter list ends.",
+        visualization: "edgecases"
+      },
+      
+      {
+        title: "Stage 8: Time and Space Complexity",
+        thought: "Let me verify this is optimal. Three passes through the list, constant extra space...",
+        content: `<p><strong>Time Complexity: O(n)</strong></p>
+        <ul>
+          <li>Phase 1 (find middle): O(n/2) ≈ O(n)</li>
+          <li>Phase 2 (reverse): O(n/2) ≈ O(n)</li>
+          <li>Phase 3 (merge): O(n/2) ≈ O(n)</li>
+          <li><strong>Total:</strong> O(n) + O(n) + O(n) = O(n)</li>
+        </ul>
+        
+        <p><strong>Space Complexity: O(1)</strong></p>
+        <ul>
+          <li>Only using pointer variables: slow, fast, first, second, prev, temp1, temp2</li>
+          <li>Fixed number of variables regardless of input size</li>
+          <li>No recursion (which would use O(n) stack space)</li>
+          <li>No auxiliary data structures</li>
+        </ul>
+        
+        <p><strong>Can we do better?</strong></p>
+        <p>No! We must visit every node at least once to reorder them, so O(n) time is optimal. We can't use less than O(1) space, so we've achieved the best possible complexity.</p>`,
+        insight: "Three linear passes is still O(n) — constants don't matter in Big-O. The O(1) space is the key achievement that makes this solution optimal.",
+        visualization: "complexity"
+      }
+    ];
+    
+    this.init();
+  }
+  
+  init() {
+    const listStr = document.getElementById('listInp').value;
+    const vals = listStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+    
+    if (vals.length === 0) {
+      alert('Please enter valid comma-separated numbers');
+      return;
+    }
+    
+    this.execCursor = 0;
+    this.intuitCursor = 0;
+    this.playing = false;
+    if (this.playTimer) clearTimeout(this.playTimer);
+    
+    this.execSteps = this.buildExecSteps(vals);
+    this.listVals = vals;
+    
+    this.render();
+  }
+  
+  setMode(mode) {
+    if (this.playing) this.togglePlay();
+    this.mode = mode;
+    
+    document.getElementById('btnIntuitMode').classList.toggle('active', mode === 'intuition');
+    document.getElementById('btnExecMode').classList.toggle('active', mode === 'execution');
+    
+    this.render();
+  }
+  
+  render() {
+    const main = document.getElementById('mainContent');
+    
+    if (this.mode === 'execution') {
+      main.innerHTML = this.renderExecutionMode();
+      this.attachExecListeners();
+      this.renderExecStep(this.execCursor);
+    } else {
+      main.innerHTML = this.renderIntuitionMode();
+      this.attachIntuitListeners();
+      this.updateIntuitStages();
+    }
+  }
+  
+  renderExecutionMode() {
+    return `
+      <div class="exec-layout">
+        <!-- CODE PANEL -->
+        <div class="panel">
+          <div class="panel-hdr">Python Code</div>
+          <div class="panel-body">
+            <div class="code-line" data-line="1">
+              <span class="ln">1</span>
+              <span class="ct"><span class="kw">def</span> <span class="fn">reorderList</span>(head):</span>
+            </div>
+            <div class="code-line" data-line="2">
+              <span class="ln">2</span>
+              <span class="ct">    <span class="kw">if not</span> head <span class="kw">or not</span> head.next:</span>
+            </div>
+            <div class="code-line" data-line="3">
+              <span class="ln">3</span>
+              <span class="ct">        <span class="kw">return</span></span>
+            </div>
+            <div class="code-line" data-line="4">
+              <span class="ln">4</span>
+              <span class="ct">    </span>
+            </div>
+            <div class="code-line" data-line="5">
+              <span class="ln">5</span>
+              <span class="ct">    <span class="cm"># Phase 1: Find middle</span></span>
+            </div>
+            <div class="code-line" data-line="7">
+              <span class="ln">7</span>
+              <span class="ct">    slow, fast <span class="op">=</span> head, head</span>
+            </div>
+            <div class="code-line" data-line="9">
+              <span class="ln">9</span>
+              <span class="ct">    <span class="kw">while</span> fast.next <span class="kw">and</span> fast.next.next:</span>
+            </div>
+            <div class="code-line" data-line="10">
+              <span class="ln">10</span>
+              <span class="ct">        slow <span class="op">=</span> slow.next</span>
+            </div>
+            <div class="code-line" data-line="11">
+              <span class="ln">11</span>
+              <span class="ct">        fast <span class="op">=</span> fast.next.next</span>
+            </div>
+            <div class="code-line" data-line="12">
+              <span class="ln">12</span>
+              <span class="ct">    </span>
+            </div>
+            <div class="code-line" data-line="13">
+              <span class="ln">13</span>
+              <span class="ct">    <span class="cm"># Phase 2: Reverse second half</span></span>
+            </div>
+            <div class="code-line" data-line="14">
+              <span class="ln">14</span>
+              <span class="ct">    second <span class="op">=</span> slow.next</span>
+            </div>
+            <div class="code-line" data-line="15">
+              <span class="ln">15</span>
+              <span class="ct">    slow.next <span class="op">=</span> <span class="kw">None</span></span>
+            </div>
+            <div class="code-line" data-line="16">
+              <span class="ln">16</span>
+              <span class="ct">    prev <span class="op">=</span> <span class="kw">None</span></span>
+            </div>
+            <div class="code-line" data-line="18">
+              <span class="ln">18</span>
+              <span class="ct">    <span class="kw">while</span> second:</span>
+            </div>
+            <div class="code-line" data-line="19">
+              <span class="ln">19</span>
+              <span class="ct">        temp <span class="op">=</span> second.next</span>
+            </div>
+            <div class="code-line" data-line="20">
+              <span class="ln">20</span>
+              <span class="ct">        second.next <span class="op">=</span> prev</span>
+            </div>
+            <div class="code-line" data-line="21">
+              <span class="ln">21</span>
+              <span class="ct">        prev <span class="op">=</span> second</span>
+            </div>
+            <div class="code-line" data-line="22">
+              <span class="ln">22</span>
+              <span class="ct">        second <span class="op">=</span> temp</span>
+            </div>
+            <div class="code-line" data-line="23">
+              <span class="ln">23</span>
+              <span class="ct">    </span>
+            </div>
+            <div class="code-line" data-line="24">
+              <span class="ln">24</span>
+              <span class="ct">    <span class="cm"># Phase 3: Merge alternately</span></span>
+            </div>
+            <div class="code-line" data-line="25">
+              <span class="ln">25</span>
+              <span class="ct">    first, second <span class="op">=</span> head, prev</span>
+            </div>
+            <div class="code-line" data-line="26">
+              <span class="ln">26</span>
+              <span class="ct">    <span class="kw">while</span> second:</span>
+            </div>
+            <div class="code-line" data-line="27">
+              <span class="ln">27</span>
+              <span class="ct">        temp1, temp2 <span class="op">=</span> first.next, second.next</span>
+            </div>
+            <div class="code-line" data-line="28">
+              <span class="ln">28</span>
+              <span class="ct">        first.next <span class="op">=</span> second</span>
+            </div>
+            <div class="code-line" data-line="29">
+              <span class="ln">29</span>
+              <span class="ct">        second.next <span class="op">=</span> temp1</span>
+            </div>
+            <div class="code-line" data-line="30">
+              <span class="ln">30</span>
+              <span class="ct">        first, second <span class="op">=</span> temp1, temp2</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- VIZ PANEL -->
+        <div class="panel viz-panel">
+          <div class="panel-hdr">Memory Visualization</div>
+          <div class="viz-content" id="vizContent"></div>
+          <div class="bot">
+            <button id="btnPrev" onclick="app.stepBack()">◄ Prev</button>
+            <button id="btnPlay" onclick="app.togglePlay()">▶ Play</button>
+            <button id="btnNext" onclick="app.stepFwd()">Next ►</button>
+            <span class="step-info" id="stepInfo">0 / 0</span>
+            <div class="spd-wrap">
+              <label>Speed</label>
+              <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+            </div>
+          </div>
+        </div>
+        
+        <!-- LOG PANEL -->
+        <div class="panel">
+          <div class="panel-hdr">Execution Log</div>
+          <div class="panel-body">
+            <div class="log-scroll" id="logScroll"></div>
           </div>
         </div>
       </div>
-    </div>`;
+    `;
+  }
+  
+  renderIntuitionMode() {
+    return `
+      <div class="intuit-layout">
+        <!-- THOUGHT PROCESS PANEL -->
+        <div class="panel">
+          <div class="panel-hdr">Senior Engineer's Thought Process</div>
+          <div class="intuit-content" id="intuitContent">
+            ${this.intuitionStages.map((stage, i) => `
+              <div class="stage ${i === this.intuitCursor ? 'active' : (i < this.intuitCursor ? 'past' : '')}">
+                <div class="stage-header">
+                  <div class="stage-num">${i + 1}</div>
+                  <div class="stage-title">${stage.title}</div>
+                </div>
+                
+                <div class="thought-bubble">${stage.thought}</div>
+                
+                <div class="stage-content">
+                  ${stage.content}
+                </div>
+                
+                <div class="key-insight">
+                  <div class="key-insight-title">Key Insight</div>
+                  <div class="key-insight-text">${stage.insight}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="intuit-nav">
+            <button id="btnIntuitPrev" onclick="app.intuitPrev()">◄ Previous Stage</button>
+            <button id="btnIntuitNext" onclick="app.intuitNext()">Next Stage ►</button>
+            <span class="stage-info" id="intuitInfo">Stage 1 of ${this.intuitionStages.length}</span>
+          </div>
+        </div>
+        
+        <!-- VISUAL EXPLANATION PANEL -->
+        <div class="panel">
+          <div class="panel-hdr">Visual Explanation</div>
+          <div class="intuit-viz-area" id="intuitViz">
+            <!-- Rendered based on current stage -->
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  buildExecSteps(vals) {
+    const steps = [];
     
-    if (idx < s.nodes.length - 1 && node.next) {
-      html += `<span class="heap-arrow">→</span>`;
+    // Create linked list with memory addresses
+    let head = new ListNode(vals[0], null, `0x${(1000).toString(16).toUpperCase()}`);
+    let curr = head;
+    let nodes = [head];
+    
+    for (let i = 1; i < vals.length; i++) {
+      curr.next = new ListNode(vals[i], null, `0x${(1000 + i * 8).toString(16).toUpperCase()}`);
+      curr = curr.next;
+      nodes.push(curr);
     }
-  });
-  
-  html += `</div>`;
-  html += `</div></div>`;
-  
-  // Result for final step
-  if (s.phase === 'done') {
+    
+    function snap(line, op, desc, logType, logText, phase, vars = {}, changed = [], heapRefs = {}) {
+      const nodesState = nodes.map(n => ({
+        val: n.val,
+        addr: n.addr,
+        next: n.next ? n.next.addr : null,
+        nextVal: n.next ? n.next.val : null
+      }));
+      
+      steps.push({
+        line,
+        operation: op,
+        description: desc,
+        log: { type: logType, text: logText },
+        phase,
+        variables: { ...vars },
+        changed,
+        nodes: nodesState,
+        heapRefs
+      });
+    }
+    
+    // Initial state
+    snap(2, 'INITIALIZATION', 'Starting reorder process with linked list', 
+      'init', 'Initialize with original list', 'init',
+      { head: { addr: head.addr, val: head.val } }, [], {});
+    
+    // Phase 1: Find middle
+    snap(7, 'VARIABLE ASSIGNMENT', 'Initialize slow and fast pointers to head',
+      'find', 'slow = head, fast = head', 'find',
+      { 
+        head: { addr: head.addr, val: head.val },
+        slow: { addr: head.addr, val: head.val },
+        fast: { addr: head.addr, val: head.val }
+      }, 
+      ['slow', 'fast'],
+      { slow: head.addr, fast: head.addr });
+    
+    let slow = head, fast = head;
+    
+    while (fast.next && fast.next.next) {
+      slow = slow.next;
+      fast = fast.next.next;
+      
+      snap(10, 'POINTER UPDATE', `Move slow to node ${slow.val}, fast to node ${fast.val}`,
+        'find', `slow = slow.next (→${slow.val}), fast = fast.next.next (→${fast.val})`, 'find',
+        {
+          head: { addr: head.addr, val: head.val },
+          slow: { addr: slow.addr, val: slow.val },
+          fast: { addr: fast.addr, val: fast.val }
+        },
+        ['slow', 'fast'],
+        { slow: slow.addr, fast: fast.addr });
+    }
+    
+    snap(14, 'POINTER ASSIGNMENT', 'Store reference to second half',
+      'reverse', `second = slow.next (→${slow.next ? slow.next.val : 'null'})`, 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        slow: { addr: slow.addr, val: slow.val },
+        second: slow.next ? { addr: slow.next.addr, val: slow.next.val } : null
+      },
+      ['second'],
+      { slow: slow.addr, second: slow.next ? slow.next.addr : null });
+    
+    let second = slow.next;
+    
+    slow.next = null;
+    snap(15, 'LINK MODIFICATION', 'Break the list at middle',
+      'reverse', 'slow.next = None (split the list)', 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        slow: { addr: slow.addr, val: slow.val },
+        second: second ? { addr: second.addr, val: second.val } : null
+      },
+      [],
+      { slow: slow.addr, second: second ? second.addr : null });
+    
+    snap(16, 'VARIABLE INITIALIZATION', 'Initialize prev to None for reversal',
+      'reverse', 'prev = None', 'reverse',
+      {
+        head: { addr: head.addr, val: head.val },
+        slow: { addr: slow.addr, val: slow.val },
+        second: second ? { addr: second.addr, val: second.val } : null,
+        prev: null
+      },
+      ['prev'],
+      { slow: slow.addr, second: second ? second.addr : null, prev: null });
+    
+    let prev = null;
+    
+    while (second) {
+      const temp = second.next;
+      
+      snap(19, 'BACKUP POINTER', 'Store next pointer before modifying',
+        'reverse', `temp = second.next (→${temp ? temp.val : 'null'})`, 'reverse',
+        {
+          head: { addr: head.addr, val: head.val },
+          second: { addr: second.addr, val: second.val },
+          prev: prev ? { addr: prev.addr, val: prev.val } : null,
+          temp: temp ? { addr: temp.addr, val: temp.val } : null
+        },
+        ['temp'],
+        { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
+      
+      second.next = prev;
+      snap(20, 'REVERSE LINK', `Reverse: node ${second.val} now points to ${prev ? prev.val : 'null'}`,
+        'reverse', `second.next = prev (reverse the link)`, 'reverse',
+        {
+          head: { addr: head.addr, val: head.val },
+          second: { addr: second.addr, val: second.val },
+          prev: prev ? { addr: prev.addr, val: prev.val } : null,
+          temp: temp ? { addr: temp.addr, val: temp.val } : null
+        },
+        [],
+        { second: second.addr, prev: prev ? prev.addr : null, temp: temp ? temp.addr : null });
+      
+      prev = second;
+      snap(21, 'MOVE PREV', `Advance prev to node ${prev.val}`,
+        'reverse', `prev = second (→${prev.val})`, 'reverse',
+        {
+          head: { addr: head.addr, val: head.val },
+          second: { addr: second.addr, val: second.val },
+          prev: { addr: prev.addr, val: prev.val },
+          temp: temp ? { addr: temp.addr, val: temp.val } : null
+        },
+        ['prev'],
+        { second: second.addr, prev: prev.addr, temp: temp ? temp.addr : null });
+      
+      second = temp;
+      snap(22, 'MOVE SECOND', `Advance second to ${second ? 'node ' + second.val : 'null'}`,
+        'reverse', `second = temp (→${second ? second.val : 'null'})`, 'reverse',
+        {
+          head: { addr: head.addr, val: head.val },
+          second: second ? { addr: second.addr, val: second.val } : null,
+          prev: { addr: prev.addr, val: prev.val },
+          temp: null
+        },
+        ['second'],
+        { second: second ? second.addr : null, prev: prev.addr });
+    }
+    
+    second = prev;
+    snap(25, 'PREPARE MERGE', 'Initialize first and second for merging',
+      'merge', `first = head, second = prev (reversed half)`, 'merge',
+      {
+        head: { addr: head.addr, val: head.val },
+        first: { addr: head.addr, val: head.val },
+        second: { addr: second.addr, val: second.val },
+        prev: { addr: prev.addr, val: prev.val }
+      },
+      ['first', 'second'],
+      { first: head.addr, second: second.addr });
+    
+    let first = head;
+    
+    while (second) {
+      const temp1 = first.next;
+      const temp2 = second.next;
+      
+      snap(27, 'STORE NEXT POINTERS', 'Backup next pointers before reconnecting',
+        'merge', `temp1 = first.next, temp2 = second.next`, 'merge',
+        {
+          head: { addr: head.addr, val: head.val },
+          first: { addr: first.addr, val: first.val },
+          second: { addr: second.addr, val: second.val },
+          temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+          temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+        },
+        ['temp1', 'temp2'],
+        { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+      
+      first.next = second;
+      snap(28, 'CONNECT FIRST→SECOND', `Link node ${first.val} → ${second.val}`,
+        'merge', `first.next = second`, 'merge',
+        {
+          head: { addr: head.addr, val: head.val },
+          first: { addr: first.addr, val: first.val },
+          second: { addr: second.addr, val: second.val },
+          temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+          temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+        },
+        [],
+        { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+      
+      second.next = temp1;
+      snap(29, 'CONNECT SECOND→TEMP1', `Link node ${second.val} → ${temp1 ? temp1.val : 'null'}`,
+        'merge', `second.next = temp1`, 'merge',
+        {
+          head: { addr: head.addr, val: head.val },
+          first: { addr: first.addr, val: first.val },
+          second: { addr: second.addr, val: second.val },
+          temp1: temp1 ? { addr: temp1.addr, val: temp1.val } : null,
+          temp2: temp2 ? { addr: temp2.addr, val: temp2.val } : null
+        },
+        [],
+        { first: first.addr, second: second.addr, temp1: temp1 ? temp1.addr : null, temp2: temp2 ? temp2.addr : null });
+      
+      first = temp1;
+      second = temp2;
+      
+      snap(30, 'ADVANCE POINTERS', `Move to next pair: first=${first ? first.val : 'null'}, second=${second ? second.val : 'null'}`,
+        'merge', `first = temp1, second = temp2`, 'merge',
+        {
+          head: { addr: head.addr, val: head.val },
+          first: first ? { addr: first.addr, val: first.val } : null,
+          second: second ? { addr: second.addr, val: second.val } : null
+        },
+        ['first', 'second'],
+        { first: first ? first.addr : null, second: second ? second.addr : null });
+    }
+    
     let result = [];
-    let curr = s.nodes[0];
-    let visited = new Set();
-    
-    while (curr && !visited.has(curr.addr)) {
+    curr = head;
+    while (curr) {
       result.push(curr.val);
-      visited.add(curr.addr);
-      if (curr.next) {
-        curr = s.nodes.find(n => n.addr === curr.next);
-      } else {
-        curr = null;
-      }
+      curr = curr.next;
     }
     
-    html += `<div class="result-box">
-      <div class="result-title">✨ Final Reordered List</div>
-      <div class="result-value">[${result.join(' → ')}]</div>
-    </div>`;
+    snap(30, 'COMPLETE', 'List reordering complete',
+      'done', `Final: [${result.join(', ')}]`, 'done',
+      { head: { addr: head.addr, val: head.val } },
+      [],
+      {});
+    
+    return steps;
   }
   
-  viz.innerHTML = html;
-  updateStepInfo();
-}
-
-function stepFwd() {
-  if (cursor < steps.length - 1) {
-    cursor++;
-    addLog(cursor, steps[cursor].log);
-    renderStep(cursor);
+  renderExecStep(idx) {
+    const s = this.execSteps[idx];
+    const viz = document.getElementById('vizContent');
+    
+    // Highlight active line
+    document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+    const activeLine = document.querySelector(`[data-line="${s.line}"]`);
+    if (activeLine) activeLine.classList.add('active');
+    
+    let html = '';
+    
+    // Phase badge
+    let phaseName = s.phase === 'init' ? 'init' : s.phase === 'find' ? 'find' : s.phase === 'reverse' ? 'reverse' : s.phase === 'merge' ? 'merge' : 'done';
+    html += `<div class="phase-badge ${phaseName}">
+      ${s.phase === 'init' ? '🚀 INIT' : s.phase === 'find' ? '🎯 PHASE 1: FIND MIDDLE' : s.phase === 'reverse' ? '🔄 PHASE 2: REVERSE' : s.phase === 'merge' ? '🔗 PHASE 3: MERGE' : '✅ COMPLETE'}
+    </div>`;
+    
+    // Operation description
+    html += `<div class="operation-box">
+      <div class="op-title">${s.operation}</div>
+      <div class="op-desc">${s.description}</div>
+    </div>`;
+    
+    // Stack Variables
+    html += `<div class="memory-section">
+      <div class="section-title">📦 Stack Frame</div>
+      <div class="stack-grid">`;
+    
+    const varOrder = ['head', 'slow', 'fast', 'first', 'second', 'prev', 'temp', 'temp1', 'temp2'];
+    const varColors = {
+      slow: 'slow', fast: 'fast', first: 'first', second: 'second',
+      prev: 'prev', temp: 'temp', temp1: 'temp', temp2: 'temp'
+    };
+    
+    varOrder.forEach(varName => {
+      if (s.variables[varName] !== undefined) {
+        const v = s.variables[varName];
+        const isChanged = s.changed.includes(varName);
+        const colorClass = varColors[varName] || '';
+        
+        html += `<div class="stack-var ${isChanged ? 'changed' : ''}">
+          <div class="var-name">${varName}</div>
+          <div class="var-value ${v === null ? 'null' : colorClass}">`;
+        
+        if (v === null) {
+          html += 'null';
+        } else {
+          html += `<span class="ptr-arrow">→</span> Node(${v.val})`;
+        }
+        
+        html += `</div>`;
+        
+        if (v !== null) {
+          html += `<div class="mem-addr">${v.addr}</div>`;
+        }
+        
+        html += `</div>`;
+      }
+    });
+    
+    html += `</div></div>`;
+    
+    // Heap Memory
+    html += `<div class="memory-section">
+      <div class="section-title">🗄️ Heap Memory</div>
+      <div class="heap-container">`;
+    
+    html += `<div class="heap-row">`;
+    
+    s.nodes.forEach((node, idx) => {
+      let refs = [];
+      if (s.heapRefs.slow === node.addr) refs.push('slow');
+      if (s.heapRefs.fast === node.addr) refs.push('fast');
+      if (s.heapRefs.first === node.addr) refs.push('first');
+      if (s.heapRefs.second === node.addr) refs.push('second');
+      if (s.heapRefs.prev === node.addr) refs.push('prev');
+      if (s.heapRefs.temp === node.addr) refs.push('temp');
+      if (s.heapRefs.temp1 === node.addr) refs.push('temp1');
+      if (s.heapRefs.temp2 === node.addr) refs.push('temp2');
+      
+      let nodeClass = 'heap-node';
+      if (refs.length > 0) {
+        nodeClass += ' highlighted';
+        refs.forEach(ref => {
+          if (ref === 'slow') nodeClass += ' slow-ref';
+          else if (ref === 'fast') nodeClass += ' fast-ref';
+          else if (ref === 'first') nodeClass += ' first-ref';
+          else if (ref === 'second') nodeClass += ' second-ref';
+          else if (ref === 'prev') nodeClass += ' prev-ref';
+          else nodeClass += ' temp-ref';
+        });
+      }
+      
+      html += `<div class="${nodeClass}" style="position: relative; margin-top: ${refs.length > 0 ? '20px' : '0'};">`;
+      
+      if (refs.length > 0) {
+        html += `<div class="ref-labels">`;
+        refs.forEach(ref => {
+          const refClass = ref === 'temp1' || ref === 'temp2' ? 'temp' : ref;
+          html += `<span class="ref-tag ${refClass}">${ref}</span>`;
+        });
+        html += `</div>`;
+      }
+      
+      html += `<div class="node-addr">${node.addr}</div>
+        <div class="node-content">
+          <div class="node-field">
+            <div class="field-label">val</div>
+            <div class="field-value">${node.val}</div>
+          </div>
+          <div class="node-field">
+            <div class="field-label">next</div>
+            <div class="field-value ${node.next ? 'ptr' : 'null-ptr'}">
+              ${node.next ? node.next : 'null'}
+            </div>
+          </div>
+        </div>
+      </div>`;
+      
+      if (idx < s.nodes.length - 1 && node.next) {
+        html += `<span class="heap-arrow">→</span>`;
+      }
+    });
+    
+    html += `</div>`;
+    html += `</div></div>`;
+    
+    // Result
+    if (s.phase === 'done') {
+      let result = [];
+      let curr = s.nodes[0];
+      let visited = new Set();
+      
+      while (curr && !visited.has(curr.addr)) {
+        result.push(curr.val);
+        visited.add(curr.addr);
+        if (curr.next) {
+          curr = s.nodes.find(n => n.addr === curr.next);
+        } else {
+          curr = null;
+        }
+      }
+      
+      html += `<div class="result-box">
+        <div class="result-title">✨ Final Reordered List</div>
+        <div class="result-value">[${result.join(' → ')}]</div>
+      </div>`;
+    }
+    
+    viz.innerHTML = html;
+    this.updateStepInfo();
+  }
+  
+  stepFwd() {
+    if (this.execCursor < this.execSteps.length - 1) {
+      this.execCursor++;
+      this.addLog(this.execCursor, this.execSteps[this.execCursor].log);
+      this.renderExecStep(this.execCursor);
+    }
+  }
+  
+  stepBack() {
+    if (this.execCursor > 0) {
+      this.execCursor--;
+      this.rebuildLog();
+      this.renderExecStep(this.execCursor);
+    }
+  }
+  
+  togglePlay() {
+    this.playing = !this.playing;
+    document.getElementById('btnPlay').textContent = this.playing ? '⏸ Pause' : '▶ Play';
+    if (this.playing) {
+      this.playStep();
+    } else {
+      if (this.playTimer) clearTimeout(this.playTimer);
+    }
+  }
+  
+  playStep() {
+    if (!this.playing) return;
+    if (this.execCursor < this.execSteps.length - 1) {
+      this.stepFwd();
+      const speed = parseInt(document.getElementById('speedSlider').value);
+      this.playTimer = setTimeout(() => this.playStep(), 1600 - speed);
+    } else {
+      this.playing = false;
+      document.getElementById('btnPlay').textContent = '▶ Play';
+    }
+  }
+  
+  updateStepInfo() {
+    document.getElementById('stepInfo').textContent = `${this.execCursor} / ${this.execSteps.length - 1}`;
+    document.getElementById('btnPrev').disabled = this.execCursor === 0;
+    document.getElementById('btnNext').disabled = this.execCursor === this.execSteps.length - 1;
+  }
+  
+  addLog(idx, log) {
+    const el = document.getElementById('logScroll');
+    const d = document.createElement('div');
+    d.className = `log-entry ${log.type}`;
+    d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+  }
+  
+  rebuildLog() {
+    const el = document.getElementById('logScroll');
+    el.innerHTML = '';
+    for (let i = 0; i <= this.execCursor; i++) {
+      this.addLog(i, this.execSteps[i].log);
+    }
+  }
+  
+  attachExecListeners() {
+    // Already attached via onclick
+  }
+  
+  // INTUITION MODE
+  
+  intuitNext() {
+    if (this.intuitCursor < this.intuitionStages.length - 1) {
+      this.intuitCursor++;
+      this.updateIntuitStages();
+    }
+  }
+  
+  intuitPrev() {
+    if (this.intuitCursor > 0) {
+      this.intuitCursor--;
+      this.updateIntuitStages();
+    }
+  }
+  
+  updateIntuitStages() {
+    document.querySelectorAll('.stage').forEach((stage, i) => {
+      stage.classList.remove('active', 'past');
+      if (i === this.intuitCursor) {
+        stage.classList.add('active');
+      } else if (i < this.intuitCursor) {
+        stage.classList.add('past');
+      }
+    });
+    
+    document.getElementById('intuitInfo').textContent = 
+      `Stage ${this.intuitCursor + 1} of ${this.intuitionStages.length}`;
+    
+    document.getElementById('btnIntuitPrev').disabled = this.intuitCursor === 0;
+    document.getElementById('btnIntuitNext').disabled = 
+      this.intuitCursor === this.intuitionStages.length - 1;
+    
+    const activeStage = document.querySelectorAll('.stage')[this.intuitCursor];
+    if (activeStage) {
+      activeStage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    this.renderIntuitViz();
+  }
+  
+  renderIntuitViz() {
+    const stage = this.intuitionStages[this.intuitCursor];
+    const viz = document.getElementById('intuitViz');
+    
+    let html = '';
+    
+    switch (stage.visualization) {
+      case 'problem':
+        html = this.renderProblemViz();
+        break;
+      case 'phases':
+        html = this.renderPhasesViz();
+        break;
+      case 'findmiddle':
+        html = this.renderFindMiddleViz();
+        break;
+      case 'reverse':
+        html = this.renderReverseViz();
+        break;
+      case 'merge':
+        html = this.renderMergeViz();
+        break;
+      case 'approaches':
+        html = this.renderApproachesViz();
+        break;
+      case 'edgecases':
+        html = this.renderEdgeCasesViz();
+        break;
+      case 'complexity':
+        html = this.renderComplexityViz();
+        break;
+    }
+    
+    viz.innerHTML = html;
+  }
+  
+  renderProblemViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">The Reordering Pattern</div>
+        <div style="margin-bottom: 0.85rem;">
+          <strong style="color: var(--text);">Original:</strong>
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,2,3,4,5].map((v, i) => `
+                <div class="node-box">
+                  <div class="node-val">${v}</div>
+                  <div class="node-label">L${i}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <strong style="color: var(--accent);">Reordered:</strong>
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,5,2,4,3].map((v, i) => `
+                <div class="node-box" style="border-color: var(--accent);">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+          </div>
+          <div style="margin-top: 0.65rem; color: var(--text); font-size: 0.82rem;">
+            Pattern: L₀ → Lₙ → L₁ → Lₙ₋₁ → L₂ → Lₙ₋₂ ...
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderPhasesViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">Phase 1: Find Middle</div>
+        <div class="list-viz" style="margin-bottom: 0.5rem;">
+          <div class="list-row">
+            ${[1,2,3].map((v, i) => `
+              <div class="node-box first-ptr">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 2 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+            <div style="color: var(--muted); margin: 0 0.5rem;">|</div>
+            ${[4,5].map((v, i) => `
+              <div class="node-box second-ptr">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 1 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+          </div>
+          <div style="margin-top: 0.35rem;">
+            <span class="ptr-label first">First Half</span>
+            <span class="ptr-label second">Second Half</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-section">
+        <div class="demo-title">Phase 2: Reverse Second Half</div>
+        <div class="list-viz">
+          <div class="list-row">
+            ${[1,2,3].map((v, i) => `
+              <div class="node-box first-ptr">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 2 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+            <div style="color: var(--muted); margin: 0 0.5rem;">+</div>
+            ${[5,4].map((v, i) => `
+              <div class="node-box second-ptr">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 1 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-section">
+        <div class="demo-title">Phase 3: Merge Alternately</div>
+        <div class="list-viz">
+          <div class="list-row">
+            ${[1,5,2,4,3].map((v, i) => `
+              <div class="node-box" style="border-color: var(--green); box-shadow: 0 0 10px rgba(57,217,138,0.25);">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 4 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderFindMiddleViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">Two-Pointer Technique</div>
+        <div style="margin-bottom: 0.85rem;">
+          <strong>Iteration 0:</strong> Both start at head
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,2,3,4,5].map((v, i) => `
+                <div class="node-box ${i === 0 ? 'slow-ptr fast-ptr' : ''}">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+            <div style="margin-top: 0.35rem;">
+              <span class="ptr-label slow">SLOW</span>
+              <span class="ptr-label fast">FAST</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 0.85rem;">
+          <strong>Iteration 1:</strong> slow+1, fast+2
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,2,3,4,5].map((v, i) => `
+                <div class="node-box ${i === 1 ? 'slow-ptr' : ''} ${i === 2 ? 'fast-ptr' : ''}">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <strong>Iteration 2:</strong> slow at middle
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,2,3,4,5].map((v, i) => `
+                <div class="node-box ${i === 2 ? 'slow-ptr' : ''} ${i === 4 ? 'fast-ptr' : ''}">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+            <div style="margin-top: 0.65rem; padding: 0.65rem; background: rgba(57,217,138,0.08); border-radius: 5px; color: var(--text); font-size: 0.82rem;">
+              ✅ fast.next.next is null, loop ends<br>
+              slow is at node 3 (last of first half)
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderReverseViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">Reversal Process</div>
+        <div style="margin-bottom: 0.85rem; background: var(--card); padding: 0.65rem; border-radius: 5px; font-family: 'Fira Code', monospace; font-size: 0.8rem;">
+second = slow.next&nbsp;&nbsp;# [4, 5]<br>
+slow.next = None&nbsp;&nbsp;&nbsp;&nbsp;# Break: [1,2,3] | [4,5]<br>
+prev = None&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Start reversed with null
+        </div>
+        
+        <div style="margin-bottom: 0.85rem;">
+          <strong>Before reversal:</strong>
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[4,5].map((v, i) => `
+                <div class="node-box second-ptr">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 1 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+              <div class="arrow">→</div>
+              <div style="color: var(--muted); font-style: italic;">null</div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <strong>After reversal:</strong>
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              <div style="color: var(--muted); font-style: italic;">null</div>
+              <div class="arrow" style="transform: scaleX(-1);">→</div>
+              ${[5,4].map((v, i) => `
+                <div class="node-box second-ptr">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 1 ? '<div class="arrow" style="transform: scaleX(-1);">→</div>' : ''}
+              `).join('')}
+            </div>
+            <div style="margin-top: 0.65rem; color: var(--text); font-size: 0.82rem;">
+              prev now points to node 5 (new head of reversed list)
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderMergeViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">The Merge Pattern</div>
+        <div style="margin-bottom: 0.85rem; background: var(--card); padding: 0.65rem; border-radius: 5px; font-family: 'Fira Code', monospace; font-size: 0.8rem;">
+first = head&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# [1,2,3]<br>
+second = prev&nbsp;&nbsp;&nbsp;# [5,4] (reversed)
+        </div>
+        
+        <div style="margin-bottom: 0.85rem;">
+          <strong>Iteration 1:</strong> Link 1→5→2
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              <div class="node-box first-ptr">
+                <div class="node-val">1</div>
+              </div>
+              <div class="arrow">→</div>
+              <div class="node-box second-ptr">
+                <div class="node-val">5</div>
+              </div>
+              <div class="arrow">→</div>
+              <div class="node-box">
+                <div class="node-val">2</div>
+              </div>
+              <div style="color: var(--muted); margin: 0 0.35rem;">...</div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <strong>Iteration 2:</strong> Link 2→4→3
+          <div class="list-viz" style="margin-top: 0.5rem;">
+            <div class="list-row">
+              ${[1,5,2,4,3].map((v, i) => `
+                <div class="node-box ${i === 2 ? 'first-ptr' : ''} ${i === 3 ? 'second-ptr' : ''}">
+                  <div class="node-val">${v}</div>
+                </div>
+                ${i < 4 ? '<div class="arrow">→</div>' : ''}
+              `).join('')}
+            </div>
+            <div style="margin-top: 0.65rem; padding: 0.65rem; background: rgba(57,217,138,0.08); border-radius: 5px; color: var(--text); font-size: 0.82rem;">
+              ✅ second becomes null, merging complete!
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderApproachesViz() {
+    return `
+      <div class="approach-card rejected">
+        <div class="approach-title">❌ Array Approach</div>
+        <div class="approach-detail">
+          <div><strong>Idea:</strong> Convert list → array → rebuild</div>
+          <div><strong>Time:</strong> O(n)</div>
+          <div><strong>Space:</strong> O(n) — needs extra array</div>
+          <div style="color: var(--red); margin-top: 0.35rem;">Not optimal for space</div>
+        </div>
+      </div>
+      
+      <div class="approach-card rejected">
+        <div class="approach-title">❌ Stack Approach</div>
+        <div class="approach-detail">
+          <div><strong>Idea:</strong> Push second half to stack, pop and merge</div>
+          <div><strong>Time:</strong> O(n)</div>
+          <div><strong>Space:</strong> O(n) — needs stack</div>
+          <div style="color: var(--red); margin-top: 0.35rem;">Same space issue</div>
+        </div>
+      </div>
+      
+      <div class="approach-card chosen">
+        <div class="approach-title">✅ In-Place Three-Phase</div>
+        <div class="approach-detail">
+          <div><strong>Idea:</strong> Find middle → Reverse → Merge</div>
+          <div><strong>Time:</strong> O(n) — three passes</div>
+          <div><strong>Space:</strong> O(1) — only pointers</div>
+          <div style="color: var(--green); margin-top: 0.35rem;">Optimal!</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderEdgeCasesViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">Edge Case: Two Nodes</div>
+        <div class="list-viz">
+          <div class="list-row">
+            ${[1,2].map((v, i) => `
+              <div class="node-box">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 1 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+          </div>
+          <div style="margin-top: 0.5rem; color: var(--text); font-size: 0.82rem;">
+            Result: [1,2] (unchanged)
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-section">
+        <div class="demo-title">Edge Case: Three Nodes</div>
+        <div class="list-viz">
+          <div class="list-row">
+            ${[1,3,2].map((v, i) => `
+              <div class="node-box">
+                <div class="node-val">${v}</div>
+              </div>
+              ${i < 2 ? '<div class="arrow">→</div>' : ''}
+            `).join('')}
+          </div>
+          <div style="margin-top: 0.5rem; color: var(--text); font-size: 0.82rem;">
+            Original: [1,2,3] → Result: [1,3,2]
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding: 0.65rem; background: rgba(57,217,138,0.08); border-radius: 5px; margin-top: 0.85rem;">
+        <strong style="color: var(--green);">Why They Work</strong>
+        <div style="color: var(--text); font-size: 0.82rem; margin-top: 0.35rem;">
+          The algorithm handles all edge cases naturally because:<br>
+          • Early return for empty/single node<br>
+          • Two-pointer works for any length ≥2<br>
+          • Reversal works even for single-node lists<br>
+          • Merge stops when shorter list ends
+        </div>
+      </div>
+    `;
+  }
+  
+  renderComplexityViz() {
+    return `
+      <div class="demo-section">
+        <div class="demo-title">Time Complexity: O(n)</div>
+        <div style="color: var(--text); font-size: 0.84rem; line-height: 1.5;">
+          <div style="margin-bottom: 0.35rem;">• <strong>Phase 1:</strong> O(n/2) to find middle</div>
+          <div style="margin-bottom: 0.35rem;">• <strong>Phase 2:</strong> O(n/2) to reverse second half</div>
+          <div style="margin-bottom: 0.35rem;">• <strong>Phase 3:</strong> O(n/2) to merge</div>
+          <div style="margin-top: 0.65rem; padding: 0.5rem; background: var(--card); border-radius: 5px;">
+            <strong>Total:</strong> 3 × O(n/2) = O(n)
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-section">
+        <div class="demo-title">Space Complexity: O(1)</div>
+        <div style="color: var(--text); font-size: 0.84rem; line-height: 1.5;">
+          <div style="margin-bottom: 0.35rem;">• Only pointer variables: slow, fast, first, second, prev, temp1, temp2</div>
+          <div style="margin-bottom: 0.35rem;">• No recursion (no stack space)</div>
+          <div style="margin-bottom: 0.35rem;">• No auxiliary data structures</div>
+          <div style="margin-top: 0.65rem; padding: 0.5rem; background: var(--card); border-radius: 5px;">
+            <strong>Result:</strong> Constant space regardless of input size
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding: 0.65rem; background: rgba(57,217,138,0.08); border-radius: 5px; border-left: 3px solid var(--green); margin-top: 0.85rem;">
+        <strong style="color: var(--green);">This is Optimal!</strong>
+        <div style="color: var(--text); font-size: 0.82rem; margin-top: 0.35rem;">
+          We must visit every node at least once (O(n) is unavoidable).<br>
+          We can't use less than O(1) space.<br>
+          Therefore, we've achieved the best possible complexity.
+        </div>
+      </div>
+    `;
+  }
+  
+  attachIntuitListeners() {
+    // Already attached via onclick
   }
 }
 
-function stepBack() {
-  if (cursor > 0) {
-    cursor--;
-    rebuildLog();
-    renderStep(cursor);
-  }
-}
+// Initialize app
+const app = new App();
 
-function togglePlay() {
-  playing = !playing;
-  document.getElementById('btnPlay').textContent = playing ? '⏸ Pause' : '▶ Play';
-  if (playing) {
-    playLoop();
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (app.mode === 'execution') {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      app.togglePlay();
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      app.stepFwd();
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      app.stepBack();
+    }
   } else {
-    clearTimeout(playTimer);
+    if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      app.intuitNext();
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      app.intuitPrev();
+    }
   }
-}
-
-function playLoop() {
-  if (!playing) return;
-  if (cursor < steps.length - 1) {
-    stepFwd();
-    const speed = parseInt(document.getElementById('speedSlider').value);
-    playTimer = setTimeout(playLoop, 1600 - speed);
-  } else {
-    playing = false;
-    document.getElementById('btnPlay').textContent = '▶ Play';
-  }
-}
-
-function addLog(idx, log) {
-  const el = document.getElementById('logScroll');
-  const d = document.createElement('div');
-  d.className = `log-entry ${log.type}`;
-  d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
-  el.appendChild(d);
-  el.scrollTop = el.scrollHeight;
-}
-
-function rebuildLog() {
-  document.getElementById('logScroll').innerHTML = '';
-  for (let i = 0; i <= cursor; i++) {
-    addLog(i, steps[i].log);
-  }
-}
-
-function updateStepInfo() {
-  document.getElementById('stepInfo').textContent = `${cursor} / ${steps.length - 1}`;
-  document.getElementById('btnPrev').disabled = cursor === 0;
-  document.getElementById('btnNext').disabled = cursor === steps.length - 1;
-}
-
-init();
+});
 </script>
 </body>
 </html>
