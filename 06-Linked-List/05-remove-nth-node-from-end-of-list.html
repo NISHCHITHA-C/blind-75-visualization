@@ -35,35 +35,35 @@
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.5rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.5rem;
       flex-shrink: 0;
     }
     .h-top {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .h-num {
       font-family: 'Clash Display', sans-serif;
-      font-size: 1.5rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--accent);
     }
     .h-title {
       font-family: 'Clash Display', sans-serif;
-      font-size: 1.15rem;
+      font-size: 0.95rem;
       font-weight: 600;
       flex: 1;
     }
     .h-badge {
       background: rgba(255,209,102,0.15);
       color: var(--yellow);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
       font-weight: 600;
       letter-spacing: 0.5px;
     }
@@ -84,19 +84,19 @@
     }
     .mode-btn {
       flex: 1;
-      padding: 0.6rem 1.25rem;
+      padding: 0.45rem 0.85rem;
       border: none;
       background: transparent;
       color: var(--muted);
       cursor: pointer;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
       font-weight: 600;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .mode-btn:hover {
       color: var(--text);
@@ -110,11 +110,11 @@
       background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.5rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
       font-family: 'Fira Code', monospace;
-      width: 200px;
+      width: 180px;
     }
     .inp:focus {
       outline: none;
@@ -124,10 +124,10 @@
       background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
+      padding: 0.4rem 0.75rem;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       transition: all 0.15s;
     }
@@ -170,11 +170,11 @@
     }
     .panel:last-child { border-right: none; }
     .panel-hdr {
-      padding: 1rem 1.25rem;
+      padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       color: var(--muted);
       text-transform: uppercase;
       flex-shrink: 0;
@@ -182,7 +182,7 @@
     .panel-body {
       flex: 1;
       overflow-y: auto;
-      padding: 1.25rem;
+      padding: 0.75rem;
     }
     .panel-body::-webkit-scrollbar { width: 8px; }
     .panel-body::-webkit-scrollbar-track { background: var(--surface); }
@@ -192,9 +192,9 @@
     .code-line {
       display: flex;
       font-family: 'Fira Code', monospace;
-      font-size: 0.82rem;
-      line-height: 1.6;
-      padding: 0.15rem 0;
+      font-size: 0.75rem;
+      line-height: 1.35;
+      padding: 0.1rem 0;
       border-left: 3px solid transparent;
       transition: all 0.2s;
     }
@@ -204,9 +204,9 @@
     }
     .ln {
       color: var(--muted);
-      width: 35px;
+      width: 30px;
       text-align: right;
-      padding-right: 1rem;
+      padding-right: 0.75rem;
       user-select: none;
       flex-shrink: 0;
     }
@@ -230,10 +230,10 @@
     .viz-content {
       flex: 1;
       overflow-y: auto;
-      padding: 1.5rem;
+      padding: 0.75rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.75rem;
     }
     .viz-content::-webkit-scrollbar { width: 8px; }
     .viz-content::-webkit-scrollbar-track { background: var(--surface); }
@@ -242,19 +242,19 @@
     .list-viz {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.5rem;
     }
     .list-row {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .node-box {
       background: var(--card);
       border: 2px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem;
-      min-width: 60px;
+      border-radius: 6px;
+      padding: 0.5rem;
+      min-width: 50px;
       text-align: center;
       transition: all 0.25s;
       position: relative;
@@ -286,54 +286,54 @@
     }
     .node-val {
       font-family: 'Fira Code', monospace;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--text);
     }
     .node-label {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--muted);
-      margin-top: 0.35rem;
+      margin-top: 0.25rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .arrow {
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: 1rem;
     }
     .ptr-label {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.35rem 0.65rem;
-      font-size: 0.75rem;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      margin-top: 0.5rem;
+      margin-top: 0.35rem;
     }
     .ptr-label.slow { color: var(--accent2); border-color: var(--accent2); }
     .ptr-label.fast { color: var(--purple); border-color: var(--purple); }
     
     .vars-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.5rem;
     }
     .vc {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem;
+      border-radius: 6px;
+      padding: 0.5rem;
     }
     .vn {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.25rem;
     }
     .vv {
       font-family: 'Fira Code', monospace;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--accent);
     }
@@ -343,28 +343,28 @@
       border: 1px solid var(--border);
       border-left: 3px solid var(--blue);
       border-radius: 6px;
-      padding: 1rem;
-      font-size: 0.9rem;
-      line-height: 1.5;
+      padding: 0.65rem;
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
     
     .result-box {
       background: var(--card);
       border: 2px solid var(--green);
       border-radius: 8px;
-      padding: 1.25rem;
+      padding: 0.85rem;
       text-align: center;
     }
     .result-title {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .result-val {
       font-family: 'Fira Code', monospace;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--green);
     }
@@ -373,20 +373,20 @@
     .bot {
       background: var(--card);
       border-top: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.5rem 0.75rem;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
       flex-shrink: 0;
     }
     .bot button {
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
+      padding: 0.4rem 0.85rem;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       transition: all 0.15s;
     }
@@ -434,18 +434,18 @@
     .log-scroll::-webkit-scrollbar-track { background: var(--surface); }
     .log-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     .log-entry {
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 0.35rem;
+      padding: 0.35rem 0.5rem;
+      margin-bottom: 0.25rem;
       border-left: 3px solid var(--border);
       background: var(--card);
       border-radius: 4px;
-      font-size: 0.8rem;
-      line-height: 1.4;
+      font-size: 0.75rem;
+      line-height: 1.3;
       font-family: 'Fira Code', monospace;
     }
     .ls {
       color: var(--muted);
-      margin-right: 0.5rem;
+      margin-right: 0.4rem;
     }
     .log-entry.init { border-left-color: var(--blue); }
     .log-entry.move { border-left-color: var(--accent); }
@@ -455,7 +455,7 @@
     
     /* INTUITION PANEL STYLES */
     .intuit-content {
-      padding: 2rem;
+      padding: 1rem;
       overflow-y: auto;
     }
     .intuit-content::-webkit-scrollbar { width: 8px; }
@@ -463,7 +463,7 @@
     .intuit-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     
     .stage {
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
       opacity: 0.3;
       transition: opacity 0.3s ease;
     }
@@ -477,21 +477,21 @@
     .stage-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
     }
     .stage-num {
       background: var(--card);
       border: 2px solid var(--border);
       color: var(--accent);
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       flex-shrink: 0;
     }
     .stage.active .stage-num {
@@ -500,7 +500,7 @@
     }
     .stage-title {
       font-family: 'Clash Display', sans-serif;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--text);
     }
@@ -508,12 +508,13 @@
     .thought-bubble {
       background: rgba(126,232,250,0.08);
       border-left: 3px solid var(--accent);
-      padding: 1rem 1.25rem;
-      border-radius: 6px;
-      margin: 1rem 0;
+      padding: 0.65rem 0.85rem;
+      border-radius: 5px;
+      margin: 0.65rem 0;
       font-style: italic;
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.5;
+      font-size: 0.88rem;
     }
     .thought-bubble::before {
       content: '💭 ';
@@ -522,18 +523,19 @@
     
     .stage-content {
       color: var(--text);
-      line-height: 1.7;
-      margin-bottom: 1rem;
+      line-height: 1.5;
+      margin-bottom: 0.65rem;
+      font-size: 0.88rem;
     }
     .stage-content p {
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     .stage-content ul {
-      margin-left: 1.5rem;
-      margin-bottom: 0.75rem;
+      margin-left: 1.25rem;
+      margin-bottom: 0.5rem;
     }
     .stage-content li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
     }
     .stage-content strong {
       color: var(--accent);
@@ -551,32 +553,34 @@
     .key-insight {
       background: rgba(57,217,138,0.08);
       border-left: 3px solid var(--green);
-      padding: 1rem 1.25rem;
-      border-radius: 6px;
-      margin-top: 1rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 5px;
+      margin-top: 0.65rem;
     }
     .key-insight-title {
       font-weight: 600;
       color: var(--green);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      font-size: 0.85rem;
     }
     .key-insight-title::before {
       content: '💡';
     }
     .key-insight-text {
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.5;
+      font-size: 0.88rem;
     }
     
     .intuit-viz-area {
-      padding: 2rem;
+      padding: 1rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.85rem;
     }
     .intuit-viz-area::-webkit-scrollbar { width: 8px; }
     .intuit-viz-area::-webkit-scrollbar-track { background: var(--surface); }
@@ -585,8 +589,8 @@
     .approach-card {
       background: var(--card);
       border: 2px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
+      border-radius: 6px;
+      padding: 0.85rem;
       transition: all 0.2s;
     }
     .approach-card.rejected {
@@ -599,11 +603,11 @@
     }
     .approach-title {
       font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .approach-card.rejected .approach-title {
       color: var(--red);
@@ -613,73 +617,73 @@
     }
     .approach-detail {
       color: var(--text);
-      line-height: 1.6;
-      font-size: 0.9rem;
+      line-height: 1.5;
+      font-size: 0.84rem;
     }
     .approach-detail div {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
     }
     
     .complexity-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 0.65rem;
     }
     .complexity-card {
       background: var(--card);
       border: 2px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem;
+      border-radius: 6px;
+      padding: 0.85rem;
     }
     .complexity-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.35rem;
     }
     .complexity-value {
       font-family: 'Fira Code', monospace;
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     .complexity-explain {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.4;
     }
     
     .demo-section {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
+      border-radius: 6px;
+      padding: 0.85rem;
     }
     .demo-title {
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 1rem;
-      font-size: 1rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.9rem;
     }
     
     .intuit-nav {
       background: var(--card);
       border-top: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.5rem 0.75rem;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .intuit-nav button {
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
+      padding: 0.4rem 0.85rem;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       transition: all 0.15s;
     }
@@ -745,68 +749,52 @@
           {
             title: "Stage 1: Understanding the Problem",
             thought: "Hmm, removing from the END... but I can only traverse forward. That's tricky.",
-            content: `<p>The challenge here is that linked lists only let us move forward (head → next → next...), but we need to remove a node counting from the <strong>end</strong>.</p>
+            content: `<p>Linked lists only move forward, but we need to count from the <strong>end</strong>. The naive solution? Count the length first, then calculate position <code>(length - n)</code>. But that's two passes.</p>
             
-            <p>If we knew the total length, we could calculate: remove the <code>(length - n + 1)</code>th node from the start. But that requires two passes — one to count, one to remove.</p>
-            
-            <p><strong>Can we do it in one pass?</strong> That would be more elegant.</p>`,
-            insight: "The problem isn't just removing a node — it's converting an 'end-based index' to a 'start-based position' WITHOUT knowing the length ahead of time.",
+            <p><strong>Can we do it in one pass?</strong></p>`,
+            insight: "The real challenge: convert an 'end-based index' to a 'start-based position' WITHOUT knowing the length.",
             visualization: "problem"
           },
           {
             title: "Stage 2: The Two-Pointer Breakthrough",
-            thought: "Wait! What if I use two pointers with a fixed gap between them? If the gap is n, then when the fast pointer reaches the end...",
-            content: `<p>Here's the key insight: if I maintain two pointers that are <strong>exactly n nodes apart</strong>, then when the fast pointer reaches the end (null), the slow pointer will be exactly n nodes from the end!</p>
+            thought: "Wait! What if two pointers stay exactly n nodes apart? When fast hits the end, slow is n from the end!",
+            content: `<p>The insight: maintain <strong>exactly n nodes of gap</strong> between two pointers.</p>
             
-            <ul>
-              <li><strong>Fast pointer:</strong> Moves ahead first, creating the gap</li>
-              <li><strong>Slow pointer:</strong> Starts moving once gap is established</li>
-              <li><strong>Result:</strong> When fast reaches null, slow is at the right position</li>
-            </ul>
-            
-            <p>This is the <strong>two-pointer technique</strong> — a powerful pattern for linked list problems.</p>`,
-            insight: "By maintaining a fixed gap of n nodes between two pointers, we automatically locate the nth node from the end when the fast pointer finishes.",
+            <p><strong>Fast pointer:</strong> Moves ahead first<br>
+            <strong>Slow pointer:</strong> Follows behind<br>
+            <strong>Result:</strong> When fast reaches null, slow is at the right spot!</p>`,
+            insight: "A fixed gap of n nodes between pointers automatically locates the nth node from the end.",
             visualization: "twopointer"
           },
           {
             title: "Stage 3: The Dummy Node Trick",
-            thought: "But what if we need to remove the head itself? We'd have to return a different node... Unless we use a dummy!",
-            content: `<p>Consider this edge case: <code>list = [1, 2], n = 2</code> (remove the head).</p>
+            thought: "But what if we remove the head? Can't access the node before it... unless I use a dummy!",
+            content: `<p>Edge case: <code>[1, 2], n = 2</code> (remove the head).</p>
             
-            <p>If <code>slow</code> starts at <code>head</code>, it can't access the node <strong>before</strong> the one we want to remove. We need <code>slow</code> to point to the <strong>predecessor</strong> of the target node.</p>
+            <p>Problem: If slow starts at head, it can't reach the <strong>predecessor</strong> of the node to remove. We need slow to stop <strong>before</strong> the target.</p>
             
-            <p><strong>The dummy node solution:</strong></p>
-            <ul>
-              <li>Create a dummy node pointing to head</li>
-              <li>Start both pointers at dummy (not head)</li>
-              <li>Move fast <code>n+1</code> steps (extra step to position slow correctly)</li>
-              <li>Now slow will end up just <strong>before</strong> the node to remove</li>
-            </ul>`,
-            insight: "A dummy node handles edge cases elegantly — especially when the head itself needs removal. It ensures we always have a predecessor node.",
+            <p><strong>Solution:</strong> Create a dummy node before head. Start both pointers there. Now we always have a predecessor!</p>`,
+            insight: "A dummy node elegantly handles edge cases, especially head removal. It guarantees a predecessor always exists.",
             visualization: "dummy"
           },
           {
-            title: "Stage 4: Why Start Both at Dummy?",
-            thought: "I need to think about positioning carefully. Where should slow and fast begin?",
-            content: `<p>Let's trace through an example: <code>list = [1, 2, 3, 4, 5], n = 2</code></p>
+            title: "Stage 4: Why n+1 Steps?",
+            thought: "Wait, why move fast n+1 steps instead of just n?",
+            content: `<p>Example: <code>[1,2,3,4,5], n=2</code> (remove 4)</p>
             
-            <p><strong>If we start both at dummy:</strong></p>
-            <ul>
-              <li>dummy → 1 → 2 → 3 → 4 → 5 → null</li>
-              <li>Move fast <code>n+1 = 3</code> steps: fast is at node 3</li>
-              <li>Gap between slow (dummy) and fast (3) = 3 nodes</li>
-              <li>Move both until fast reaches null</li>
-              <li>Slow ends at node 3 (predecessor of node 4, which we want to remove)</li>
-            </ul>
+            <p>If we move fast <strong>n+1 = 3 steps</strong>:<br>
+            • dummy → 1 → 2 → <strong>3 (fast)</strong> → 4 → 5<br>
+            • When fast hits null, slow stops at <strong>3</strong><br>
+            • Perfect! 3 is just before 4</p>
             
-            <p><strong>Why n+1 instead of n?</strong> Because we want slow to stop at the node <strong>before</strong> the target, not at the target itself. This lets us do <code>slow.next = slow.next.next</code>.</p>`,
-            insight: "Moving fast n+1 steps (instead of n) positions slow at the predecessor, giving us the handle we need to perform the deletion.",
+            <p><strong>Why n+1?</strong> We need slow at the <strong>predecessor</strong>, not the target itself. Then we can do <code>slow.next = slow.next.next</code>.</p>`,
+            insight: "n+1 steps positions slow at the predecessor, giving us the handle to perform deletion.",
             visualization: "positioning"
           },
           {
             title: "Stage 5: The Movement Phase",
-            thought: "Now I move both pointers together until fast reaches the end. The gap stays constant!",
-            content: `<p>Once the gap is established, we enter the movement phase:</p>
+            thought: "Now both move together. The gap stays constant until fast hits the end!",
+            content: `<p>Simple loop:</p>
             
             <div style="background: var(--card); padding: 1rem; border-radius: 6px; font-family: 'Fira Code', monospace; margin: 1rem 0;">
 while fast:
@@ -814,59 +802,31 @@ while fast:
     fast = fast.next
             </div>
             
-            <p>This maintains the gap of <code>n+1</code> nodes. When <code>fast</code> becomes <code>null</code> (reaches the end), <code>slow</code> is automatically positioned at the node right before our target.</p>
-            
-            <p><strong>Example with [1,2,3,4,5], n=2:</strong></p>
-            <ul>
-              <li>Start: slow=dummy, fast=3</li>
-              <li>Iteration 1: slow=1, fast=4</li>
-              <li>Iteration 2: slow=2, fast=5</li>
-              <li>Iteration 3: slow=3, fast=null ← STOP!</li>
-            </ul>
-            
-            <p>Now slow is at node 3, and <code>slow.next</code> (node 4) is what we remove.</p>`,
-            insight: "The while loop preserves the gap. When fast hits null, slow is perfectly positioned for the deletion.",
+            <p>When <code>fast</code> becomes <code>null</code>, <code>slow</code> is perfectly positioned before the target.</p>`,
+            insight: "The while loop preserves the gap. When fast hits null, slow is at the predecessor.",
             visualization: "movement"
           },
           {
             title: "Stage 6: The Deletion",
-            thought: "Perfect! Now I just skip over the target node. One line of code!",
-            content: `<p>With <code>slow</code> positioned at the predecessor, deletion is trivial:</p>
+            thought: "Perfect! Now just skip over the target node. One line!",
+            content: `<p>With slow at the predecessor, deletion is simple:</p>
             
             <div style="background: var(--card); padding: 1rem; border-radius: 6px; font-family: 'Fira Code', monospace; margin: 1rem 0;">
 slow.next = slow.next.next
             </div>
             
-            <p><strong>What's happening:</strong></p>
-            <ul>
-              <li><code>slow.next</code> is the node we want to remove</li>
-              <li><code>slow.next.next</code> is the node after it</li>
-              <li>We bypass the target by pointing directly to the next node</li>
-            </ul>
-            
-            <p>The removed node is effectively unreachable now — it's been "snipped out" of the linked list chain.</p>`,
-            insight: "Linked list deletion is just pointer redirection. No actual 'deletion' happens — we just bypass the node.",
+            <p>We bypass the target by pointing directly to the next node. The removed node is now unreachable — effectively deleted.</p>`,
+            insight: "Linked list deletion is just pointer redirection. We bypass the node, making it unreachable.",
             visualization: "deletion"
           },
           {
-            title: "Stage 7: Complexity & Why This Is Optimal",
-            thought: "Let me verify this is the best we can do. One pass, constant space... yeah, that's optimal!",
-            content: `<p><strong>Time Complexity: O(n)</strong></p>
-            <ul>
-              <li>We traverse the list once</li>
-              <li>Move fast n+1 steps, then move both until fast reaches end</li>
-              <li>Total: ~L steps where L = list length</li>
-            </ul>
+            title: "Stage 7: Why This Is Optimal",
+            thought: "Let me verify — one pass, constant space. That's as good as it gets!",
+            content: `<p><strong>Time: O(n)</strong> — Traverse the list once<br>
+            <strong>Space: O(1)</strong> — Only three pointers (dummy, slow, fast)</p>
             
-            <p><strong>Space Complexity: O(1)</strong></p>
-            <ul>
-              <li>Only using three pointers (dummy, slow, fast)</li>
-              <li>No auxiliary data structures</li>
-              <li>Space usage doesn't grow with input size</li>
-            </ul>
-            
-            <p><strong>Why this is optimal:</strong> We must at least touch the nodes near the target (O(n) is unavoidable). We can't improve on O(1) space for a pointer-based approach. This solution achieves both theoretical limits.</p>`,
-            insight: "One-pass, constant space — this solution is theoretically optimal for this problem.",
+            <p><strong>Why optimal?</strong> We must at least touch the nodes near the target (O(n) unavoidable). We can't beat O(1) space. This achieves both limits.</p>`,
+            insight: "One-pass, constant space — theoretically optimal for this problem.",
             visualization: "complexity"
           }
         ];
