@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>19. Remove Nth Node From End of List</title>
+  <title>19. Remove Nth Node From End of List - Dual Mode Visualizer</title>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Clash+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -37,9 +37,14 @@
       border-bottom: 1px solid var(--border);
       padding: 1rem 1.5rem;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 0.75rem;
       flex-shrink: 0;
+    }
+    .h-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
     .h-num {
       font-family: 'Clash Display', sans-serif;
@@ -67,6 +72,40 @@
       gap: 0.5rem;
       align-items: center;
     }
+    
+    /* MODE TOGGLE */
+    .mode-toggle {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--card);
+      padding: 0.35rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 0.6rem 1.25rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .mode-btn:hover {
+      color: var(--text);
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    
     .inp {
       background: var(--card);
       border: 1px solid var(--border);
@@ -101,12 +140,27 @@
     .btn-g:hover {
       background: var(--hl);
     }
+    
     main {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+    }
+    
+    /* EXECUTION MODE LAYOUT */
+    .exec-layout {
       display: grid;
       grid-template-columns: 390px 1fr 255px;
       flex: 1;
-      overflow: hidden;
     }
+    
+    /* INTUITION MODE LAYOUT */
+    .intuit-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+    }
+    
     .panel {
       background: var(--surface);
       border-right: 1px solid var(--border);
@@ -398,135 +452,279 @@
     .log-entry.found { border-left-color: var(--green); }
     .log-entry.remove { border-left-color: var(--red); }
     .log-entry.complete { border-left-color: var(--green); }
+    
+    /* INTUITION PANEL STYLES */
+    .intuit-content {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .intuit-content::-webkit-scrollbar { width: 8px; }
+    .intuit-content::-webkit-scrollbar-track { background: var(--surface); }
+    .intuit-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    
+    .stage {
+      margin-bottom: 2.5rem;
+      opacity: 0.3;
+      transition: opacity 0.3s ease;
+    }
+    .stage.active {
+      opacity: 1;
+    }
+    .stage.past {
+      opacity: 0.6;
+    }
+    
+    .stage-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .stage-num {
+      background: var(--card);
+      border: 2px solid var(--border);
+      color: var(--accent);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .stage.active .stage-num {
+      border-color: var(--accent);
+      background: var(--hl);
+    }
+    .stage-title {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .thought-bubble {
+      background: rgba(126,232,250,0.08);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .thought-bubble::before {
+      content: '💭 ';
+      font-style: normal;
+    }
+    
+    .stage-content {
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .stage-content p {
+      margin-bottom: 0.75rem;
+    }
+    .stage-content ul {
+      margin-left: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .stage-content li {
+      margin-bottom: 0.5rem;
+    }
+    .stage-content strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .stage-content code {
+      background: var(--card);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9em;
+      color: var(--yellow);
+    }
+    
+    .key-insight {
+      background: rgba(57,217,138,0.08);
+      border-left: 3px solid var(--green);
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+    .key-insight-title {
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .key-insight-title::before {
+      content: '💡';
+    }
+    .key-insight-text {
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    .intuit-viz-area {
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .intuit-viz-area::-webkit-scrollbar { width: 8px; }
+    .intuit-viz-area::-webkit-scrollbar-track { background: var(--surface); }
+    .intuit-viz-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    
+    .approach-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+    }
+    .approach-card.rejected {
+      border-color: rgba(255,92,92,0.3);
+      background: rgba(255,92,92,0.05);
+    }
+    .approach-card.chosen {
+      border-color: rgba(57,217,138,0.5);
+      background: rgba(57,217,138,0.05);
+    }
+    .approach-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .approach-card.rejected .approach-title {
+      color: var(--red);
+    }
+    .approach-card.chosen .approach-title {
+      color: var(--green);
+    }
+    .approach-detail {
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+    .approach-detail div {
+      margin-bottom: 0.5rem;
+    }
+    
+    .complexity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .complexity-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .complexity-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+    .complexity-value {
+      font-family: 'Fira Code', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .complexity-explain {
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    
+    .demo-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .demo-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    
+    .intuit-nav {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .intuit-nav button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .intuit-nav button:hover { background: var(--border); }
+    .intuit-nav button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .intuit-nav .stage-info {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
   </style>
 </head>
 <body>
   <header>
-    <span class="h-num">19.</span>
-    <span class="h-title">Remove Nth Node From End of List</span>
-    <span class="h-badge">MEDIUM</span>
-    <div class="h-right">
-      <input type="text" id="listInp" class="inp" placeholder="e.g., 1,2,3,4,5" value="1,2,3,4,5"/>
-      <input type="text" id="nInp" class="inp" placeholder="n" value="2" style="width:60px"/>
-      <button onclick="init()" class="btn btn-g">Reset</button>
+    <div class="h-top">
+      <span class="h-num">19.</span>
+      <span class="h-title">Remove Nth Node From End of List</span>
+      <span class="h-badge">MEDIUM</span>
+      <div class="h-right">
+        <input type="text" id="listInp" class="inp" placeholder="e.g., 1,2,3,4,5" value="1,2,3,4,5"/>
+        <input type="text" id="nInp" class="inp" placeholder="n" value="2" style="width:60px"/>
+        <button onclick="app.init()" class="btn btn-g">Reset</button>
+      </div>
+    </div>
+    
+    <!-- MODE TOGGLE -->
+    <div class="mode-toggle">
+      <button class="mode-btn" id="btnIntuitMode" onclick="app.setMode('intuition')">
+        💡 Intuition & Thought Process
+      </button>
+      <button class="mode-btn active" id="btnExecMode" onclick="app.setMode('execution')">
+        ▶️ Step-by-Step Execution
+      </button>
     </div>
   </header>
   
-  <main>
-    <!-- CODE PANEL -->
-    <div class="panel">
-      <div class="panel-hdr">Python Code</div>
-      <div class="panel-body">
-        <div class="code-line" data-line="1">
-          <span class="ln">1</span>
-          <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
-        </div>
-        <div class="code-line" data-line="2">
-          <span class="ln">2</span>
-          <span class="ct">    <span class="kw">def</span> <span class="fn">removeNthFromEnd</span>(<span class="kw">self</span>, head, n):</span>
-        </div>
-        <div class="code-line" data-line="3">
-          <span class="ln">3</span>
-          <span class="ct">        <span class="cm"># Create dummy node</span></span>
-        </div>
-        <div class="code-line" data-line="4">
-          <span class="ln">4</span>
-          <span class="ct">        dummy = ListNode(<span class="nm">0</span>, head)</span>
-        </div>
-        <div class="code-line" data-line="5">
-          <span class="ln">5</span>
-          <span class="ct">        slow = fast = dummy</span>
-        </div>
-        <div class="code-line" data-line="6">
-          <span class="ln">6</span>
-          <span class="ct">        </span>
-        </div>
-        <div class="code-line" data-line="7">
-          <span class="ln">7</span>
-          <span class="ct">        <span class="cm"># Move fast n+1 steps ahead</span></span>
-        </div>
-        <div class="code-line" data-line="8">
-          <span class="ln">8</span>
-          <span class="ct">        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n + <span class="nm">1</span>):</span>
-        </div>
-        <div class="code-line" data-line="9">
-          <span class="ln">9</span>
-          <span class="ct">            fast = fast.next</span>
-        </div>
-        <div class="code-line" data-line="10">
-          <span class="ln">10</span>
-          <span class="ct">        </span>
-        </div>
-        <div class="code-line" data-line="11">
-          <span class="ln">11</span>
-          <span class="ct">        <span class="cm"># Move both until fast is None</span></span>
-        </div>
-        <div class="code-line" data-line="12">
-          <span class="ln">12</span>
-          <span class="ct">        <span class="kw">while</span> fast:</span>
-        </div>
-        <div class="code-line" data-line="13">
-          <span class="ln">13</span>
-          <span class="ct">            slow = slow.next</span>
-        </div>
-        <div class="code-line" data-line="14">
-          <span class="ln">14</span>
-          <span class="ct">            fast = fast.next</span>
-        </div>
-        <div class="code-line" data-line="15">
-          <span class="ln">15</span>
-          <span class="ct">        </span>
-        </div>
-        <div class="code-line" data-line="16">
-          <span class="ln">16</span>
-          <span class="ct">        <span class="cm"># Remove nth node</span></span>
-        </div>
-        <div class="code-line" data-line="17">
-          <span class="ln">17</span>
-          <span class="ct">        slow.next = slow.next.next</span>
-        </div>
-        <div class="code-line" data-line="18">
-          <span class="ln">18</span>
-          <span class="ct">        </span>
-        </div>
-        <div class="code-line" data-line="19">
-          <span class="ln">19</span>
-          <span class="ct">        <span class="kw">return</span> dummy.next</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- VIZ PANEL -->
-    <div class="panel viz-panel">
-      <div class="panel-hdr">Visualization</div>
-      <div class="viz-content" id="vizContent"></div>
-      <div class="bot">
-        <button id="btnPrev" onclick="stepBack()">◄ Prev</button>
-        <button id="btnPlay" onclick="togglePlay()">▶ Play</button>
-        <button id="btnNext" onclick="stepFwd()">Next ►</button>
-        <span class="step-info" id="stepInfo">0 / 0</span>
-        <div class="spd-wrap">
-          <label>Speed</label>
-          <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
-        </div>
-      </div>
-    </div>
-    
-    <!-- LOG PANEL -->
-    <div class="panel">
-      <div class="panel-hdr">Step Log</div>
-      <div class="panel-body">
-        <div class="log-scroll" id="logScroll"></div>
-      </div>
-    </div>
+  <main id="mainContent">
+    <!-- Content will be rendered here based on mode -->
   </main>
   
   <script>
-    let steps = [];
-    let cursor = 0;
-    let playing = false;
-    let playTimer = null;
-    
     class ListNode {
       constructor(val = 0, next = null) {
         this.val = val;
@@ -534,256 +732,965 @@
       }
     }
     
-    function init() {
-      const listStr = document.getElementById('listInp').value;
-      const n = parseInt(document.getElementById('nInp').value);
-      
-      const vals = listStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
-      if (vals.length === 0 || isNaN(n) || n < 1 || n > vals.length) {
-        alert('Invalid input. Please enter a valid list and n value.');
-        return;
+    class App {
+      constructor() {
+        this.mode = 'execution'; // 'execution' or 'intuition'
+        this.execCursor = 0;
+        this.intuitCursor = 0;
+        this.playing = false;
+        this.playTimer = null;
+        this.execSteps = [];
+        
+        this.intuitionStages = [
+          {
+            title: "Stage 1: Understanding the Problem",
+            thought: "Hmm, removing from the END... but I can only traverse forward. That's tricky.",
+            content: `<p>The challenge here is that linked lists only let us move forward (head → next → next...), but we need to remove a node counting from the <strong>end</strong>.</p>
+            
+            <p>If we knew the total length, we could calculate: remove the <code>(length - n + 1)</code>th node from the start. But that requires two passes — one to count, one to remove.</p>
+            
+            <p><strong>Can we do it in one pass?</strong> That would be more elegant.</p>`,
+            insight: "The problem isn't just removing a node — it's converting an 'end-based index' to a 'start-based position' WITHOUT knowing the length ahead of time.",
+            visualization: "problem"
+          },
+          {
+            title: "Stage 2: The Two-Pointer Breakthrough",
+            thought: "Wait! What if I use two pointers with a fixed gap between them? If the gap is n, then when the fast pointer reaches the end...",
+            content: `<p>Here's the key insight: if I maintain two pointers that are <strong>exactly n nodes apart</strong>, then when the fast pointer reaches the end (null), the slow pointer will be exactly n nodes from the end!</p>
+            
+            <ul>
+              <li><strong>Fast pointer:</strong> Moves ahead first, creating the gap</li>
+              <li><strong>Slow pointer:</strong> Starts moving once gap is established</li>
+              <li><strong>Result:</strong> When fast reaches null, slow is at the right position</li>
+            </ul>
+            
+            <p>This is the <strong>two-pointer technique</strong> — a powerful pattern for linked list problems.</p>`,
+            insight: "By maintaining a fixed gap of n nodes between two pointers, we automatically locate the nth node from the end when the fast pointer finishes.",
+            visualization: "twopointer"
+          },
+          {
+            title: "Stage 3: The Dummy Node Trick",
+            thought: "But what if we need to remove the head itself? We'd have to return a different node... Unless we use a dummy!",
+            content: `<p>Consider this edge case: <code>list = [1, 2], n = 2</code> (remove the head).</p>
+            
+            <p>If <code>slow</code> starts at <code>head</code>, it can't access the node <strong>before</strong> the one we want to remove. We need <code>slow</code> to point to the <strong>predecessor</strong> of the target node.</p>
+            
+            <p><strong>The dummy node solution:</strong></p>
+            <ul>
+              <li>Create a dummy node pointing to head</li>
+              <li>Start both pointers at dummy (not head)</li>
+              <li>Move fast <code>n+1</code> steps (extra step to position slow correctly)</li>
+              <li>Now slow will end up just <strong>before</strong> the node to remove</li>
+            </ul>`,
+            insight: "A dummy node handles edge cases elegantly — especially when the head itself needs removal. It ensures we always have a predecessor node.",
+            visualization: "dummy"
+          },
+          {
+            title: "Stage 4: Why Start Both at Dummy?",
+            thought: "I need to think about positioning carefully. Where should slow and fast begin?",
+            content: `<p>Let's trace through an example: <code>list = [1, 2, 3, 4, 5], n = 2</code></p>
+            
+            <p><strong>If we start both at dummy:</strong></p>
+            <ul>
+              <li>dummy → 1 → 2 → 3 → 4 → 5 → null</li>
+              <li>Move fast <code>n+1 = 3</code> steps: fast is at node 3</li>
+              <li>Gap between slow (dummy) and fast (3) = 3 nodes</li>
+              <li>Move both until fast reaches null</li>
+              <li>Slow ends at node 3 (predecessor of node 4, which we want to remove)</li>
+            </ul>
+            
+            <p><strong>Why n+1 instead of n?</strong> Because we want slow to stop at the node <strong>before</strong> the target, not at the target itself. This lets us do <code>slow.next = slow.next.next</code>.</p>`,
+            insight: "Moving fast n+1 steps (instead of n) positions slow at the predecessor, giving us the handle we need to perform the deletion.",
+            visualization: "positioning"
+          },
+          {
+            title: "Stage 5: The Movement Phase",
+            thought: "Now I move both pointers together until fast reaches the end. The gap stays constant!",
+            content: `<p>Once the gap is established, we enter the movement phase:</p>
+            
+            <div style="background: var(--card); padding: 1rem; border-radius: 6px; font-family: 'Fira Code', monospace; margin: 1rem 0;">
+while fast:
+    slow = slow.next
+    fast = fast.next
+            </div>
+            
+            <p>This maintains the gap of <code>n+1</code> nodes. When <code>fast</code> becomes <code>null</code> (reaches the end), <code>slow</code> is automatically positioned at the node right before our target.</p>
+            
+            <p><strong>Example with [1,2,3,4,5], n=2:</strong></p>
+            <ul>
+              <li>Start: slow=dummy, fast=3</li>
+              <li>Iteration 1: slow=1, fast=4</li>
+              <li>Iteration 2: slow=2, fast=5</li>
+              <li>Iteration 3: slow=3, fast=null ← STOP!</li>
+            </ul>
+            
+            <p>Now slow is at node 3, and <code>slow.next</code> (node 4) is what we remove.</p>`,
+            insight: "The while loop preserves the gap. When fast hits null, slow is perfectly positioned for the deletion.",
+            visualization: "movement"
+          },
+          {
+            title: "Stage 6: The Deletion",
+            thought: "Perfect! Now I just skip over the target node. One line of code!",
+            content: `<p>With <code>slow</code> positioned at the predecessor, deletion is trivial:</p>
+            
+            <div style="background: var(--card); padding: 1rem; border-radius: 6px; font-family: 'Fira Code', monospace; margin: 1rem 0;">
+slow.next = slow.next.next
+            </div>
+            
+            <p><strong>What's happening:</strong></p>
+            <ul>
+              <li><code>slow.next</code> is the node we want to remove</li>
+              <li><code>slow.next.next</code> is the node after it</li>
+              <li>We bypass the target by pointing directly to the next node</li>
+            </ul>
+            
+            <p>The removed node is effectively unreachable now — it's been "snipped out" of the linked list chain.</p>`,
+            insight: "Linked list deletion is just pointer redirection. No actual 'deletion' happens — we just bypass the node.",
+            visualization: "deletion"
+          },
+          {
+            title: "Stage 7: Complexity & Why This Is Optimal",
+            thought: "Let me verify this is the best we can do. One pass, constant space... yeah, that's optimal!",
+            content: `<p><strong>Time Complexity: O(n)</strong></p>
+            <ul>
+              <li>We traverse the list once</li>
+              <li>Move fast n+1 steps, then move both until fast reaches end</li>
+              <li>Total: ~L steps where L = list length</li>
+            </ul>
+            
+            <p><strong>Space Complexity: O(1)</strong></p>
+            <ul>
+              <li>Only using three pointers (dummy, slow, fast)</li>
+              <li>No auxiliary data structures</li>
+              <li>Space usage doesn't grow with input size</li>
+            </ul>
+            
+            <p><strong>Why this is optimal:</strong> We must at least touch the nodes near the target (O(n) is unavoidable). We can't improve on O(1) space for a pointer-based approach. This solution achieves both theoretical limits.</p>`,
+            insight: "One-pass, constant space — this solution is theoretically optimal for this problem.",
+            visualization: "complexity"
+          }
+        ];
+        
+        this.init();
       }
       
-      cursor = 0;
-      playing = false;
-      if (playTimer) clearTimeout(playTimer);
-      steps = buildSteps(vals, n);
-      clearLog();
-      renderStep(0);
-      updateButtons();
-    }
-    
-    function buildSteps(vals, n) {
-      const steps = [];
-      let stepIdx = 0;
+      init() {
+        const listStr = document.getElementById('listInp').value;
+        const n = parseInt(document.getElementById('nInp').value);
+        
+        const vals = listStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+        if (vals.length === 0 || isNaN(n) || n < 1 || n > vals.length) {
+          alert('Invalid input. Please enter a valid list and n value.');
+          return;
+        }
+        
+        this.execCursor = 0;
+        this.intuitCursor = 0;
+        this.playing = false;
+        if (this.playTimer) clearTimeout(this.playTimer);
+        
+        this.execSteps = this.buildExecSteps(vals, n);
+        this.listVals = vals;
+        this.nVal = n;
+        
+        this.render();
+      }
       
-      // Build linked list
-      let head = null;
-      let tail = null;
-      for (let val of vals) {
-        const node = new ListNode(val);
-        if (!head) {
-          head = node;
-          tail = node;
+      setMode(mode) {
+        if (this.playing) this.togglePlay();
+        this.mode = mode;
+        
+        document.getElementById('btnIntuitMode').classList.toggle('active', mode === 'intuition');
+        document.getElementById('btnExecMode').classList.toggle('active', mode === 'execution');
+        
+        this.render();
+      }
+      
+      render() {
+        const main = document.getElementById('mainContent');
+        
+        if (this.mode === 'execution') {
+          main.innerHTML = this.renderExecutionMode();
+          this.attachExecListeners();
+          this.renderExecStep(this.execCursor);
         } else {
-          tail.next = node;
-          tail = node;
+          main.innerHTML = this.renderIntuitionMode();
+          this.attachIntuitListeners();
+          this.updateIntuitStages();
         }
       }
       
-      // Snapshot helper
-      function snap(line, msg, logType, logText, state) {
-        const listArr = [];
-        let curr = state.dummy || state.head;
-        while (curr) {
-          listArr.push({
-            val: curr.val,
-            isDummy: curr === state.dummy,
-            isSlow: curr === state.slow,
-            isFast: curr === state.fast,
-            isToRemove: curr === state.toRemove,
-            isRemoved: state.removed && curr === state.toRemove
+      renderExecutionMode() {
+        return `
+          <div class="exec-layout">
+            <!-- CODE PANEL -->
+            <div class="panel">
+              <div class="panel-hdr">Python Code</div>
+              <div class="panel-body">
+                <div class="code-line" data-line="1">
+                  <span class="ln">1</span>
+                  <span class="ct"><span class="kw">class</span> <span class="fn">Solution</span>:</span>
+                </div>
+                <div class="code-line" data-line="2">
+                  <span class="ln">2</span>
+                  <span class="ct">    <span class="kw">def</span> <span class="fn">removeNthFromEnd</span>(<span class="kw">self</span>, head, n):</span>
+                </div>
+                <div class="code-line" data-line="3">
+                  <span class="ln">3</span>
+                  <span class="ct">        <span class="cm"># Create dummy node</span></span>
+                </div>
+                <div class="code-line" data-line="4">
+                  <span class="ln">4</span>
+                  <span class="ct">        dummy = ListNode(<span class="nm">0</span>, head)</span>
+                </div>
+                <div class="code-line" data-line="5">
+                  <span class="ln">5</span>
+                  <span class="ct">        slow = fast = dummy</span>
+                </div>
+                <div class="code-line" data-line="6">
+                  <span class="ln">6</span>
+                  <span class="ct">        </span>
+                </div>
+                <div class="code-line" data-line="7">
+                  <span class="ln">7</span>
+                  <span class="ct">        <span class="cm"># Move fast n+1 steps ahead</span></span>
+                </div>
+                <div class="code-line" data-line="8">
+                  <span class="ln">8</span>
+                  <span class="ct">        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n + <span class="nm">1</span>):</span>
+                </div>
+                <div class="code-line" data-line="9">
+                  <span class="ln">9</span>
+                  <span class="ct">            fast = fast.next</span>
+                </div>
+                <div class="code-line" data-line="10">
+                  <span class="ln">10</span>
+                  <span class="ct">        </span>
+                </div>
+                <div class="code-line" data-line="11">
+                  <span class="ln">11</span>
+                  <span class="ct">        <span class="cm"># Move both until fast is None</span></span>
+                </div>
+                <div class="code-line" data-line="12">
+                  <span class="ln">12</span>
+                  <span class="ct">        <span class="kw">while</span> fast:</span>
+                </div>
+                <div class="code-line" data-line="13">
+                  <span class="ln">13</span>
+                  <span class="ct">            slow = slow.next</span>
+                </div>
+                <div class="code-line" data-line="14">
+                  <span class="ln">14</span>
+                  <span class="ct">            fast = fast.next</span>
+                </div>
+                <div class="code-line" data-line="15">
+                  <span class="ln">15</span>
+                  <span class="ct">        </span>
+                </div>
+                <div class="code-line" data-line="16">
+                  <span class="ln">16</span>
+                  <span class="ct">        <span class="cm"># Remove nth node</span></span>
+                </div>
+                <div class="code-line" data-line="17">
+                  <span class="ln">17</span>
+                  <span class="ct">        slow.next = slow.next.next</span>
+                </div>
+                <div class="code-line" data-line="18">
+                  <span class="ln">18</span>
+                  <span class="ct">        </span>
+                </div>
+                <div class="code-line" data-line="19">
+                  <span class="ln">19</span>
+                  <span class="ct">        <span class="kw">return</span> dummy.next</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- VIZ PANEL -->
+            <div class="panel viz-panel">
+              <div class="panel-hdr">Visualization</div>
+              <div class="viz-content" id="vizContent"></div>
+              <div class="bot">
+                <button id="btnPrev" onclick="app.stepBack()">◄ Prev</button>
+                <button id="btnPlay" onclick="app.togglePlay()">▶ Play</button>
+                <button id="btnNext" onclick="app.stepFwd()">Next ►</button>
+                <span class="step-info" id="stepInfo">0 / 0</span>
+                <div class="spd-wrap">
+                  <label>Speed</label>
+                  <input type="range" id="speedSlider" min="100" max="1500" value="800"/>
+                </div>
+              </div>
+            </div>
+            
+            <!-- LOG PANEL -->
+            <div class="panel">
+              <div class="panel-hdr">Step Log</div>
+              <div class="panel-body">
+                <div class="log-scroll" id="logScroll"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderIntuitionMode() {
+        return `
+          <div class="intuit-layout">
+            <!-- THOUGHT PROCESS PANEL -->
+            <div class="panel">
+              <div class="panel-hdr">Senior Engineer's Thought Process</div>
+              <div class="intuit-content" id="intuitContent">
+                ${this.intuitionStages.map((stage, i) => `
+                  <div class="stage ${i === this.intuitCursor ? 'active' : (i < this.intuitCursor ? 'past' : '')}">
+                    <div class="stage-header">
+                      <div class="stage-num">${i + 1}</div>
+                      <div class="stage-title">${stage.title}</div>
+                    </div>
+                    
+                    <div class="thought-bubble">${stage.thought}</div>
+                    
+                    <div class="stage-content">
+                      ${stage.content}
+                    </div>
+                    
+                    <div class="key-insight">
+                      <div class="key-insight-title">Key Insight</div>
+                      <div class="key-insight-text">${stage.insight}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="intuit-nav">
+                <button id="btnIntuitPrev" onclick="app.intuitPrev()">◄ Previous Stage</button>
+                <button id="btnIntuitNext" onclick="app.intuitNext()">Next Stage ►</button>
+                <span class="stage-info" id="intuitInfo">Stage 1 of ${this.intuitionStages.length}</span>
+              </div>
+            </div>
+            
+            <!-- VISUAL EXPLANATION PANEL -->
+            <div class="panel">
+              <div class="panel-hdr">Visual Explanation</div>
+              <div class="intuit-viz-area" id="intuitViz">
+                <!-- Rendered based on current stage -->
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      buildExecSteps(vals, n) {
+        const steps = [];
+        
+        // Build linked list
+        let head = null;
+        let tail = null;
+        for (let val of vals) {
+          const node = new ListNode(val);
+          if (!head) {
+            head = node;
+            tail = node;
+          } else {
+            tail.next = node;
+            tail = node;
+          }
+        }
+        
+        function snap(line, msg, logType, logText, state) {
+          const listArr = [];
+          let curr = state.dummy || state.head;
+          while (curr) {
+            listArr.push({
+              val: curr.val,
+              isDummy: curr === state.dummy,
+              isSlow: curr === state.slow,
+              isFast: curr === state.fast,
+              isToRemove: curr === state.toRemove,
+              isRemoved: state.removed && curr === state.toRemove
+            });
+            curr = curr.next;
+          }
+          
+          steps.push({
+            line: line,
+            msg: msg,
+            log: { type: logType, text: logText },
+            listArr: listArr,
+            n: n,
+            slow: state.slow,
+            fast: state.fast,
+            done: state.done || false
           });
-          curr = curr.next;
         }
         
-        steps.push({
-          line: line,
-          msg: msg,
-          log: { type: logType, text: logText },
-          listArr: listArr,
-          n: n,
-          slow: state.slow,
-          fast: state.fast,
-          done: state.done || false
-        });
-      }
-      
-      // Algorithm simulation
-      const dummy = new ListNode(0, head);
-      let slow = dummy;
-      let fast = dummy;
-      
-      snap(4, 'Created dummy node pointing to head', 'init', 'Initialize dummy, slow, fast pointers', {
-        dummy, head, slow, fast, done: false
-      });
-      
-      // Move fast n+1 steps ahead
-      for (let i = 0; i <= n; i++) {
-        fast = fast.next;
-        snap(9, `Moving fast pointer (step ${i+1}/${n+1})`, 'move', `Fast pointer advanced to position ${i+1}`, {
+        const dummy = new ListNode(0, head);
+        let slow = dummy;
+        let fast = dummy;
+        
+        snap(4, 'Created dummy node pointing to head', 'init', 'Initialize dummy, slow, fast pointers', {
           dummy, head, slow, fast, done: false
         });
-      }
-      
-      snap(9, `Fast pointer is now ${n+1} steps ahead of slow`, 'move', `Gap of ${n} nodes created between slow and fast`, {
-        dummy, head, slow, fast, done: false
-      });
-      
-      // Move both until fast reaches end
-      let moveCount = 0;
-      while (fast) {
-        slow = slow.next;
-        fast = fast.next;
-        moveCount++;
-        snap(13, `Moving both pointers together (iteration ${moveCount})`, 'move', `Both pointers moved forward`, {
-          dummy, head, slow, fast, done: false
-        });
-      }
-      
-      // Mark node to remove
-      const toRemove = slow.next;
-      snap(17, 'Slow pointer is just before the node to remove', 'found', `Node with value ${toRemove.val} will be removed`, {
-        dummy, head, slow, fast, toRemove, done: false
-      });
-      
-      // Remove the node
-      slow.next = slow.next.next;
-      snap(17, 'Removed the nth node from end', 'remove', `Removed node with value ${toRemove.val}`, {
-        dummy, head, slow, fast, toRemove, removed: true, done: false
-      });
-      
-      // Final result
-      const result = dummy.next;
-      snap(19, 'Return modified list', 'complete', 'List modification complete', {
-        dummy, head: result, slow, fast, toRemove, removed: true, done: true
-      });
-      
-      return steps;
-    }
-    
-    function renderStep(idx) {
-      if (idx < 0 || idx >= steps.length) return;
-      
-      const step = steps[idx];
-      const viz = document.getElementById('vizContent');
-      
-      // Highlight active line
-      document.querySelectorAll('.code-line').forEach(line => {
-        line.classList.toggle('active', parseInt(line.dataset.line) === step.line);
-      });
-      
-      // Build visualization
-      let html = '';
-      
-      // Linked list visualization
-      html += '<div class="list-viz">';
-      html += '<div class="list-row">';
-      step.listArr.forEach((node, i) => {
-        let classes = 'node-box';
-        if (node.isDummy) classes += ' dummy';
-        if (node.isSlow) classes += ' slow-ptr';
-        if (node.isFast) classes += ' fast-ptr';
-        if (node.isToRemove) classes += ' to-remove';
-        if (node.isRemoved) classes += ' removed';
         
-        html += `<div class="${classes}">`;
-        html += `<div class="node-val">${node.val}</div>`;
-        if (node.isDummy) html += `<div class="node-label">dummy</div>`;
-        html += '</div>';
-        
-        if (i < step.listArr.length - 1) {
-          html += '<div class="arrow">→</div>';
+        for (let i = 0; i <= n; i++) {
+          fast = fast.next;
+          snap(9, `Moving fast pointer (step ${i+1}/${n+1})`, 'move', `Fast pointer advanced to position ${i+1}`, {
+            dummy, head, slow, fast, done: false
+          });
         }
-      });
-      html += '</div>';
+        
+        snap(9, `Fast pointer is now ${n+1} steps ahead of slow`, 'move', `Gap of ${n} nodes created between slow and fast`, {
+          dummy, head, slow, fast, done: false
+        });
+        
+        let moveCount = 0;
+        while (fast) {
+          slow = slow.next;
+          fast = fast.next;
+          moveCount++;
+          snap(13, `Moving both pointers together (iteration ${moveCount})`, 'move', `Both pointers moved forward`, {
+            dummy, head, slow, fast, done: false
+          });
+        }
+        
+        const toRemove = slow.next;
+        snap(17, 'Slow pointer is just before the node to remove', 'found', `Node with value ${toRemove.val} will be removed`, {
+          dummy, head, slow, fast, toRemove, done: false
+        });
+        
+        slow.next = slow.next.next;
+        snap(17, 'Removed the nth node from end', 'remove', `Removed node with value ${toRemove.val}`, {
+          dummy, head, slow, fast, toRemove, removed: true, done: false
+        });
+        
+        const result = dummy.next;
+        snap(19, 'Return modified list', 'complete', 'List modification complete', {
+          dummy, head: result, slow, fast, toRemove, removed: true, done: true
+        });
+        
+        return steps;
+      }
       
-      // Pointer labels
-      html += '<div class="list-row" style="gap:0.5rem;margin-top:0.5rem">';
-      if (step.slow) html += '<div class="ptr-label slow">SLOW</div>';
-      if (step.fast) html += '<div class="ptr-label fast">FAST</div>';
-      html += '</div>';
-      html += '</div>';
-      
-      // Variables
-      html += '<div class="vars-grid">';
-      html += `<div class="vc"><div class="vn">n (from end)</div><div class="vv">${step.n}</div></div>`;
-      html += '</div>';
-      
-      // Message box
-      html += `<div class="msg-box">${step.msg}</div>`;
-      
-      // Result box (if done)
-      if (step.done) {
-        const resultVals = step.listArr.filter(n => !n.isDummy && !n.isRemoved).map(n => n.val).join(' → ');
-        html += '<div class="result-box">';
-        html += '<div class="result-title">Modified List</div>';
-        html += `<div class="result-val">${resultVals}</div>`;
+      renderExecStep(idx) {
+        if (idx < 0 || idx >= this.execSteps.length) return;
+        
+        const step = this.execSteps[idx];
+        const viz = document.getElementById('vizContent');
+        
+        document.querySelectorAll('.code-line').forEach(line => {
+          line.classList.toggle('active', parseInt(line.dataset.line) === step.line);
+        });
+        
+        let html = '';
+        
+        html += '<div class="list-viz">';
+        html += '<div class="list-row">';
+        step.listArr.forEach((node, i) => {
+          let classes = 'node-box';
+          if (node.isDummy) classes += ' dummy';
+          if (node.isSlow) classes += ' slow-ptr';
+          if (node.isFast) classes += ' fast-ptr';
+          if (node.isToRemove) classes += ' to-remove';
+          if (node.isRemoved) classes += ' removed';
+          
+          html += `<div class="${classes}">`;
+          html += `<div class="node-val">${node.val}</div>`;
+          if (node.isDummy) html += `<div class="node-label">dummy</div>`;
+          html += '</div>';
+          
+          if (i < step.listArr.length - 1) {
+            html += '<div class="arrow">→</div>';
+          }
+        });
         html += '</div>';
+        
+        html += '<div class="list-row" style="gap:0.5rem;margin-top:0.5rem">';
+        if (step.slow) html += '<div class="ptr-label slow">SLOW</div>';
+        if (step.fast) html += '<div class="ptr-label fast">FAST</div>';
+        html += '</div>';
+        html += '</div>';
+        
+        html += '<div class="vars-grid">';
+        html += `<div class="vc"><div class="vn">n (from end)</div><div class="vv">${step.n}</div></div>`;
+        html += '</div>';
+        
+        html += `<div class="msg-box">${step.msg}</div>`;
+        
+        if (step.done) {
+          const resultVals = step.listArr.filter(n => !n.isDummy && !n.isRemoved).map(n => n.val).join(' → ');
+          html += '<div class="result-box">';
+          html += '<div class="result-title">Modified List</div>';
+          html += `<div class="result-val">${resultVals}</div>`;
+          html += '</div>';
+        }
+        
+        viz.innerHTML = html;
+        
+        document.getElementById('stepInfo').textContent = `${idx} / ${this.execSteps.length - 1}`;
+        this.updateExecButtons();
+        
+        this.rebuildLog();
       }
       
-      viz.innerHTML = html;
+      stepFwd() {
+        if (this.execCursor < this.execSteps.length - 1) {
+          this.execCursor++;
+          this.renderExecStep(this.execCursor);
+        }
+      }
       
-      // Update step info
-      document.getElementById('stepInfo').textContent = `${idx} / ${steps.length - 1}`;
-      updateButtons();
-    }
-    
-    function stepFwd() {
-      if (cursor < steps.length - 1) {
-        cursor++;
-        addLog(cursor, steps[cursor].log);
-        renderStep(cursor);
+      stepBack() {
+        if (this.execCursor > 0) {
+          this.execCursor--;
+          this.renderExecStep(this.execCursor);
+        }
+      }
+      
+      togglePlay() {
+        this.playing = !this.playing;
+        document.getElementById('btnPlay').textContent = this.playing ? '⏸ Pause' : '▶ Play';
+        if (this.playing) {
+          this.playStep();
+        } else {
+          if (this.playTimer) clearTimeout(this.playTimer);
+        }
+      }
+      
+      playStep() {
+        if (!this.playing) return;
+        if (this.execCursor < this.execSteps.length - 1) {
+          this.stepFwd();
+          const speed = parseInt(document.getElementById('speedSlider').value);
+          this.playTimer = setTimeout(() => this.playStep(), speed);
+        } else {
+          this.playing = false;
+          document.getElementById('btnPlay').textContent = '▶ Play';
+        }
+      }
+      
+      updateExecButtons() {
+        document.getElementById('btnPrev').disabled = this.execCursor === 0;
+        document.getElementById('btnNext').disabled = this.execCursor === this.execSteps.length - 1;
+      }
+      
+      rebuildLog() {
+        const el = document.getElementById('logScroll');
+        el.innerHTML = '';
+        for (let i = 0; i <= this.execCursor; i++) {
+          const log = this.execSteps[i].log;
+          const d = document.createElement('div');
+          d.className = `log-entry ${log.type}`;
+          d.innerHTML = `<span class="ls">[${i}]</span>${log.text}`;
+          el.appendChild(d);
+        }
+        el.scrollTop = el.scrollHeight;
+      }
+      
+      attachExecListeners() {
+        // Already attached via onclick
+      }
+      
+      // INTUITION MODE METHODS
+      
+      intuitNext() {
+        if (this.intuitCursor < this.intuitionStages.length - 1) {
+          this.intuitCursor++;
+          this.updateIntuitStages();
+        }
+      }
+      
+      intuitPrev() {
+        if (this.intuitCursor > 0) {
+          this.intuitCursor--;
+          this.updateIntuitStages();
+        }
+      }
+      
+      updateIntuitStages() {
+        document.querySelectorAll('.stage').forEach((stage, i) => {
+          stage.classList.remove('active', 'past');
+          if (i === this.intuitCursor) {
+            stage.classList.add('active');
+          } else if (i < this.intuitCursor) {
+            stage.classList.add('past');
+          }
+        });
+        
+        document.getElementById('intuitInfo').textContent = 
+          `Stage ${this.intuitCursor + 1} of ${this.intuitionStages.length}`;
+        
+        document.getElementById('btnIntuitPrev').disabled = this.intuitCursor === 0;
+        document.getElementById('btnIntuitNext').disabled = 
+          this.intuitCursor === this.intuitionStages.length - 1;
+        
+        // Scroll active stage into view
+        const activeStage = document.querySelectorAll('.stage')[this.intuitCursor];
+        if (activeStage) {
+          activeStage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        this.renderIntuitViz();
+      }
+      
+      renderIntuitViz() {
+        const stage = this.intuitionStages[this.intuitCursor];
+        const viz = document.getElementById('intuitViz');
+        
+        let html = '';
+        
+        switch (stage.visualization) {
+          case 'problem':
+            html = this.renderProblemViz();
+            break;
+          case 'twopointer':
+            html = this.renderTwoPointerViz();
+            break;
+          case 'dummy':
+            html = this.renderDummyViz();
+            break;
+          case 'positioning':
+            html = this.renderPositioningViz();
+            break;
+          case 'movement':
+            html = this.renderMovementViz();
+            break;
+          case 'deletion':
+            html = this.renderDeletionViz();
+            break;
+          case 'complexity':
+            html = this.renderComplexityViz();
+            break;
+        }
+        
+        viz.innerHTML = html;
+      }
+      
+      renderProblemViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">The Challenge</div>
+            <div class="list-viz">
+              <div class="list-row">
+                ${[1,2,3,4,5].map((v, i) => `
+                  <div class="node-box ${i === 3 ? 'to-remove' : ''}">
+                    <div class="node-val">${v}</div>
+                    ${i === 3 ? '<div class="node-label">remove this</div>' : ''}
+                  </div>
+                  ${i < 4 ? '<div class="arrow">→</div>' : ''}
+                `).join('')}
+              </div>
+              <div style="margin-top: 1rem; color: var(--text);">
+                <strong>Given:</strong> n = 2 (2nd from end)<br>
+                <strong>Problem:</strong> We can only traverse forward → → →
+              </div>
+            </div>
+          </div>
+          
+          <div class="approach-card rejected">
+            <div class="approach-title">❌ Naive Approach: Two Passes</div>
+            <div class="approach-detail">
+              <div><strong>Pass 1:</strong> Count total length</div>
+              <div><strong>Pass 2:</strong> Navigate to (length - n)th node</div>
+              <div style="color: var(--red); margin-top: 0.5rem;">Not optimal — can we do better?</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderTwoPointerViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">Two Pointer Technique</div>
+            <div class="list-viz">
+              <div class="list-row">
+                ${[0,1,2,3,4,5].map((v, i) => `
+                  <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 0 ? 'slow-ptr' : ''} ${i === 3 ? 'fast-ptr' : ''}">
+                    <div class="node-val">${v === 0 ? 'D' : v}</div>
+                    ${i === 0 ? '<div class="node-label">dummy</div>' : ''}
+                  </div>
+                  ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                `).join('')}
+              </div>
+              <div class="list-row" style="gap:0.5rem;margin-top:0.5rem">
+                <div class="ptr-label slow">SLOW (start)</div>
+                <div class="ptr-label fast">FAST (n+1 ahead)</div>
+              </div>
+              <div style="margin-top: 1rem; padding: 1rem; background: var(--card); border-radius: 6px;">
+                <strong style="color: var(--accent);">Key Insight:</strong> If the gap is <code>n+1</code> nodes, when fast reaches null, slow is at the predecessor of the target!
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderDummyViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">Why Use a Dummy Node?</div>
+            <div style="margin-bottom: 1.5rem;">
+              <strong style="color: var(--text);">Edge Case:</strong> Remove head (n = list length)
+            </div>
+            <div class="list-viz">
+              <div class="list-row">
+                ${[0,1,2].map((v, i) => `
+                  <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 1 ? 'to-remove' : ''}">
+                    <div class="node-val">${v === 0 ? 'D' : v}</div>
+                    ${i === 0 ? '<div class="node-label">dummy</div>' : ''}
+                    ${i === 1 ? '<div class="node-label">head</div>' : ''}
+                  </div>
+                  ${i < 2 ? '<div class="arrow">→</div>' : ''}
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+            <div class="approach-card rejected">
+              <div class="approach-title">❌ Without Dummy</div>
+              <div class="approach-detail">
+                <div>Start at head</div>
+                <div>Can't access predecessor</div>
+                <div>Special case needed for head removal</div>
+              </div>
+            </div>
+            
+            <div class="approach-card chosen">
+              <div class="approach-title">✅ With Dummy</div>
+              <div class="approach-detail">
+                <div>Start at dummy</div>
+                <div>Always have predecessor</div>
+                <div>Uniform handling of all cases</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderPositioningViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">Initial Positioning: Why n+1 Steps?</div>
+            <div style="margin-bottom: 1rem; color: var(--text);">
+              <strong>Example:</strong> [1,2,3,4,5], n=2 (remove 4)
+            </div>
+            <div class="list-viz">
+              <div class="list-row">
+                ${[0,1,2,3,4,5].map((v, i) => `
+                  <div class="node-box ${i === 0 ? 'dummy slow-ptr' : ''} ${i === 3 ? 'fast-ptr' : ''}">
+                    <div class="node-val">${v === 0 ? 'D' : v}</div>
+                  </div>
+                  ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                `).join('')}
+              </div>
+              <div style="margin-top: 1rem; padding: 1rem; background: var(--card); border-radius: 6px;">
+                <div style="margin-bottom: 0.5rem;">
+                  <strong>Move fast</strong> n+1 = 3 steps ahead
+                </div>
+                <div style="color: var(--muted); font-size: 0.9rem;">
+                  Gap between slow and fast = 3 nodes<br>
+                  When fast reaches end, slow will be at node 3 (before node 4)
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 1.5rem; padding: 1.25rem; background: rgba(57,217,138,0.08); border: 2px solid var(--green); border-radius: 8px;">
+            <strong style="color: var(--green);">💡 Why n+1 instead of n?</strong>
+            <div style="margin-top: 0.5rem; color: var(--text);">
+              We need slow to stop at the <strong>predecessor</strong> (node before target), not at the target itself. This allows us to do <code>slow.next = slow.next.next</code>.
+            </div>
+          </div>
+        `;
+      }
+      
+      renderMovementViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">Movement Phase: Maintaining the Gap</div>
+            <div style="margin-bottom: 1rem; font-family: 'Fira Code', monospace; background: var(--card); padding: 1rem; border-radius: 6px;">
+while fast:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;slow = slow.next<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fast = fast.next
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">Iteration 1</div>
+                <div class="list-viz">
+                  <div class="list-row">
+                    ${[0,1,2,3,4,5].map((v, i) => `
+                      <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 1 ? 'slow-ptr' : ''} ${i === 4 ? 'fast-ptr' : ''}">
+                        <div class="node-val">${v === 0 ? 'D' : v}</div>
+                      </div>
+                      ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">Iteration 2</div>
+                <div class="list-viz">
+                  <div class="list-row">
+                    ${[0,1,2,3,4,5].map((v, i) => `
+                      <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 2 ? 'slow-ptr' : ''} ${i === 5 ? 'fast-ptr' : ''}">
+                        <div class="node-val">${v === 0 ? 'D' : v}</div>
+                      </div>
+                      ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--green);">Final Position (fast = null)</div>
+                <div class="list-viz">
+                  <div class="list-row">
+                    ${[0,1,2,3,4,5].map((v, i) => `
+                      <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 3 ? 'slow-ptr' : ''} ${i === 4 ? 'to-remove' : ''}">
+                        <div class="node-val">${v === 0 ? 'D' : v}</div>
+                      </div>
+                      ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                    `).join('')}
+                  </div>
+                  <div style="margin-top: 1rem; color: var(--green);">
+                    ✅ Slow is at node 3, perfectly positioned before node 4 (target)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderDeletionViz() {
+        return `
+          <div class="demo-section">
+            <div class="demo-title">The Deletion: One Line of Code</div>
+            
+            <div style="margin-bottom: 1.5rem;">
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">Before Deletion</div>
+              <div class="list-viz">
+                <div class="list-row">
+                  ${[0,1,2,3,4,5].map((v, i) => `
+                    <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 3 ? 'slow-ptr' : ''} ${i === 4 ? 'to-remove' : ''}">
+                      <div class="node-val">${v === 0 ? 'D' : v}</div>
+                    </div>
+                    ${i < 5 ? '<div class="arrow">→</div>' : ''}
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+            
+            <div style="background: var(--card); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+              <div style="font-family: 'Fira Code', monospace; color: var(--yellow);">
+                slow.next = slow.next.next
+              </div>
+              <div style="margin-top: 0.5rem; color: var(--muted); font-size: 0.9rem;">
+                Translation: "Point to the node after the one I'm skipping"
+              </div>
+            </div>
+            
+            <div>
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">After Deletion</div>
+              <div class="list-viz">
+                <div class="list-row">
+                  ${[0,1,2,3,5].map((v, i) => `
+                    <div class="node-box ${i === 0 ? 'dummy' : ''} ${i === 3 ? 'slow-ptr' : ''}">
+                      <div class="node-val">${v === 0 ? 'D' : v}</div>
+                    </div>
+                    ${i < 4 ? '<div class="arrow">→</div>' : ''}
+                  `).join('')}
+                </div>
+                <div style="margin-top: 1rem;">
+                  <div class="node-box removed" style="display: inline-block;">
+                    <div class="node-val">4</div>
+                    <div class="node-label">orphaned</div>
+                  </div>
+                  <div style="margin-top: 0.5rem; color: var(--muted); font-size: 0.9rem;">
+                    Node 4 is no longer reachable — effectively deleted
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderComplexityViz() {
+        return `
+          <div class="complexity-grid">
+            <div class="complexity-card">
+              <div class="complexity-label">Time Complexity</div>
+              <div class="complexity-value">O(n)</div>
+              <div class="complexity-explain">
+                • Traverse list once<br>
+                • Fast pointer: ~n steps<br>
+                • Both pointers: ~L-n steps<br>
+                • Total: O(L) where L = length
+              </div>
+            </div>
+            
+            <div class="complexity-card">
+              <div class="complexity-label">Space Complexity</div>
+              <div class="complexity-value">O(1)</div>
+              <div class="complexity-explain">
+                • Only 3 pointers (dummy, slow, fast)<br>
+                • No auxiliary data structures<br>
+                • Constant space regardless of input size
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(57,217,138,0.08); border: 2px solid var(--green); border-radius: 8px;">
+            <div style="font-weight: 600; color: var(--green); margin-bottom: 0.75rem;">
+              ✅ This Solution Is Optimal
+            </div>
+            <div style="color: var(--text); line-height: 1.6;">
+              <strong>Why?</strong> We must at least touch the node we're removing (O(n) is unavoidable). We can't improve on O(1) space for a pointer-based approach. This solution achieves both theoretical limits.
+            </div>
+          </div>
+          
+          <div style="margin-top: 1rem; padding: 1.25rem; background: var(--card); border-radius: 8px;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem;">Alternative Approaches</div>
+            <div style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              • <strong>Two-pass:</strong> O(n) time, O(1) space — same complexity, but less elegant<br>
+              • <strong>Stack-based:</strong> O(n) time, O(n) space — worse space complexity<br>
+              • <strong>Recursion:</strong> O(n) time, O(n) space (call stack) — same issue
+            </div>
+          </div>
+        `;
+      }
+      
+      attachIntuitListeners() {
+        // Already attached via onclick
       }
     }
     
-    function stepBack() {
-      if (cursor > 0) {
-        cursor--;
-        rebuildLog();
-        renderStep(cursor);
-      }
-    }
+    // Initialize app
+    const app = new App();
     
-    function togglePlay() {
-      playing = !playing;
-      document.getElementById('btnPlay').textContent = playing ? '⏸ Pause' : '▶ Play';
-      if (playing) {
-        playStep();
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (app.mode === 'execution') {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          app.togglePlay();
+        } else if (e.code === 'ArrowRight') {
+          e.preventDefault();
+          app.stepFwd();
+        } else if (e.code === 'ArrowLeft') {
+          e.preventDefault();
+          app.stepBack();
+        }
       } else {
-        if (playTimer) clearTimeout(playTimer);
+        if (e.code === 'ArrowRight') {
+          e.preventDefault();
+          app.intuitNext();
+        } else if (e.code === 'ArrowLeft') {
+          e.preventDefault();
+          app.intuitPrev();
+        }
       }
-    }
-    
-    function playStep() {
-      if (!playing) return;
-      if (cursor < steps.length - 1) {
-        stepFwd();
-        const speed = parseInt(document.getElementById('speedSlider').value);
-        playTimer = setTimeout(playStep, speed);
-      } else {
-        playing = false;
-        document.getElementById('btnPlay').textContent = '▶ Play';
-      }
-    }
-    
-    function updateButtons() {
-      document.getElementById('btnPrev').disabled = cursor === 0;
-      document.getElementById('btnNext').disabled = cursor === steps.length - 1;
-    }
-    
-    function addLog(idx, log) {
-      const el = document.getElementById('logScroll');
-      const d = document.createElement('div');
-      d.className = `log-entry ${log.type}`;
-      d.innerHTML = `<span class="ls">[${idx}]</span>${log.text}`;
-      el.appendChild(d);
-      el.scrollTop = el.scrollHeight;
-    }
-    
-    function clearLog() {
-      document.getElementById('logScroll').innerHTML = '';
-    }
-    
-    function rebuildLog() {
-      clearLog();
-      for (let i = 0; i <= cursor; i++) {
-        addLog(i, steps[i].log);
-      }
-    }
-    
-    // Initialize on load
-    init();
+    });
   </script>
 </body>
 </html>
