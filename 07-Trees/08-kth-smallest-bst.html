@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>230. Kth Smallest Element in a BST - Visualizer</title>
+    <title>230. Kth Smallest Element in a BST - Dual Mode Visualizer</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,9 @@
             --code-bg: #f9fafb;
             --highlight: #fef3c7;
             --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
             --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
             
             /* Syntax highlighting - Light */
@@ -40,6 +43,9 @@
             --code-bg: #0f1419;
             --highlight: #422006;
             --accent: #60a5fa;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #fbbf24;
             
             /* Syntax highlighting - Dark (Dracula-inspired) */
             --keyword: #ff79c6;
@@ -84,12 +90,6 @@
             color: var(--text-primary);
         }
 
-        .controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
         .theme-toggle {
             background: var(--bg-primary);
             border: 1px solid var(--border);
@@ -105,6 +105,37 @@
             background: var(--border);
         }
 
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            background: var(--border);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Input Section */
         .input-section {
             display: flex;
             gap: 12px;
@@ -124,7 +155,6 @@
             color: var(--text-primary);
             font-family: var(--font-mono);
             font-size: 13px;
-            width: 250px;
         }
 
         .input-field:focus {
@@ -146,11 +176,6 @@
 
         .btn:hover {
             opacity: 0.9;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         /* Main Content */
@@ -187,8 +212,8 @@
         /* Code Panel */
         .code-display {
             font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.7;
             background: var(--code-bg);
             color: var(--text-primary);
             height: 100%;
@@ -202,8 +227,8 @@
         .code-line {
             display: flex;
             align-items: center;
-            padding: 3px 0;
-            min-height: 22px;
+            padding: 2px 0;
+            min-height: 24px;
             transition: background 0.2s ease;
         }
 
@@ -224,16 +249,116 @@
         .line-content {
             flex: 1;
             white-space: pre;
-            color: inherit;
         }
 
-        /* Syntax highlighting classes */
+        /* Syntax highlighting */
         .keyword { color: var(--keyword); font-weight: 500; }
         .function { color: var(--function); }
         .string { color: var(--string); }
         .number { color: var(--number); }
         .type { color: var(--type); }
         .comment { color: var(--comment); font-style: italic; }
+
+        /* Intuition Styles */
+        .intuition-panel {
+            padding: 24px;
+        }
+
+        .intuition-stage {
+            margin-bottom: 32px;
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .intuition-stage.active {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--accent);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .intuition-stage h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .thought-bubble {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-style: italic;
+            color: var(--text-primary);
+            border-radius: 4px;
+        }
+
+        .thought-bubble::before {
+            content: '💭 ';
+        }
+
+        .key-insight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .key-insight::before {
+            content: '💡 ';
+            font-weight: bold;
+        }
+
+        .stage-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .approach-box {
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .approach-box.rejected {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+
+        .approach-box.accepted {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .approach-box h4 {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .approach-box.rejected h4::before {
+            content: '❌ ';
+        }
+
+        .approach-box.accepted h4::before {
+            content: '✅ ';
+        }
 
         /* Visualization Panel */
         .viz-panel {
@@ -274,9 +399,6 @@
             color: var(--text-primary);
             font-size: 14px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .control-btn:hover:not(:disabled) {
@@ -334,7 +456,6 @@
             margin: 0 0 8px 0;
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-primary);
         }
 
         .variable-item {
@@ -361,20 +482,8 @@
             color: var(--text-primary);
         }
 
-        .history-item:not(.current) {
-            color: var(--text-secondary);
-        }
-
-        /* SVG Styles */
-        .tree-node {
-            transition: all 0.3s ease;
-        }
-
-        .tree-edge {
-            transition: all 0.3s ease;
-        }
-
-        .node-circle {
+        /* SVG Animations */
+        .tree-node, .tree-edge, .node-circle {
             transition: all 0.3s ease;
         }
 
@@ -383,102 +492,77 @@
             font-weight: 500;
         }
 
-        .pointer-label {
+        /* Complexity Display */
+        .complexity-box {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .complexity-box h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .complexity-item {
+            margin: 8px 0 8px 20px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Traversal Comparison */
+        .traversal-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+        }
+
+        .traversal-row.selected {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+        }
+
+        .traversal-row.unselected {
+            opacity: 0.6;
+        }
+
+        .traversal-label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .traversal-order {
             font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 14px;
+            color: var(--accent);
         }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <div class="header">
-            <div class="header-top">
-                <h1 class="title">230. Kth Smallest Element in a BST</h1>
-                <div class="controls">
-                    <button class="theme-toggle" onclick="toggleTheme()">
-                        <span id="theme-icon">🌙 Dark</span>
-                    </button>
-                </div>
-            </div>
-            <div class="input-section">
-                <span class="input-label">Tree (level-order):</span>
-                <input 
-                    type="text" 
-                    class="input-field" 
-                    id="treeInput" 
-                    value="[3,1,4,null,2]"
-                    placeholder="e.g., [3,1,4,null,2]"
-                />
-                <span class="input-label">k:</span>
-                <input 
-                    type="text" 
-                    class="input-field" 
-                    id="kInput" 
-                    value="1"
-                    placeholder="e.g., 1"
-                    style="width: 80px;"
-                />
-                <button class="btn" onclick="runSolution()">Run</button>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <!-- Code Panel -->
-            <div class="panel" style="width: 30%;">
-                <div class="panel-header">Solution Code</div>
-                <div class="panel-content">
-                    <div class="code-display" id="codePanel"></div>
-                </div>
-            </div>
-
-            <!-- Visualization Panel -->
-            <div class="panel viz-panel" style="width: 50%;">
-                <div class="panel-header">Binary Search Tree Visualization</div>
-                <div class="viz-content">
-                    <svg id="treeSvg" class="viz-svg" viewBox="0 0 800 600"></svg>
-                </div>
-                <div class="viz-controls">
-                    <button class="control-btn" onclick="resetVisualization()" title="Reset">
-                        ⏮️ Reset
-                    </button>
-                    <button class="control-btn" onclick="stepBackward()" id="stepBackBtn">
-                        ⏪ Step Back
-                    </button>
-                    <button class="control-btn primary" onclick="togglePlayPause()" id="playBtn">
-                        ▶️ Play
-                    </button>
-                    <button class="control-btn" onclick="stepForward()" id="stepForwardBtn">
-                        Step Forward ⏩
-                    </button>
-                    <select class="speed-selector" id="speedSelector" onchange="updateSpeed()">
-                        <option value="0.5">0.5x</option>
-                        <option value="1" selected>1x</option>
-                        <option value="2">2x</option>
-                        <option value="4">4x</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Step Log Panel -->
-            <div class="panel" style="width: 20%;">
-                <div class="panel-header">Execution Log</div>
-                <div class="panel-content">
-                    <div class="step-log" id="stepLog"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="container" id="app"></div>
 
     <script>
         // Global state
         let state = {
             theme: 'dark',
+            mode: 'intuition', // 'intuition' or 'execution'
+            
+            // Execution mode
             steps: [],
             currentStep: 0,
             isPlaying: false,
             speed: 1,
             playInterval: null,
+            
+            // Intuition mode
+            currentIntuitionStage: 0,
+            isIntuitionPlaying: false,
+            
+            // Common
             tree: null,
             k: 1
         };
@@ -486,6 +570,12 @@
         // Solution code
         const solutionCode = `class Solution:
     def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
+        """
+        Find kth smallest element in BST using in-order traversal.
+        
+        Time: O(k) in best case (early termination)
+        Space: O(h) for recursion stack, where h is tree height
+        """
         self.count = 0
         self.result = None
         
@@ -507,16 +597,115 @@
         inorder(root)
         return self.result`;
 
+        // Intuition stages
+        const intuitionStages = [
+            {
+                title: "Understanding the Problem",
+                thought: "A BST has a special property - when traversed in-order, we get elements in sorted order. That's the key!",
+                content: `What makes this problem unique:
+                
+• We have a Binary Search Tree (BST) where left < parent < right
+• We need the kth smallest element (1-indexed)
+• Example: [3,1,4,null,2] with k=1 should return 1
+
+The critical insight: BST + sorted order = in-order traversal!`,
+                insight: "BST property guarantees that in-order traversal visits nodes in ascending order",
+                visualization: "example_tree"
+            },
+            {
+                title: "Exploring Approaches",
+                thought: "I could collect all values then sort... but wait, the tree is already 'sorted' by structure!",
+                content: `Let me compare different strategies:`,
+                insight: "We can avoid extra sorting by leveraging the BST structure directly",
+                visualization: "approach_comparison"
+            },
+            {
+                title: "The In-Order Traversal Trick",
+                thought: "If I traverse left → node → right, I visit nodes in ascending order. I just need to count to k!",
+                content: `The key technique: In-order traversal on a BST
+
+• Pattern: Visit left subtree → current node → right subtree
+• On a BST, this naturally gives us sorted order
+• We just count nodes as we visit them
+• When count == k, we've found our answer!
+
+This is the 'secret sauce' - using the tree's structure to avoid explicit sorting.`,
+                insight: "In-order traversal on BST = free sorting! Just count to k.",
+                visualization: "traversal_comparison",
+                codeHighlight: [15, 16, 17, 18, 19, 20, 21]
+            },
+            {
+                title: "Writing the Solution",
+                thought: "I'll use recursion. Track count globally, stop early when count == k. Clean and efficient!",
+                content: `Implementation structure:
+
+• Use instance variables to track count and result
+• Recursive helper function for in-order traversal
+• Base case: null node or result already found
+• Recurse left → process node → recurse right
+• Early termination when we find the kth element`,
+                insight: "Early termination saves time - we don't need to visit all n nodes",
+                visualization: "code_flow",
+                codeHighlight: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+            },
+            {
+                title: "Complexity Analysis",
+                thought: "Best case O(k) if kth element is found early. Worst case O(n) if k equals n. Space is O(h) for recursion.",
+                content: `Why this is efficient:`,
+                insight: "This solution is optimal because we can't do better than O(k) time for finding the kth element",
+                visualization: "complexity"
+            },
+            {
+                title: "Edge Cases & Testing",
+                thought: "What could break this? k=1 (smallest), k=n (largest), single node, skewed tree...",
+                content: `Testing strategy:
+
+• Edge case 1: k = 1 (minimum element)
+  → Should return leftmost node
+  
+• Edge case 2: k = n (maximum element)
+  → Should return rightmost node
+  
+• Edge case 3: Single node tree
+  → Should return that node's value
+  
+• Edge case 4: Skewed tree (all left or all right)
+  → Still works, just deeper recursion`,
+                insight: "The solution handles all cases because in-order traversal is complete and systematic",
+                visualization: "edge_cases"
+            },
+            {
+                title: "Final Synthesis",
+                thought: "Beautiful! BST structure + in-order traversal + early termination = elegant O(k) solution.",
+                content: `Why this solution is interview-ready:
+
+• Leverages BST property (shows understanding of data structures)
+• Uses optimal traversal (in-order for sorted output)
+• Implements early termination (shows optimization thinking)
+• Clean recursive structure (demonstrates good code organization)
+• Handles edge cases naturally (robust solution)
+
+This demonstrates mastery of:
+→ Tree traversals (DFS, in-order specifically)
+→ BST properties (left < parent < right)
+→ Recursion and base cases
+→ Optimization techniques (early stopping)`,
+                insight: "This is the standard optimal solution - any interviewer would be satisfied",
+                visualization: "final_demo"
+            }
+        ];
+
         // Tree Node class
         class TreeNode {
             constructor(val, left = null, right = null) {
                 this.val = val;
                 this.left = left;
                 this.right = right;
+                this.id = Math.random();
             }
         }
 
-        // Parse level-order array to tree
+        // Parse array to tree
         function arrayToTree(arr) {
             if (!arr || arr.length === 0 || arr[0] === null) return null;
             
@@ -543,7 +732,44 @@
             return root;
         }
 
-        // Solution with step tracking
+        // Get traversal orders
+        function getInorder(root) {
+            const result = [];
+            function traverse(node) {
+                if (!node) return;
+                traverse(node.left);
+                result.push(node.val);
+                traverse(node.right);
+            }
+            traverse(root);
+            return result;
+        }
+
+        function getPreorder(root) {
+            const result = [];
+            function traverse(node) {
+                if (!node) return;
+                result.push(node.val);
+                traverse(node.left);
+                traverse(node.right);
+            }
+            traverse(root);
+            return result;
+        }
+
+        function getPostorder(root) {
+            const result = [];
+            function traverse(node) {
+                if (!node) return;
+                traverse(node.left);
+                traverse(node.right);
+                result.push(node.val);
+            }
+            traverse(root);
+            return result;
+        }
+
+        // Solution with tracking
         function kthSmallestWithTracking(root, k) {
             const steps = [];
             let count = 0;
@@ -560,80 +786,68 @@
                 });
             }
             
-            function inorder(node, depth = 0, path = []) {
-                logStep(6, { count, result, current_node: node ? node.val : null, depth, path: [...path] }, 
-                    `Entering inorder${node ? ' with node ' + node.val : ' (null node)'}`, node ? node.val : null);
+            function inorder(node) {
+                logStep(11, { count, result, current_node: node ? node.val : null }, 
+                    node ? `Entering inorder with node ${node.val}` : 'Entering inorder (null node)', 
+                    node ? node.id : null);
                 
                 if (!node || result !== null) {
-                    logStep(7, { count, result, current_node: null }, 
+                    logStep(12, { count, result }, 
                         result !== null ? 'Early termination - result found' : 'Node is null, returning', null);
                     return;
                 }
                 
-                // Left subtree
-                logStep(10, { count, result, current_node: node.val }, 
-                    `Exploring left subtree of ${node.val}`, node.val);
-                if (node.left) {
-                    inorder(node.left, depth + 1, [...path, 'L']);
-                } else {
-                    logStep(10, { count, result }, 'No left child', node.val);
-                }
+                // Left
+                logStep(15, { count, result, current_node: node.val }, 
+                    `Exploring left subtree of ${node.val}`, node.id);
+                inorder(node.left);
                 
-                if (result !== null) return; // Early exit check
+                if (result !== null) return;
                 
-                // Process current node
+                // Process
                 count++;
-                logStep(13, { count, result, current_node: node.val }, 
-                    `Processing node ${node.val} (count = ${count})`, node.val);
+                logStep(18, { count, result, current_node: node.val }, 
+                    `Processing node ${node.val} (count = ${count})`, node.id);
                 
-                logStep(14, { count, result, k, current_node: node.val }, 
-                    `Checking if count (${count}) == k (${k})`, node.val);
+                logStep(19, { count, result, k, current_node: node.val }, 
+                    `Checking if count (${count}) == k (${k})`, node.id);
                 
                 if (count === k) {
                     result = node.val;
-                    logStep(15, { count, result, k, current_node: node.val }, 
-                        `Found kth smallest! result = ${result}`, node.val);
-                    logStep(16, { count, result }, 'Early termination', node.val);
+                    logStep(20, { count, result, k }, 
+                        `Found kth smallest! result = ${result}`, node.id);
                     return;
                 }
                 
-                // Right subtree
-                logStep(18, { count, result, current_node: node.val }, 
-                    `Exploring right subtree of ${node.val}`, node.val);
-                if (node.right) {
-                    inorder(node.right, depth + 1, [...path, 'R']);
-                } else {
-                    logStep(18, { count, result }, 'No right child', node.val);
-                }
+                // Right
+                logStep(23, { count, result, current_node: node.val }, 
+                    `Exploring right subtree of ${node.val}`, node.id);
+                inorder(node.right);
             }
             
-            logStep(20, { count, result, k }, `Starting in-order traversal with k=${k}`, null);
+            logStep(25, { count, result, k }, `Starting with k=${k}`, null);
             inorder(root);
-            logStep(21, { count, result }, `Returning result: ${result}`, null);
+            logStep(26, { count, result }, `Returning result: ${result}`, null);
             
             return { result, steps };
         }
 
-        // Syntax highlighting for Python
+        // Syntax highlighting
         function highlightPythonLine(line) {
             if (!line) return '&nbsp;';
             
-            // Escape HTML
             let highlighted = line
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
             
-            // Comments
             if (highlighted.trim().startsWith('#')) {
                 return `<span class="comment">${highlighted}</span>`;
             }
             
-            // Strings (handle escaped quotes)
             highlighted = highlighted.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, 
                 '<span class="string">$&</span>');
             
-            // Keywords
             const keywords = ['class', 'def', 'if', 'or', 'not', 'return', 'None', 'self'];
             keywords.forEach(kw => {
                 const regex = new RegExp(`\\b${kw}\\b`, 'g');
@@ -641,7 +855,6 @@
                     `<span class="keyword">${kw}</span>`);
             });
             
-            // Types
             const types = ['Optional', 'TreeNode', 'int'];
             types.forEach(type => {
                 const regex = new RegExp(`\\b${type}\\b`, 'g');
@@ -649,66 +862,50 @@
                     `<span class="type">${type}</span>`);
             });
             
-            // Function names (after def or calls)
             highlighted = highlighted.replace(/\b(def\s+)([a-zA-Z_][a-zA-Z0-9_]*)/g, 
                 '$1<span class="function">$2</span>');
             highlighted = highlighted.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, 
                 '<span class="function">$1</span>(');
             
-            // Numbers
             highlighted = highlighted.replace(/\b(\d+)\b/g, 
                 '<span class="number">$1</span>');
             
             return highlighted;
         }
 
-        // Render code panel
+        // Render functions
         function renderCode(currentLine = -1) {
             const lines = solutionCode.split('\n');
-            const codePanel = document.getElementById('codePanel');
-            
             let html = '<pre>';
+            
             lines.forEach((line, i) => {
                 const lineClass = currentLine === i ? 'code-line current' : 'code-line';
-                const lineNum = i + 1;
-                const highlighted = highlightPythonLine(line);
-                
                 html += `<div class="${lineClass}">`;
-                html += `<span class="line-number">${lineNum}</span>`;
-                html += `<code class="line-content">${highlighted}</code>`;
+                html += `<span class="line-number">${i + 1}</span>`;
+                html += `<code class="line-content">${highlightPythonLine(line)}</code>`;
                 html += `</div>`;
             });
-            html += '</pre>';
             
-            codePanel.innerHTML = html;
+            html += '</pre>';
+            return html;
         }
 
-        // Calculate tree layout positions
         function calculateTreeLayout(root) {
             if (!root) return { nodes: [], edges: [] };
             
             const positions = { nodes: [], edges: [] };
             const levelWidth = 80;
             const nodeRadius = 24;
-            let maxDepth = 0;
             
-            // Calculate depth
-            function getDepth(node) {
-                if (!node) return 0;
-                return 1 + Math.max(getDepth(node.left), getDepth(node.right));
-            }
-            maxDepth = getDepth(root);
-            
-            // Assign positions using BFS
             const queue = [{ node: root, x: 400, y: 60, level: 0 }];
             const visited = new Set();
             
             while (queue.length > 0) {
                 const { node, x, y, level } = queue.shift();
-                if (!node || visited.has(node.val + '-' + level)) continue;
+                if (!node || visited.has(node.id)) continue;
                 
-                visited.add(node.val + '-' + level);
-                positions.nodes.push({ val: node.val, x, y, level });
+                visited.add(node.id);
+                positions.nodes.push({ val: node.val, x, y, level, id: node.id });
                 
                 const spread = 200 / Math.pow(2, level);
                 
@@ -736,24 +933,19 @@
             return positions;
         }
 
-        // Render tree visualization
-        function renderTree() {
-            const svg = document.getElementById('treeSvg');
+        function renderTree(currentNodeId = null, showCount = false) {
             if (!state.tree) {
-                svg.innerHTML = '<text x="400" y="300" text-anchor="middle" fill="var(--text-secondary)">No tree to display</text>';
-                return;
+                return '<text x="400" y="300" text-anchor="middle" fill="var(--text-secondary)">No tree to display</text>';
             }
             
             const layout = calculateTreeLayout(state.tree);
-            const currentStep = state.steps[state.currentStep];
-            const currentNode = currentStep ? currentStep.currentNode : null;
-            const count = currentStep ? currentStep.vars.count : 0;
+            const count = showCount && state.steps[state.currentStep] ? state.steps[state.currentStep].vars.count : 0;
             
-            let svgContent = '';
+            let svg = '';
             
-            // Draw edges
-            layout.edges.forEach((edge, i) => {
-                svgContent += `<line 
+            // Edges
+            layout.edges.forEach(edge => {
+                svg += `<line 
                     class="tree-edge"
                     x1="${edge.x1}" y1="${edge.y1}" 
                     x2="${edge.x2}" y2="${edge.y2}" 
@@ -762,9 +954,9 @@
                 />`;
             });
             
-            // Draw nodes
-            layout.nodes.forEach((node, i) => {
-                const isActive = node.val === currentNode;
+            // Nodes
+            layout.nodes.forEach(node => {
+                const isActive = node.id === currentNodeId;
                 const fillColor = isActive 
                     ? (state.theme === 'dark' ? '#3b82f6' : '#2563eb')
                     : (state.theme === 'dark' ? '#374151' : '#e5e7eb');
@@ -773,7 +965,7 @@
                     : (state.theme === 'dark' ? '#4b5563' : '#d1d5db');
                 const textColor = isActive || state.theme === 'dark' ? '#fff' : '#111827';
                 
-                svgContent += `
+                svg += `
                     <g class="tree-node">
                         <circle 
                             class="node-circle"
@@ -794,9 +986,9 @@
                 `;
             });
             
-            // Add count label
-            if (count > 0) {
-                svgContent += `
+            // Count label
+            if (showCount && count > 0) {
+                svg += `
                     <text x="400" y="30" text-anchor="middle" 
                           fill="${state.theme === 'dark' ? '#fbbf24' : '#d97706'}"
                           font-size="16" font-weight="600" font-family="var(--font-mono)">
@@ -805,17 +997,201 @@
                 `;
             }
             
-            svg.innerHTML = svgContent;
+            return svg;
         }
 
-        // Render step log
+        function renderIntuitionViz() {
+            const stage = intuitionStages[state.currentIntuitionStage];
+            
+            switch(stage.visualization) {
+                case 'example_tree':
+                    return `
+                        <div style="padding: 24px; width: 100%;">
+                            <svg viewBox="0 0 800 400" style="width: 100%; height: 400px;">
+                                ${renderTree()}
+                            </svg>
+                            <div style="text-align: center; margin-top: 16px; color: var(--text-secondary);">
+                                In-order traversal of this BST gives us values in sorted order!
+                            </div>
+                        </div>
+                    `;
+                
+                case 'approach_comparison':
+                    return `
+                        <div style="padding: 24px;">
+                            <h3 style="margin-bottom: 20px;">Comparing Approaches</h3>
+                            
+                            <div class="approach-box rejected">
+                                <h4>Approach 1: Collect All Values Then Sort</h4>
+                                <div style="margin-top: 8px; font-size: 14px;">
+                                    <strong>Idea:</strong> Do in-order traversal, collect all values in array, then return array[k-1]<br>
+                                    <strong>Time:</strong> O(n) to traverse + O(n log n) to sort = O(n log n)<br>
+                                    <strong>Space:</strong> O(n) for array<br>
+                                    <strong>Problem:</strong> Unnecessary! The tree is already "sorted" by structure
+                                </div>
+                            </div>
+                            
+                            <div class="approach-box rejected">
+                                <h4>Approach 2: Morris Traversal (No Recursion)</h4>
+                                <div style="margin-top: 8px; font-size: 14px;">
+                                    <strong>Idea:</strong> Use threading to traverse without stack<br>
+                                    <strong>Time:</strong> O(n)<br>
+                                    <strong>Space:</strong> O(1)<br>
+                                    <strong>Problem:</strong> Complex implementation, overkill for this problem
+                                </div>
+                            </div>
+                            
+                            <div class="approach-box accepted">
+                                <h4>Approach 3: In-Order Traversal with Counter</h4>
+                                <div style="margin-top: 8px; font-size: 14px;">
+                                    <strong>Idea:</strong> Count nodes during in-order traversal, stop at kth<br>
+                                    <strong>Time:</strong> O(k) best case, O(n) worst case<br>
+                                    <strong>Space:</strong> O(h) for recursion stack<br>
+                                    <strong>Why Better:</strong> No extra sorting, early termination, clean code
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                
+                case 'traversal_comparison':
+                    const preorder = state.tree ? getPreorder(state.tree) : [];
+                    const inorder = state.tree ? getInorder(state.tree) : [];
+                    const postorder = state.tree ? getPostorder(state.tree) : [];
+                    
+                    return `
+                        <div style="padding: 24px;">
+                            <svg viewBox="0 0 800 250" style="width: 100%; height: 250px; margin-bottom: 20px;">
+                                ${renderTree()}
+                            </svg>
+                            
+                            <h3 style="margin-bottom: 16px;">Traversal Order Comparison</h3>
+                            
+                            <div class="traversal-row selected">
+                                <div class="traversal-label">✅ In-order:</div>
+                                <div class="traversal-order">[${inorder.join(', ')}]</div>
+                                <div style="margin-left: auto; color: var(--success);">← Sorted!</div>
+                            </div>
+                            
+                            <div class="traversal-row unselected">
+                                <div class="traversal-label">Pre-order:</div>
+                                <div class="traversal-order">[${preorder.join(', ')}]</div>
+                                <div style="margin-left: auto;">Not sorted</div>
+                            </div>
+                            
+                            <div class="traversal-row unselected">
+                                <div class="traversal-label">Post-order:</div>
+                                <div class="traversal-order">[${postorder.join(', ')}]</div>
+                                <div style="margin-left: auto;">Not sorted</div>
+                            </div>
+                            
+                            <div style="margin-top: 16px; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 6px;">
+                                <strong>Key Insight:</strong> In-order traversal (Left → Node → Right) on a BST 
+                                visits nodes in ascending order because of the BST property: left &lt; parent &lt; right
+                            </div>
+                        </div>
+                    `;
+                
+                case 'complexity':
+                    return `
+                        <div style="padding: 24px;">
+                            <div class="complexity-box">
+                                <h4>⏱️ Time Complexity</h4>
+                                <div class="complexity-item">
+                                    <strong>Best Case: O(k)</strong>
+                                    <div style="margin-left: 20px;">
+                                        • If kth element is in left subtree, we stop early<br>
+                                        • Example: k=1 only visits leftmost path<br>
+                                        • Don't need to visit all n nodes
+                                    </div>
+                                </div>
+                                <div class="complexity-item">
+                                    <strong>Worst Case: O(n)</strong>
+                                    <div style="margin-left: 20px;">
+                                        • When k = n (need largest element)<br>
+                                        • Must visit all nodes in the tree<br>
+                                        • Still optimal - can't do better
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="complexity-box">
+                                <h4>💾 Space Complexity</h4>
+                                <div class="complexity-item">
+                                    <strong>O(h) where h = height of tree</strong>
+                                    <div style="margin-left: 20px;">
+                                        • Recursion stack depth = tree height<br>
+                                        • Balanced tree: O(log n)<br>
+                                        • Skewed tree: O(n)<br>
+                                        • No additional data structures needed
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                
+                case 'code_flow':
+                case 'final_demo':
+                    return `
+                        <div style="padding: 24px;">
+                            <svg viewBox="0 0 800 400" style="width: 100%; height: 400px;">
+                                ${renderTree()}
+                            </svg>
+                            <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                <div style="font-family: var(--font-mono); color: var(--accent); margin-bottom: 8px;">
+                                    In-order sequence: [${state.tree ? getInorder(state.tree).join(', ') : ''}]
+                                </div>
+                                <div style="color: var(--text-secondary);">
+                                    The ${state.k}th smallest element is at index ${state.k - 1} in this sorted sequence
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                
+                default:
+                    return renderTree();
+            }
+        }
+
+        function renderIntuitionContent() {
+            let html = '';
+            
+            intuitionStages.forEach((stage, i) => {
+                const isActive = i === state.currentIntuitionStage;
+                const isPast = i < state.currentIntuitionStage;
+                const opacity = isActive ? 1 : (isPast ? 0.7 : 0.4);
+                
+                html += `
+                    <div class="intuition-stage ${isActive ? 'active' : ''}" style="opacity: ${opacity}">
+                        <h3>
+                            <span class="stage-number">${i + 1}</span>
+                            ${stage.title}
+                        </h3>
+                        
+                        ${stage.thought ? `
+                            <div class="thought-bubble">${stage.thought}</div>
+                        ` : ''}
+                        
+                        <div class="stage-content">
+                            ${stage.content.replace(/\n/g, '<br>')}
+                        </div>
+                        
+                        ${stage.insight ? `
+                            <div class="key-insight">
+                                <strong>Key Insight:</strong> ${stage.insight}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
         function renderStepLog() {
-            const stepLog = document.getElementById('stepLog');
             const currentStep = state.steps[state.currentStep];
             
             if (!currentStep) {
-                stepLog.innerHTML = '<p class="step-description">Run the solution to see execution steps</p>';
-                return;
+                return '<p class="step-description">Run the solution to see execution steps</p>';
             }
             
             let html = '<div class="step-info">';
@@ -823,7 +1199,6 @@
             html += `<p class="step-description">${currentStep.description}</p>`;
             html += '</div>';
             
-            // Variables
             html += '<div style="margin-bottom: 16px;">';
             html += '<h4 class="section-title">Variables</h4>';
             Object.entries(currentStep.vars).forEach(([name, value]) => {
@@ -836,7 +1211,6 @@
             });
             html += '</div>';
             
-            // History
             html += '<div>';
             html += '<h4 class="section-title">History</h4>';
             state.steps.slice(0, state.currentStep + 1).forEach((step, i) => {
@@ -846,28 +1220,145 @@
             });
             html += '</div>';
             
-            stepLog.innerHTML = html;
+            return html;
         }
 
-        // Update UI
-        function updateUI() {
-            renderCode(state.steps[state.currentStep]?.line);
-            renderTree();
-            renderStepLog();
+        function render() {
+            const app = document.getElementById('app');
             
-            // Update button states
-            document.getElementById('stepBackBtn').disabled = state.currentStep === 0;
-            document.getElementById('stepForwardBtn').disabled = 
-                state.currentStep >= state.steps.length - 1;
+            const headerHTML = `
+                <div class="header">
+                    <div class="header-top">
+                        <h1 class="title">230. Kth Smallest Element in a BST</h1>
+                        <button class="theme-toggle" onclick="toggleTheme()">
+                            <span id="theme-icon">${state.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mode-toggle">
+                        <button class="mode-btn ${state.mode === 'intuition' ? 'active' : ''}" 
+                                onclick="setMode('intuition')">
+                            💡 Intuition & Thought Process
+                        </button>
+                        <button class="mode-btn ${state.mode === 'execution' ? 'active' : ''}" 
+                                onclick="setMode('execution')">
+                            ▶️ Step-by-Step Execution
+                        </button>
+                    </div>
+                    
+                    ${state.mode === 'execution' ? `
+                        <div class="input-section">
+                            <span class="input-label">Tree:</span>
+                            <input type="text" class="input-field" id="treeInput" 
+                                   value="[3,1,4,null,2]" style="width: 200px;">
+                            <span class="input-label">k:</span>
+                            <input type="text" class="input-field" id="kInput" 
+                                   value="1" style="width: 60px;">
+                            <button class="btn" onclick="runSolution()">Run</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            let contentHTML = '';
+            
+            if (state.mode === 'intuition') {
+                contentHTML = `
+                    <div class="panel" style="width: 50%;">
+                        <div class="panel-header">
+                            Senior Engineer's Thought Process
+                            <span style="float: right;">Stage ${state.currentIntuitionStage + 1} of ${intuitionStages.length}</span>
+                        </div>
+                        <div class="panel-content">
+                            <div class="intuition-panel">${renderIntuitionContent()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel" style="width: 50%;">
+                        <div class="panel-header">Visual Explanation</div>
+                        <div class="panel-content">
+                            <div class="viz-content">${renderIntuitionViz()}</div>
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-btn" onclick="prevIntuitionStage()">⏪ Previous</button>
+                            <button class="control-btn primary" onclick="toggleIntuitionPlay()">
+                                ${state.isIntuitionPlaying ? '⏸️ Pause' : '▶️ Play'}
+                            </button>
+                            <button class="control-btn" onclick="nextIntuitionStage()">Next ⏩</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentHTML = `
+                    <div class="panel" style="width: 30%;">
+                        <div class="panel-header">Solution Code</div>
+                        <div class="panel-content">
+                            <div class="code-display">${renderCode(state.steps[state.currentStep]?.line)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel viz-panel" style="width: 50%;">
+                        <div class="panel-header">BST Visualization</div>
+                        <div class="viz-content">
+                            <svg class="viz-svg" viewBox="0 0 800 600">
+                                ${state.steps[state.currentStep] ? 
+                                    renderTree(state.steps[state.currentStep].currentNode, true) : 
+                                    renderTree()}
+                            </svg>
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-btn" onclick="resetExecution()">⏮️ Reset</button>
+                            <button class="control-btn" onclick="stepBackward()" 
+                                    ${state.currentStep === 0 ? 'disabled' : ''}>⏪ Step Back</button>
+                            <button class="control-btn primary" onclick="toggleExecutionPlay()">
+                                ${state.isPlaying ? '⏸️ Pause' : '▶️ Play'}
+                            </button>
+                            <button class="control-btn" onclick="stepForward()" 
+                                    ${state.currentStep >= state.steps.length - 1 ? 'disabled' : ''}>Step Forward ⏩</button>
+                            <select class="speed-selector" onchange="updateSpeed()">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="2">2x</option>
+                                <option value="4">4x</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="panel" style="width: 20%;">
+                        <div class="panel-header">Execution Log</div>
+                        <div class="panel-content">
+                            <div class="step-log">${renderStepLog()}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            app.innerHTML = headerHTML + '<div class="main-content">' + contentHTML + '</div>';
         }
 
-        // Run solution
+        // Control functions
+        function setMode(mode) {
+            if (state.playInterval) {
+                clearInterval(state.playInterval);
+                state.playInterval = null;
+            }
+            state.isPlaying = false;
+            state.isIntuitionPlaying = false;
+            state.mode = mode;
+            render();
+        }
+
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', state.theme);
+            render();
+        }
+
         function runSolution() {
             try {
                 const treeInput = document.getElementById('treeInput').value;
                 const kInput = document.getElementById('kInput').value;
                 
-                // Parse inputs
                 const arr = JSON.parse(treeInput);
                 const k = parseInt(kInput);
                 
@@ -884,7 +1375,6 @@
                     return;
                 }
                 
-                // Run solution
                 const { result, steps } = kthSmallestWithTracking(state.tree, k);
                 state.steps = steps;
                 state.currentStep = 0;
@@ -895,58 +1385,51 @@
                     state.playInterval = null;
                 }
                 
-                updateUI();
-                document.getElementById('playBtn').innerHTML = '▶️ Play';
-                
+                render();
             } catch (error) {
                 alert('Error: ' + error.message);
-                console.error(error);
             }
         }
 
-        // Playback controls
         function stepForward() {
             if (state.currentStep < state.steps.length - 1) {
                 state.currentStep++;
-                updateUI();
+                render();
             }
         }
 
         function stepBackward() {
             if (state.currentStep > 0) {
                 state.currentStep--;
-                updateUI();
+                render();
             }
         }
 
-        function resetVisualization() {
+        function resetExecution() {
             state.currentStep = 0;
             state.isPlaying = false;
             if (state.playInterval) {
                 clearInterval(state.playInterval);
                 state.playInterval = null;
             }
-            updateUI();
-            document.getElementById('playBtn').innerHTML = '▶️ Play';
+            render();
         }
 
-        function togglePlayPause() {
+        function toggleExecutionPlay() {
             state.isPlaying = !state.isPlaying;
-            const playBtn = document.getElementById('playBtn');
             
             if (state.isPlaying) {
-                playBtn.innerHTML = '⏸️ Pause';
-                play();
+                playExecution();
             } else {
-                playBtn.innerHTML = '▶️ Play';
                 if (state.playInterval) {
                     clearInterval(state.playInterval);
                     state.playInterval = null;
                 }
             }
+            render();
         }
 
-        function play() {
+        function playExecution() {
             if (state.playInterval) {
                 clearInterval(state.playInterval);
             }
@@ -956,53 +1439,100 @@
             state.playInterval = setInterval(() => {
                 if (state.currentStep < state.steps.length - 1) {
                     state.currentStep++;
-                    updateUI();
+                    render();
                 } else {
                     state.isPlaying = false;
                     clearInterval(state.playInterval);
                     state.playInterval = null;
-                    document.getElementById('playBtn').innerHTML = '▶️ Play';
+                    render();
                 }
             }, interval);
         }
 
         function updateSpeed() {
-            state.speed = parseFloat(document.getElementById('speedSelector').value);
+            state.speed = parseFloat(event.target.value);
             if (state.isPlaying) {
-                play(); // Restart with new speed
+                playExecution();
             }
         }
 
-        // Theme toggle
-        function toggleTheme() {
-            state.theme = state.theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', state.theme);
-            document.getElementById('theme-icon').textContent = 
-                state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
-            updateUI();
+        function nextIntuitionStage() {
+            if (state.currentIntuitionStage < intuitionStages.length - 1) {
+                state.currentIntuitionStage++;
+                render();
+            }
+        }
+
+        function prevIntuitionStage() {
+            if (state.currentIntuitionStage > 0) {
+                state.currentIntuitionStage--;
+                render();
+            }
+        }
+
+        function toggleIntuitionPlay() {
+            state.isIntuitionPlaying = !state.isIntuitionPlaying;
+            
+            if (state.isIntuitionPlaying) {
+                playIntuition();
+            } else {
+                if (state.playInterval) {
+                    clearInterval(state.playInterval);
+                    state.playInterval = null;
+                }
+            }
+            render();
+        }
+
+        function playIntuition() {
+            if (state.playInterval) {
+                clearInterval(state.playInterval);
+            }
+            
+            state.playInterval = setInterval(() => {
+                if (state.currentIntuitionStage < intuitionStages.length - 1) {
+                    state.currentIntuitionStage++;
+                    render();
+                } else {
+                    state.isIntuitionPlaying = false;
+                    clearInterval(state.playInterval);
+                    state.playInterval = null;
+                    render();
+                }
+            }, 4000); // 4 seconds per stage
         }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
-                togglePlayPause();
+                if (state.mode === 'execution') {
+                    toggleExecutionPlay();
+                } else {
+                    toggleIntuitionPlay();
+                }
             } else if (e.code === 'ArrowRight') {
                 e.preventDefault();
-                stepForward();
+                if (state.mode === 'execution') {
+                    stepForward();
+                } else {
+                    nextIntuitionStage();
+                }
             } else if (e.code === 'ArrowLeft') {
                 e.preventDefault();
-                stepBackward();
-            } else if (e.code === 'KeyR') {
-                e.preventDefault();
-                resetVisualization();
+                if (state.mode === 'execution') {
+                    stepBackward();
+                } else {
+                    prevIntuitionStage();
+                }
             }
         });
 
         // Initialize
         document.documentElement.setAttribute('data-theme', 'dark');
-        renderCode();
-        runSolution();
+        state.tree = arrayToTree([3,1,4,null,2]);
+        state.k = 1;
+        render();
     </script>
 </body>
 </html>
