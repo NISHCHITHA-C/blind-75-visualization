@@ -15,31 +15,37 @@
             --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
             --bg-primary: #ffffff;
             --bg-secondary: #f3f4f6;
+            --bg-tertiary: #e5e7eb;
             --text-primary: #111827;
             --text-secondary: #6b7280;
-            --border: #e5e7eb;
+            --border: #d1d5db;
             --code-bg: #f9fafb;
             --highlight: #fef3c7;
             --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
             
             /* Light mode syntax colors - GitHub-inspired */
-            --keyword: #af00db;
-            --function: #795e26;
-            --string: #a31515;
-            --number: #098658;
-            --type: #267f99;
-            --comment: #008000;
+            --keyword: #d73a49;
+            --function: #6f42c1;
+            --string: #032f62;
+            --number: #005cc5;
+            --type: #005cc5;
+            --comment: #6a737d;
         }
 
         [data-theme="dark"] {
             --bg-primary: #1f2937;
             --bg-secondary: #111827;
+            --bg-tertiary: #374151;
             --text-primary: #f9fafb;
             --text-secondary: #9ca3af;
             --border: #374151;
             --code-bg: #0f1419;
             --highlight: rgba(251, 191, 36, 0.15);
             --accent: #60a5fa;
+            --success: #10b981;
+            --warning: #fbbf24;
             
             /* Dark mode syntax colors - Dracula-inspired */
             --keyword: #ff79c6;
@@ -47,148 +53,186 @@
             --string: #f1fa8c;
             --number: #bd93f9;
             --type: #8be9fd;
-            --comment: #6a9955;
+            --comment: #6272a4;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-primary);
+            background: var(--bg-secondary);
             color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
         }
 
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
         .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--border);
             padding: 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 16px;
         }
 
         .header h1 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
         }
 
-        .header-controls {
+        .theme-toggle {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Input Section */
+        .input-section {
             display: flex;
             gap: 12px;
             align-items: center;
         }
 
-        .theme-toggle {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-secondary);
-        }
-
-        .input-section {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
         .input-field {
-            background: var(--bg-primary);
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
-            padding: 6px 12px;
             border-radius: 6px;
-            color: var(--text-primary);
             font-family: var(--font-mono);
-            font-size: 12px;
-            width: 200px;
+            font-size: 13px;
+            color: var(--text-primary);
         }
 
-        .btn {
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .run-btn {
+            padding: 8px 20px;
             background: var(--accent);
             color: white;
             border: none;
-            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
+            transition: background 0.2s;
         }
 
-        .btn:hover {
+        .run-btn:hover {
             opacity: 0.9;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .main-container {
+        /* Main Content */
+        .main-content {
+            flex: 1;
             display: flex;
-            height: calc(100vh - 65px);
             overflow: hidden;
         }
 
+        /* Panels */
         .panel {
-            border-right: 1px solid var(--border);
-            overflow: hidden;
+            background: var(--bg-primary);
+            border-right: 2px solid var(--border);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel:last-child {
+            border-right: none;
         }
 
         .panel-header {
-            background: var(--bg-secondary);
             padding: 12px 16px;
+            background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
-            font-weight: 600;
             font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
         }
 
         .panel-content {
             flex: 1;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
+        /* Code Panel */
         .code-panel {
-            width: 30%;
-        }
-
-        .viz-panel {
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .log-panel {
-            width: 20%;
-            border-right: none;
-        }
-
-        .code-display {
             font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 0.4;
             background: var(--code-bg);
             color: var(--text-primary);
-            overflow: auto;
-            height: 100%;
+        }
+
+        .code-panel pre {
+            margin: 0;
+            padding: 16px;
         }
 
         .code-line {
             display: flex;
             align-items: center;
             padding: 3px 0;
-            min-height: 22px;
+            min-height: 23px;
             transition: background 0.2s ease;
         }
 
-        .code-line.active {
+        .code-line.highlight {
             background: var(--highlight);
         }
 
@@ -202,7 +246,7 @@
             font-weight: 400;
         }
 
-        .line-content {
+        .line-code {
             flex: 1;
             white-space: pre;
             color: inherit;
@@ -216,40 +260,44 @@
         .type { color: var(--type); }
         .comment { color: var(--comment); font-style: italic; }
 
+        /* Visualization Panel */
+        .viz-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
         .viz-content {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
             overflow: auto;
         }
 
-        .controls {
+        .viz-controls {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             padding: 12px 16px;
             display: flex;
             gap: 8px;
             align-items: center;
-            justify-content: center;
+            flex-shrink: 0;
         }
 
         .control-btn {
-            background: var(--bg-primary);
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
             border: 1px solid var(--border);
-            padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            color: var(--text-primary);
             font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            color: var(--text-primary);
+            transition: all 0.2s;
         }
 
         .control-btn:hover:not(:disabled) {
-            background: var(--bg-secondary);
+            background: var(--border);
         }
 
         .control-btn:disabled {
@@ -257,53 +305,77 @@
             cursor: not-allowed;
         }
 
-        .speed-selector {
-            background: var(--bg-primary);
+        .control-btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .control-btn.primary:hover {
+            opacity: 0.9;
+        }
+
+        .speed-control {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speed-control select {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
             border: 1px solid var(--border);
-            padding: 8px 12px;
             border-radius: 6px;
             color: var(--text-primary);
             font-size: 13px;
             cursor: pointer;
         }
 
-        .step-info {
+        /* Step Log Panel */
+        .step-log {
             padding: 16px;
         }
 
-        .step-title {
+        .step-info h3 {
             font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        .step-description {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .variables-section {
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             color: var(--text-primary);
         }
 
-        .variable-item {
+        .step-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .variables h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .var-item {
             margin: 4px 0;
             font-size: 12px;
             font-family: var(--font-mono);
             color: var(--text-secondary);
         }
 
-        .variable-name {
+        .var-name {
             color: var(--accent);
+            font-weight: 500;
+        }
+
+        .step-history h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 20px;
+            color: var(--text-primary);
         }
 
         .history-item {
@@ -311,104 +383,188 @@
             margin: 4px 0;
             border-radius: 4px;
             font-size: 12px;
+            transition: background 0.2s;
         }
 
-        .history-item.active {
-            background: var(--bg-secondary);
+        .history-item.current {
+            background: var(--bg-tertiary);
             color: var(--text-primary);
+            font-weight: 500;
         }
 
-        .history-item:not(.active) {
+        .history-item:not(.current) {
             color: var(--text-secondary);
         }
 
-        svg {
-            max-width: 100%;
-            max-height: 100%;
+        /* Intuition Mode */
+        .intuition-panel {
+            padding: 24px;
         }
 
+        .intuition-stage {
+            margin-bottom: 32px;
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            transition: opacity 0.3s ease;
+        }
+
+        .intuition-stage h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .thought-bubble {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-style: italic;
+            color: var(--text-primary);
+            border-radius: 4px;
+        }
+
+        .key-insight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .key-insight strong {
+            color: var(--success);
+        }
+
+        .intuition-stage p {
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-line;
+        }
+
+        /* Approach boxes */
+        .approach-box {
+            padding: 20px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .approach-box.bad {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .approach-box.good {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .approach-box h4 {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .approach-box.bad h4 {
+            color: #ef4444;
+        }
+
+        .approach-box.good h4 {
+            color: var(--success);
+        }
+
+        /* SVG Styles */
         .tree-node {
             transition: all 0.3s ease;
         }
 
-        .tree-node.current {
-            fill: #3b82f6;
-        }
-
-        .tree-node.deepest {
-            fill: #10b981;
-        }
-
-        .tree-node.lca {
-            fill: #f59e0b;
-        }
-
-        .tree-edge {
-            transition: stroke 0.3s ease;
-        }
-
-        .tree-edge.active {
-            stroke: var(--accent);
+        .tree-node.current circle {
             stroke-width: 3;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .tree-node.lca circle {
+            stroke-width: 4;
+            filter: drop-shadow(0 0 12px var(--success));
+        }
+
+        .tree-node.deepest circle {
+            stroke-width: 3;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
         }
     </style>
 </head>
 <body data-theme="dark">
-    <div class="header">
-        <h1>1123. Lowest Common Ancestor of Deepest Leaves</h1>
-        <div class="header-controls">
-            <div class="input-section">
-                <input 
-                    type="text" 
-                    class="input-field" 
-                    id="treeInput" 
-                    placeholder="[3,5,1,6,2,0,8,null,null,7,4]"
-                    value="[3,5,1,6,2,0,8,null,null,7,4]"
-                />
-                <button class="btn" id="runBtn">Run</button>
-            </div>
-            <button class="theme-toggle" id="themeToggle">☀️ Light Mode</button>
-        </div>
-    </div>
-
-    <div class="main-container">
-        <div class="panel code-panel">
-            <div class="panel-header">Code</div>
-            <div class="panel-content">
-                <div class="code-display" id="codeDisplay"></div>
-            </div>
-        </div>
-
-        <div class="panel viz-panel">
-            <div class="panel-header">Visualization</div>
-            <div class="viz-content" id="vizContent">
-                <svg id="treeSvg" viewBox="0 0 1000 600"></svg>
-            </div>
-            <div class="controls">
-                <button class="control-btn" id="resetBtn">⏮ Reset</button>
-                <button class="control-btn" id="prevBtn">◀ Prev</button>
-                <button class="control-btn" id="playBtn">▶ Play</button>
-                <button class="control-btn" id="nextBtn">Next ▶</button>
-                <select class="speed-selector" id="speedSelect">
-                    <option value="0.5">0.5x</option>
-                    <option value="1" selected>1x</option>
-                    <option value="2">2x</option>
-                    <option value="4">4x</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="panel log-panel">
-            <div class="panel-header">Step Log</div>
-            <div class="panel-content">
-                <div class="step-info" id="stepInfo"></div>
-            </div>
-        </div>
-    </div>
+    <div class="container" id="app"></div>
 
     <script>
-        // Python code with syntax highlighting
-        const pythonCode = `class Solution:
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+                this.id = Math.random().toString(36).substr(2, 9);
+            }
+        }
+
+        class LCADeepestLeavesVisualizer {
+            constructor() {
+                this.state = {
+                    theme: 'dark',
+                    mode: 'intuition', // 'intuition' or 'execution'
+                    
+                    // Execution mode
+                    currentStep: 0,
+                    isPlaying: false,
+                    speed: 1,
+                    steps: [],
+                    
+                    // Intuition mode
+                    currentIntuitionStage: 0,
+                    isIntuitionPlaying: false,
+                    
+                    // Common
+                    treeArray: [3,5,1,6,2,0,8,null,null,7,4],
+                    root: null
+                };
+
+                this.problemNumber = 1123;
+                this.problemTitle = "Lowest Common Ancestor of Deepest Leaves";
+                
+                this.solutionCode = `class Solution:
     def lcaDeepestLeaves(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
         def dfs(node):
             """
@@ -435,548 +591,1271 @@
         
         return dfs(root)[1]`;
 
-        // State
-        let steps = [];
-        let currentStep = 0;
-        let isPlaying = false;
-        let playInterval = null;
-        let speed = 1;
-        let tree = null;
-
-        // Tree node class
-        class TreeNode {
-            constructor(val, left = null, right = null) {
-                this.val = val;
-                this.left = left;
-                this.right = right;
+                this.intuitionStages = this.getIntuitionStages();
+                this.init();
             }
-        }
 
-        // Build tree from array
-        function buildTree(arr) {
-            if (!arr || arr.length === 0) return null;
-            
-            const root = new TreeNode(arr[0]);
-            const queue = [root];
-            let i = 1;
-            
-            while (queue.length > 0 && i < arr.length) {
-                const node = queue.shift();
-                
-                if (i < arr.length && arr[i] !== null) {
-                    node.left = new TreeNode(arr[i]);
-                    queue.push(node.left);
-                }
-                i++;
-                
-                if (i < arr.length && arr[i] !== null) {
-                    node.right = new TreeNode(arr[i]);
-                    queue.push(node.right);
-                }
-                i++;
+            init() {
+                this.buildTree();
+                this.attachEventListeners();
+                this.render();
             }
-            
-            return root;
-        }
 
-        // Solution with tracing
-        function solutionWithTracing(root) {
-            const steps = [];
-            let stepNum = 0;
-            
-            function logStep(lineNo, vars, description) {
+            getIntuitionStages() {
+                return [
+                    {
+                        title: "Understanding the Problem",
+                        thought: "What are we really looking for? The deepest leaves... and their lowest common ancestor. Interesting!",
+                        content: `Let me break this down:
+- "Deepest leaves" = all leaf nodes at maximum depth
+- "LCA" = lowest (deepest) common ancestor of those leaves
+- Could be multiple deepest leaves, but they all have ONE common ancestor
+
+Example: In tree [3,5,1,6,2,0,8,null,null,7,4]
+- Deepest leaves: 6, 7, 4, 0, 8 (all at depth 3)
+- Wait, actually need to find which are DEEPEST
+- Key insight: might have multiple leaves at same max depth`,
+                        insight: "Unlike regular LCA, we don't know which nodes we're finding the ancestor of until we explore the tree!",
+                        visualization: "example_tree"
+                    },
+                    {
+                        title: "Naive Approach: Two-Pass Solution",
+                        thought: "I could first find the max depth, then find all leaves at that depth, then find their LCA...",
+                        content: `Brute force strategy:
+Pass 1: Find maximum depth
+- DFS/BFS to find deepest level
+- Time: O(n)
+
+Pass 2: Collect all deepest leaves
+- Another traversal to gather leaves at max depth
+- Time: O(n)
+
+Pass 3: Find LCA of collected leaves
+- Use standard LCA algorithm
+- Time: O(n)
+
+Total: O(3n) = O(n), but three separate passes
+Space: O(n) to store leaves + O(h) recursion`,
+                        insight: "This works but feels inefficient - can we do it in one pass?",
+                        visualization: "approach_comparison"
+                    },
+                    {
+                        title: "The One-Pass Insight",
+                        thought: "Wait! What if I return BOTH depth AND LCA from each recursive call? Then I can solve it bottom-up in one pass!",
+                        content: `The key realization:
+At each node, I need to know:
+1. What's the max depth in my left subtree?
+2. What's the LCA of deepest leaves in left subtree?
+3. What's the max depth in my right subtree?
+4. What's the LCA of deepest leaves in right subtree?
+
+Then I can decide:
+- If left_depth == right_depth → I'm the LCA! (both sides have deepest leaves)
+- If left_depth > right_depth → pass up left's LCA
+- If right_depth > left_depth → pass up right's LCA
+
+This is POST-ORDER traversal: children first, then parent decides`,
+                        insight: "Returning a TUPLE (depth, lca) lets us combine depth-finding and LCA-finding in one pass!",
+                        visualization: "technique_demo"
+                    },
+                    {
+                        title: "The Base Case",
+                        thought: "For recursion, I always start with: what's the simplest case?",
+                        content: `Base case: node is None (null)
+- Depth: 0 (no nodes below)
+- LCA: None (no leaves to find LCA of)
+- Return: (0, None)
+
+This makes sense because:
+- Empty subtree contributes 0 to depth
+- Empty subtree has no deepest leaves
+- Parent will compare depths and ignore this side if the other side is deeper
+
+Recursive case builds on this:
+- Get (depth, lca) from both children
+- Increment depth by 1 (current node adds one level)
+- Determine LCA based on which side(s) have deepest leaves`,
+                        insight: "The base case naturally handles edge cases like single-node trees and unbalanced trees",
+                        visualization: "base_case"
+                    },
+                    {
+                        title: "Implementation Strategy",
+                        thought: "Now let's translate this logic into clean code...",
+                        content: `Algorithm structure:
+1. Helper function: dfs(node) → (depth, lca)
+
+2. Base case:
+   if not node: return (0, None)
+
+3. Recursive case:
+   left_depth, left_lca = dfs(node.left)
+   right_depth, right_lca = dfs(node.right)
+
+4. Decision logic:
+   if left_depth == right_depth:
+       return (left_depth + 1, node)  # I'm the LCA
+   elif left_depth > right_depth:
+       return (left_depth + 1, left_lca)
+   else:
+       return (right_depth + 1, right_lca)
+
+Why this works:
+- Post-order ensures we know child depths before deciding
+- Tuple return carries both pieces of info upward
+- Each node makes local decision based on child info`,
+                        insight: "Post-order traversal is perfect here: we need child info before making parent decision",
+                        visualization: "code_flow"
+                    },
+                    {
+                        title: "Complexity Analysis",
+                        thought: "Is this optimal? Let me verify...",
+                        content: `Time Complexity: O(n)
+- Visit each node exactly once
+- At each node: O(1) work (comparisons, tuple creation)
+- Cannot do better - must visit all nodes to find max depth
+
+Space Complexity: O(h)
+- Recursion stack depth = height of tree
+- Best case (balanced): O(log n)
+- Worst case (skewed): O(n)
+- No extra data structures needed
+
+Why better than two-pass?
+- Same O(n) time, but single traversal
+- Same O(h) space for recursion
+- More elegant: no need to store leaves separately`,
+                        insight: "Single-pass solution is optimal: O(n) time, O(h) space",
+                        visualization: "complexity"
+                    },
+                    {
+                        title: "Edge Cases & Examples",
+                        thought: "Let me think through tricky cases to make sure this works...",
+                        content: `Edge Case 1: Single node
+- Tree: [1]
+- Deepest leaf: 1 (root itself)
+- LCA: 1
+- Our algorithm: returns (1, node(1)) ✓
+
+Edge Case 2: All leaves at different depths
+- Tree: [1,2,null,3,null,4]
+- Deepest leaf: 4 (only one)
+- LCA: 4 (a leaf can be its own LCA)
+- Our algorithm: deeper side's LCA bubbles up ✓
+
+Edge Case 3: Multiple deepest leaves on same side
+- Tree: [1,2,3,4,5]
+- Deepest leaves: 4, 5 (both under node 2)
+- LCA: 2
+- Our algorithm: left_depth > right_depth, return left_lca ✓
+
+Edge Case 4: Deepest leaves on both sides
+- Tree: [3,5,1,6,2,0,8,null,null,7,4]
+- Deepest leaves on left AND right
+- LCA: root (3)
+- Our algorithm: left_depth == right_depth, return current node ✓`,
+                        insight: "The equal-depth case is the KEY: when both sides have deepest leaves, current node IS the LCA",
+                        visualization: "edge_cases"
+                    },
+                    {
+                        title: "Why This Solution Shines",
+                        thought: "This is elegant! One pass, simple logic, handles all cases.",
+                        content: `What makes this solution interview-ready:
+
+1. Pattern Recognition
+   - Recognizes need for post-order DFS
+   - Uses tuple return to carry multiple values
+   - Classic "depth + LCA" combination problem
+
+2. Code Quality
+   - Clean, readable helper function
+   - Clear variable names (left_depth, right_depth)
+   - Logical flow: base case → recurse → decide
+
+3. Explanation Points
+   - "I use post-order because I need child info first"
+   - "Tuple return lets me propagate both depth and LCA"
+   - "Equal depth means current node is the split point"
+
+4. Optimality
+   - Single pass: O(n) time
+   - Minimal space: O(h) recursion only
+   - No extra data structures
+
+Key Interview Talking Points:
+- This problem combines depth-tracking with LCA-finding
+- Post-order traversal is crucial for bottom-up solutions
+- Returning tuples is a powerful Python technique`,
+                        insight: "This showcases mastery of tree recursion, post-order traversal, and multi-value returns",
+                        visualization: "final_demo"
+                    }
+                ];
+            }
+
+            buildTree() {
+                const arr = this.state.treeArray;
+                if (!arr || arr.length === 0) {
+                    this.state.root = null;
+                    return;
+                }
+
+                this.state.root = new TreeNode(arr[0]);
+                const queue = [this.state.root];
+                let i = 1;
+
+                while (queue.length > 0 && i < arr.length) {
+                    const node = queue.shift();
+                    
+                    if (i < arr.length && arr[i] !== null) {
+                        node.left = new TreeNode(arr[i]);
+                        queue.push(node.left);
+                    }
+                    i++;
+                    
+                    if (i < arr.length && arr[i] !== null) {
+                        node.right = new TreeNode(arr[i]);
+                        queue.push(node.right);
+                    }
+                    i++;
+                }
+            }
+
+            getDeepestLeaves(node, depth = 0) {
+                if (!node) return { depth: 0, leaves: [] };
+                
+                if (!node.left && !node.right) {
+                    return { depth: depth, leaves: [node] };
+                }
+                
+                const left = this.getDeepestLeaves(node.left, depth + 1);
+                const right = this.getDeepestLeaves(node.right, depth + 1);
+                
+                if (left.depth > right.depth) {
+                    return left;
+                } else if (right.depth > left.depth) {
+                    return right;
+                } else {
+                    return { depth: left.depth, leaves: [...left.leaves, ...right.leaves] };
+                }
+            }
+
+            simulateLCA() {
+                const steps = [];
+                const root = this.state.root;
+                
+                if (!root) return steps;
+
+                let stepNum = 0;
+
+                const dfs = (node, path = []) => {
+                    steps.push({
+                        line: 10,
+                        description: node ? `Exploring node ${node.val}` : 'Reached null node (base case)',
+                        vars: { 
+                            current_node: node ? node.val : 'None',
+                            path: path.join(' → ') || 'root'
+                        },
+                        currentNodeId: node ? node.id : null,
+                        stepNum: stepNum++
+                    });
+                    
+                    if (!node) {
+                        steps.push({
+                            line: 11,
+                            description: 'Base case: returning (depth=0, lca=None)',
+                            vars: { return_value: '(0, None)' },
+                            currentNodeId: null,
+                            stepNum: stepNum++
+                        });
+                        return [0, null];
+                    }
+                    
+                    steps.push({
+                        line: 14,
+                        description: `Processing left child of node ${node.val}`,
+                        vars: { current_node: node.val, action: 'Exploring left subtree' },
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+                    
+                    const [leftDepth, leftLca] = dfs(node.left, [...path, `${node.val}→L`]);
+                    
+                    steps.push({
+                        line: 14,
+                        description: `Left subtree of ${node.val} returned: depth=${leftDepth}, lca=${leftLca ? leftLca.val : 'None'}`,
+                        vars: { 
+                            current_node: node.val,
+                            left_depth: leftDepth,
+                            left_lca: leftLca ? leftLca.val : 'None'
+                        },
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+                    
+                    steps.push({
+                        line: 15,
+                        description: `Processing right child of node ${node.val}`,
+                        vars: { current_node: node.val, action: 'Exploring right subtree' },
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+                    
+                    const [rightDepth, rightLca] = dfs(node.right, [...path, `${node.val}→R`]);
+                    
+                    steps.push({
+                        line: 15,
+                        description: `Right subtree of ${node.val} returned: depth=${rightDepth}, lca=${rightLca ? rightLca.val : 'None'}`,
+                        vars: { 
+                            current_node: node.val,
+                            right_depth: rightDepth,
+                            right_lca: rightLca ? rightLca.val : 'None'
+                        },
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+                    
+                    steps.push({
+                        line: 18,
+                        description: `Comparing depths at node ${node.val}: left=${leftDepth}, right=${rightDepth}`,
+                        vars: {
+                            current_node: node.val,
+                            left_depth: leftDepth,
+                            right_depth: rightDepth,
+                            comparison: leftDepth === rightDepth ? 'equal' : (leftDepth > rightDepth ? 'left deeper' : 'right deeper')
+                        },
+                        currentNodeId: node.id,
+                        stepNum: stepNum++
+                    });
+                    
+                    if (leftDepth === rightDepth) {
+                        steps.push({
+                            line: 19,
+                            description: `Equal depths! Node ${node.val} is the LCA. Returning (${leftDepth + 1}, ${node.val})`,
+                            vars: {
+                                current_node: node.val,
+                                return_depth: leftDepth + 1,
+                                return_lca: node.val
+                            },
+                            currentNodeId: node.id,
+                            lcaNodeId: node.id,
+                            stepNum: stepNum++
+                        });
+                        return [leftDepth + 1, node];
+                    }
+                    
+                    if (leftDepth > rightDepth) {
+                        steps.push({
+                            line: 22,
+                            description: `Left deeper. Returning (${leftDepth + 1}, ${leftLca ? leftLca.val : 'None'})`,
+                            vars: {
+                                current_node: node.val,
+                                return_depth: leftDepth + 1,
+                                return_lca: leftLca ? leftLca.val : 'None'
+                            },
+                            currentNodeId: node.id,
+                            lcaNodeId: leftLca ? leftLca.id : null,
+                            stepNum: stepNum++
+                        });
+                        return [leftDepth + 1, leftLca];
+                    } else {
+                        steps.push({
+                            line: 24,
+                            description: `Right deeper. Returning (${rightDepth + 1}, ${rightLca ? rightLca.val : 'None'})`,
+                            vars: {
+                                current_node: node.val,
+                                return_depth: rightDepth + 1,
+                                return_lca: rightLca ? rightLca.val : 'None'
+                            },
+                            currentNodeId: node.id,
+                            lcaNodeId: rightLca ? rightLca.id : null,
+                            stepNum: stepNum++
+                        });
+                        return [rightDepth + 1, rightLca];
+                    }
+                };
+
                 steps.push({
-                    line: lineNo,
-                    vars: JSON.parse(JSON.stringify(vars)),
-                    description: description,
+                    line: 26,
+                    description: 'Starting DFS from root',
+                    vars: {},
+                    currentNodeId: root.id,
                     stepNum: stepNum++
                 });
+                
+                const result = dfs(root, ['root']);
+                
+                steps.push({
+                    line: 26,
+                    description: `Final answer: LCA of deepest leaves is node ${result[1] ? result[1].val : 'None'} at depth ${result[0]}`,
+                    vars: { 
+                        final_result: result[1] ? result[1].val : 'None',
+                        max_depth: result[0]
+                    },
+                    currentNodeId: result[1] ? result[1].id : null,
+                    lcaNodeId: result[1] ? result[1].id : null,
+                    stepNum: stepNum++
+                });
+
+                this.state.steps = steps;
+                this.state.currentStep = 0;
             }
-            
-            function dfs(node, path = []) {
-                logStep(10, { 
-                    current_node: node ? node.val : 'None',
-                    path: path.join(' → ')
-                }, node ? `Exploring node ${node.val}` : 'Reached null node');
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
+                document.body.setAttribute('data-theme', this.state.theme);
+                this.render();
+            }
+
+            toggleMode(mode) {
+                this.pause();
+                this.pauseIntuition();
+                this.state.mode = mode;
                 
-                if (!node) {
-                    logStep(11, { 
-                        return_value: '(0, None)' 
-                    }, 'Base case: returning (depth=0, lca=None)');
-                    return [0, null];
-                }
-                
-                logStep(14, { 
-                    current_node: node.val,
-                    action: 'Exploring left subtree'
-                }, `Processing left child of node ${node.val}`);
-                
-                const [leftDepth, leftLca] = dfs(node.left, [...path, `${node.val}L`]);
-                
-                logStep(14, { 
-                    current_node: node.val,
-                    left_depth: leftDepth,
-                    left_lca: leftLca ? leftLca.val : 'None'
-                }, `Left subtree returned: depth=${leftDepth}, lca=${leftLca ? leftLca.val : 'None'}`);
-                
-                logStep(15, { 
-                    current_node: node.val,
-                    action: 'Exploring right subtree'
-                }, `Processing right child of node ${node.val}`);
-                
-                const [rightDepth, rightLca] = dfs(node.right, [...path, `${node.val}R`]);
-                
-                logStep(15, { 
-                    current_node: node.val,
-                    right_depth: rightDepth,
-                    right_lca: rightLca ? rightLca.val : 'None'
-                }, `Right subtree returned: depth=${rightDepth}, lca=${rightLca ? rightLca.val : 'None'}`);
-                
-                logStep(18, {
-                    current_node: node.val,
-                    left_depth: leftDepth,
-                    right_depth: rightDepth,
-                    comparison: leftDepth === rightDepth ? 'equal' : (leftDepth > rightDepth ? 'left deeper' : 'right deeper')
-                }, `Comparing depths: left=${leftDepth}, right=${rightDepth}`);
-                
-                if (leftDepth === rightDepth) {
-                    logStep(19, {
-                        current_node: node.val,
-                        return_depth: leftDepth + 1,
-                        return_lca: node.val
-                    }, `Depths are equal! Node ${node.val} is the LCA. Returning (${leftDepth + 1}, ${node.val})`);
-                    return [leftDepth + 1, node];
-                }
-                
-                if (leftDepth > rightDepth) {
-                    logStep(22, {
-                        current_node: node.val,
-                        return_depth: leftDepth + 1,
-                        return_lca: leftLca ? leftLca.val : 'None'
-                    }, `Left is deeper. Returning (${leftDepth + 1}, ${leftLca ? leftLca.val : 'None'})`);
-                    return [leftDepth + 1, leftLca];
+                if (mode === 'intuition') {
+                    this.state.currentIntuitionStage = 0;
                 } else {
-                    logStep(24, {
-                        current_node: node.val,
-                        return_depth: rightDepth + 1,
-                        return_lca: rightLca ? rightLca.val : 'None'
-                    }, `Right is deeper. Returning (${rightDepth + 1}, ${rightLca ? rightLca.val : 'None'})`);
-                    return [rightDepth + 1, rightLca];
+                    this.state.currentStep = 0;
+                    if (this.state.steps.length === 0) {
+                        this.runSimulation();
+                    }
+                }
+                
+                this.render();
+            }
+
+            runSimulation() {
+                this.buildTree();
+                this.simulateLCA();
+                this.state.currentStep = 0;
+                this.render();
+            }
+
+            // Execution mode controls
+            play() {
+                if (this.state.currentStep >= this.state.steps.length - 1) {
+                    this.state.currentStep = 0;
+                }
+                
+                this.state.isPlaying = true;
+                this.render();
+                
+                this.playInterval = setInterval(() => {
+                    if (this.state.currentStep < this.state.steps.length - 1) {
+                        this.state.currentStep++;
+                        this.render();
+                    } else {
+                        this.pause();
+                    }
+                }, 1000 / this.state.speed);
+            }
+
+            pause() {
+                this.state.isPlaying = false;
+                if (this.playInterval) {
+                    clearInterval(this.playInterval);
+                    this.playInterval = null;
+                }
+                this.render();
+            }
+
+            stepForward() {
+                if (this.state.currentStep < this.state.steps.length - 1) {
+                    this.state.currentStep++;
+                    this.render();
                 }
             }
-            
-            logStep(26, {}, 'Starting DFS from root');
-            const result = dfs(root, ['root']);
-            logStep(26, { 
-                final_result: result[1] ? result[1].val : 'None',
-                max_depth: result[0]
-            }, `Final answer: LCA of deepest leaves is node ${result[1] ? result[1].val : 'None'} at depth ${result[0]}`);
-            
-            return { result: result[1], steps };
-        }
 
-        // Syntax highlighting
-        function highlightPythonLine(line) {
-            // Handle empty lines
-            if (!line || line.trim() === '') {
-                return '&nbsp;';
+            stepBack() {
+                if (this.state.currentStep > 0) {
+                    this.state.currentStep--;
+                    this.render();
+                }
             }
-            
-            // Comments - handle first to avoid conflicts
-            if (line.trim().startsWith('#')) {
-                return `<span class="comment">${escapeHtml(line)}</span>`;
-            }
-            
-            // Docstrings
-            if (line.trim().startsWith('"""') || line.trim().startsWith("'''")) {
-                return `<span class="string">${escapeHtml(line)}</span>`;
-            }
-            
-            // Start with escaped HTML to prevent XSS
-            let result = line;
-            
-            // Escape HTML characters but preserve structure for highlighting
-            const parts = [];
-            let currentIndex = 0;
-            
-            // Process line character by character, applying highlights
-            // Simple approach: escape first, then selectively highlight
-            result = escapeHtml(line);
-            
-            // Keywords - must be word boundaries
-            const keywords = ['class', 'def', 'if', 'elif', 'else', 'while', 'for', 'return', 'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None'];
-            keywords.forEach(kw => {
-                const regex = new RegExp(`\\b(${kw})\\b`, 'g');
-                result = result.replace(regex, '<span class="keyword">$1</span>');
-            });
-            
-            // Types
-            const types = ['Optional', 'TreeNode', 'List', 'int', 'str'];
-            types.forEach(type => {
-                const regex = new RegExp(`\\b(${type})\\b`, 'g');
-                result = result.replace(regex, '<span class="type">$1</span>');
-            });
-            
-            // Function names
-            result = result.replace(/\b(lcaDeepestLeaves|dfs)\b/g, '<span class="function">$1</span>');
-            
-            // Strings - must come after keywords to avoid conflicts
-            result = result.replace(/((?:&quot;|&#39;).*?(?:&quot;|&#39;))/g, '<span class="string">$1</span>');
-            
-            // Numbers
-            result = result.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
-            
-            return result;
-        }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Render code with highlighting
-        function renderCode() {
-            const lines = pythonCode.split('\n');
-            const codeDisplay = document.getElementById('codeDisplay');
-            
-            // Clear existing content
-            codeDisplay.innerHTML = '';
-            
-            // Create pre wrapper
-            const pre = document.createElement('pre');
-            pre.style.margin = '0';
-            pre.style.padding = '16px';
-            
-            lines.forEach((line, i) => {
-                const isActive = currentStep < steps.length && steps[currentStep].line === i;
-                
-                // Create line div
-                const lineDiv = document.createElement('div');
-                lineDiv.className = `code-line ${isActive ? 'active' : ''}`;
-                
-                // Create line number span
-                const lineNum = document.createElement('span');
-                lineNum.className = 'line-number';
-                lineNum.textContent = i + 1;
-                
-                // Create code span
-                const codeSpan = document.createElement('code');
-                codeSpan.className = 'line-content';
-                codeSpan.innerHTML = highlightPythonLine(line) || '&nbsp;';
-                
-                lineDiv.appendChild(lineNum);
-                lineDiv.appendChild(codeSpan);
-                pre.appendChild(lineDiv);
-            });
-            
-            codeDisplay.appendChild(pre);
-        }
-
-        // Layout tree nodes
-        function layoutTree(node, depth = 0, index = 0, offset = 500) {
-            if (!node) return { nodes: [], edges: [], width: 0 };
-            
-            const nodeSize = 40;
-            const levelHeight = 80;
-            
-            const leftLayout = layoutTree(node.left, depth + 1, index * 2, offset / 2);
-            const rightLayout = layoutTree(node.right, depth + 1, index * 2 + 1, offset / 2);
-            
-            const x = 500 + (index - Math.pow(2, depth) / 2 + 0.5) * offset;
-            const y = 50 + depth * levelHeight;
-            
-            const currentNode = {
-                val: node.val,
-                x: x,
-                y: y,
-                node: node
-            };
-            
-            const nodes = [currentNode, ...leftLayout.nodes, ...rightLayout.nodes];
-            const edges = [...leftLayout.edges, ...rightLayout.edges];
-            
-            if (node.left) {
-                const leftNode = leftLayout.nodes[0];
-                edges.push({
-                    from: currentNode,
-                    to: leftNode,
-                    highlighted: false
-                });
+            reset() {
+                this.pause();
+                this.state.currentStep = 0;
+                this.render();
             }
-            
-            if (node.right) {
-                const rightNode = rightLayout.nodes[0];
-                edges.push({
-                    from: currentNode,
-                    to: rightNode,
-                    highlighted: false
-                });
-            }
-            
-            return { nodes, edges };
-        }
 
-        // Get deepest leaves
-        function getDeepestLeaves(node, depth = 0) {
-            if (!node) return { depth: 0, leaves: [] };
-            
-            if (!node.left && !node.right) {
-                return { depth: depth, leaves: [node] };
+            setSpeed(speed) {
+                const wasPlaying = this.state.isPlaying;
+                this.pause();
+                this.state.speed = parseFloat(speed);
+                if (wasPlaying) {
+                    this.play();
+                }
             }
-            
-            const left = getDeepestLeaves(node.left, depth + 1);
-            const right = getDeepestLeaves(node.right, depth + 1);
-            
-            if (left.depth > right.depth) {
-                return left;
-            } else if (right.depth > left.depth) {
-                return right;
-            } else {
-                return { depth: left.depth, leaves: [...left.leaves, ...right.leaves] };
-            }
-        }
 
-        // Render tree
-        function renderTree() {
-            if (!tree) return;
-            
-            const svg = document.getElementById('treeSvg');
-            const layout = layoutTree(tree);
-            
-            const currentVars = currentStep < steps.length ? steps[currentStep].vars : {};
-            const currentNode = currentVars.current_node;
-            const lcaNode = currentVars.return_lca;
-            
-            const deepestInfo = getDeepestLeaves(tree);
-            const deepestValues = deepestInfo.leaves.map(n => n.val);
-            
-            let svgContent = '';
-            
-            // Draw edges
-            layout.edges.forEach(edge => {
-                svgContent += `<line 
-                    x1="${edge.from.x}" y1="${edge.from.y}" 
-                    x2="${edge.to.x}" y2="${edge.to.y}" 
-                    stroke="${edge.highlighted ? '#3b82f6' : '#6b7280'}" 
-                    stroke-width="2" 
-                    class="tree-edge"/>`;
-            });
-            
-            // Draw nodes
-            layout.nodes.forEach(node => {
-                const isCurrent = currentNode == node.val || currentNode === node.val;
-                const isLca = lcaNode == node.val || lcaNode === node.val;
-                const isDeepest = deepestValues.includes(node.val);
+            // Intuition mode controls
+            playIntuition() {
+                if (this.state.currentIntuitionStage >= this.intuitionStages.length - 1) {
+                    this.state.currentIntuitionStage = 0;
+                }
                 
-                let fillColor = '#374151';
-                if (isLca) fillColor = '#f59e0b';
-                else if (isCurrent) fillColor = '#3b82f6';
-                else if (isDeepest) fillColor = '#10b981';
+                this.state.isIntuitionPlaying = true;
+                this.render();
                 
-                svgContent += `<g class="tree-node ${isCurrent ? 'current' : ''} ${isDeepest ? 'deepest' : ''} ${isLca ? 'lca' : ''}">
-                    <circle cx="${node.x}" cy="${node.y}" r="24" 
-                        fill="${fillColor}" 
-                        stroke="#60a5fa" 
-                        stroke-width="${isCurrent || isLca ? 3 : 1}"/>
-                    <text x="${node.x}" y="${node.y}" 
-                        text-anchor="middle" 
-                        dominant-baseline="middle" 
-                        fill="#fff" 
-                        font-size="14" 
-                        font-weight="600">
-                        ${node.val}
-                    </text>
-                </g>`;
-            });
-            
-            // Legend
-            svgContent += `<g transform="translate(20, 500)">
-                <circle cx="10" cy="0" r="8" fill="#3b82f6"/>
-                <text x="25" y="0" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Current Node</text>
-                
-                <circle cx="10" cy="25" r="8" fill="#10b981"/>
-                <text x="25" y="25" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Deepest Leaf</text>
-                
-                <circle cx="10" cy="50" r="8" fill="#f59e0b"/>
-                <text x="25" y="50" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">LCA Result</text>
-            </g>`;
-            
-            svg.innerHTML = svgContent;
-        }
-
-        // Render step log
-        function renderStepLog() {
-            const stepInfo = document.getElementById('stepInfo');
-            
-            if (steps.length === 0) {
-                stepInfo.innerHTML = '<div class="step-description">Run the algorithm to see execution steps</div>';
-                return;
+                this.intuitionInterval = setInterval(() => {
+                    if (this.state.currentIntuitionStage < this.intuitionStages.length - 1) {
+                        this.state.currentIntuitionStage++;
+                        this.render();
+                    } else {
+                        this.pauseIntuition();
+                    }
+                }, 4000);
             }
-            
-            const step = steps[currentStep];
-            
-            let html = `
-                <div class="step-title">Step ${currentStep + 1} of ${steps.length}</div>
-                <div class="step-description">${step.description}</div>
-                
-                <div class="variables-section">
-                    <div class="section-title">Variables</div>
-                    ${Object.entries(step.vars).map(([name, value]) => `
-                        <div class="variable-item">
-                            <span class="variable-name">${name}</span>: ${
-                                typeof value === 'object' ? JSON.stringify(value) : value
+
+            pauseIntuition() {
+                this.state.isIntuitionPlaying = false;
+                if (this.intuitionInterval) {
+                    clearInterval(this.intuitionInterval);
+                    this.intuitionInterval = null;
+                }
+                this.render();
+            }
+
+            nextIntuitionStage() {
+                if (this.state.currentIntuitionStage < this.intuitionStages.length - 1) {
+                    this.state.currentIntuitionStage++;
+                    this.render();
+                }
+            }
+
+            prevIntuitionStage() {
+                if (this.state.currentIntuitionStage > 0) {
+                    this.state.currentIntuitionStage--;
+                    this.render();
+                }
+            }
+
+            attachEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            if (this.state.isPlaying) {
+                                this.pause();
+                            } else {
+                                this.play();
                             }
+                        } else {
+                            if (this.state.isIntuitionPlaying) {
+                                this.pauseIntuition();
+                            } else {
+                                this.playIntuition();
+                            }
+                        }
+                    } else if (e.code === 'ArrowRight') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            this.stepForward();
+                        } else {
+                            this.nextIntuitionStage();
+                        }
+                    } else if (e.code === 'ArrowLeft') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            this.stepBack();
+                        } else {
+                            this.prevIntuitionStage();
+                        }
+                    }
+                });
+            }
+
+            highlightPythonLine(line) {
+                const div = document.createElement('div');
+                div.textContent = line;
+                let escaped = div.innerHTML;
+
+                if (!escaped.trim() || escaped.trim().length < 2) {
+                    return escaped || '&nbsp;';
+                }
+
+                // Comments
+                escaped = escaped.replace(/(#.*$)/g, '<span class="comment">$1</span>');
+
+                // Strings
+                escaped = escaped.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)/g, '<span class="string">$1</span>');
+                escaped = escaped.replace(/(&#39;(?:[^&]|&(?!#39;))*&#39;)/g, '<span class="string">$1</span>');
+
+                // Keywords
+                const keywords = ['class', 'def', 'return', 'if', 'elif', 'else', 'while', 'for', 
+                                'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None'];
+                keywords.forEach(kw => {
+                    const regex = new RegExp(`\\b(${kw})\\b`, 'g');
+                    escaped = escaped.replace(regex, '<span class="keyword">$1</span>');
+                });
+
+                // Types
+                const types = ['TreeNode', 'Optional', 'List', 'Dict', 'int', 'str', 'bool'];
+                types.forEach(type => {
+                    const regex = new RegExp(`\\b(${type})\\b`, 'g');
+                    escaped = escaped.replace(regex, '<span class="type">$1</span>');
+                });
+
+                // Function names
+                escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="function">$1</span>');
+
+                // Numbers
+                escaped = escaped.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+
+                return escaped;
+            }
+
+            renderCodePanel() {
+                const lines = this.solutionCode.split('\n');
+                const currentLine = this.state.steps.length > 0 ? this.state.steps[this.state.currentStep].line - 1 : -1;
+
+                const linesHTML = lines.map((line, i) => {
+                    const highlightClass = i === currentLine ? 'highlight' : '';
+                    const highlightedCode = this.highlightPythonLine(line);
+                    
+                    return `
+                        <div class="code-line ${highlightClass}">
+                            <span class="line-number">${i + 1}</span>
+                            <code class="line-code">${highlightedCode}</code>
                         </div>
-                    `).join('')}
-                </div>
-                
-                <div class="variables-section">
-                    <div class="section-title">History</div>
-                    ${steps.slice(0, currentStep + 1).map((s, i) => `
-                        <div class="history-item ${i === currentStep ? 'active' : ''}">
+                    `;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: 30%">
+                        <div class="panel-header">Solution Code</div>
+                        <div class="panel-content code-panel">
+                            <pre>${linesHTML}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateTreeLayout(root) {
+                if (!root) return { nodes: [], edges: [], maxDepth: 0 };
+
+                const nodes = [];
+                const edges = [];
+                let maxDepth = 0;
+
+                const traverse = (node, depth, x, minX, maxX) => {
+                    if (!node) return;
+
+                    maxDepth = Math.max(maxDepth, depth);
+                    const y = 80 + depth * 100;
+
+                    nodes.push({ node, x, y, depth });
+
+                    if (node.left) {
+                        const leftX = (minX + x) / 2;
+                        edges.push({ from: { x, y }, to: { x: leftX, y: y + 100 }, highlighted: false });
+                        traverse(node.left, depth + 1, leftX, minX, x);
+                    }
+
+                    if (node.right) {
+                        const rightX = (x + maxX) / 2;
+                        edges.push({ from: { x, y }, to: { x: rightX, y: y + 100 }, highlighted: false });
+                        traverse(node.right, depth + 1, rightX, x, maxX);
+                    }
+                };
+
+                traverse(root, 0, 500, 0, 1000);
+
+                return { nodes, edges, maxDepth };
+            }
+
+            renderTree(root, currentNodeId, lcaNodeId) {
+                if (!root) {
+                    return `<div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                        No tree to display. Enter a valid tree array.
+                    </div>`;
+                }
+
+                const { nodes, edges, maxDepth } = this.calculateTreeLayout(root);
+                const svgHeight = Math.max(500, (maxDepth + 1) * 100 + 80);
+
+                const deepestInfo = this.getDeepestLeaves(root);
+                const deepestValues = deepestInfo.leaves.map(n => n.val);
+
+                const edgesHTML = edges.map((edge, i) => {
+                    const strokeColor = this.state.theme === 'dark' ? '#6b7280' : '#9ca3af';
+                    return `
+                        <line
+                            x1="${edge.from.x}" y1="${edge.from.y + 28}"
+                            x2="${edge.to.x}" y2="${edge.to.y - 28}"
+                            stroke="${strokeColor}"
+                            stroke-width="2"
+                            class="tree-edge"
+                        />
+                    `;
+                }).join('');
+
+                const nodesHTML = nodes.map(({ node, x, y }) => {
+                    let fillColor, strokeColor, strokeWidth;
+                    let cssClass = 'tree-node';
+
+                    const isCurrent = currentNodeId && node.id === currentNodeId;
+                    const isLca = lcaNodeId && node.id === lcaNodeId;
+                    const isDeepest = deepestValues.includes(node.val);
+
+                    if (isLca) {
+                        fillColor = this.state.theme === 'dark' ? '#f59e0b' : '#d97706';
+                        strokeColor = this.state.theme === 'dark' ? '#fbbf24' : '#f59e0b';
+                        strokeWidth = 4;
+                        cssClass += ' lca';
+                    } else if (isCurrent) {
+                        fillColor = this.state.theme === 'dark' ? '#3b82f6' : '#2563eb';
+                        strokeColor = this.state.theme === 'dark' ? '#60a5fa' : '#3b82f6';
+                        strokeWidth = 3;
+                        cssClass += ' current';
+                    } else if (isDeepest) {
+                        fillColor = this.state.theme === 'dark' ? '#10b981' : '#059669';
+                        strokeColor = this.state.theme === 'dark' ? '#34d399' : '#10b981';
+                        strokeWidth = 3;
+                        cssClass += ' deepest';
+                    } else {
+                        fillColor = this.state.theme === 'dark' ? '#374151' : '#e5e7eb';
+                        strokeColor = this.state.theme === 'dark' ? '#4b5563' : '#9ca3af';
+                        strokeWidth = 2;
+                    }
+
+                    const textColor = (isLca || isCurrent || isDeepest) ? '#ffffff' : 
+                                     (this.state.theme === 'dark' ? '#f9fafb' : '#111827');
+
+                    return `
+                        <g class="${cssClass}">
+                            <circle
+                                cx="${x}" cy="${y}" r="28"
+                                fill="${fillColor}"
+                                stroke="${strokeColor}"
+                                stroke-width="${strokeWidth}"
+                            />
+                            <text
+                                x="${x}" y="${y}"
+                                text-anchor="middle"
+                                dominant-baseline="middle"
+                                fill="${textColor}"
+                                font-size="16"
+                                font-weight="600"
+                                font-family="var(--font-sans)"
+                            >
+                                ${node.val}
+                            </text>
+                        </g>
+                    `;
+                }).join('');
+
+                const legendY = svgHeight - 100;
+                const legendHTML = `
+                    <g transform="translate(20, ${legendY})">
+                        <circle cx="10" cy="0" r="8" fill="${this.state.theme === 'dark' ? '#3b82f6' : '#2563eb'}"/>
+                        <text x="25" y="0" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Current Node</text>
+                        
+                        <circle cx="10" cy="25" r="8" fill="${this.state.theme === 'dark' ? '#10b981' : '#059669'}"/>
+                        <text x="25" y="25" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">Deepest Leaf</text>
+                        
+                        <circle cx="10" cy="50" r="8" fill="${this.state.theme === 'dark' ? '#f59e0b' : '#d97706'}"/>
+                        <text x="25" y="50" dominant-baseline="middle" fill="var(--text-primary)" font-size="12">LCA Result</text>
+                    </g>
+                `;
+
+                return `
+                    <svg viewBox="0 0 1000 ${svgHeight}" style="width: 100%; height: 100%; min-height: 500px;">
+                        ${edgesHTML}
+                        ${nodesHTML}
+                        ${legendHTML}
+                    </svg>
+                `;
+            }
+
+            renderVizPanel() {
+                const step = this.state.steps[this.state.currentStep];
+                const currentNodeId = step ? step.currentNodeId : null;
+                const lcaNodeId = step ? step.lcaNodeId : null;
+
+                return `
+                    <div class="panel viz-panel" style="width: 50%">
+                        <div class="panel-header">Tree Visualization</div>
+                        <div class="viz-content">
+                            ${this.renderTree(this.state.root, currentNodeId, lcaNodeId)}
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-btn" onclick="app.reset()">⏮ Reset</button>
+                            <button class="control-btn" onclick="app.stepBack()" 
+                                ${this.state.currentStep === 0 ? 'disabled' : ''}>
+                                ◀ Step Back
+                            </button>
+                            <button class="control-btn primary" onclick="${this.state.isPlaying ? 'app.pause()' : 'app.play()'}">
+                                ${this.state.isPlaying ? '⏸ Pause' : '▶ Play'}
+                            </button>
+                            <button class="control-btn" onclick="app.stepForward()"
+                                ${this.state.currentStep >= this.state.steps.length - 1 ? 'disabled' : ''}>
+                                Step Forward ▶
+                            </button>
+                            <div class="speed-control">
+                                <span style="font-size: 13px; color: var(--text-secondary);">Speed:</span>
+                                <select onchange="app.setSpeed(this.value)" style="cursor: pointer;">
+                                    <option value="0.5" ${this.state.speed === 0.5 ? 'selected' : ''}>0.5x</option>
+                                    <option value="1" ${this.state.speed === 1 ? 'selected' : ''}>1x</option>
+                                    <option value="2" ${this.state.speed === 2 ? 'selected' : ''}>2x</option>
+                                    <option value="4" ${this.state.speed === 4 ? 'selected' : ''}>4x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderStepPanel() {
+                if (this.state.steps.length === 0) {
+                    return `
+                        <div class="panel" style="width: 20%">
+                            <div class="panel-header">Execution Log</div>
+                            <div class="panel-content step-log">
+                                <p style="color: var(--text-secondary); font-size: 13px;">
+                                    Click "Run" to start visualization.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const step = this.state.steps[this.state.currentStep];
+
+                const varsHTML = Object.entries(step.vars).map(([name, value]) => `
+                    <div class="var-item">
+                        <span class="var-name">${name}</span>: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </div>
+                `).join('');
+
+                const historyHTML = this.state.steps.slice(0, this.state.currentStep + 1).map((s, i) => {
+                    const isCurrent = i === this.state.currentStep;
+                    return `
+                        <div class="history-item ${isCurrent ? 'current' : ''}">
                             ${i + 1}. ${s.description}
                         </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            stepInfo.innerHTML = html;
-        }
+                    `;
+                }).join('');
 
-        // Update UI
-        function updateUI() {
-            renderCode();
-            renderTree();
-            renderStepLog();
-            
-            document.getElementById('prevBtn').disabled = currentStep === 0;
-            document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
-        }
+                return `
+                    <div class="panel" style="width: 20%">
+                        <div class="panel-header">Execution Log</div>
+                        <div class="panel-content step-log">
+                            <div class="step-info">
+                                <h3>Step ${this.state.currentStep + 1} of ${this.state.steps.length}</h3>
+                                <p class="step-description">${step.description}</p>
+                            </div>
+                            
+                            <div class="variables">
+                                <h4>Variables</h4>
+                                ${varsHTML}
+                            </div>
+                            
+                            <div class="step-history">
+                                <h4>History</h4>
+                                ${historyHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
 
-        // Playback controls
-        function play() {
-            if (isPlaying) return;
-            isPlaying = true;
-            document.getElementById('playBtn').innerHTML = '⏸ Pause';
-            
-            playInterval = setInterval(() => {
-                if (currentStep < steps.length - 1) {
-                    currentStep++;
-                    updateUI();
-                } else {
-                    pause();
+            renderExecutionMode() {
+                return `
+                    ${this.renderCodePanel()}
+                    ${this.renderVizPanel()}
+                    ${this.renderStepPanel()}
+                `;
+            }
+
+            renderIntuitionContent() {
+                const stages = this.intuitionStages;
+                const currentIdx = this.state.currentIntuitionStage;
+
+                const stagesHTML = stages.map((stage, i) => {
+                    const isActive = i === currentIdx;
+                    const isPast = i < currentIdx;
+                    const opacity = isActive ? '1' : (isPast ? '0.6' : '0.3');
+
+                    return `
+                        <div class="intuition-stage" style="opacity: ${opacity}">
+                            <h3>
+                                <span class="stage-number">${i + 1}</span>
+                                ${stage.title}
+                            </h3>
+                            
+                            ${stage.thought ? `
+                                <div class="thought-bubble">
+                                    💭 "${stage.thought}"
+                                </div>
+                            ` : ''}
+                            
+                            <p>${stage.content}</p>
+                            
+                            ${stage.insight ? `
+                                <div class="key-insight">
+                                    <strong>💡 Key Insight:</strong> ${stage.insight}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: 50%; border-right: 2px solid var(--border);">
+                        <div class="panel-header">
+                            Senior Engineer's Thought Process
+                            <span style="float: right;">Stage ${currentIdx + 1} of ${stages.length}</span>
+                        </div>
+                        <div class="panel-content intuition-panel">
+                            ${stagesHTML}
+                            
+                            <div style="margin-top: 24px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                <button class="control-btn" onclick="app.prevIntuitionStage()" 
+                                    ${currentIdx === 0 ? 'disabled' : ''} 
+                                    style="margin-right: 8px;">
+                                    ◀ Previous
+                                </button>
+                                <button class="control-btn primary" 
+                                    onclick="${this.state.isIntuitionPlaying ? 'app.pauseIntuition()' : 'app.playIntuition()'}">
+                                    ${this.state.isIntuitionPlaying ? '⏸ Pause' : '▶ Play'}
+                                </button>
+                                <button class="control-btn" onclick="app.nextIntuitionStage()"
+                                    ${currentIdx >= stages.length - 1 ? 'disabled' : ''}
+                                    style="margin-left: 8px;">
+                                    Next ▶
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderIntuitionViz() {
+                const stage = this.intuitionStages[this.state.currentIntuitionStage];
+                let vizContent = '';
+
+                switch(stage.visualization) {
+                    case 'example_tree':
+                        const deepestInfo = this.getDeepestLeaves(this.state.root);
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">Example Tree Analysis</h3>
+                                ${this.renderTree(this.state.root, null, null)}
+                                <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                    <div style="font-size: 14px; line-height: 1.8;">
+                                        Max depth: ${deepestInfo.depth}<br>
+                                        Deepest leaves: ${deepestInfo.leaves.map(n => n.val).join(', ')}<br>
+                                        Total deepest leaves: ${deepestInfo.leaves.length}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'approach_comparison':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 20px;">Comparing Approaches</h3>
+                                
+                                <div class="approach-box bad">
+                                    <h4>❌ Naive: Three-Pass Solution</h4>
+                                    <div style="margin-top: 8px; line-height: 1.6;">
+                                        <strong>Pass 1:</strong> Find max depth → O(n)<br>
+                                        <strong>Pass 2:</strong> Collect deepest leaves → O(n)<br>
+                                        <strong>Pass 3:</strong> Find LCA of leaves → O(n)<br>
+                                        <strong>Total Time:</strong> O(3n) = O(n)<br>
+                                        <strong>Space:</strong> O(n) for leaf storage + O(h) recursion<br>
+                                        <strong>Problem:</strong> Three separate tree traversals!
+                                    </div>
+                                </div>
+                                
+                                <div class="approach-box good">
+                                    <h4>✅ Optimal: One-Pass DFS with Tuple Return</h4>
+                                    <div style="margin-top: 8px; line-height: 1.6;">
+                                        <strong>Strategy:</strong> Return (depth, lca) from each call<br>
+                                        <strong>Time:</strong> O(n) - single traversal<br>
+                                        <strong>Space:</strong> O(h) - recursion only<br>
+                                        <strong>Why Better:</strong> Combines depth-finding and LCA-finding!<br>
+                                        <strong>Key:</strong> Post-order traversal gets child info first
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'technique_demo':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">The Tuple Return Technique</h3>
+                                ${this.renderTree(this.state.root, this.state.root.id, null)}
+                                <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                    <div style="font-size: 14px; line-height: 1.8;">
+                                        <strong>At each node, return TWO values:</strong><br>
+                                        1. <span style="color: var(--accent);">depth</span>: max depth in this subtree<br>
+                                        2. <span style="color: var(--success);">lca</span>: LCA of deepest leaves in this subtree<br><br>
+                                        
+                                        <strong>Decision logic:</strong><br>
+                                        • If left_depth == right_depth → <span style="color: var(--success);">I'm the LCA!</span><br>
+                                        • If left_depth > right_depth → Pass up left's LCA<br>
+                                        • If right_depth > left_depth → Pass up right's LCA
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'base_case':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 20px;">Base Case: The Foundation</h3>
+                                
+                                <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                                    <div style="font-family: var(--font-mono); font-size: 14px; line-height: 1.8;">
+                                        <span style="color: var(--keyword);">if not</span> node:<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--keyword);">return</span> (<span style="color: var(--number);">0</span>, <span style="color: var(--keyword);">None</span>)
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 16px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); border-radius: 4px;">
+                                    <strong style="color: var(--success);">Why this works:</strong><br>
+                                    <div style="margin-top: 8px; line-height: 1.6;">
+                                        • Depth 0: No nodes below an empty subtree<br>
+                                        • LCA None: No leaves to find ancestor of<br>
+                                        • Parent compares: if other side deeper, ignores this<br>
+                                        • Handles: single node, leaf nodes, unbalanced trees
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'code_flow':
+                        const lines = this.solutionCode.split('\n');
+                        const highlightLines = [3, 4, 5, 6, 7, 8, 10, 11, 13, 14, 15, 17, 18, 19, 21, 22, 23, 24, 25];
+                        const codeHTML = lines.map((line, i) => {
+                            const shouldHighlight = highlightLines.includes(i + 1);
+                            const bgColor = shouldHighlight ? 
+                                (this.state.theme === 'dark' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)') : 
+                                'transparent';
+                            
+                            return `
+                                <div style="background: ${bgColor}; padding: 2px 8px; border-left: ${shouldHighlight ? '3px solid var(--accent)' : '3px solid transparent'};">
+                                    <span style="color: var(--text-secondary); display: inline-block; min-width: 30px; font-family: var(--font-mono);">${i + 1}</span>
+                                    <code style="font-family: var(--font-mono); white-space: pre; font-size: 13px;">${line || ' '}</code>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px;">Post-Order DFS Implementation</h3>
+                                <div style="background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto;">
+                                    ${codeHTML}
+                                </div>
+                                <div style="margin-top: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; line-height: 1.6;">
+                                    <strong>Post-order means:</strong><br>
+                                    1. Process left child first (get depth & LCA)<br>
+                                    2. Process right child next (get depth & LCA)<br>
+                                    3. Make decision at current node<br>
+                                    4. Return result upward
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'complexity':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <div style="background: var(--bg-secondary); padding: 24px; margin-bottom: 16px; border-radius: 8px;">
+                                    <h3 style="color: var(--accent); margin-bottom: 12px;">Time Complexity</h3>
+                                    <div style="margin-top: 12px; line-height: 1.8;">
+                                        <strong>O(n)</strong> - visit each node exactly once<br>
+                                        <div style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
+                                            • Single DFS traversal<br>
+                                            • O(1) work per node (comparisons, tuple creation)<br>
+                                            • Cannot do better - must examine all nodes<br>
+                                            • Optimal!
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 24px; border-radius: 8px;">
+                                    <h3 style="color: var(--accent); margin-bottom: 12px;">Space Complexity</h3>
+                                    <div style="margin-top: 12px; line-height: 1.8;">
+                                        <strong>O(h)</strong> where h = height<br>
+                                        <div style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
+                                            • Recursion stack depth = tree height<br>
+                                            • Best (balanced): O(log n)<br>
+                                            • Worst (skewed): O(n)<br>
+                                            • No extra data structures!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'edge_cases':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 20px;">Edge Cases Handled</h3>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; margin-bottom: 12px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 1: Single node tree</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Tree: [1]<br>
+                                        ✅ Root is both deepest leaf AND its own LCA<br>
+                                        Returns: (1, node(1))
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; margin-bottom: 12px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 2: All deepest leaves on one side</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Tree: [1,2,3,4,5]<br>
+                                        ✅ Left subtree deeper → propagate left_lca upward<br>
+                                        LCA is the root of that deeper subtree
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; margin-bottom: 12px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 3: Deepest leaves on BOTH sides</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Tree: [3,5,1,6,2,0,8,null,null,7,4]<br>
+                                        ✅ Equal depths → current node IS the LCA!<br>
+                                        This is the KEY case that makes the algorithm work
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 4: Highly unbalanced tree</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Tree: [1,2,null,3,null,4]<br>
+                                        ✅ One side always null → other side's LCA propagates<br>
+                                        Deepest leaf becomes its own LCA
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'final_demo':
+                        this.simulateLCA();
+                        const finalStep = this.state.steps[this.state.steps.length - 1];
+                        const lcaNode = finalStep.lcaNodeId ? 
+                            this.findNodeById(this.state.root, finalStep.lcaNodeId) : null;
+                        
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">Complete Solution Demo</h3>
+                                ${this.renderTree(this.state.root, null, finalStep.lcaNodeId)}
+                                <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 12px;">
+                                        Final Answer: ${finalStep.vars.final_result}
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                                        Max depth: ${finalStep.vars.max_depth}<br>
+                                        <span style="color: var(--success);">●</span> Orange node is the LCA of all deepest leaves<br>
+                                        <span style="color: var(--success);">●</span> Green nodes are the deepest leaves
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    default:
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                ${this.renderTree(this.state.root, null, null)}
+                            </div>
+                        `;
                 }
-            }, 1000 / speed);
-        }
 
-        function pause() {
-            isPlaying = false;
-            document.getElementById('playBtn').innerHTML = '▶ Play';
-            if (playInterval) {
-                clearInterval(playInterval);
-                playInterval = null;
+                return `
+                    <div class="panel" style="width: 50%;">
+                        <div class="panel-header">Visual Explanation</div>
+                        <div class="panel-content">
+                            ${vizContent}
+                        </div>
+                    </div>
+                `;
             }
-        }
 
-        function stepForward() {
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                updateUI();
+            findNodeById(root, id) {
+                if (!root) return null;
+                if (root.id === id) return root;
+                const left = this.findNodeById(root.left, id);
+                if (left) return left;
+                return this.findNodeById(root.right, id);
             }
-        }
 
-        function stepBackward() {
-            if (currentStep > 0) {
-                currentStep--;
-                updateUI();
+            renderIntuitionMode() {
+                return `
+                    ${this.renderIntuitionContent()}
+                    ${this.renderIntuitionViz()}
+                `;
             }
-        }
 
-        function reset() {
-            pause();
-            currentStep = 0;
-            updateUI();
-        }
-
-        // Run algorithm
-        function runAlgorithm() {
-            pause();
-            
-            const input = document.getElementById('treeInput').value;
-            try {
-                const arr = JSON.parse(input);
-                tree = buildTree(arr);
+            render() {
+                const app = document.getElementById('app');
                 
-                const { result, steps: newSteps } = solutionWithTracing(tree);
-                steps = newSteps;
-                currentStep = 0;
-                
-                updateUI();
-            } catch (e) {
-                alert('Invalid input format. Please use format like: [3,5,1,6,2,0,8,null,null,7,4]');
+                const inputSection = this.state.mode === 'execution' ? `
+                    <div class="input-section">
+                        <label style="font-size: 14px; font-weight: 500; color: var(--text-secondary);">Tree:</label>
+                        <input 
+                            type="text" 
+                            class="input-field"
+                            value="[${this.state.treeArray.join(',')}]"
+                            onchange="app.updateTree(this.value)"
+                            placeholder="e.g., [3,5,1,6,2,0,8,null,null,7,4]"
+                        />
+                        <button class="run-btn" onclick="app.runSimulation()">▶ Run</button>
+                    </div>
+                ` : '';
+
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="header-top">
+                            <h1>${this.problemNumber}. ${this.problemTitle}</h1>
+                            <button class="theme-toggle" onclick="app.toggleTheme()">
+                                ${this.state.theme === 'dark' ? '☀️ Light' : '🌙 Dark'} Mode
+                            </button>
+                        </div>
+                        
+                        <div class="mode-toggle">
+                            <button 
+                                class="mode-btn ${this.state.mode === 'intuition' ? 'active' : ''}" 
+                                onclick="app.toggleMode('intuition')">
+                                💡 Intuition & Thought Process
+                            </button>
+                            <button 
+                                class="mode-btn ${this.state.mode === 'execution' ? 'active' : ''}" 
+                                onclick="app.toggleMode('execution')">
+                                ▶️ Step-by-Step Execution
+                            </button>
+                        </div>
+                        
+                        ${inputSection}
+                    </div>
+                    
+                    <div class="main-content">
+                        ${this.state.mode === 'execution' ? this.renderExecutionMode() : this.renderIntuitionMode()}
+                    </div>
+                `;
             }
-        }
 
-        // Theme toggle
-        function toggleTheme() {
-            const body = document.body;
-            const themeToggle = document.getElementById('themeToggle');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                themeToggle.textContent = '🌙 Dark Mode';
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '☀️ Light Mode';
-            }
-            
-            updateUI();
-        }
-
-        // Event listeners
-        document.getElementById('playBtn').addEventListener('click', () => {
-            if (isPlaying) {
-                pause();
-            } else {
-                play();
-            }
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', stepForward);
-        document.getElementById('prevBtn').addEventListener('click', stepBackward);
-        document.getElementById('resetBtn').addEventListener('click', reset);
-        document.getElementById('runBtn').addEventListener('click', runAlgorithm);
-        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-        document.getElementById('speedSelect').addEventListener('change', (e) => {
-            speed = parseFloat(e.target.value);
-            if (isPlaying) {
-                pause();
-                play();
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (isPlaying) {
-                    pause();
-                } else {
-                    play();
+            updateTree(value) {
+                try {
+                    const arr = JSON.parse(value);
+                    this.state.treeArray = arr;
+                    this.buildTree();
+                } catch (e) {
+                    alert('Invalid JSON format. Use: [3,5,1,6,2,0,8,null,null,7,4]');
                 }
-            } else if (e.code === 'ArrowRight') {
-                e.preventDefault();
-                stepForward();
-            } else if (e.code === 'ArrowLeft') {
-                e.preventDefault();
-                stepBackward();
             }
-        });
+        }
 
-        // Initialize
-        runAlgorithm();
+        // Initialize app
+        const app = new LCADeepestLeavesVisualizer();
     </script>
 </body>
 </html>
