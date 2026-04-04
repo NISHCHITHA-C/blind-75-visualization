@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>572. Subtree of Another Tree - Visualizer</title>
+    <title>572. Subtree of Another Tree - Dual Mode Visualizer</title>
     <style>
         * {
             margin: 0;
@@ -59,6 +59,35 @@
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 12px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
 
         .controls {
@@ -139,14 +168,17 @@
         .panel-content {
             flex: 1;
             overflow: auto;
+            padding: 16px;
         }
 
+        /* Code Panel */
         .code-panel {
             font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.65;
             background: var(--code-bg);
             color: #e0e0e0;
+            padding: 0;
         }
 
         [data-theme="light"] .code-panel {
@@ -156,8 +188,8 @@
         .code-line {
             display: flex;
             align-items: center;
-            padding: 3px 0;
-            min-height: 22px;
+            padding: 2px 0;
+            min-height: 24px;
             transition: background 0.2s ease;
         }
 
@@ -181,8 +213,22 @@
             color: inherit;
         }
 
+        /* Syntax Highlighting */
+        .keyword { color: #ff79c6; font-weight: 600; }
+        .function { color: #50fa7b; font-weight: 500; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .type { color: #8be9fd; font-weight: 500; }
+
+        [data-theme="light"] .keyword { color: #d73a49; font-weight: 600; }
+        [data-theme="light"] .function { color: #6f42c1; font-weight: 500; }
+        [data-theme="light"] .string { color: #032f62; }
+        [data-theme="light"] .comment { color: #6a737d; font-style: italic; }
+        [data-theme="light"] .type { color: #005cc5; font-weight: 500; }
+
+        /* Visualization Panel */
         .viz-container {
-            padding: 16px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -194,6 +240,7 @@
             align-items: center;
             justify-content: center;
             overflow: auto;
+            padding: 16px;
         }
 
         .viz-controls {
@@ -211,8 +258,9 @@
             min-width: 80px;
         }
 
+        /* Step Log Panel */
         .step-log {
-            padding: 16px;
+            padding: 0;
         }
 
         .step-info {
@@ -266,22 +314,101 @@
             color: var(--text-primary);
         }
 
-        .tree-container {
-            display: flex;
-            gap: 40px;
-            align-items: flex-start;
-            justify-content: center;
+        /* Intuition Mode Styles */
+        .intuition-stage {
+            margin-bottom: 32px;
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
         }
 
-        .tree-box {
+        .intuition-stage.active {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
             text-align: center;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-weight: 700;
         }
 
-        .tree-label {
-            font-size: 14px;
-            font-weight: 600;
+        .intuition-stage h3 {
+            font-size: 16px;
             margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .thought-bubble {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-style: italic;
             color: var(--text-primary);
+            border-radius: 4px;
+        }
+
+        .thought-bubble::before {
+            content: '💭 ';
+            font-style: normal;
+        }
+
+        .key-insight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .key-insight::before {
+            content: '💡 ';
+            font-weight: bold;
+        }
+
+        .stage-content {
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .approach-box {
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .approach-box.rejected {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .approach-box.accepted {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+
+        .approach-box h4 {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .approach-box.rejected h4 {
+            color: #ef4444;
+        }
+
+        .approach-box.accepted h4 {
+            color: #10b981;
         }
 
         select {
@@ -294,27 +421,56 @@
             cursor: pointer;
         }
 
-        .keyword { color: #ff79c6; font-weight: 600; }
-        .function { color: #50fa7b; font-weight: 500; }
-        .string { color: #f1fa8c; }
-        .comment { color: #6272a4; font-style: italic; }
-        .type { color: #8be9fd; font-weight: 500; }
-
-        [data-theme="light"] .keyword { color: #d73a49; font-weight: 600; }
-        [data-theme="light"] .function { color: #6f42c1; font-weight: 500; }
-        [data-theme="light"] .string { color: #032f62; }
-        [data-theme="light"] .comment { color: #6a737d; font-style: italic; }
-        [data-theme="light"] .type { color: #005cc5; font-weight: 500; }
-
-        .resize-handle {
-            width: 4px;
-            cursor: col-resize;
-            background: transparent;
-            transition: background 0.2s;
+        .tree-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-align: center;
         }
 
-        .resize-handle:hover {
-            background: var(--accent);
+        .complexity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .complexity-card {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .complexity-card h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .complexity-value {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .complexity-explanation {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .stage-nav {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -322,7 +478,17 @@
     <div class="container">
         <div class="header">
             <div class="title">572. Subtree of Another Tree</div>
-            <div class="controls">
+            
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="intuitionModeBtn" onclick="app.switchMode('intuition')">
+                    💡 Intuition & Thought Process
+                </button>
+                <button class="mode-btn" id="executionModeBtn" onclick="app.switchMode('execution')">
+                    ▶️ Step-by-Step Execution
+                </button>
+            </div>
+
+            <div class="controls" id="executionControls">
                 <div class="input-group">
                     <label>Root:</label>
                     <input type="text" id="rootInput" value="[3,4,5,1,2]" placeholder="[3,4,5,1,2]">
@@ -336,20 +502,19 @@
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="panel" id="codePanel" style="width: 30%;">
+        <!-- Execution Mode Layout -->
+        <div class="main-content" id="executionMode">
+            <div class="panel" style="width: 30%;">
                 <div class="panel-header">Code</div>
-                <div class="panel-content">
+                <div class="panel-content" style="padding: 0;">
                     <pre class="code-panel" id="codeDisplay"></pre>
                 </div>
             </div>
 
-            <div class="resize-handle" data-panel="0"></div>
-
-            <div class="panel" id="vizPanel" style="width: 50%;">
+            <div class="panel" style="width: 50%;">
                 <div class="panel-header">Visualization</div>
                 <div class="viz-container">
-                    <div class="viz-content" id="vizContent">
+                    <div class="viz-content">
                         <svg id="treeSvg" width="900" height="500"></svg>
                     </div>
                     <div class="viz-controls">
@@ -367,12 +532,32 @@
                 </div>
             </div>
 
-            <div class="resize-handle" data-panel="1"></div>
-
-            <div class="panel" id="logPanel" style="width: 20%;">
+            <div class="panel" style="width: 20%;">
                 <div class="panel-header">Execution Log</div>
                 <div class="panel-content">
                     <div class="step-log" id="stepLog"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intuition Mode Layout -->
+        <div class="main-content hidden" id="intuitionMode">
+            <div class="panel" style="width: 50%;">
+                <div class="panel-header">Senior Engineer's Thought Process</div>
+                <div class="panel-content" id="thoughtProcess"></div>
+            </div>
+
+            <div class="panel" style="width: 50%;">
+                <div class="panel-header">Visual Explanation</div>
+                <div class="panel-content">
+                    <div class="viz-content">
+                        <svg id="intuitionSvg" width="800" height="500"></svg>
+                    </div>
+                    <div class="stage-nav">
+                        <button onclick="app.prevIntuitionStage()">◀ Previous Stage</button>
+                        <button onclick="app.playIntuition()" id="intuitionPlayBtn">▶ Auto-Advance</button>
+                        <button onclick="app.nextIntuitionStage()">Next Stage ▶</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -385,6 +570,7 @@
                 this.val = val;
                 this.left = left;
                 this.right = right;
+                this.id = Math.random().toString(36).substr(2, 9);
             }
         }
 
@@ -432,21 +618,21 @@
                 });
 
                 if (!s && !t) {
-                    logStep(16, 'Both nodes are null - identical!', { result: true });
+                    logStep(16, 'Both nodes are null - trees are identical!', { result: true });
                     return true;
                 }
 
                 if (!s || !t) {
-                    logStep(19, 'One node is null - not identical', { result: false });
+                    logStep(19, 'One node is null while other is not - not identical', { result: false });
                     return false;
                 }
 
                 if (s.val !== t.val) {
-                    logStep(22, `Values differ: ${s.val} ≠ ${t.val}`, { result: false });
+                    logStep(22, `Values differ: ${s.val} ≠ ${t.val} - not identical`, { result: false });
                     return false;
                 }
 
-                logStep(22, `Values match: ${s.val} = ${t.val}, checking children...`, {
+                logStep(25, `Values match: ${s.val} = ${t.val}, checking children...`, {
                     's.val': s.val,
                     't.val': t.val
                 });
@@ -469,7 +655,7 @@
                 logStep(30, `Exploring node ${node.val} at ${path.join('→') || 'root'}`, {
                     'current': node.val,
                     'path': path.join('→') || 'root',
-                    'checking': 'if this node matches subRoot'
+                    'action': 'checking if this node matches subRoot'
                 });
 
                 if (isIdentical(node, subRoot, path)) {
@@ -488,496 +674,757 @@
                     return true;
                 }
 
-                logStep(35, `No match in left subtree, searching right subtree...`, {
+                logStep(35, `No match in left, searching right subtree of ${node.val}...`, {
                     'current': node.val
                 });
 
                 return dfs(node.right, [...path, 'R']);
             }
 
-            logStep(1, 'Starting subtree search...', {
+            logStep(1, 'Starting subtree search algorithm...', {
                 'root': root ? root.val : 'null',
                 'subRoot': subRoot ? subRoot.val : 'null'
             });
 
             if (!subRoot) {
-                logStep(38, 'subRoot is null - returning True', { result: true });
+                logStep(38, 'subRoot is null - returning True (empty tree is always a subtree)', { result: true });
                 return { result: true, steps };
             }
 
             const result = dfs(root);
-            logStep(40, `Final result: ${result}`, { result: result });
+            logStep(40, `Search complete. Final result: ${result}`, { result: result });
 
             return { result, steps };
         }
 
-        // Code highlighting
-        const code = `class SolutionFastest:
+        // Code for display
+        const code = `class Solution:
     def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
         """
-        Classic DFS with helper function.
-        Time: O(m * n) worst case
-        Space: O(h) recursion stack
+        Determine if subRoot is a subtree of root.
+        A subtree must include the entire structure from that node down.
+        
+        Time: O(m * n) - for each node in root, we might check entire subRoot
+        Space: O(h) - recursion stack height
         """
-        def is_identical(s, t):
+        
+        def is_identical(s: TreeNode, t: TreeNode) -> bool:
+            """Check if two trees are structurally identical"""
             # Both empty - identical
             if not s and not t:
                 return True
-            # One empty - not identical
+            
+            # One empty, one not - different
             if not s or not t:
                 return False
-            # Check value and recurse on children
+            
+            # Check value and recurse on both children
             return (s.val == t.val and 
                     is_identical(s.left, t.left) and 
                     is_identical(s.right, t.right))
         
-        def dfs(node):
+        def dfs(node: TreeNode) -> bool:
             if not node:
                 return False
-            # Check if current node matches
+            
+            # Check if current node starts a matching subtree
             if is_identical(node, subRoot):
                 return True
-            # Search in left or right subtree
+            
+            # Otherwise search in left or right subtree
             return dfs(node.left) or dfs(node.right)
         
+        # Edge case: empty subRoot is always a subtree
         if not subRoot:
             return True
+        
         return dfs(root)`;
 
-        // State
-        let steps = [];
-        let currentStep = 0;
-        let isPlaying = false;
-        let playInterval = null;
-        let speed = 1;
-        let rootTree = null;
-        let subRootTree = null;
+        // Intuition stages
+        const intuitionStages = [
+            {
+                title: "Stage 1: Understanding the Problem",
+                thought: "What does 'subtree' really mean? Let me break this down carefully...",
+                content: `I need to understand the exact definition here. A subtree isn't just "contains the same values" - it must be an EXACT structural match from some node downward.
 
-        // Syntax highlighting helper
-        function highlightPythonLine(line) {
-            if (!line.trim()) return '&nbsp;';
-            
-            // Escape HTML
-            let highlighted = line
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-            
-            // Comments (must be first to avoid highlighting inside comments)
-            if (line.trim().startsWith('#')) {
-                return `<span class="comment">${highlighted}</span>`;
+Key observations:
+• The subtree must include a complete branch - I can't pick and choose nodes
+• It must match structurally AND by values
+• The subtree could start at ANY node in the main tree (including root)
+• An empty tree is a subtree of any tree (edge case)
+
+Example: If I have tree [3,4,5,1,2] and looking for [4,1,2], I need to find a node with value 4, then verify its entire structure matches [4,1,2].`,
+                insight: "A subtree is an EXACT copy of a portion of the tree, not just similar values. It's like asking: 'Can I cut out a branch that looks exactly like this?'",
+                visualization: "example_tree"
+            },
+            {
+                title: "Stage 2: Exploring Approaches",
+                thought: "Hmm, I could try a few different strategies. Let me compare them...",
+                content: `Let me think through my options:
+
+<div class="approach-box rejected">
+    <h4>❌ Approach 1: Serialize and String Match</h4>
+    <strong>Idea:</strong> Convert both trees to strings (like "3,4,1,#,#,2,#,#,5,#,#") and check if subRoot's string appears in root's string.<br>
+    <strong>Time:</strong> O(m + n)<br>
+    <strong>Problem:</strong> Tricky to get serialization right. Edge cases with similar values. Need to handle nulls carefully.
+</div>
+
+<div class="approach-box accepted">
+    <h4>✅ Approach 2: DFS + Tree Comparison</h4>
+    <strong>Idea:</strong> For each node in the main tree, check if starting from that node gives us an exact match to subRoot.<br>
+    <strong>Time:</strong> O(m * n) where m = nodes in root, n = nodes in subRoot<br>
+    <strong>Why Better:</strong> Simple, clear logic. Easy to reason about. No serialization tricks needed.
+</div>`,
+                insight: "The DFS approach is more intuitive and easier to debug. We're essentially asking at each node: 'Does a subtree starting here match my target?'",
+                visualization: "approach_comparison"
+            },
+            {
+                title: "Stage 3: The Key Technique - Two Helper Functions",
+                thought: "Wait! I need TWO different types of comparisons here. That's the key insight!",
+                content: `This is the crucial realization: I need TWO recursive functions with different jobs:
+
+**Function 1: isIdentical(s, t)**
+• Compare two trees for EXACT structural match
+• Both values AND structure must be identical
+• This is the classic "are these trees the same?" problem
+
+**Function 2: dfs(node)**
+• Traverse through the main tree
+• At each node, use isIdentical() to check if a match starts there
+• If no match, continue searching in left and right subtrees
+
+It's like having a detective (dfs) who walks through the city, and at each building, calls in an expert (isIdentical) to check if that building matches the blueprint.`,
+                insight: "Separating concerns: One function FINDS where to check, the other function CHECKS if it matches. This separation makes the logic crystal clear.",
+                visualization: "two_functions"
+            },
+            {
+                title: "Stage 4: Writing isIdentical - The Comparison Logic",
+                thought: "How do I check if two trees are identical? Let me think recursively...",
+                content: `For isIdentical(s, t), I need to handle three cases:
+
+1. **Both null** → They're identical ✓
+   if not s and not t: return True
+
+2. **One null, one not** → They're different ✗
+   if not s or not t: return False
+
+3. **Both exist** → Check value AND recurse on children
+   return (s.val == t.val AND 
+           isIdentical(s.left, t.left) AND 
+           isIdentical(s.right, t.right))
+
+The recursion naturally handles the entire tree structure. If any node doesn't match (value OR structure), the whole AND chain collapses to False.`,
+                insight: "Recursion handles tree comparison elegantly. The base cases (null checks) prevent infinite recursion, and the recursive case builds up the complete answer.",
+                visualization: "identical_demo"
+            },
+            {
+                title: "Stage 5: Writing dfs - The Search Logic",
+                thought: "Now I need to search through every node in the main tree...",
+                content: `For dfs(node), I search every possible starting point:
+
+1. **Base case:** if node is null → return False (can't match)
+
+2. **Try matching here:**
+   if isIdentical(node, subRoot) → return True (found it!)
+
+3. **Recursively search children:**
+   return dfs(node.left) OR dfs(node.right)
+
+The OR is important: we only need ONE match anywhere in the tree. As soon as we find it, we can stop (short-circuit evaluation).
+
+Think of it like searching for a specific puzzle piece in a box - once you find it, you're done!`,
+                insight: "DFS with OR logic means we explore every node until we find a match. The recursion tree represents all possible places we could find the subtree.",
+                visualization: "dfs_search"
+            },
+            {
+                title: "Stage 6: Complexity Analysis",
+                thought: "Is this optimal? Let me verify the time and space complexity...",
+                content: `<div class="complexity-grid">
+    <div class="complexity-card">
+        <h4>Time Complexity</h4>
+        <div class="complexity-value">O(m × n)</div>
+        <div class="complexity-explanation">
+            • m = nodes in root tree<br>
+            • n = nodes in subRoot tree<br>
+            • We might visit all m nodes (DFS)<br>
+            • At each node, we might compare all n nodes (isIdentical)<br>
+            • Worst case: m × n comparisons
+        </div>
+    </div>
+    <div class="complexity-card">
+        <h4>Space Complexity</h4>
+        <div class="complexity-value">O(h)</div>
+        <div class="complexity-explanation">
+            • h = height of root tree<br>
+            • Recursion stack for DFS traversal<br>
+            • In worst case (skewed tree): O(m)<br>
+            • In balanced tree: O(log m)<br>
+            • No additional data structures needed
+        </div>
+    </div>
+</div>
+
+**Can we do better?** 
+• The O(m × n) is actually optimal for this problem
+• We MUST check each potential starting point (m options)
+• We MUST verify the entire subtree match (n comparisons)
+• String matching could be O(m + n) but has implementation complexity`,
+                insight: "This solution achieves optimal time complexity while maintaining code clarity. The space usage is minimal (just recursion stack).",
+                visualization: "complexity"
+            },
+            {
+                title: "Stage 7: Edge Cases & Testing",
+                thought: "What could break this solution? Let me think through edge cases...",
+                content: `Critical edge cases to verify:
+
+**1. Empty Trees**
+• subRoot is null → True (empty tree is subtree of anything)
+• root is null, subRoot is not → False
+• Both null → True
+
+**2. Single Node Trees**
+• root = [1], subRoot = [1] → True
+• root = [1], subRoot = [2] → False
+
+**3. Subtree at Different Positions**
+• Match at root itself
+• Match in left subtree
+• Match in right subtree
+• Match deep in the tree
+
+**4. Similar but Not Identical**
+• Same values but different structure
+• Example: root = [3,4,5,1,2,null,null,0], subRoot = [4,1,2]
+  The [4,1,2] in root has an extra child (0), so NOT a match!
+
+**5. Multiple Potential Matches**
+• Tree with duplicate values
+• First match should return True (short-circuit)`,
+                insight: "The solution is robust because our null checks handle empty trees, and the structural comparison (checking both children) ensures we don't get fooled by extra nodes.",
+                visualization: "edge_cases"
+            },
+            {
+                title: "Stage 8: Final Synthesis",
+                thought: "Beautiful! Everything comes together elegantly.",
+                content: `Let's appreciate the complete solution:
+
+**The Strategy:**
+1. Use DFS to explore every node in the main tree
+2. At each node, check if it's the root of a matching subtree
+3. Use a separate helper to verify exact tree matching
+
+**Why It's Elegant:**
+• Clean separation of concerns (search vs compare)
+• Recursive solutions for both operations
+• Short-circuit evaluation (stop when found)
+• Minimal space usage
+• Easy to understand and debug
+
+**Interview Readiness:**
+• Demonstrates understanding of tree traversal
+• Shows ability to break down complex problems
+• Handles edge cases properly
+• Can explain time/space complexity
+• Code is clean and maintainable
+
+This is a perfect example of how dividing a problem into smaller, well-defined functions leads to a clear, correct solution.`,
+                insight: "This solution demonstrates mastery of recursion, tree traversal, and problem decomposition - all key skills for technical interviews.",
+                visualization: "final_synthesis"
             }
-            
-            // Docstrings
-            if (line.includes('"""')) {
-                return `<span class="string">${highlighted}</span>`;
-            }
-            
-            // Strings (single and double quotes)
-            highlighted = highlighted.replace(
-                /(["'])(?:(?=(\\?))\2.)*?\1/g,
-                '<span class="string">$&</span>'
-            );
-            
-            // Keywords
-            const keywords = [
-                'class', 'def', 'if', 'elif', 'else', 'while', 'for', 'return',
-                'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None',
-                'self', 'pass', 'break', 'continue', 'yield', 'with', 'as', 'raise',
-                'try', 'except', 'finally', 'lambda', 'is'
-            ];
-            
-            keywords.forEach(kw => {
-                const regex = new RegExp(`\\b(${kw})\\b`, 'g');
-                highlighted = highlighted.replace(regex, '<span class="keyword">$1</span>');
-            });
-            
-            // Type hints
-            const types = ['Optional', 'TreeNode', 'List', 'Dict', 'Set', 'Tuple', 'bool', 'int', 'str'];
-            types.forEach(type => {
-                const regex = new RegExp(`\\b(${type})\\b`, 'g');
-                highlighted = highlighted.replace(regex, '<span class="type">$1</span>');
-            });
-            
-            // Function names (word followed by parenthesis)
-            highlighted = highlighted.replace(
-                /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g,
-                '<span class="function">$1</span>'
-            );
-            
-            return highlighted;
-        }
+        ];
 
-        // Display code with highlighting
-        function displayCode(highlightLine = -1) {
-            const lines = code.split('\n');
-            const codeDisplay = document.getElementById('codeDisplay');
-            codeDisplay.innerHTML = '';
-
-            lines.forEach((line, i) => {
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'code-line';
-                if (highlightLine === i) {
-                    lineDiv.classList.add('highlighted');
-                }
-
-                const lineNum = document.createElement('span');
-                lineNum.className = 'line-number';
-                lineNum.textContent = i + 1;
-
-                const lineCode = document.createElement('code');
-                lineCode.className = 'line-code';
-                lineCode.innerHTML = highlightPythonLine(line);
-
-                lineDiv.appendChild(lineNum);
-                lineDiv.appendChild(lineCode);
-                codeDisplay.appendChild(lineDiv);
-            });
-        }
-
-        // Tree layout calculation
-        function calculateTreeLayout(root, startX = 400, startY = 40, levelGap = 80, siblingGap = 40) {
-            if (!root) return { nodes: [], edges: [] };
-
-            const nodes = [];
-            const edges = [];
-
-            function getTreeWidth(node) {
-                if (!node) return 0;
-                if (!node.left && !node.right) return 1;
-                return getTreeWidth(node.left) + getTreeWidth(node.right);
+        // Application state
+        class App {
+            constructor() {
+                this.mode = 'intuition';
+                this.currentStep = 0;
+                this.currentIntuitionStage = 0;
+                this.isPlaying = false;
+                this.isIntuitionPlaying = false;
+                this.playInterval = null;
+                this.intuitionInterval = null;
+                this.speed = 1;
+                this.steps = [];
+                this.rootTree = null;
+                this.subRootTree = null;
+                
+                this.init();
             }
 
-            function layout(node, x, y, width) {
-                if (!node) return;
-
-                nodes.push({ val: node.val, x, y, node });
-
-                const leftWidth = getTreeWidth(node.left);
-                const rightWidth = getTreeWidth(node.right);
-                const totalWidth = leftWidth + rightWidth || 1;
-
-                if (node.left) {
-                    const leftX = x - (width * siblingGap / 2);
-                    const leftY = y + levelGap;
-                    edges.push({ x1: x, y1: y, x2: leftX, y2: leftY });
-                    layout(node.left, leftX, leftY, width * leftWidth / totalWidth);
-                }
-
-                if (node.right) {
-                    const rightX = x + (width * siblingGap / 2);
-                    const rightY = y + levelGap;
-                    edges.push({ x1: x, y1: y, x2: rightX, y2: rightY });
-                    layout(node.right, rightX, rightY, width * rightWidth / totalWidth);
-                }
+            init() {
+                this.renderIntuitionMode();
+                this.runSolution();
+                this.attachEventListeners();
             }
 
-            layout(root, startX, startY, getTreeWidth(root));
-            return { nodes, edges };
-        }
+            switchMode(mode) {
+                this.pause();
+                this.pauseIntuition();
+                this.mode = mode;
 
-        // Draw trees
-        function drawTrees(currentNode = null, matchingNode = null) {
-            const svg = document.getElementById('treeSvg');
-            svg.innerHTML = '';
-
-            // Main tree
-            const mainLayout = calculateTreeLayout(rootTree, 300, 40, 70, 35);
-            
-            // SubRoot tree
-            const subLayout = calculateTreeLayout(subRootTree, 650, 40, 70, 35);
-
-            // Draw main tree
-            const mainGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            
-            // Edges
-            mainLayout.edges.forEach(edge => {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', edge.x1);
-                line.setAttribute('y1', edge.y1);
-                line.setAttribute('x2', edge.x2);
-                line.setAttribute('y2', edge.y2);
-                line.setAttribute('stroke', '#6b7280');
-                line.setAttribute('stroke-width', '2');
-                mainGroup.appendChild(line);
-            });
-
-            // Nodes
-            mainLayout.nodes.forEach(node => {
-                const isHighlighted = currentNode && node.node === currentNode;
-                const isMatching = matchingNode && node.node === matchingNode;
-
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', node.x);
-                circle.setAttribute('cy', node.y);
-                circle.setAttribute('r', '24');
-                circle.setAttribute('fill', isHighlighted ? '#3b82f6' : (isMatching ? '#10b981' : '#374151'));
-                circle.setAttribute('stroke', isHighlighted ? '#60a5fa' : (isMatching ? '#34d399' : '#60a5fa'));
-                circle.setAttribute('stroke-width', isHighlighted || isMatching ? '3' : '1');
-
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', node.x);
-                text.setAttribute('y', node.y);
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('dominant-baseline', 'middle');
-                text.setAttribute('fill', '#fff');
-                text.setAttribute('font-size', '14');
-                text.setAttribute('font-weight', '600');
-                text.textContent = node.val;
-
-                mainGroup.appendChild(circle);
-                mainGroup.appendChild(text);
-            });
-
-            // Label
-            const mainLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            mainLabel.setAttribute('x', '300');
-            mainLabel.setAttribute('y', '20');
-            mainLabel.setAttribute('text-anchor', 'middle');
-            mainLabel.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--text-primary'));
-            mainLabel.setAttribute('font-size', '14');
-            mainLabel.setAttribute('font-weight', '600');
-            mainLabel.textContent = 'Main Tree';
-            mainGroup.appendChild(mainLabel);
-
-            svg.appendChild(mainGroup);
-
-            // Draw subRoot tree
-            const subGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-
-            // Edges
-            subLayout.edges.forEach(edge => {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', edge.x1);
-                line.setAttribute('y1', edge.y1);
-                line.setAttribute('x2', edge.x2);
-                line.setAttribute('y2', edge.y2);
-                line.setAttribute('stroke', '#6b7280');
-                line.setAttribute('stroke-width', '2');
-                subGroup.appendChild(line);
-            });
-
-            // Nodes
-            subLayout.nodes.forEach(node => {
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', node.x);
-                circle.setAttribute('cy', node.y);
-                circle.setAttribute('r', '24');
-                circle.setAttribute('fill', '#374151');
-                circle.setAttribute('stroke', '#f59e0b');
-                circle.setAttribute('stroke-width', '2');
-
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', node.x);
-                text.setAttribute('y', node.y);
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('dominant-baseline', 'middle');
-                text.setAttribute('fill', '#fff');
-                text.setAttribute('font-size', '14');
-                text.setAttribute('font-weight', '600');
-                text.textContent = node.val;
-
-                subGroup.appendChild(circle);
-                subGroup.appendChild(text);
-            });
-
-            // Label
-            const subLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            subLabel.setAttribute('x', '650');
-            subLabel.setAttribute('y', '20');
-            subLabel.setAttribute('text-anchor', 'middle');
-            subLabel.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--text-primary'));
-            subLabel.setAttribute('font-size', '14');
-            subLabel.setAttribute('font-weight', '600');
-            subLabel.textContent = 'SubRoot (Target)';
-            subGroup.appendChild(subLabel);
-
-            svg.appendChild(subGroup);
-        }
-
-        // Update step display
-        function updateStep() {
-            if (steps.length === 0) return;
-
-            const step = steps[currentStep];
-            displayCode(step.line - 1);
-
-            // Update log panel
-            const logPanel = document.getElementById('stepLog');
-            logPanel.innerHTML = `
-                <div class="step-info">
-                    <div class="step-title">Step ${currentStep + 1} of ${steps.length}</div>
-                    <div class="step-description">${step.description}</div>
-                </div>
-                <div class="variables-section">
-                    <div class="section-title">Variables</div>
-                    ${Object.entries(step.vars).map(([key, val]) => `
-                        <div class="variable-item">
-                            <span class="var-name">${key}</span>: ${typeof val === 'object' ? JSON.stringify(val) : val}
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="variables-section">
-                    <div class="section-title">History</div>
-                    ${steps.slice(0, currentStep + 1).map((s, i) => `
-                        <div class="history-item ${i === currentStep ? 'current' : ''}">
-                            ${i + 1}. ${s.description}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            drawTrees();
-        }
-
-        // Playback controls
-        function play() {
-            if (isPlaying) return;
-            isPlaying = true;
-            document.getElementById('playBtn').textContent = '⏸ Pause';
-            
-            playInterval = setInterval(() => {
-                if (currentStep < steps.length - 1) {
-                    currentStep++;
-                    updateStep();
+                if (mode === 'execution') {
+                    document.getElementById('intuitionMode').classList.add('hidden');
+                    document.getElementById('executionMode').classList.remove('hidden');
+                    document.getElementById('executionControls').style.display = 'flex';
+                    document.getElementById('intuitionModeBtn').classList.remove('active');
+                    document.getElementById('executionModeBtn').classList.add('active');
+                    this.updateStep();
                 } else {
-                    pause();
+                    document.getElementById('executionMode').classList.add('hidden');
+                    document.getElementById('intuitionMode').classList.remove('hidden');
+                    document.getElementById('executionControls').style.display = 'none';
+                    document.getElementById('executionModeBtn').classList.remove('active');
+                    document.getElementById('intuitionModeBtn').classList.add('active');
+                    this.renderIntuitionMode();
                 }
-            }, 1000 / speed);
-        }
+            }
 
-        function pause() {
-            isPlaying = false;
-            document.getElementById('playBtn').textContent = '▶ Play';
-            if (playInterval) {
-                clearInterval(playInterval);
-                playInterval = null;
+            // Syntax highlighting
+            highlightPythonLine(line) {
+                if (!line.trim()) return '&nbsp;';
+                
+                let highlighted = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                
+                if (line.trim().startsWith('#')) {
+                    return `<span class="comment">${highlighted}</span>`;
+                }
+                
+                if (line.includes('"""')) {
+                    return `<span class="string">${highlighted}</span>`;
+                }
+                
+                highlighted = highlighted.replace(
+                    /(["'])(?:(?=(\\?))\2.)*?\1/g,
+                    '<span class="string">$&</span>'
+                );
+                
+                const keywords = [
+                    'class', 'def', 'if', 'elif', 'else', 'while', 'for', 'return',
+                    'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None',
+                    'self', 'pass', 'break', 'continue'
+                ];
+                
+                keywords.forEach(kw => {
+                    const regex = new RegExp(`\\b(${kw})\\b`, 'g');
+                    highlighted = highlighted.replace(regex, '<span class="keyword">$1</span>');
+                });
+                
+                const types = ['Optional', 'TreeNode', 'bool', 'int', 'str'];
+                types.forEach(type => {
+                    const regex = new RegExp(`\\b(${type})\\b`, 'g');
+                    highlighted = highlighted.replace(regex, '<span class="type">$1</span>');
+                });
+                
+                highlighted = highlighted.replace(
+                    /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g,
+                    '<span class="function">$1</span>'
+                );
+                
+                return highlighted;
+            }
+
+            displayCode(highlightLine = -1) {
+                const lines = code.split('\n');
+                const codeDisplay = document.getElementById('codeDisplay');
+                codeDisplay.innerHTML = '';
+
+                lines.forEach((line, i) => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'code-line';
+                    if (highlightLine === i) {
+                        lineDiv.classList.add('highlighted');
+                    }
+
+                    const lineNum = document.createElement('span');
+                    lineNum.className = 'line-number';
+                    lineNum.textContent = i + 1;
+
+                    const lineCode = document.createElement('code');
+                    lineCode.className = 'line-code';
+                    lineCode.innerHTML = this.highlightPythonLine(line);
+
+                    lineDiv.appendChild(lineNum);
+                    lineDiv.appendChild(lineCode);
+                    codeDisplay.appendChild(lineDiv);
+                });
+            }
+
+            calculateTreeLayout(root, startX = 400, startY = 40, levelGap = 80, siblingGap = 40) {
+                if (!root) return { nodes: [], edges: [] };
+
+                const nodes = [];
+                const edges = [];
+
+                function getTreeWidth(node) {
+                    if (!node) return 0;
+                    if (!node.left && !node.right) return 1;
+                    return getTreeWidth(node.left) + getTreeWidth(node.right);
+                }
+
+                function layout(node, x, y, width) {
+                    if (!node) return;
+
+                    nodes.push({ val: node.val, x, y, node });
+
+                    const leftWidth = getTreeWidth(node.left);
+                    const rightWidth = getTreeWidth(node.right);
+                    const totalWidth = leftWidth + rightWidth || 1;
+
+                    if (node.left) {
+                        const leftX = x - (width * siblingGap / 2);
+                        const leftY = y + levelGap;
+                        edges.push({ x1: x, y1: y, x2: leftX, y2: leftY });
+                        layout(node.left, leftX, leftY, width * leftWidth / totalWidth);
+                    }
+
+                    if (node.right) {
+                        const rightX = x + (width * siblingGap / 2);
+                        const rightY = y + levelGap;
+                        edges.push({ x1: x, y1: y, x2: rightX, y2: rightY });
+                        layout(node.right, rightX, rightY, width * rightWidth / totalWidth);
+                    }
+                }
+
+                layout(root, startX, startY, getTreeWidth(root));
+                return { nodes, edges };
+            }
+
+            drawTrees(svgId = 'treeSvg') {
+                const svg = document.getElementById(svgId);
+                svg.innerHTML = '';
+
+                const mainLayout = this.calculateTreeLayout(this.rootTree, 300, 40, 70, 35);
+                const subLayout = this.calculateTreeLayout(this.subRootTree, 650, 40, 70, 35);
+
+                // Draw main tree
+                mainLayout.edges.forEach(edge => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', edge.x1);
+                    line.setAttribute('y1', edge.y1);
+                    line.setAttribute('x2', edge.x2);
+                    line.setAttribute('y2', edge.y2);
+                    line.setAttribute('stroke', '#6b7280');
+                    line.setAttribute('stroke-width', '2');
+                    svg.appendChild(line);
+                });
+
+                mainLayout.nodes.forEach(node => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.x);
+                    circle.setAttribute('cy', node.y);
+                    circle.setAttribute('r', '24');
+                    circle.setAttribute('fill', '#374151');
+                    circle.setAttribute('stroke', '#60a5fa');
+                    circle.setAttribute('stroke-width', '1');
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('fill', '#fff');
+                    text.setAttribute('font-size', '14');
+                    text.setAttribute('font-weight', '600');
+                    text.textContent = node.val;
+
+                    svg.appendChild(circle);
+                    svg.appendChild(text);
+                });
+
+                const mainLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                mainLabel.setAttribute('x', '300');
+                mainLabel.setAttribute('y', '20');
+                mainLabel.setAttribute('text-anchor', 'middle');
+                mainLabel.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--text-primary'));
+                mainLabel.setAttribute('font-size', '14');
+                mainLabel.setAttribute('font-weight', '600');
+                mainLabel.textContent = 'Main Tree (root)';
+                svg.appendChild(mainLabel);
+
+                // Draw subRoot tree
+                subLayout.edges.forEach(edge => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', edge.x1);
+                    line.setAttribute('y1', edge.y1);
+                    line.setAttribute('x2', edge.x2);
+                    line.setAttribute('y2', edge.y2);
+                    line.setAttribute('stroke', '#6b7280');
+                    line.setAttribute('stroke-width', '2');
+                    svg.appendChild(line);
+                });
+
+                subLayout.nodes.forEach(node => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.x);
+                    circle.setAttribute('cy', node.y);
+                    circle.setAttribute('r', '24');
+                    circle.setAttribute('fill', '#374151');
+                    circle.setAttribute('stroke', '#f59e0b');
+                    circle.setAttribute('stroke-width', '2');
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('fill', '#fff');
+                    text.setAttribute('font-size', '14');
+                    text.setAttribute('font-weight', '600');
+                    text.textContent = node.val;
+
+                    svg.appendChild(circle);
+                    svg.appendChild(text);
+                });
+
+                const subLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                subLabel.setAttribute('x', '650');
+                subLabel.setAttribute('y', '20');
+                subLabel.setAttribute('text-anchor', 'middle');
+                subLabel.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--text-primary'));
+                subLabel.setAttribute('font-size', '14');
+                subLabel.setAttribute('font-weight', '600');
+                subLabel.textContent = 'SubRoot (target)';
+                svg.appendChild(subLabel);
+            }
+
+            updateStep() {
+                if (this.steps.length === 0) return;
+
+                const step = this.steps[this.currentStep];
+                this.displayCode(step.line - 1);
+
+                const logPanel = document.getElementById('stepLog');
+                logPanel.innerHTML = `
+                    <div class="step-info">
+                        <div class="step-title">Step ${this.currentStep + 1} of ${this.steps.length}</div>
+                        <div class="step-description">${step.description}</div>
+                    </div>
+                    <div class="variables-section">
+                        <div class="section-title">Variables</div>
+                        ${Object.entries(step.vars).map(([key, val]) => `
+                            <div class="variable-item">
+                                <span class="var-name">${key}</span>: ${typeof val === 'object' ? JSON.stringify(val) : val}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="variables-section">
+                        <div class="section-title">History</div>
+                        ${this.steps.slice(0, this.currentStep + 1).map((s, i) => `
+                            <div class="history-item ${i === this.currentStep ? 'current' : ''}">
+                                ${i + 1}. ${s.description}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                this.drawTrees('treeSvg');
+            }
+
+            play() {
+                if (this.isPlaying) return;
+                this.isPlaying = true;
+                document.getElementById('playBtn').textContent = '⏸ Pause';
+                
+                this.playInterval = setInterval(() => {
+                    if (this.currentStep < this.steps.length - 1) {
+                        this.currentStep++;
+                        this.updateStep();
+                    } else {
+                        this.pause();
+                    }
+                }, 1000 / this.speed);
+            }
+
+            pause() {
+                this.isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶ Play';
+                if (this.playInterval) {
+                    clearInterval(this.playInterval);
+                    this.playInterval = null;
+                }
+            }
+
+            stepForward() {
+                this.pause();
+                if (this.currentStep < this.steps.length - 1) {
+                    this.currentStep++;
+                    this.updateStep();
+                }
+            }
+
+            stepBack() {
+                this.pause();
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.updateStep();
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.currentStep = 0;
+                this.updateStep();
+            }
+
+            runSolution() {
+                this.pause();
+                const rootInput = document.getElementById('rootInput').value;
+                const subRootInput = document.getElementById('subRootInput').value;
+
+                try {
+                    const rootArr = JSON.parse(rootInput);
+                    const subRootArr = JSON.parse(subRootInput);
+
+                    this.rootTree = arrayToTree(rootArr);
+                    this.subRootTree = arrayToTree(subRootArr);
+
+                    const { result, steps: newSteps } = isSubtreeWithTracing(this.rootTree, this.subRootTree);
+                    this.steps = newSteps;
+                    this.currentStep = 0;
+
+                    this.updateStep();
+                } catch (e) {
+                    alert('Invalid input format. Use arrays like [3,4,5,1,2]');
+                }
+            }
+
+            // Intuition Mode
+            renderIntuitionMode() {
+                const thoughtProcess = document.getElementById('thoughtProcess');
+                thoughtProcess.innerHTML = intuitionStages.map((stage, i) => {
+                    const isActive = i === this.currentIntuitionStage;
+                    const isPast = i < this.currentIntuitionStage;
+                    const opacity = isActive ? '1' : (isPast ? '0.6' : '0.4');
+
+                    return `
+                        <div class="intuition-stage ${isActive ? 'active' : ''}" style="opacity: ${opacity}">
+                            <h3>
+                                <span class="stage-number">${i + 1}</span>
+                                ${stage.title}
+                            </h3>
+                            
+                            ${stage.thought ? `
+                                <div class="thought-bubble">${stage.thought}</div>
+                            ` : ''}
+                            
+                            <div class="stage-content">${stage.content}</div>
+                            
+                            ${stage.insight ? `
+                                <div class="key-insight"><strong>Key Insight:</strong> ${stage.insight}</div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                this.renderIntuitionVisualization();
+            }
+
+            renderIntuitionVisualization() {
+                const stage = intuitionStages[this.currentIntuitionStage];
+                this.drawTrees('intuitionSvg');
+            }
+
+            nextIntuitionStage() {
+                this.pauseIntuition();
+                if (this.currentIntuitionStage < intuitionStages.length - 1) {
+                    this.currentIntuitionStage++;
+                    this.renderIntuitionMode();
+                }
+            }
+
+            prevIntuitionStage() {
+                this.pauseIntuition();
+                if (this.currentIntuitionStage > 0) {
+                    this.currentIntuitionStage--;
+                    this.renderIntuitionMode();
+                }
+            }
+
+            playIntuition() {
+                if (this.isIntuitionPlaying) {
+                    this.pauseIntuition();
+                    return;
+                }
+
+                this.isIntuitionPlaying = true;
+                document.getElementById('intuitionPlayBtn').textContent = '⏸ Pause';
+                
+                this.intuitionInterval = setInterval(() => {
+                    if (this.currentIntuitionStage < intuitionStages.length - 1) {
+                        this.currentIntuitionStage++;
+                        this.renderIntuitionMode();
+                    } else {
+                        this.pauseIntuition();
+                    }
+                }, 4000); // 4 seconds per stage
+            }
+
+            pauseIntuition() {
+                this.isIntuitionPlaying = false;
+                document.getElementById('intuitionPlayBtn').textContent = '▶ Auto-Advance';
+                if (this.intuitionInterval) {
+                    clearInterval(this.intuitionInterval);
+                    this.intuitionInterval = null;
+                }
+            }
+
+            attachEventListeners() {
+                document.getElementById('runBtn').addEventListener('click', () => this.runSolution());
+                document.getElementById('playBtn').addEventListener('click', () => {
+                    if (this.isPlaying) this.pause();
+                    else this.play();
+                });
+                document.getElementById('nextBtn').addEventListener('click', () => this.stepForward());
+                document.getElementById('prevBtn').addEventListener('click', () => this.stepBack());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('speedSelect').addEventListener('change', (e) => {
+                    this.speed = parseFloat(e.target.value);
+                    if (this.isPlaying) {
+                        this.pause();
+                        this.play();
+                    }
+                });
+                document.getElementById('themeBtn').addEventListener('click', () => {
+                    const body = document.body;
+                    const currentTheme = body.getAttribute('data-theme');
+                    body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (this.mode === 'execution') {
+                        if (e.code === 'Space') {
+                            e.preventDefault();
+                            if (this.isPlaying) this.pause();
+                            else this.play();
+                        } else if (e.code === 'ArrowRight') {
+                            e.preventDefault();
+                            this.stepForward();
+                        } else if (e.code === 'ArrowLeft') {
+                            e.preventDefault();
+                            this.stepBack();
+                        }
+                    } else {
+                        if (e.code === 'Space') {
+                            e.preventDefault();
+                            this.playIntuition();
+                        } else if (e.code === 'ArrowRight') {
+                            e.preventDefault();
+                            this.nextIntuitionStage();
+                        } else if (e.code === 'ArrowLeft') {
+                            e.preventDefault();
+                            this.prevIntuitionStage();
+                        }
+                    }
+                });
             }
         }
 
-        function stepForward() {
-            pause();
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                updateStep();
-            }
-        }
-
-        function stepBack() {
-            pause();
-            if (currentStep > 0) {
-                currentStep--;
-                updateStep();
-            }
-        }
-
-        function reset() {
-            pause();
-            currentStep = 0;
-            updateStep();
-        }
-
-        // Run solution
-        function runSolution() {
-            pause();
-            const rootInput = document.getElementById('rootInput').value;
-            const subRootInput = document.getElementById('subRootInput').value;
-
-            try {
-                const rootArr = JSON.parse(rootInput);
-                const subRootArr = JSON.parse(subRootInput);
-
-                rootTree = arrayToTree(rootArr);
-                subRootTree = arrayToTree(subRootArr);
-
-                const { result, steps: newSteps } = isSubtreeWithTracing(rootTree, subRootTree);
-                steps = newSteps;
-                currentStep = 0;
-
-                updateStep();
-                alert(`Result: ${result}`);
-            } catch (e) {
-                alert('Invalid input format. Use arrays like [3,4,5,1,2]');
-            }
-        }
-
-        // Event listeners
-        document.getElementById('runBtn').addEventListener('click', runSolution);
-        document.getElementById('playBtn').addEventListener('click', () => {
-            if (isPlaying) pause();
-            else play();
-        });
-        document.getElementById('nextBtn').addEventListener('click', stepForward);
-        document.getElementById('prevBtn').addEventListener('click', stepBack);
-        document.getElementById('resetBtn').addEventListener('click', reset);
-        document.getElementById('speedSelect').addEventListener('change', (e) => {
-            speed = parseFloat(e.target.value);
-            if (isPlaying) {
-                pause();
-                play();
-            }
-        });
-        document.getElementById('themeBtn').addEventListener('click', () => {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (isPlaying) pause();
-                else play();
-            } else if (e.code === 'ArrowRight') {
-                e.preventDefault();
-                stepForward();
-            } else if (e.code === 'ArrowLeft') {
-                e.preventDefault();
-                stepBack();
-            }
-        });
-
-        // Panel resizing
-        let resizing = false;
-        let currentHandle = null;
-        let startX = 0;
-        let startWidths = [];
-
-        document.querySelectorAll('.resize-handle').forEach(handle => {
-            handle.addEventListener('mousedown', (e) => {
-                resizing = true;
-                currentHandle = parseInt(handle.getAttribute('data-panel'));
-                startX = e.clientX;
-                const panels = document.querySelectorAll('.panel');
-                startWidths = Array.from(panels).map(p => p.offsetWidth);
-                e.preventDefault();
-            });
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!resizing) return;
-            
-            const delta = e.clientX - startX;
-            const panels = document.querySelectorAll('.panel');
-            const totalWidth = document.querySelector('.main-content').offsetWidth;
-            
-            const newWidth1 = startWidths[currentHandle] + delta;
-            const newWidth2 = startWidths[currentHandle + 1] - delta;
-            
-            if (newWidth1 > 200 && newWidth2 > 200) {
-                panels[currentHandle].style.width = `${(newWidth1 / totalWidth) * 100}%`;
-                panels[currentHandle + 1].style.width = `${(newWidth2 / totalWidth) * 100}%`;
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            resizing = false;
-        });
-
-        // Initialize
-        displayCode();
-        runSolution();
+        // Initialize app
+        const app = new App();
     </script>
 </body>
 </html>
