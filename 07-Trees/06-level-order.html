@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>102. Binary Tree Level Order Traversal - BFS Visualization</title>
+    <title>102. Binary Tree Level Order Traversal - Dual Mode Visualizer</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,9 @@
             --code-bg: #f9fafb;
             --highlight: #fef3c7;
             --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
         }
 
@@ -32,6 +35,9 @@
             --code-bg: #0f1419;
             --highlight: rgba(251, 191, 36, 0.15);
             --accent: #60a5fa;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
         }
 
         body {
@@ -52,10 +58,14 @@
             background: var(--bg-secondary);
             border-bottom: 2px solid var(--border);
             padding: 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
+            margin-bottom: 16px;
         }
 
         .header h1 {
@@ -64,7 +74,56 @@
             color: var(--text-primary);
         }
 
-        .header-controls {
+        .theme-toggle {
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border);
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mode-btn:hover {
+            background: var(--border);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .input-section {
             display: flex;
             gap: 12px;
             align-items: center;
@@ -90,7 +149,7 @@
             color: var(--text-primary);
             font-size: 13px;
             font-family: var(--font-mono);
-            width: 200px;
+            width: 220px;
         }
 
         .btn {
@@ -117,20 +176,7 @@
 
         .btn-primary:hover {
             opacity: 0.9;
-        }
-
-        .theme-toggle {
-            padding: 6px 10px;
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            background: var(--border);
+            background: var(--accent);
         }
 
         .panels {
@@ -165,6 +211,7 @@
             overflow: auto;
         }
 
+        /* Execution mode panels */
         .code-panel {
             width: 30%;
         }
@@ -179,10 +226,21 @@
             width: 20%;
         }
 
+        /* Intuition mode panels */
+        .intuition-thought-panel {
+            width: 50%;
+        }
+
+        .intuition-viz-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+
         .code-content {
             font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.7;
             background: var(--code-bg);
             color: var(--text-primary);
             padding: 16px;
@@ -192,7 +250,7 @@
             display: flex;
             align-items: center;
             padding: 3px 0;
-            min-height: 22px;
+            min-height: 24px;
             transition: background 0.2s ease;
         }
 
@@ -215,63 +273,25 @@
             white-space: pre;
         }
 
-        /* Syntax highlighting for dark mode */
-        [data-theme="dark"] .keyword {
-            color: #ff79c6;
-            font-weight: 500;
-        }
+        /* Syntax highlighting */
+        [data-theme="dark"] .keyword { color: #ff79c6; font-weight: 500; }
+        [data-theme="dark"] .function { color: #50fa7b; }
+        [data-theme="dark"] .string { color: #f1fa8c; }
+        [data-theme="dark"] .comment { color: #6272a4; font-style: italic; }
+        [data-theme="dark"] .type { color: #8be9fd; }
+        [data-theme="dark"] .number { color: #bd93f9; }
 
-        [data-theme="dark"] .function {
-            color: #50fa7b;
-        }
-
-        [data-theme="dark"] .string {
-            color: #f1fa8c;
-        }
-
-        [data-theme="dark"] .comment {
-            color: #6272a4;
-            font-style: italic;
-        }
-
-        [data-theme="dark"] .type {
-            color: #8be9fd;
-        }
-
-        [data-theme="dark"] .number {
-            color: #bd93f9;
-        }
-
-        /* Syntax highlighting for light mode */
-        [data-theme="light"] .keyword {
-            color: #d73a49;
-            font-weight: 500;
-        }
-
-        [data-theme="light"] .function {
-            color: #6f42c1;
-        }
-
-        [data-theme="light"] .string {
-            color: #032f62;
-        }
-
-        [data-theme="light"] .comment {
-            color: #6a737d;
-            font-style: italic;
-        }
-
-        [data-theme="light"] .type {
-            color: #005cc5;
-        }
-
-        [data-theme="light"] .number {
-            color: #005cc5;
-        }
+        [data-theme="light"] .keyword { color: #d73a49; font-weight: 500; }
+        [data-theme="light"] .function { color: #6f42c1; }
+        [data-theme="light"] .string { color: #032f62; }
+        [data-theme="light"] .comment { color: #6a737d; font-style: italic; }
+        [data-theme="light"] .type { color: #005cc5; }
+        [data-theme="light"] .number { color: #005cc5; }
 
         .viz-content {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -337,6 +357,158 @@
         .speed-option.active {
             background: var(--accent);
             color: white;
+        }
+
+        /* Intuition styles */
+        .intuition-content {
+            padding: 24px;
+        }
+
+        .intuition-stage {
+            margin-bottom: 32px;
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .intuition-stage.active {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .intuition-stage h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .thought-bubble {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 6px;
+            font-style: italic;
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .thought-bubble::before {
+            content: '💭 ';
+            font-style: normal;
+        }
+
+        .key-insight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .key-insight::before {
+            content: '💡 ';
+            font-weight: 700;
+        }
+
+        .stage-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin: 12px 0;
+        }
+
+        .approach-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .approach-card {
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .approach-card.rejected {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+
+        .approach-card.chosen {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .approach-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .approach-card.rejected h4 {
+            color: var(--danger);
+        }
+
+        .approach-card.chosen h4 {
+            color: var(--success);
+        }
+
+        .approach-details {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .complexity-box {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .complexity-box h4 {
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .complexity-item {
+            margin: 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .complexity-item strong {
+            color: var(--text-primary);
+        }
+
+        .complexity-explanation {
+            color: var(--text-secondary);
+            margin-left: 20px;
+            font-size: 12px;
         }
 
         .log-content {
@@ -418,6 +590,8 @@
         }
 
         .queue-container {
+            width: 100%;
+            max-width: 760px;
             margin-top: 20px;
             padding: 16px;
             background: var(--bg-secondary);
@@ -448,6 +622,8 @@
         }
 
         .result-display {
+            width: 100%;
+            max-width: 760px;
             margin-top: 16px;
             padding: 12px;
             background: var(--bg-secondary);
@@ -467,23 +643,83 @@
             font-size: 13px;
             color: var(--text-primary);
         }
+
+        .traversal-demo {
+            padding: 20px;
+        }
+
+        .traversal-option {
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .traversal-option.selected {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .traversal-option.not-selected {
+            opacity: 0.6;
+        }
+
+        .traversal-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .traversal-result {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 6px 0;
+        }
+
+        .traversal-explanation {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body data-theme="dark">
     <div class="container">
         <div class="header">
-            <h1>102. Binary Tree Level Order Traversal</h1>
-            <div class="header-controls">
+            <div class="header-top">
+                <h1>102. Binary Tree Level Order Traversal</h1>
+                <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+            </div>
+            
+            <div class="mode-toggle">
+                <button class="mode-btn" id="intuitionModeBtn" onclick="switchMode('intuition')">
+                    💡 Intuition & Thought Process
+                </button>
+                <button class="mode-btn active" id="executionModeBtn" onclick="switchMode('execution')">
+                    ▶️ Step-by-Step Execution
+                </button>
+            </div>
+            
+            <div class="input-section" id="inputSection">
                 <div class="input-group">
                     <label>Test Case:</label>
                     <input type="text" id="treeInput" value="[3,9,20,null,null,15,7]" />
                     <button class="btn btn-primary" onclick="parseAndRun()">Run</button>
                 </div>
-                <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             </div>
         </div>
 
-        <div class="panels">
+        <!-- Execution Mode Panels -->
+        <div class="panels" id="executionPanels">
             <div class="panel code-panel">
                 <div class="panel-header">Solution Code</div>
                 <div class="panel-content">
@@ -498,9 +734,9 @@
                 </div>
                 <div class="viz-controls">
                     <button class="control-btn" onclick="reset()">⟲ Reset</button>
-                    <button class="control-btn" onclick="stepBack()" id="stepBackBtn">◀ Step Back</button>
+                    <button class="control-btn" onclick="stepBack()" id="stepBackBtn">◀ Back</button>
                     <button class="control-btn" onclick="togglePlay()" id="playBtn">▶ Play</button>
-                    <button class="control-btn" onclick="stepForward()" id="stepForwardBtn">Step Forward ▶</button>
+                    <button class="control-btn" onclick="stepForward()" id="stepForwardBtn">Forward ▶</button>
                     <div class="speed-selector">
                         <button class="speed-option" onclick="setSpeed(0.5)">0.5x</button>
                         <button class="speed-option active" onclick="setSpeed(1)">1x</button>
@@ -515,10 +751,35 @@
                 <div class="panel-content log-content" id="logContent"></div>
             </div>
         </div>
+
+        <!-- Intuition Mode Panels -->
+        <div class="panels hidden" id="intuitionPanels">
+            <div class="panel intuition-thought-panel">
+                <div class="panel-header">
+                    Senior Engineer's Thought Process
+                    <span style="float: right;" id="stageCounter"></span>
+                </div>
+                <div class="panel-content">
+                    <div class="intuition-content" id="intuitionContent"></div>
+                </div>
+            </div>
+
+            <div class="panel intuition-viz-panel">
+                <div class="panel-header">Visual Explanation</div>
+                <div class="panel-content viz-content" id="intuitionVizContent"></div>
+                <div class="viz-controls">
+                    <button class="control-btn" onclick="resetIntuition()">⟲ Reset</button>
+                    <button class="control-btn" onclick="prevStage()" id="prevStageBtn">◀ Previous Stage</button>
+                    <button class="control-btn" onclick="toggleIntuitionPlay()" id="intuitionPlayBtn">▶ Auto-play</button>
+                    <button class="control-btn" onclick="nextStage()" id="nextStageBtn">Next Stage ▶</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // Global state
+        let currentMode = 'execution';
         let steps = [];
         let currentStep = 0;
         let isPlaying = false;
@@ -526,9 +787,21 @@
         let speed = 1;
         let tree = null;
 
+        // Intuition state
+        let currentIntuitionStage = 0;
+        let isIntuitionPlaying = false;
+        let intuitionInterval = null;
+        let intuitionStages = [];
+
         const code = `from collections import deque
+from typing import Optional, List
+
 class Solution:
     def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        """
+        Perform level-order traversal (BFS) on a binary tree.
+        Time: O(n), Space: O(n) for the queue and result
+        """
         if not root:
             return []
         
@@ -591,13 +864,174 @@ class Solution:
             return root;
         }
 
+        // Get traversal orders
+        function getPreorder(root) {
+            if (!root) return [];
+            return [root.val, ...getPreorder(root.left), ...getPreorder(root.right)];
+        }
+
+        function getInorder(root) {
+            if (!root) return [];
+            return [...getInorder(root.left), root.val, ...getInorder(root.right)];
+        }
+
+        function getPostorder(root) {
+            if (!root) return [];
+            return [...getPostorder(root.left), ...getPostorder(root.right), root.val];
+        }
+
+        function getLevelOrder(root) {
+            if (!root) return [];
+            const result = [];
+            const queue = [root];
+            while (queue.length > 0) {
+                const node = queue.shift();
+                result.push(node.val);
+                if (node.left) queue.push(node.left);
+                if (node.right) queue.push(node.right);
+            }
+            return result;
+        }
+
+        // Initialize intuition stages
+        function initIntuitionStages() {
+            intuitionStages = [
+                {
+                    title: "Understanding the Problem",
+                    thought: "What's this problem really asking? Level-order means I need to visit nodes level by level, left to right...",
+                    content: `Let me break this down:
+• Input: A binary tree
+• Output: A 2D array where each sub-array contains values from one level
+• Constraint: Must visit each level completely before moving to the next
+• Example: For tree [3,9,20,null,null,15,7], output is [[3],[9,20],[15,7]]
+
+The key here is "level by level" - this screams BFS (Breadth-First Search)!`,
+                    insight: "The problem structure itself hints at BFS - we need to process nodes by their depth/level.",
+                    visualization: "example_tree"
+                },
+                {
+                    title: "Exploring Approaches",
+                    thought: "Hmm, could I use DFS? Or should I use BFS? Let me think through both...",
+                    content: `Let's compare:
+
+Approach A: DFS (Depth-First Search)
+• Would visit nodes by going deep first
+• Would need to track level numbers
+• More complex to group by level
+• Recursive, uses call stack
+
+Approach B: BFS (Breadth-First Search)
+• Naturally processes level by level
+• Uses a queue to track nodes
+• Easy to group nodes by level
+• Iterative, explicit queue`,
+                    insight: "BFS is the natural fit because it processes nodes in level-order by design!",
+                    visualization: "approach_comparison"
+                },
+                {
+                    title: "The BFS Technique",
+                    thought: "Wait! If I use a queue and track the level size, I can process each level as a group...",
+                    content: `The key insight: Before processing a level, I know exactly how many nodes are in it!
+
+Here's the trick:
+1. At the start of each level, capture queue.length - that's how many nodes are at THIS level
+2. Process exactly that many nodes (no more, no less)
+3. While processing, add their children to the queue - those are for the NEXT level
+4. Repeat until queue is empty
+
+This guarantees perfect level separation!`,
+                    insight: "Capturing the queue size before processing gives us natural level boundaries.",
+                    visualization: "bfs_demo"
+                },
+                {
+                    title: "Writing the Solution",
+                    thought: "Now I can code this up. Structure: edge case check, queue initialization, main loop...",
+                    content: `Implementation strategy:
+
+1. Edge case: If root is null, return empty array
+2. Initialize:
+   • result = [] (will store all levels)
+   • queue = [root] (start with root)
+3. Main loop (while queue not empty):
+   • Capture level_size = len(queue)
+   • Create level_values = []
+   • For each node in this level:
+     - Dequeue node
+     - Add its value to level_values
+     - Enqueue its children
+   • Append level_values to result
+4. Return result`,
+                    insight: "The code structure mirrors our thinking - outer loop for levels, inner loop for nodes within a level.",
+                    visualization: "code_structure"
+                },
+                {
+                    title: "Complexity Analysis",
+                    thought: "Is this optimal? Let me verify the time and space complexity...",
+                    content: `Time Complexity: O(n)
+• We visit each node exactly once
+• Each node is enqueued and dequeued once
+• Operations (enqueue, dequeue, append) are O(1)
+• Total: n nodes × O(1) = O(n)
+
+Space Complexity: O(n)
+• Queue: At worst, holds one full level
+• For a complete binary tree, max level has n/2 nodes
+• Result array: Stores all n node values
+• Total: O(n) for queue + O(n) for result = O(n)`,
+                    insight: "This is optimal - we can't do better than O(n) since we must visit every node at least once.",
+                    visualization: "complexity"
+                },
+                {
+                    title: "Edge Cases & Testing",
+                    thought: "What could break this? Empty tree? Single node? Unbalanced tree? Let me verify...",
+                    content: `Testing strategy:
+
+Edge Case 1: Empty tree (root = null)
+• Handled by the initial check: if not root: return []
+
+Edge Case 2: Single node tree
+• Works: queue starts with [root], processes it, returns [[root.val]]
+
+Edge Case 3: Unbalanced tree (all left or all right)
+• Works: BFS naturally handles any tree shape
+• Each level will have 1 node, but algorithm still correct
+
+Edge Case 4: Complete binary tree
+• Ideal case: demonstrates level-by-level processing clearly`,
+                    insight: "The solution is robust because BFS works for any tree structure - balanced or not.",
+                    visualization: "edge_cases"
+                },
+                {
+                    title: "Final Synthesis",
+                    thought: "Beautiful! The BFS pattern elegantly solves level-order traversal. Everything fits together.",
+                    content: `Why this solution is elegant:
+
+✓ Natural fit: BFS + queue naturally processes by level
+✓ Clean code: Simple while loop, easy to understand
+✓ Optimal: O(n) time, can't do better
+✓ Robust: Handles all edge cases
+✓ Interview-ready: Easy to explain and code
+
+The key pattern to remember: When you need level-order processing, think BFS with level size tracking!
+
+This demonstrates mastery of:
+• Tree traversal techniques
+• Queue data structure
+• Breadth-First Search algorithm
+• Time/space complexity analysis`,
+                    insight: "BFS with level tracking is the gold standard for level-order problems.",
+                    visualization: "final_demo"
+                }
+            ];
+        }
+
         // BFS with step tracking
         function levelOrderWithSteps(root) {
             const steps = [];
             
             if (!root) {
                 steps.push({
-                    line: 3,
+                    line: 8,
                     description: "Root is null, returning empty array",
                     vars: { root: null, result: [] },
                     queue: [],
@@ -612,7 +1046,7 @@ class Solution:
             const queue = [root];
             
             steps.push({
-                line: 6,
+                line: 11,
                 description: "Initialized empty result array",
                 vars: { root: root.val, result: [], queue: [root.val] },
                 queue: [root],
@@ -622,7 +1056,7 @@ class Solution:
             });
             
             steps.push({
-                line: 7,
+                line: 12,
                 description: "Created queue with root node",
                 vars: { root: root.val, result: [], queue: [root.val] },
                 queue: [root],
@@ -631,13 +1065,12 @@ class Solution:
                 currentLevel: []
             });
             
-            let stepNum = 0;
             while (queue.length > 0) {
                 const level_size = queue.length;
                 const level_values = [];
                 
                 steps.push({
-                    line: 10,
+                    line: 15,
                     description: `Starting level ${result.length + 1} with ${level_size} node(s)`,
                     vars: { 
                         level_size, 
@@ -656,7 +1089,7 @@ class Solution:
                     level_values.push(node.val);
                     
                     steps.push({
-                        line: 15,
+                        line: 20,
                         description: `Processing node ${node.val}, adding to level_values`,
                         vars: { 
                             node: node.val,
@@ -673,7 +1106,7 @@ class Solution:
                     if (node.left) {
                         queue.push(node.left);
                         steps.push({
-                            line: 19,
+                            line: 24,
                             description: `Added left child ${node.left.val} to queue`,
                             vars: { 
                                 node: node.val,
@@ -691,7 +1124,7 @@ class Solution:
                     if (node.right) {
                         queue.push(node.right);
                         steps.push({
-                            line: 21,
+                            line: 26,
                             description: `Added right child ${node.right.val} to queue`,
                             vars: { 
                                 node: node.val,
@@ -709,7 +1142,7 @@ class Solution:
                 
                 result.push(level_values);
                 steps.push({
-                    line: 24,
+                    line: 29,
                     description: `Completed level ${result.length}, added ${JSON.stringify(level_values)} to result`,
                     vars: { 
                         level_values,
@@ -724,7 +1157,7 @@ class Solution:
             }
             
             steps.push({
-                line: 26,
+                line: 31,
                 description: "All levels processed, returning result",
                 vars: { 
                     result: JSON.parse(JSON.stringify(result)),
@@ -741,42 +1174,32 @@ class Solution:
 
         // Syntax highlighting
         function highlightPythonLine(line) {
-            // Escape HTML first
             const div = document.createElement('div');
             div.textContent = line;
             let escaped = div.innerHTML;
             
-            // Don't highlight empty lines
             if (!escaped.trim()) {
                 return escaped || ' ';
             }
             
-            // Comments
             if (escaped.trim().startsWith('#')) {
                 return `<span class="comment">${escaped}</span>`;
             }
             
-            // Keywords
             const keywords = ['class', 'def', 'if', 'not', 'return', 'while', 'for', 'in', 'import', 'from'];
             keywords.forEach(kw => {
                 const regex = new RegExp(`\\b${kw}\\b`, 'g');
                 escaped = escaped.replace(regex, `<span class="keyword">${kw}</span>`);
             });
             
-            // Types
             const types = ['Optional', 'TreeNode', 'List', 'deque'];
             types.forEach(type => {
                 const regex = new RegExp(`\\b${type}\\b`, 'g');
                 escaped = escaped.replace(regex, `<span class="type">${type}</span>`);
             });
             
-            // Function names
             escaped = escaped.replace(/\b(levelOrder|len|range|append|popleft)\b/g, '<span class="function">$1</span>');
-            
-            // Strings
             escaped = escaped.replace(/(&quot;[^&]*&quot;|&#39;[^&]*&#39;)/g, '<span class="string">$1</span>');
-            
-            // Numbers
             escaped = escaped.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
             
             return escaped || ' ';
@@ -851,16 +1274,13 @@ class Solution:
             const queueIds = step?.queue?.map(n => n.id) || [];
             const processedLevel = step?.currentLevel || [];
             
-            // Build SVG content
             let svgContent = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#6b7280" /></marker></defs>';
             
-            // Draw edges
-            layout.edges.forEach((edge, i) => {
+            layout.edges.forEach((edge) => {
                 svgContent += `<line x1="${edge.from.x}" y1="${edge.from.y}" x2="${edge.to.x}" y2="${edge.to.y}" stroke="#4b5563" stroke-width="2" class="tree-edge" />`;
             });
             
-            // Draw nodes
-            layout.nodes.forEach((node, i) => {
+            layout.nodes.forEach((node) => {
                 const isCurrentNode = node.id === currentNodeId;
                 const isInQueue = queueIds.includes(node.id);
                 const isProcessed = processedLevel.includes(node.val);
@@ -891,7 +1311,6 @@ class Solution:
             
             svg.innerHTML = svgContent;
             
-            // Render queue below tree
             const queueContainer = document.createElement('div');
             queueContainer.className = 'queue-container';
             queueContainer.innerHTML = `
@@ -957,6 +1376,382 @@ class Solution:
             logContent.innerHTML = html;
         }
 
+        // Render intuition content
+        function renderIntuitionContent() {
+            const content = document.getElementById('intuitionContent');
+            
+            const stagesHTML = intuitionStages.map((stage, i) => {
+                const isActive = i === currentIntuitionStage;
+                const isPast = i < currentIntuitionStage;
+                const opacity = isActive ? '1' : (isPast ? '0.7' : '0.4');
+                
+                return `
+                    <div class="intuition-stage ${isActive ? 'active' : ''}" style="opacity: ${opacity}">
+                        <h3>
+                            <span class="stage-number">${i + 1}</span>
+                            ${stage.title}
+                        </h3>
+                        
+                        ${stage.thought ? `
+                            <div class="thought-bubble">${stage.thought}</div>
+                        ` : ''}
+                        
+                        <div class="stage-content">${stage.content.replace(/\n/g, '<br>')}</div>
+                        
+                        ${stage.insight ? `
+                            <div class="key-insight"><strong>Key Insight:</strong> ${stage.insight}</div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            content.innerHTML = stagesHTML;
+            
+            document.getElementById('stageCounter').textContent = `Stage ${currentIntuitionStage + 1} of ${intuitionStages.length}`;
+        }
+
+        // Render intuition visualization
+        function renderIntuitionViz() {
+            const stage = intuitionStages[currentIntuitionStage];
+            const vizContent = document.getElementById('intuitionVizContent');
+            
+            let html = '';
+            
+            switch(stage.visualization) {
+                case 'example_tree':
+                    html = renderExampleTree();
+                    break;
+                case 'approach_comparison':
+                    html = renderApproachComparison();
+                    break;
+                case 'bfs_demo':
+                    html = renderBFSDemo();
+                    break;
+                case 'code_structure':
+                    html = renderCodeStructure();
+                    break;
+                case 'complexity':
+                    html = renderComplexityAnalysis();
+                    break;
+                case 'edge_cases':
+                    html = renderEdgeCases();
+                    break;
+                case 'final_demo':
+                    html = renderFinalDemo();
+                    break;
+                default:
+                    html = renderExampleTree();
+            }
+            
+            vizContent.innerHTML = html;
+        }
+
+        function renderExampleTree() {
+            if (!tree) return '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No tree loaded</div>';
+            
+            const layout = calculateTreeLayout(tree);
+            let svgContent = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#6b7280" /></marker></defs>';
+            
+            layout.edges.forEach((edge) => {
+                svgContent += `<line x1="${edge.from.x}" y1="${edge.from.y}" x2="${edge.to.x}" y2="${edge.to.y}" stroke="#4b5563" stroke-width="2" />`;
+            });
+            
+            layout.nodes.forEach((node) => {
+                svgContent += `
+                    <g>
+                        <circle cx="${node.x}" cy="${node.y}" r="24" fill="#374151" stroke="#60a5fa" stroke-width="2" />
+                        <text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="14" font-weight="500">${node.val}</text>
+                        <text x="${node.x}" y="${node.y + 50}" text-anchor="middle" fill="var(--text-secondary)" font-size="12">Level ${node.depth + 1}</text>
+                    </g>
+                `;
+            });
+            
+            return `
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <svg viewBox="0 0 800 600" style="max-width: 100%; max-height: 400px;">
+                        ${svgContent}
+                    </svg>
+                    <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px; max-width: 600px;">
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <strong style="color: var(--text-primary);">Input:</strong> ${document.getElementById('treeInput').value}<br>
+                            <strong style="color: var(--text-primary);">Expected Output:</strong> [[${tree.val}], [${tree.left?.val || '?'}, ${tree.right?.val || '?'}], ...]<br>
+                            <strong style="color: var(--text-primary);">Goal:</strong> Visit each level completely before moving to the next
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderApproachComparison() {
+            return `
+                <div class="approach-comparison" style="padding: 40px; max-width: 700px;">
+                    <div class="approach-card rejected">
+                        <h4>❌ Approach A: Depth-First Search (DFS)</h4>
+                        <div class="approach-details">
+                            <strong>Idea:</strong> Recursively visit nodes, track level numbers<br>
+                            <strong>Time:</strong> O(n) - visit each node once<br>
+                            <strong>Space:</strong> O(h) - recursion stack depth<br>
+                            <strong>Problem:</strong> Nodes aren't naturally grouped by level - we'd need extra bookkeeping to collect values at each depth. More complex than needed.
+                        </div>
+                    </div>
+                    
+                    <div class="approach-card chosen">
+                        <h4>✅ Approach B: Breadth-First Search (BFS)</h4>
+                        <div class="approach-details">
+                            <strong>Idea:</strong> Use a queue to process nodes level by level<br>
+                            <strong>Time:</strong> O(n) - visit each node once<br>
+                            <strong>Space:</strong> O(n) - queue holds up to n/2 nodes<br>
+                            <strong>Why Better:</strong> BFS naturally processes level-order! Queue inherently separates levels. With the "level size" trick, we get perfect level boundaries with minimal code.
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid var(--accent);">
+                        <strong style="color: var(--accent);">Decision:</strong> BFS is the clear winner. The problem structure (level-order) matches the algorithm structure (BFS queue), making it both simpler and more intuitive.
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBFSDemo() {
+            if (!tree) return '<div style="padding: 20px;">No tree loaded</div>';
+            
+            const levelOrder = getLevelOrder(tree);
+            
+            return `
+                <div style="padding: 30px; max-width: 700px;">
+                    <h3 style="margin-bottom: 20px; color: var(--accent);">BFS Level-Size Trick</h3>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-size: 14px; line-height: 1.8; color: var(--text-secondary);">
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 12px;">The Key Insight:</strong>
+                            
+                            <div style="margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid var(--accent); border-radius: 4px;">
+                                Before processing each level, we know <strong>exactly</strong> how many nodes are in it: <code style="font-family: var(--font-mono); color: var(--accent);">level_size = len(queue)</code>
+                            </div>
+                            
+                            <strong style="color: var(--text-primary); display: block; margin-top: 16px;">How it works:</strong>
+                            <ol style="margin: 8px 0; padding-left: 24px;">
+                                <li style="margin: 6px 0;">Start of level: Queue contains only THIS level's nodes</li>
+                                <li style="margin: 6px 0;">Capture <code style="font-family: var(--font-mono);">level_size = len(queue)</code></li>
+                                <li style="margin: 6px 0;">Process exactly <code style="font-family: var(--font-mono);">level_size</code> nodes (no more, no less)</li>
+                                <li style="margin: 6px 0;">While processing, add children to queue → they're for NEXT level</li>
+                                <li style="margin: 6px 0;">After the loop, queue contains only NEXT level's nodes</li>
+                            </ol>
+                            
+                            This gives us perfect level separation automatically!
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+                        <strong style="color: var(--text-primary);">Example Walkthrough:</strong>
+                        <div style="font-family: var(--font-mono); font-size: 13px; margin-top: 12px; line-height: 1.8; color: var(--text-secondary);">
+                            Initial: queue = [${tree.val}]<br>
+                            Level 1: level_size = 1, process [${tree.val}], add children → queue = [${tree.left?.val || 'null'}, ${tree.right?.val || 'null'}]<br>
+                            Level 2: level_size = 2, process both, add their children...<br>
+                            ...and so on!
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCodeStructure() {
+            return `
+                <div style="padding: 30px; max-width: 700px;">
+                    <h3 style="margin-bottom: 20px; color: var(--accent);">Code Structure Mirrors Thinking</h3>
+                    
+                    <div style="background: var(--code-bg); padding: 20px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; line-height: 1.8; color: var(--text-primary);">
+                        <span style="color: var(--text-secondary);"># Edge case</span><br>
+                        <span class="keyword">if</span> <span class="keyword">not</span> root:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> []<br>
+                        <br>
+                        <span style="color: var(--text-secondary);"># Setup</span><br>
+                        result = []<br>
+                        queue = [root]<br>
+                        <br>
+                        <span style="color: var(--text-secondary);"># Outer loop: for each level</span><br>
+                        <span class="keyword">while</span> queue:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;level_size = <span class="function">len</span>(queue)  <span style="color: var(--text-secondary);"># ← The trick!</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;level_values = []<br>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--text-secondary);"># Inner loop: for each node in this level</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(level_size):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node = queue.popleft()<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level_values.append(node.val)<br>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--text-secondary);"># Add children for next level</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> node.left: queue.append(node.left)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> node.right: queue.append(node.right)<br>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;result.append(level_values)<br>
+                        <br>
+                        <span class="keyword">return</span> result
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 3px solid var(--success);">
+                        <strong style="color: var(--success);">Notice the structure:</strong>
+                        <ul style="margin: 8px 0; padding-left: 24px; font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
+                            <li>Outer <code>while</code> = one iteration per level</li>
+                            <li>Inner <code>for</code> = one iteration per node in current level</li>
+                            <li>This nested structure naturally produces a 2D result!</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderComplexityAnalysis() {
+            return `
+                <div style="padding: 30px; max-width: 700px;">
+                    <div class="complexity-box">
+                        <h4>⏱️ Time Complexity: O(n)</h4>
+                        <div class="complexity-item">
+                            <strong>Analysis:</strong>
+                            <div class="complexity-explanation">
+                                • We visit each node exactly once<br>
+                                • Each node is enqueued once and dequeued once<br>
+                                • Queue operations (append, popleft) are O(1)<br>
+                                • Total: n nodes × O(1) operations = O(n)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="complexity-box" style="margin-top: 16px;">
+                        <h4>💾 Space Complexity: O(n)</h4>
+                        <div class="complexity-item">
+                            <strong>Analysis:</strong>
+                            <div class="complexity-explanation">
+                                • Queue: At worst, holds one complete level<br>
+                                • For a complete binary tree, the last level has ~n/2 nodes<br>
+                                • Result array: Stores all n node values<br>
+                                • Total: O(n/2) + O(n) = O(n)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 3px solid var(--success);">
+                        <strong style="color: var(--success);">✓ This is optimal!</strong>
+                        <div style="margin-top: 8px; font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                            We cannot do better than O(n) time because we must visit every node at least once to build the output. The O(n) space is also necessary to store the result.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEdgeCases() {
+            return `
+                <div style="padding: 30px; max-width: 700px;">
+                    <h3 style="margin-bottom: 20px; color: var(--accent);">Edge Case Analysis</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--success);">
+                            <strong style="color: var(--text-primary);">✓ Empty Tree (root = null)</strong>
+                            <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                                Handled by: <code style="font-family: var(--font-mono); color: var(--accent);">if not root: return []</code><br>
+                                Result: <code style="font-family: var(--font-mono);">[]</code>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--success);">
+                            <strong style="color: var(--text-primary);">✓ Single Node Tree</strong>
+                            <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                                Input: <code style="font-family: var(--font-mono);">[1]</code><br>
+                                Queue progression: [1] → []<br>
+                                Result: <code style="font-family: var(--font-mono);">[[1]]</code>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--success);">
+                            <strong style="color: var(--text-primary);">✓ Unbalanced Tree (all left/right)</strong>
+                            <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                                Input: <code style="font-family: var(--font-mono);">[1,2,null,3,null,4]</code><br>
+                                BFS naturally handles any shape!<br>
+                                Result: <code style="font-family: var(--font-mono);">[[1],[2],[3],[4]]</code>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--success);">
+                            <strong style="color: var(--text-primary);">✓ Complete Binary Tree</strong>
+                            <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                                Ideal case: Demonstrates level-by-level processing clearly<br>
+                                Each level has 2^depth nodes (until last level)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 3px solid var(--success);">
+                        <strong style="color: var(--success);">Why it's robust:</strong>
+                        <div style="margin-top: 8px; font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                            BFS works for ANY tree structure - balanced, unbalanced, skewed, complete, or sparse. The level-size technique ensures correct grouping regardless of tree shape.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFinalDemo() {
+            if (!tree) return '<div>No tree loaded</div>';
+            
+            const levelOrderResult = [];
+            const queue = [tree];
+            while (queue.length > 0) {
+                const levelSize = queue.length;
+                const levelValues = [];
+                for (let i = 0; i < levelSize; i++) {
+                    const node = queue.shift();
+                    levelValues.push(node.val);
+                    if (node.left) queue.push(node.left);
+                    if (node.right) queue.push(node.right);
+                }
+                levelOrderResult.push(levelValues);
+            }
+            
+            return `
+                <div style="padding: 30px; max-width: 700px;">
+                    <h3 style="margin-bottom: 20px; color: var(--accent);">Complete Solution in Action</h3>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong style="color: var(--text-primary);">Input Tree:</strong> ${document.getElementById('treeInput').value}<br>
+                        <strong style="color: var(--text-primary);">Output:</strong> <code style="font-family: var(--font-mono); color: var(--accent);">${JSON.stringify(levelOrderResult)}</code>
+                    </div>
+                    
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 8px; border-left: 3px solid var(--success); margin-bottom: 20px;">
+                        <strong style="color: var(--success); display: block; margin-bottom: 12px;">✓ Why This Solution is Elegant:</strong>
+                        <ul style="margin: 0; padding-left: 24px; font-size: 14px; line-height: 1.8; color: var(--text-secondary);">
+                            <li><strong>Natural fit:</strong> BFS + queue naturally process by level</li>
+                            <li><strong>Clean code:</strong> Simple nested loops, easy to understand</li>
+                            <li><strong>Optimal:</strong> O(n) time and space, can't do better</li>
+                            <li><strong>Robust:</strong> Handles all edge cases seamlessly</li>
+                            <li><strong>Interview-ready:</strong> Easy to explain and code in 5-10 minutes</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+                        <strong style="color: var(--text-primary); display: block; margin-bottom: 12px;">Pattern to Remember:</strong>
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
+                            Whenever you see <strong>"level-order"</strong> or <strong>"process by level"</strong> in a tree problem, immediately think:
+                            <div style="margin: 12px 0; padding: 12px; background: var(--code-bg); border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--accent);">
+                                BFS + Queue + Level Size Tracking
+                            </div>
+                            This pattern appears in many LeetCode problems!
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid var(--accent);">
+                        <strong style="color: var(--accent);">🎯 Demonstrates Mastery Of:</strong>
+                        <div style="margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                            • Tree traversal techniques (BFS vs DFS)<br>
+                            • Queue data structure and operations<br>
+                            • Algorithm design (choosing the right approach)<br>
+                            • Time/space complexity analysis<br>
+                            • Edge case handling
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         // Update UI
         function updateUI() {
             renderCode();
@@ -967,7 +1762,46 @@ class Solution:
             document.getElementById('stepForwardBtn').disabled = currentStep === steps.length - 1;
         }
 
-        // Controls
+        function updateIntuitionUI() {
+            renderIntuitionContent();
+            renderIntuitionViz();
+            
+            document.getElementById('prevStageBtn').disabled = currentIntuitionStage === 0;
+            document.getElementById('nextStageBtn').disabled = currentIntuitionStage === intuitionStages.length - 1;
+        }
+
+        // Mode switching
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            const executionBtn = document.getElementById('executionModeBtn');
+            const intuitionBtn = document.getElementById('intuitionModeBtn');
+            const executionPanels = document.getElementById('executionPanels');
+            const intuitionPanels = document.getElementById('intuitionPanels');
+            const inputSection = document.getElementById('inputSection');
+            
+            if (mode === 'execution') {
+                executionBtn.classList.add('active');
+                intuitionBtn.classList.remove('active');
+                executionPanels.classList.remove('hidden');
+                intuitionPanels.classList.add('hidden');
+                inputSection.style.display = 'flex';
+                
+                if (isIntuitionPlaying) toggleIntuitionPlay();
+                updateUI();
+            } else {
+                intuitionBtn.classList.add('active');
+                executionBtn.classList.remove('active');
+                intuitionPanels.classList.remove('hidden');
+                executionPanels.classList.add('hidden');
+                inputSection.style.display = 'none';
+                
+                if (isPlaying) togglePlay();
+                updateIntuitionUI();
+            }
+        }
+
+        // Execution mode controls
         function stepForward() {
             if (currentStep < steps.length - 1) {
                 currentStep++;
@@ -1023,6 +1857,50 @@ class Solution:
             }
         }
 
+        // Intuition mode controls
+        function nextStage() {
+            if (currentIntuitionStage < intuitionStages.length - 1) {
+                currentIntuitionStage++;
+                updateIntuitionUI();
+            }
+        }
+
+        function prevStage() {
+            if (currentIntuitionStage > 0) {
+                currentIntuitionStage--;
+                updateIntuitionUI();
+            }
+        }
+
+        function resetIntuition() {
+            currentIntuitionStage = 0;
+            if (isIntuitionPlaying) toggleIntuitionPlay();
+            updateIntuitionUI();
+        }
+
+        function toggleIntuitionPlay() {
+            isIntuitionPlaying = !isIntuitionPlaying;
+            const playBtn = document.getElementById('intuitionPlayBtn');
+            
+            if (isIntuitionPlaying) {
+                playBtn.innerHTML = '⏸ Pause';
+                intuitionInterval = setInterval(() => {
+                    if (currentIntuitionStage < intuitionStages.length - 1) {
+                        nextStage();
+                    } else {
+                        toggleIntuitionPlay();
+                    }
+                }, 4000); // 4 seconds per stage
+            } else {
+                playBtn.innerHTML = '▶ Auto-play';
+                if (intuitionInterval) {
+                    clearInterval(intuitionInterval);
+                    intuitionInterval = null;
+                }
+            }
+        }
+
+        // Theme toggle
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -1030,6 +1908,7 @@ class Solution:
             body.setAttribute('data-theme', newTheme);
         }
 
+        // Parse and run
         function parseAndRun() {
             const input = document.getElementById('treeInput').value;
             try {
@@ -1045,8 +1924,36 @@ class Solution:
             }
         }
 
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (currentMode === 'execution') {
+                    togglePlay();
+                } else {
+                    toggleIntuitionPlay();
+                }
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                if (currentMode === 'execution') {
+                    stepForward();
+                } else {
+                    nextStage();
+                }
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentMode === 'execution') {
+                    stepBack();
+                } else {
+                    prevStage();
+                }
+            }
+        });
+
         // Initialize
+        initIntuitionStages();
         parseAndRun();
+        switchMode('intuition'); // Start in intuition mode by default
     </script>
 </body>
 </html>
