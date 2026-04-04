@@ -1,1 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>235. Lowest Common Ancestor of a Binary Search Tree - Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --bg-tertiary: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #d1d5db;
+            --code-bg: #f9fafb;
+            --highlight: #fef3c7;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            
+            /* Syntax highlighting - Light (GitHub inspired) */
+            --syn-keyword: #d73a49;
+            --syn-function: #6f42c1;
+            --syn-string: #032f62;
+            --syn-comment: #6a737d;
+            --syn-type: #005cc5;
+            --syn-number: #005cc5;
+            --syn-operator: #d73a49;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #4b5563;
+            --code-bg: #0f1419;
+            --highlight: #422006;
+            
+            /* Syntax highlighting - Dark (Dracula inspired) */
+            --syn-keyword: #ff79c6;
+            --syn-function: #50fa7b;
+            --syn-string: #f1fa8c;
+            --syn-comment: #6272a4;
+            --syn-type: #8be9fd;
+            --syn-number: #bd93f9;
+            --syn-operator: #ff79c6;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--border);
+            padding: 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-section label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-section input {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .input-section input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .run-btn {
+            padding: 8px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .run-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--bg-primary);
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Code Panel */
+        .code-panel {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.65;
+            background: var(--code-bg);
+            color: var(--text-primary);
+        }
+
+        .code-panel pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            min-height: 23px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.highlight {
+            background: var(--highlight);
+        }
+
+        .line-number {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-secondary);
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .line-code {
+            flex: 1;
+            white-space: pre;
+            color: inherit;
+        }
+
+        /* Syntax highlighting classes */
+        .syn-keyword { color: var(--syn-keyword); font-weight: 500; }
+        .syn-function { color: var(--syn-function); font-weight: 500; }
+        .syn-string { color: var(--syn-string); }
+        .syn-comment { color: var(--syn-comment); font-style: italic; }
+        .syn-type { color: var(--syn-type); }
+        .syn-number { color: var(--syn-number); }
+        .syn-operator { color: var(--syn-operator); }
+
+        /* Visualization Panel */
+        .viz-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+        }
+
+        .viz-controls {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: var(--border);
+        }
+
+        .control-btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .control-btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .speed-control {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speed-control select {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Step Log Panel */
+        .step-log {
+            padding: 16px;
+        }
+
+        .step-info {
+            margin-bottom: 20px;
+        }
+
+        .step-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .variables {
+            margin-bottom: 20px;
+        }
+
+        .variables h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .var-item {
+            margin: 4px 0;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .var-name {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .step-history h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .history-item.current {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .history-item:not(.current) {
+            color: var(--text-secondary);
+        }
+
+        /* Intuition Mode */
+        .intuition-panel {
+            padding: 24px;
+        }
+
+        .intuition-stage {
+            margin-bottom: 32px;
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            transition: opacity 0.3s ease;
+        }
+
+        .intuition-stage h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .thought-bubble {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-style: italic;
+            color: var(--text-primary);
+            border-radius: 4px;
+        }
+
+        .key-insight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .key-insight strong {
+            color: var(--success);
+        }
+
+        .intuition-stage p {
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-line;
+        }
+
+        /* SVG Styles */
+        .tree-node circle {
+            transition: all 0.3s ease;
+        }
+
+        .tree-node.current circle {
+            stroke-width: 3;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .tree-node.lca circle {
+            stroke-width: 4;
+            filter: drop-shadow(0 0 12px var(--success));
+        }
+
+        .tree-node.target circle {
+            stroke-width: 3;
+        }
+
+        .tree-edge {
+            transition: all 0.3s ease;
+        }
+
+        .tree-edge.highlight {
+            stroke-width: 3;
+        }
+
+        /* Approach comparison */
+        .approach-box {
+            padding: 20px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .approach-box.bad {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--error);
+        }
+
+        .approach-box.good {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .approach-box h4 {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .approach-box.bad h4 {
+            color: var(--error);
+        }
+
+        .approach-box.good h4 {
+            color: var(--success);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .panel {
+                min-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        class TreeNode {
+            constructor(val, left = null, right = null) {
+                this.val = val;
+                this.left = left;
+                this.right = right;
+                this.id = Math.random().toString(36).substr(2, 9);
+            }
+        }
+
+        class LCAVisualizer {
+            constructor() {
+                this.state = {
+                    theme: 'dark',
+                    mode: 'intuition', // 'intuition' or 'execution'
+                    
+                    // Execution mode
+                    currentStep: 0,
+                    isPlaying: false,
+                    speed: 1,
+                    steps: [],
+                    
+                    // Intuition mode
+                    currentIntuitionStage: 0,
+                    isIntuitionPlaying: false,
+                    
+                    // Common
+                    treeArray: [6,2,8,0,4,7,9,null,null,3,5],
+                    p: 2,
+                    q: 8,
+                    root: null
+                };
+
+                this.problemNumber = 235;
+                this.problemTitle = "Lowest Common Ancestor of a Binary Search Tree";
+                
+                this.solutionCode = `class Solution:
+    def lowestCommonAncestor(
+        self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode'
+    ) -> 'TreeNode':
+        """
+        Find LCA in BST using BST property.
+        
+        Time: O(h) where h is height
+        Space: O(1) - iterative approach
+        """
+        # Current node we're examining
+        current = root
+        
+        while current:
+            # Both p and q are in left subtree
+            if p.val < current.val and q.val < current.val:
+                current = current.left
+            # Both p and q are in right subtree
+            elif p.val > current.val and q.val > current.val:
+                current = current.right
+            # Found the split point - this is LCA
+            else:
+                return current
+        
+        return None`;
+
+                this.intuitionStages = this.getIntuitionStages();
+                this.init();
+            }
+
+            init() {
+                this.buildTree();
+                this.attachEventListeners();
+                this.render();
+            }
+
+            getIntuitionStages() {
+                return [
+                    {
+                        title: "Understanding the Problem",
+                        thought: "What makes finding LCA in a BST different from a regular binary tree?",
+                        content: `Let me break down what we're looking for:
+- LCA (Lowest Common Ancestor) is the deepest node that's an ancestor of both p and q
+- In a BST, left subtree values < node < right subtree values
+- This ordering property is KEY - we can use it to navigate!
+
+Example: For p=2, q=8 in the tree shown:
+- Node 6 is an ancestor of both 2 and 8
+- But is it the LOWEST? Let me trace the paths...`,
+                        insight: "The BST property lets us determine which direction to search without exploring both subtrees!",
+                        visualization: "example_tree"
+                    },
+                    {
+                        title: "Naive Approach: Find Paths",
+                        thought: "I could find the path from root to p, path from root to q, then find where they diverge...",
+                        content: `Brute force approach:
+1. Find path: root → p (store all nodes)
+2. Find path: root → q (store all nodes)
+3. Compare paths, find last common node
+
+Why this works:
+- Guaranteed to find LCA
+- Clear and simple logic
+
+Why this is suboptimal:
+- Time: O(h) for each path = O(2h) = O(h)
+- Space: O(h) to store paths
+- We're NOT using the BST property at all!`,
+                        insight: "This approach treats the tree as a regular binary tree. We can do better!",
+                        visualization: "approach_comparison"
+                    },
+                    {
+                        title: "The BST Insight",
+                        thought: "Wait! The BST property tells me exactly where to go. If both values are less than current, go left. If both are greater, go right...",
+                        content: `The key realization:
+- If p.val < node.val AND q.val < node.val → Both are in LEFT subtree
+- If p.val > node.val AND q.val > node.val → Both are in RIGHT subtree
+- Otherwise → We found the split point! This node IS the LCA
+
+Why this works:
+- The moment p and q go different directions, we've found their LCA
+- Or if we land exactly on p or q, that node is the LCA
+
+Example with p=2, q=8:
+- At root (6): 2 < 6 but 8 > 6 → Different sides! → LCA is 6`,
+                        insight: "The LCA is where the paths to p and q diverge - we don't need to find full paths!",
+                        visualization: "technique_demo"
+                    },
+                    {
+                        title: "Implementation Strategy",
+                        thought: "This is beautifully simple - just keep going in the direction until we hit the split point...",
+                        content: `Algorithm structure:
+1. Start at root
+2. While current node exists:
+   - If both values < current → go left
+   - If both values > current → go right
+   - Else → return current (this is LCA)
+
+Why iterative instead of recursive:
+- No recursion overhead
+- More space efficient: O(1) instead of O(h) call stack
+- Still O(h) time in worst case (skewed tree)
+
+The code is just 7 lines of actual logic!`,
+                        insight: "The iterative approach uses O(1) space vs O(h) for recursion",
+                        visualization: "code_flow"
+                    },
+                    {
+                        title: "Complexity Analysis",
+                        thought: "Let me verify this is optimal...",
+                        content: `Time Complexity: O(h)
+- h = height of tree
+- Best case (balanced): O(log n)
+- Worst case (skewed): O(n)
+- We visit at most h nodes on path from root to LCA
+
+Space Complexity: O(1)
+- Only storing 'current' pointer
+- No recursion stack
+- No extra data structures
+
+Can we do better than O(h) time?
+- NO! We must at least reach the LCA node
+- This is optimal`,
+                        insight: "O(h) time is optimal - we can't find LCA without reaching it",
+                        visualization: "complexity"
+                    },
+                    {
+                        title: "Edge Cases & Robustness",
+                        thought: "What edge cases could break this? Empty tree? p or q is the LCA itself?",
+                        content: `Edge cases to consider:
+1. One node is ancestor of other (p=2, q=4)
+   → Works! When we reach p, q is in subtree, so p is LCA
+
+2. p and q are same node (p=2, q=2)
+   → Problem states p ≠ q, but if allowed, returns that node
+
+3. Empty tree (root = null)
+   → Loop never executes, returns None
+
+4. p or q not in tree
+   → Problem guarantees both exist, but returns incorrect result
+   → Could add validation if needed`,
+                        insight: "The algorithm handles ancestor-descendant cases naturally",
+                        visualization: "edge_cases"
+                    },
+                    {
+                        title: "Why This Solution Shines",
+                        thought: "This is elegant! Simple logic, optimal complexity, leverages BST property perfectly.",
+                        content: `What makes this solution interview-ready:
+
+1. Uses BST property (shows you understand data structures)
+2. Optimal time and space complexity
+3. Clean, readable code (no complex recursion)
+4. Handles edge cases naturally
+5. Easy to explain and trace
+
+Key interview talking points:
+- "I'm using the BST ordering to navigate directly to LCA"
+- "This is O(h) time, O(1) space - optimal for this problem"
+- "Unlike regular trees, BST lets us avoid searching both subtrees"
+
+Pattern recognition:
+- Any BST problem → Think about the ordering property!
+- Navigation problems → Consider iterative vs recursive tradeoffs`,
+                        insight: "This problem showcases how understanding data structure properties leads to elegant solutions",
+                        visualization: "final_demo"
+                    }
+                ];
+            }
+
+            buildTree() {
+                const arr = this.state.treeArray;
+                if (!arr || arr.length === 0) {
+                    this.state.root = null;
+                    return;
+                }
+
+                this.state.root = new TreeNode(arr[0]);
+                const queue = [this.state.root];
+                let i = 1;
+
+                while (queue.length > 0 && i < arr.length) {
+                    const node = queue.shift();
+                    
+                    if (i < arr.length && arr[i] !== null) {
+                        node.left = new TreeNode(arr[i]);
+                        queue.push(node.left);
+                    }
+                    i++;
+                    
+                    if (i < arr.length && arr[i] !== null) {
+                        node.right = new TreeNode(arr[i]);
+                        queue.push(node.right);
+                    }
+                    i++;
+                }
+            }
+
+            findNode(root, val) {
+                if (!root) return null;
+                if (root.val === val) return root;
+                const left = this.findNode(root.left, val);
+                if (left) return left;
+                return this.findNode(root.right, val);
+            }
+
+            simulateLCA() {
+                const steps = [];
+                const root = this.state.root;
+                const p = this.findNode(root, this.state.p);
+                const q = this.findNode(root, this.state.q);
+                
+                if (!root || !p || !q) return steps;
+
+                let stepNum = 0;
+                let current = root;
+
+                steps.push({
+                    line: 10,
+                    description: `Initialize: Start at root node ${root.val}. Looking for LCA of ${p.val} and ${q.val}.`,
+                    vars: { p_val: p.val, q_val: q.val, current_val: current.val },
+                    currentNodeId: current.id,
+                    pNodeId: p.id,
+                    qNodeId: q.id,
+                    lcaNodeId: null,
+                    stepNum: stepNum++
+                });
+
+                while (current) {
+                    if (p.val < current.val && q.val < current.val) {
+                        steps.push({
+                            line: 14,
+                            description: `Both ${p.val} < ${current.val} and ${q.val} < ${current.val}. Both nodes are in LEFT subtree.`,
+                            vars: { p_val: p.val, q_val: q.val, current_val: current.val, direction: 'left' },
+                            currentNodeId: current.id,
+                            pNodeId: p.id,
+                            qNodeId: q.id,
+                            lcaNodeId: null,
+                            stepNum: stepNum++
+                        });
+                        
+                        current = current.left;
+                        
+                        if (current) {
+                            steps.push({
+                                line: 15,
+                                description: `Move to left child: node ${current.val}`,
+                                vars: { p_val: p.val, q_val: q.val, current_val: current.val },
+                                currentNodeId: current.id,
+                                pNodeId: p.id,
+                                qNodeId: q.id,
+                                lcaNodeId: null,
+                                stepNum: stepNum++
+                            });
+                        }
+                    } else if (p.val > current.val && q.val > current.val) {
+                        steps.push({
+                            line: 17,
+                            description: `Both ${p.val} > ${current.val} and ${q.val} > ${current.val}. Both nodes are in RIGHT subtree.`,
+                            vars: { p_val: p.val, q_val: q.val, current_val: current.val, direction: 'right' },
+                            currentNodeId: current.id,
+                            pNodeId: p.id,
+                            qNodeId: q.id,
+                            lcaNodeId: null,
+                            stepNum: stepNum++
+                        });
+                        
+                        current = current.right;
+                        
+                        if (current) {
+                            steps.push({
+                                line: 18,
+                                description: `Move to right child: node ${current.val}`,
+                                vars: { p_val: p.val, q_val: q.val, current_val: current.val },
+                                currentNodeId: current.id,
+                                pNodeId: p.id,
+                                qNodeId: q.id,
+                                lcaNodeId: null,
+                                stepNum: stepNum++
+                            });
+                        }
+                    } else {
+                        steps.push({
+                            line: 20,
+                            description: `Found split point! ${p.val} and ${q.val} are on different sides of ${current.val}, or one equals ${current.val}. This is the LCA!`,
+                            vars: { p_val: p.val, q_val: q.val, current_val: current.val, result: current.val },
+                            currentNodeId: current.id,
+                            pNodeId: p.id,
+                            qNodeId: q.id,
+                            lcaNodeId: current.id,
+                            stepNum: stepNum++
+                        });
+                        
+                        steps.push({
+                            line: 21,
+                            description: `Return node ${current.val} as the Lowest Common Ancestor.`,
+                            vars: { p_val: p.val, q_val: q.val, lca: current.val },
+                            currentNodeId: current.id,
+                            pNodeId: p.id,
+                            qNodeId: q.id,
+                            lcaNodeId: current.id,
+                            stepNum: stepNum++
+                        });
+                        
+                        break;
+                    }
+                }
+
+                this.state.steps = steps;
+                this.state.currentStep = 0;
+            }
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', this.state.theme);
+                this.render();
+            }
+
+            toggleMode(mode) {
+                this.pause();
+                this.pauseIntuition();
+                this.state.mode = mode;
+                
+                if (mode === 'intuition') {
+                    this.state.currentIntuitionStage = 0;
+                } else {
+                    this.state.currentStep = 0;
+                    if (this.state.steps.length === 0) {
+                        this.runSimulation();
+                    }
+                }
+                
+                this.render();
+            }
+
+            runSimulation() {
+                this.buildTree();
+                this.simulateLCA();
+                this.state.currentStep = 0;
+                this.render();
+            }
+
+            // Execution mode controls
+            play() {
+                if (this.state.currentStep >= this.state.steps.length - 1) {
+                    this.state.currentStep = 0;
+                }
+                
+                this.state.isPlaying = true;
+                this.render();
+                
+                this.playInterval = setInterval(() => {
+                    if (this.state.currentStep < this.state.steps.length - 1) {
+                        this.state.currentStep++;
+                        this.render();
+                    } else {
+                        this.pause();
+                    }
+                }, 1000 / this.state.speed);
+            }
+
+            pause() {
+                this.state.isPlaying = false;
+                if (this.playInterval) {
+                    clearInterval(this.playInterval);
+                    this.playInterval = null;
+                }
+                this.render();
+            }
+
+            stepForward() {
+                if (this.state.currentStep < this.state.steps.length - 1) {
+                    this.state.currentStep++;
+                    this.render();
+                }
+            }
+
+            stepBack() {
+                if (this.state.currentStep > 0) {
+                    this.state.currentStep--;
+                    this.render();
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.state.currentStep = 0;
+                this.render();
+            }
+
+            setSpeed(speed) {
+                const wasPlaying = this.state.isPlaying;
+                this.pause();
+                this.state.speed = parseFloat(speed);
+                if (wasPlaying) {
+                    this.play();
+                }
+            }
+
+            // Intuition mode controls
+            playIntuition() {
+                if (this.state.currentIntuitionStage >= this.intuitionStages.length - 1) {
+                    this.state.currentIntuitionStage = 0;
+                }
+                
+                this.state.isIntuitionPlaying = true;
+                this.render();
+                
+                this.intuitionInterval = setInterval(() => {
+                    if (this.state.currentIntuitionStage < this.intuitionStages.length - 1) {
+                        this.state.currentIntuitionStage++;
+                        this.render();
+                    } else {
+                        this.pauseIntuition();
+                    }
+                }, 4000);
+            }
+
+            pauseIntuition() {
+                this.state.isIntuitionPlaying = false;
+                if (this.intuitionInterval) {
+                    clearInterval(this.intuitionInterval);
+                    this.intuitionInterval = null;
+                }
+                this.render();
+            }
+
+            nextIntuitionStage() {
+                if (this.state.currentIntuitionStage < this.intuitionStages.length - 1) {
+                    this.state.currentIntuitionStage++;
+                    this.render();
+                }
+            }
+
+            prevIntuitionStage() {
+                if (this.state.currentIntuitionStage > 0) {
+                    this.state.currentIntuitionStage--;
+                    this.render();
+                }
+            }
+
+            attachEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            if (this.state.isPlaying) {
+                                this.pause();
+                            } else {
+                                this.play();
+                            }
+                        } else {
+                            if (this.state.isIntuitionPlaying) {
+                                this.pauseIntuition();
+                            } else {
+                                this.playIntuition();
+                            }
+                        }
+                    } else if (e.code === 'ArrowRight') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            this.stepForward();
+                        } else {
+                            this.nextIntuitionStage();
+                        }
+                    } else if (e.code === 'ArrowLeft') {
+                        e.preventDefault();
+                        if (this.state.mode === 'execution') {
+                            this.stepBack();
+                        } else {
+                            this.prevIntuitionStage();
+                        }
+                    }
+                });
+            }
+
+            highlightPythonLine(line) {
+                // Escape HTML first
+                const div = document.createElement('div');
+                div.textContent = line;
+                let escaped = div.innerHTML;
+
+                // Don't highlight empty lines or very short lines
+                if (!escaped.trim() || escaped.trim().length < 2) {
+                    return escaped || '&nbsp;';
+                }
+
+                // Comments (must be first to avoid highlighting inside comments)
+                escaped = escaped.replace(/(#.*$)/g, '<span class="syn-comment">$1</span>');
+
+                // Strings (handle both single and double quotes, with escaped quotes)
+                escaped = escaped.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)/g, '<span class="syn-string">$1</span>');
+                escaped = escaped.replace(/(&#39;(?:[^&]|&(?!#39;))*&#39;)/g, '<span class="syn-string">$1</span>');
+
+                // Keywords
+                const keywords = ['class', 'def', 'return', 'if', 'elif', 'else', 'while', 'for', 
+                                'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None', 'self'];
+                keywords.forEach(kw => {
+                    const regex = new RegExp(`\\b(${kw})\\b`, 'g');
+                    escaped = escaped.replace(regex, '<span class="syn-keyword">$1</span>');
+                });
+
+                // Types (common Python types)
+                const types = ['TreeNode', 'int', 'str', 'list', 'dict', 'bool', 'Optional', 'List', 'Dict'];
+                types.forEach(type => {
+                    const regex = new RegExp(`\\b(${type})\\b`, 'g');
+                    escaped = escaped.replace(regex, '<span class="syn-type">$1</span>');
+                });
+
+                // Function names (word followed by opening paren)
+                escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="syn-function">$1</span>');
+
+                // Numbers
+                escaped = escaped.replace(/\b(\d+)\b/g, '<span class="syn-number">$1</span>');
+
+                return escaped;
+            }
+
+            renderCodePanel() {
+                const lines = this.solutionCode.split('\n');
+                const currentLine = this.state.steps.length > 0 ? this.state.steps[this.state.currentStep].line - 1 : -1;
+
+                const linesHTML = lines.map((line, i) => {
+                    const highlightClass = i === currentLine ? 'highlight' : '';
+                    const highlightedCode = this.highlightPythonLine(line);
+                    
+                    return `
+                        <div class="code-line ${highlightClass}">
+                            <span class="line-number">${i + 1}</span>
+                            <code class="line-code">${highlightedCode}</code>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: 30%">
+                        <div class="panel-header">Solution Code</div>
+                        <div class="panel-content code-panel">
+                            <pre>${linesHTML}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateTreeLayout(root) {
+                if (!root) return { nodes: [], edges: [], maxDepth: 0 };
+
+                const nodes = [];
+                const edges = [];
+                let maxDepth = 0;
+
+                const traverse = (node, depth, x, minX, maxX) => {
+                    if (!node) return;
+
+                    maxDepth = Math.max(maxDepth, depth);
+                    const y = 80 + depth * 100;
+
+                    nodes.push({ node, x, y, depth });
+
+                    if (node.left) {
+                        const leftX = (minX + x) / 2;
+                        edges.push({ from: { x, y }, to: { x: leftX, y: y + 100 }, highlighted: false });
+                        traverse(node.left, depth + 1, leftX, minX, x);
+                    }
+
+                    if (node.right) {
+                        const rightX = (x + maxX) / 2;
+                        edges.push({ from: { x, y }, to: { x: rightX, y: y + 100 }, highlighted: false });
+                        traverse(node.right, depth + 1, rightX, x, maxX);
+                    }
+                };
+
+                traverse(root, 0, 400, 0, 800);
+
+                return { nodes, edges, maxDepth };
+            }
+
+            renderTree(root, currentNodeId, pNodeId, qNodeId, lcaNodeId) {
+                if (!root) {
+                    return `<div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                        No tree to display. Enter a valid tree array.
+                    </div>`;
+                }
+
+                const { nodes, edges, maxDepth } = this.calculateTreeLayout(root);
+                const svgHeight = Math.max(400, (maxDepth + 1) * 100 + 80);
+
+                const edgesHTML = edges.map((edge, i) => {
+                    const strokeColor = this.state.theme === 'dark' ? '#6b7280' : '#9ca3af';
+                    return `
+                        <line
+                            x1="${edge.from.x}" y1="${edge.from.y + 28}"
+                            x2="${edge.to.x}" y2="${edge.to.y - 28}"
+                            stroke="${strokeColor}"
+                            stroke-width="2"
+                            class="tree-edge"
+                        />
+                    `;
+                }).join('');
+
+                const nodesHTML = nodes.map(({ node, x, y }) => {
+                    let fillColor, strokeColor, strokeWidth;
+                    let cssClass = 'tree-node';
+
+                    if (lcaNodeId && node.id === lcaNodeId) {
+                        fillColor = this.state.theme === 'dark' ? '#10b981' : '#059669';
+                        strokeColor = this.state.theme === 'dark' ? '#34d399' : '#10b981';
+                        strokeWidth = 4;
+                        cssClass += ' lca';
+                    } else if (pNodeId && node.id === pNodeId) {
+                        fillColor = this.state.theme === 'dark' ? '#f59e0b' : '#d97706';
+                        strokeColor = this.state.theme === 'dark' ? '#fbbf24' : '#f59e0b';
+                        strokeWidth = 3;
+                        cssClass += ' target';
+                    } else if (qNodeId && node.id === qNodeId) {
+                        fillColor = this.state.theme === 'dark' ? '#f59e0b' : '#d97706';
+                        strokeColor = this.state.theme === 'dark' ? '#fbbf24' : '#f59e0b';
+                        strokeWidth = 3;
+                        cssClass += ' target';
+                    } else if (currentNodeId && node.id === currentNodeId) {
+                        fillColor = this.state.theme === 'dark' ? '#3b82f6' : '#2563eb';
+                        strokeColor = this.state.theme === 'dark' ? '#60a5fa' : '#3b82f6';
+                        strokeWidth = 3;
+                        cssClass += ' current';
+                    } else {
+                        fillColor = this.state.theme === 'dark' ? '#374151' : '#e5e7eb';
+                        strokeColor = this.state.theme === 'dark' ? '#4b5563' : '#9ca3af';
+                        strokeWidth = 2;
+                    }
+
+                    const textColor = (lcaNodeId && node.id === lcaNodeId) || 
+                                     (pNodeId && node.id === pNodeId) ||
+                                     (qNodeId && node.id === qNodeId) ||
+                                     (currentNodeId && node.id === currentNodeId) ? '#ffffff' : 
+                                     (this.state.theme === 'dark' ? '#f9fafb' : '#111827');
+
+                    return `
+                        <g class="${cssClass}">
+                            <circle
+                                cx="${x}" cy="${y}" r="28"
+                                fill="${fillColor}"
+                                stroke="${strokeColor}"
+                                stroke-width="${strokeWidth}"
+                            />
+                            <text
+                                x="${x}" y="${y}"
+                                text-anchor="middle"
+                                dominant-baseline="middle"
+                                fill="${textColor}"
+                                font-size="16"
+                                font-weight="600"
+                                font-family="var(--font-sans)"
+                            >
+                                ${node.val}
+                            </text>
+                        </g>
+                    `;
+                }).join('');
+
+                return `
+                    <svg viewBox="0 0 800 ${svgHeight}" style="width: 100%; height: 100%; min-height: 400px;">
+                        ${edgesHTML}
+                        ${nodesHTML}
+                    </svg>
+                `;
+            }
+
+            renderVizPanel() {
+                const step = this.state.steps[this.state.currentStep];
+                const currentNodeId = step ? step.currentNodeId : null;
+                const pNodeId = step ? step.pNodeId : null;
+                const qNodeId = step ? step.qNodeId : null;
+                const lcaNodeId = step ? step.lcaNodeId : null;
+
+                return `
+                    <div class="panel viz-panel" style="width: 50%">
+                        <div class="panel-header">Binary Search Tree Visualization</div>
+                        <div class="viz-content">
+                            ${this.renderTree(this.state.root, currentNodeId, pNodeId, qNodeId, lcaNodeId)}
+                        </div>
+                        <div class="viz-controls">
+                            <button class="control-btn" onclick="app.reset()">⏮ Reset</button>
+                            <button class="control-btn" onclick="app.stepBack()" 
+                                ${this.state.currentStep === 0 ? 'disabled' : ''}>
+                                ◀ Step Back
+                            </button>
+                            <button class="control-btn primary" onclick="${this.state.isPlaying ? 'app.pause()' : 'app.play()'}">
+                                ${this.state.isPlaying ? '⏸ Pause' : '▶ Play'}
+                            </button>
+                            <button class="control-btn" onclick="app.stepForward()"
+                                ${this.state.currentStep >= this.state.steps.length - 1 ? 'disabled' : ''}>
+                                Step Forward ▶
+                            </button>
+                            <div class="speed-control">
+                                <span style="font-size: 13px; color: var(--text-secondary);">Speed:</span>
+                                <select onchange="app.setSpeed(this.value)" style="cursor: pointer;">
+                                    <option value="0.5" ${this.state.speed === 0.5 ? 'selected' : ''}>0.5x</option>
+                                    <option value="1" ${this.state.speed === 1 ? 'selected' : ''}>1x</option>
+                                    <option value="2" ${this.state.speed === 2 ? 'selected' : ''}>2x</option>
+                                    <option value="4" ${this.state.speed === 4 ? 'selected' : ''}>4x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderStepPanel() {
+                if (this.state.steps.length === 0) {
+                    return `
+                        <div class="panel" style="width: 20%">
+                            <div class="panel-header">Execution Log</div>
+                            <div class="panel-content step-log">
+                                <p style="color: var(--text-secondary); font-size: 13px;">
+                                    Click "Run" to start visualization.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const step = this.state.steps[this.state.currentStep];
+
+                const varsHTML = Object.entries(step.vars).map(([name, value]) => `
+                    <div class="var-item">
+                        <span class="var-name">${name}</span>: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </div>
+                `).join('');
+
+                const historyHTML = this.state.steps.slice(0, this.state.currentStep + 1).map((s, i) => {
+                    const isCurrent = i === this.state.currentStep;
+                    return `
+                        <div class="history-item ${isCurrent ? 'current' : ''}">
+                            ${i + 1}. ${s.description}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: 20%">
+                        <div class="panel-header">Execution Log</div>
+                        <div class="panel-content step-log">
+                            <div class="step-info">
+                                <h3>Step ${this.state.currentStep + 1} of ${this.state.steps.length}</h3>
+                                <p class="step-description">${step.description}</p>
+                            </div>
+                            
+                            <div class="variables">
+                                <h4>Variables</h4>
+                                ${varsHTML}
+                            </div>
+                            
+                            <div class="step-history">
+                                <h4>History</h4>
+                                ${historyHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderExecutionMode() {
+                return `
+                    ${this.renderCodePanel()}
+                    ${this.renderVizPanel()}
+                    ${this.renderStepPanel()}
+                `;
+            }
+
+            renderIntuitionContent() {
+                const stages = this.intuitionStages;
+                const currentIdx = this.state.currentIntuitionStage;
+
+                const stagesHTML = stages.map((stage, i) => {
+                    const isActive = i === currentIdx;
+                    const isPast = i < currentIdx;
+                    const opacity = isActive ? '1' : (isPast ? '0.6' : '0.3');
+
+                    return `
+                        <div class="intuition-stage" style="opacity: ${opacity}">
+                            <h3>
+                                <span class="stage-number">${i + 1}</span>
+                                ${stage.title}
+                            </h3>
+                            
+                            ${stage.thought ? `
+                                <div class="thought-bubble">
+                                    💭 "${stage.thought}"
+                                </div>
+                            ` : ''}
+                            
+                            <p>${stage.content}</p>
+                            
+                            ${stage.insight ? `
+                                <div class="key-insight">
+                                    <strong>💡 Key Insight:</strong> ${stage.insight}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="panel" style="width: 50%; border-right: 2px solid var(--border);">
+                        <div class="panel-header">
+                            Senior Engineer's Thought Process
+                            <span style="float: right;">Stage ${currentIdx + 1} of ${stages.length}</span>
+                        </div>
+                        <div class="panel-content intuition-panel">
+                            ${stagesHTML}
+                            
+                            <div style="margin-top: 24px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                <button class="control-btn" onclick="app.prevIntuitionStage()" 
+                                    ${currentIdx === 0 ? 'disabled' : ''} 
+                                    style="margin-right: 8px;">
+                                    ◀ Previous
+                                </button>
+                                <button class="control-btn primary" 
+                                    onclick="${this.state.isIntuitionPlaying ? 'app.pauseIntuition()' : 'app.playIntuition()'}">
+                                    ${this.state.isIntuitionPlaying ? '⏸ Pause' : '▶ Play'}
+                                </button>
+                                <button class="control-btn" onclick="app.nextIntuitionStage()"
+                                    ${currentIdx >= stages.length - 1 ? 'disabled' : ''}
+                                    style="margin-left: 8px;">
+                                    Next ▶
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderIntuitionViz() {
+                const stage = this.intuitionStages[this.state.currentIntuitionStage];
+                let vizContent = '';
+
+                switch(stage.visualization) {
+                    case 'example_tree':
+                        const pNode = this.findNode(this.state.root, this.state.p);
+                        const qNode = this.findNode(this.state.root, this.state.q);
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">Example Tree (p=${this.state.p}, q=${this.state.q})</h3>
+                                ${this.renderTree(this.state.root, null, pNode ? pNode.id : null, qNode ? qNode.id : null, null)}
+                                <div style="margin-top: 20px; text-align: center; font-size: 14px; color: var(--text-secondary);">
+                                    <span style="color: var(--warning);">●</span> Target nodes (p and q)
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'approach_comparison':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 20px;">Comparing Approaches</h3>
+                                
+                                <div class="approach-box bad">
+                                    <h4>❌ Approach 1: Find Paths</h4>
+                                    <div style="margin-top: 8px; line-height: 1.6;">
+                                        <strong>Idea:</strong> Find path root→p and root→q, then compare<br>
+                                        <strong>Time:</strong> O(h) to find each path<br>
+                                        <strong>Space:</strong> O(h) to store paths<br>
+                                        <strong>Problem:</strong> Doesn't use BST property!
+                                    </div>
+                                </div>
+                                
+                                <div class="approach-box good">
+                                    <h4>✅ Approach 2: Use BST Property</h4>
+                                    <div style="margin-top: 8px; line-height: 1.6;">
+                                        <strong>Idea:</strong> Navigate using value comparisons<br>
+                                        <strong>Time:</strong> O(h) - single path traversal<br>
+                                        <strong>Space:</strong> O(1) - no extra storage<br>
+                                        <strong>Why Better:</strong> Simpler and more space efficient!
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'technique_demo':
+                        const pNode2 = this.findNode(this.state.root, this.state.p);
+                        const qNode2 = this.findNode(this.state.root, this.state.q);
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">The Split Point is the LCA</h3>
+                                ${this.renderTree(this.state.root, this.state.root.id, pNode2 ? pNode2.id : null, qNode2 ? qNode2.id : null, null)}
+                                <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                                    <div style="font-size: 14px; line-height: 1.8;">
+                                        At root (${this.state.root.val}):<br>
+                                        • p=${this.state.p} ${this.state.p < this.state.root.val ? '<' : '>'} ${this.state.root.val}<br>
+                                        • q=${this.state.q} ${this.state.q < this.state.root.val ? '<' : '>'} ${this.state.root.val}<br>
+                                        ${this.state.p < this.state.root.val && this.state.q > this.state.root.val ? 
+                                            '• They split! → LCA is ' + this.state.root.val : 
+                                            '• Same direction → Keep searching'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'code_flow':
+                        const lines = this.solutionCode.split('\n');
+                        const highlightLines = [13, 14, 15, 16, 17, 18, 19, 20, 21];
+                        const codeHTML = lines.map((line, i) => {
+                            const shouldHighlight = highlightLines.includes(i + 1);
+                            const bgColor = shouldHighlight ? 
+                                (this.state.theme === 'dark' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)') : 
+                                'transparent';
+                            
+                            return `
+                                <div style="background: ${bgColor}; padding: 2px 8px; border-left: ${shouldHighlight ? '3px solid var(--accent)' : '3px solid transparent'};">
+                                    <span style="color: var(--text-secondary); display: inline-block; min-width: 30px;">${i + 1}</span>
+                                    <code style="font-family: var(--font-mono); white-space: pre;">${line || ' '}</code>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px;">Core Algorithm (7 lines!)</h3>
+                                <div style="background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto;">
+                                    ${codeHTML}
+                                </div>
+                                <div style="margin-top: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; line-height: 1.6;">
+                                    The highlighted section is the entire algorithm!<br>
+                                    • Line 14-15: Both left → go left<br>
+                                    • Line 17-18: Both right → go right<br>
+                                    • Line 20-21: Split point → return LCA
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'complexity':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <div style="background: var(--bg-secondary); padding: 24px; margin-bottom: 16px; border-radius: 8px;">
+                                    <h3 style="color: var(--accent); margin-bottom: 12px;">Time Complexity</h3>
+                                    <div style="margin-top: 12px; line-height: 1.8;">
+                                        <strong>O(h)</strong> where h = height of tree<br>
+                                        <div style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
+                                            • Best case (balanced): O(log n)<br>
+                                            • Worst case (skewed): O(n)<br>
+                                            • We visit at most h nodes on path to LCA<br>
+                                            • Cannot do better - must reach LCA!
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 24px; border-radius: 8px;">
+                                    <h3 style="color: var(--accent); margin-bottom: 12px;">Space Complexity</h3>
+                                    <div style="margin-top: 12px; line-height: 1.8;">
+                                        <strong>O(1)</strong> - constant space<br>
+                                        <div style="color: var(--text-secondary); margin-left: 20px; margin-top: 8px;">
+                                            • Only one pointer: 'current'<br>
+                                            • No recursion stack (iterative)<br>
+                                            • No auxiliary data structures<br>
+                                            • Optimal!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'edge_cases':
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 20px;">Edge Cases</h3>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; margin-bottom: 12px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 1: One node is ancestor of other</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Example: p=2, q=4 (where 2 is ancestor of 4)<br>
+                                        ✅ Works correctly! When we reach 2, we see 4 > 2, so we don't go right.<br>
+                                        The split happens at 2, making it the LCA.
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; margin-bottom: 12px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 2: Nodes on opposite sides</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        Example: p=0, q=5<br>
+                                        ✅ Works! We navigate down from root and find the split point naturally.
+                                    </div>
+                                </div>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+                                    <h4 style="color: var(--accent); margin-bottom: 8px;">Case 3: Empty tree</h4>
+                                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+                                        ✅ Returns None (loop doesn't execute)
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'final_demo':
+                        // Simulate finding LCA and show final result
+                        this.simulateLCA();
+                        const finalStep = this.state.steps[this.state.steps.length - 1];
+                        const lcaNode = this.findNode(this.state.root, finalStep.vars.lca);
+                        const pNodeFinal = this.findNode(this.state.root, this.state.p);
+                        const qNodeFinal = this.findNode(this.state.root, this.state.q);
+                        
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                <h3 style="margin-bottom: 16px; text-align: center;">Complete Solution</h3>
+                                ${this.renderTree(this.state.root, null, pNodeFinal ? pNodeFinal.id : null, qNodeFinal ? qNodeFinal.id : null, lcaNode ? lcaNode.id : null)}
+                                <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 8px;">
+                                        LCA(${this.state.p}, ${this.state.q}) = ${finalStep.vars.lca}
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                                        <span style="color: var(--warning);">●</span> Target nodes (p=${this.state.p}, q=${this.state.q})<br>
+                                        <span style="color: var(--success);">●</span> Lowest Common Ancestor
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    default:
+                        vizContent = `
+                            <div style="padding: 24px;">
+                                ${this.renderTree(this.state.root, null, null, null, null)}
+                            </div>
+                        `;
+                }
+
+                return `
+                    <div class="panel" style="width: 50%;">
+                        <div class="panel-header">Visual Explanation</div>
+                        <div class="panel-content">
+                            ${vizContent}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderIntuitionMode() {
+                return `
+                    ${this.renderIntuitionContent()}
+                    ${this.renderIntuitionViz()}
+                `;
+            }
+
+            render() {
+                const app = document.getElementById('app');
+                
+                const inputSection = this.state.mode === 'execution' ? `
+                    <div class="input-section">
+                        <label>Tree:</label>
+                        <input 
+                            type="text" 
+                            value="${this.state.treeArray.join(',')}"
+                            onchange="app.updateTree(this.value)"
+                            placeholder="e.g., 6,2,8,0,4,7,9,null,null,3,5"
+                        />
+                        <label>p:</label>
+                        <input 
+                            type="number" 
+                            value="${this.state.p}"
+                            onchange="app.updateP(parseInt(this.value))"
+                            style="width: 80px;"
+                        />
+                        <label>q:</label>
+                        <input 
+                            type="number" 
+                            value="${this.state.q}"
+                            onchange="app.updateQ(parseInt(this.value))"
+                            style="width: 80px;"
+                        />
+                        <button class="run-btn" onclick="app.runSimulation()">▶ Run</button>
+                    </div>
+                ` : '';
+
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="header-top">
+                            <h1>${this.problemNumber}. ${this.problemTitle}</h1>
+                            <button class="theme-toggle" onclick="app.toggleTheme()">
+                                ${this.state.theme === 'dark' ? '☀️ Light' : '🌙 Dark'} Mode
+                            </button>
+                        </div>
+                        
+                        <div class="mode-toggle">
+                            <button 
+                                class="mode-btn ${this.state.mode === 'intuition' ? 'active' : ''}" 
+                                onclick="app.toggleMode('intuition')">
+                                💡 Intuition & Thought Process
+                            </button>
+                            <button 
+                                class="mode-btn ${this.state.mode === 'execution' ? 'active' : ''}" 
+                                onclick="app.toggleMode('execution')">
+                                ▶️ Step-by-Step Execution
+                            </button>
+                        </div>
+                        
+                        ${inputSection}
+                    </div>
+                    
+                    <div class="main-content">
+                        ${this.state.mode === 'execution' ? this.renderExecutionMode() : this.renderIntuitionMode()}
+                    </div>
+                `;
+            }
+
+            updateTree(value) {
+                const arr = value.split(',').map(v => {
+                    const trimmed = v.trim();
+                    return trimmed === 'null' ? null : parseInt(trimmed);
+                });
+                this.state.treeArray = arr;
+                this.buildTree();
+            }
+
+            updateP(value) {
+                this.state.p = value;
+            }
+
+            updateQ(value) {
+                this.state.q = value;
+            }
+        }
+
+        // Initialize app
+        const app = new LCAVisualizer();
+    </script>
+</body>
+</html>
