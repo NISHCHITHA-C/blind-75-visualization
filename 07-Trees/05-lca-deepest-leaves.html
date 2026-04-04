@@ -214,9 +214,10 @@
         .code-panel {
             font-family: var(--font-mono);
             font-size: 14px;
-            line-height: 0.4;
+            line-height: 0;
             background: var(--code-bg);
             color: var(--text-primary);
+            overflow-x: auto;
         }
 
         .code-panel pre {
@@ -227,8 +228,8 @@
         .code-line {
             display: flex;
             align-items: center;
-            padding: 3px 0;
-            min-height: 23px;
+            padding: 0;
+            min-height: 20px;
             transition: background 0.2s ease;
         }
 
@@ -250,6 +251,8 @@
             flex: 1;
             white-space: pre;
             color: inherit;
+            display: inline-block;
+            line-height: 1.4;
         }
 
         /* Syntax highlighting */
@@ -1164,43 +1167,54 @@ Key Interview Talking Points:
             }
 
             highlightPythonLine(line) {
-                const div = document.createElement('div');
-                div.textContent = line;
-                let escaped = div.innerHTML;
-
-                if (!escaped.trim() || escaped.trim().length < 2) {
-                    return escaped || '&nbsp;';
+                if (!line || line.trim() === '') {
+                    return '&nbsp;';
                 }
-
-                // Comments
-                escaped = escaped.replace(/(#.*$)/g, '<span class="comment">$1</span>');
-
-                // Strings
-                escaped = escaped.replace(/(&quot;(?:[^&]|&(?!quot;))*&quot;)/g, '<span class="string">$1</span>');
-                escaped = escaped.replace(/(&#39;(?:[^&]|&(?!#39;))*&#39;)/g, '<span class="string">$1</span>');
-
+                
+                // First, escape HTML
+                let code = line
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+                
+                // Comments - must be first
+                if (code.trim().startsWith('#')) {
+                    return `<span class="comment">${code}</span>`;
+                }
+                
+                // Docstrings
+                if (code.trim().startsWith('&quot;&quot;&quot;') || code.trim().startsWith('&#39;&#39;&#39;')) {
+                    return `<span class="string">${code}</span>`;
+                }
+                
                 // Keywords
                 const keywords = ['class', 'def', 'return', 'if', 'elif', 'else', 'while', 'for', 
-                                'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None'];
+                                'import', 'from', 'in', 'and', 'or', 'not', 'True', 'False', 'None', 'self'];
                 keywords.forEach(kw => {
                     const regex = new RegExp(`\\b(${kw})\\b`, 'g');
-                    escaped = escaped.replace(regex, '<span class="keyword">$1</span>');
+                    code = code.replace(regex, '<span class="keyword">$1</span>');
                 });
-
+                
                 // Types
                 const types = ['TreeNode', 'Optional', 'List', 'Dict', 'int', 'str', 'bool'];
                 types.forEach(type => {
                     const regex = new RegExp(`\\b(${type})\\b`, 'g');
-                    escaped = escaped.replace(regex, '<span class="type">$1</span>');
+                    code = code.replace(regex, '<span class="type">$1</span>');
                 });
-
-                // Function names
-                escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="function">$1</span>');
-
+                
+                // Function names (word followed by opening paren)
+                code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="function">$1</span>');
+                
+                // Strings (after keywords to avoid conflicts)
+                code = code.replace(/(&quot;.*?&quot;)/g, '<span class="string">$1</span>');
+                code = code.replace(/(&#39;.*?&#39;)/g, '<span class="string">$1</span>');
+                
                 // Numbers
-                escaped = escaped.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
-
-                return escaped;
+                code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+                
+                return code;
             }
 
             renderCodePanel() {
@@ -1223,7 +1237,7 @@ Key Interview Talking Points:
                     <div class="panel" style="width: 30%">
                         <div class="panel-header">Solution Code</div>
                         <div class="panel-content code-panel">
-                            <pre>${linesHTML}</pre>
+                            <pre style="margin: 0; padding: 16px;">${linesHTML}</pre>
                         </div>
                     </div>
                 `;
@@ -1812,7 +1826,7 @@ Key Interview Talking Points:
                     </div>
                 ` : '';
 
-                app.innerHTML = `
+                const content = `
                     <div class="header">
                         <div class="header-top">
                             <h1>${this.problemNumber}. ${this.problemTitle}</h1>
@@ -1841,6 +1855,8 @@ Key Interview Talking Points:
                         ${this.state.mode === 'execution' ? this.renderExecutionMode() : this.renderIntuitionMode()}
                     </div>
                 `;
+                
+                app.innerHTML = content;
             }
 
             updateTree(value) {
