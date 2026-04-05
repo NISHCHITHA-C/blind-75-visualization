@@ -1,419 +1,1243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>39. Combination Sum</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<title>39. Combination Sum - Visualizer</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
-  --curr:#3b82f6;--valid:#10b981;--backtrack:#ef4444;--explore:#a78bfa;
-  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
-}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+  :root {
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-tertiary: #0d1117;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: #374151;
+    --accent: #60a5fa;
+    --accent2: #a78bfa;
+    --highlight-line: rgba(251,191,36,0.13);
+    --highlight-border: #fbbf24;
+    --font-mono: 'Consolas','Monaco','Courier New',monospace;
+    --node-default: #374151;
+    --node-active: #3b82f6;
+    --node-found: #10b981;
+    --node-pruned: #ef4444;
+    --syn-keyword: #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-number: #bd93f9;
+    --syn-type: #8be9fd;
+    --syn-decorator: #ffb86c;
+    --syn-op: #ff79c6;
+  }
+  [data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-tertiary: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border: #d1d5db;
+    --accent: #3b82f6;
+    --accent2: #7c3aed;
+    --highlight-line: rgba(251,191,36,0.22);
+    --highlight-border: #f59e0b;
+    --node-default: #d1d5db;
+    --node-active: #3b82f6;
+    --node-found: #10b981;
+    --node-pruned: #ef4444;
+    --syn-keyword: #d73a49;
+    --syn-function: #22863a;
+    --syn-string: #032f62;
+    --syn-comment: #6a737d;
+    --syn-number: #6f42c1;
+    --syn-type: #0070c1;
+    --syn-decorator: #e36209;
+    --syn-op: #d73a49;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  body { background: var(--bg-secondary); color: var(--text-primary); display: flex; flex-direction: column; }
 
-header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
-.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
-.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:150px;}
-.inp:focus{border-color:#3b82f6;}
-.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
-.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+  /* ── HEADER ── */
+  #header {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .header-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .problem-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .problem-title span { color: var(--accent); }
+  .header-btns { display: flex; gap: 8px; }
+  .btn { border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary);
+    padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-main{display:grid;grid-template-columns:330px 1fr 260px;flex:1;overflow:hidden;}
+  .mode-toggle { display: flex; gap: 6px; margin-bottom: 8px; }
+  .mode-btn { flex: 1; padding: 7px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; font-size: 13px;
+    font-weight: 600; transition: all 0.2s; }
+  .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .mode-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
 
-.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
-.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
-.cl.active{background:rgba(59,130,246,.1);}
-.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
-.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
-.cl.active .ln{color:#3b82f6;}
-.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
-.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+  .input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .input-row label { font-size: 12px; color: var(--text-secondary); }
+  .input-row input { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
+    padding: 5px 10px; border-radius: 5px; font-family: var(--font-mono); font-size: 12px; width: 160px; }
+  .input-row input:focus { outline: none; border-color: var(--accent); }
 
-.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.stats{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:20px;}
-.stat{display:flex;flex-direction:column;}
-.stat-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--curr);}
+  /* ── MAIN ── */
+  #main { flex: 1; display: flex; overflow: hidden; position: relative; }
 
-.tree-viz{flex:1;overflow:auto;padding:20px;}
-.recursion-tree{min-height:300px;position:relative;}
+  /* ── PANELS ── */
+  .panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); background: var(--bg-primary); }
+  .panel:last-child { border-right: none; }
+  .panel-header { padding: 8px 12px; font-size: 12px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
+  .panel-body { flex: 1; overflow: auto; }
 
-.tree-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
-.node-box{min-width:80px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .3s;}
-.node-path{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text);}
-.node-sum{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);}
-.tree-node.active .node-box{border-color:var(--curr);box-shadow:0 0 14px rgba(59,130,246,.3);}
-.tree-node.valid .node-box{border-color:var(--valid);background:rgba(16,185,129,.08);box-shadow:0 0 14px rgba(16,185,129,.3);}
-.tree-node.backtrack .node-box{border-color:var(--backtrack);background:rgba(239,68,68,.06);}
+  /* Divider */
+  .divider { width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0;
+    transition: background 0.15s; position: relative; z-index: 5; }
+  .divider:hover { background: var(--accent); }
 
-.tree-edge{position:absolute;stroke:var(--border);stroke-width:2;fill:none;transition:all .3s;}
-.tree-edge.active{stroke:var(--curr);stroke-width:3;}
+  /* ── CODE PANEL ── */
+  #code-panel .panel-body { background: #0d1117; }
+  .code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.0; }
+  .code-line { display: flex; align-items: stretch; min-height: 20px; transition: background 0.15s; padding: 1px 0; }
+  .code-line.active-line { background: var(--highlight-line); border-left: 3px solid var(--highlight-border); }
+  .code-line:not(.active-line) { border-left: 3px solid transparent; }
+  .line-num { display: inline-block; min-width: 36px; text-align: right; padding-right: 14px;
+    color: #4b5563; user-select: none; font-size: 12px; padding-top: 1px; flex-shrink: 0; }
+  .line-code { white-space: pre; color: #d4d4d4; flex: 1; padding-right: 16px; }
+  /* Syntax tokens */
+  .tok-kw { color: var(--syn-keyword); font-weight: 600; }
+  .tok-fn { color: var(--syn-function); }
+  .tok-str { color: var(--syn-string); }
+  .tok-cmt { color: var(--syn-comment); font-style: italic; }
+  .tok-num { color: var(--syn-number); }
+  .tok-type { color: var(--syn-type); }
+  .tok-op { color: var(--syn-op); }
+  .tok-deco { color: var(--syn-decorator); }
 
-.results{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);flex-shrink:0;}
-.results-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.result-list{display:flex;flex-direction:column;gap:4px;}
-.result-item{font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:4px 8px;border-radius:4px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);color:var(--valid);}
+  /* ── VIZ PANEL ── */
+  #viz-panel { background: var(--bg-primary); }
+  #viz-panel .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+  .viz-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px;
+    background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .ctrl-btn { border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary);
+    width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; }
+  .ctrl-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .speed-select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border);
+    padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .step-counter { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 
-.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
-.decision.explore{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
-.decision.found{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--valid);}
-.decision.back{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07);color:var(--backtrack);}
+  /* Tree SVG */
+  .tree-svg { width: 100%; flex: 1; min-height: 280px; }
 
-.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
-.btn:disabled{opacity:.3;cursor:not-allowed;}
-.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
-.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.spd-wrap label{font-size:.7rem;color:var(--muted);}
-input[type=range]{accent-color:#3b82f6;width:80px;}
+  /* Result box */
+  .result-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .result-box h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .result-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--node-found); color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-family: var(--font-mono); }
+  .chip-current { background: var(--accent); color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-family: var(--font-mono); }
 
-.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
-.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
-.lc:hover{color:var(--text);}
-.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
-.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
-.le.explore{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
-.le.found{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--valid);}
-.le.back{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);color:var(--backtrack);}
-.ls{color:var(--muted);margin-right:6px;}
+  /* Progress bar */
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.2s; }
+
+  /* ── STEP LOG PANEL ── */
+  #log-panel .panel-body { padding: 12px; }
+  .log-step-desc { background: var(--bg-secondary); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px;
+    font-size: 12.5px; line-height: 1.5; border-left: 3px solid var(--accent); }
+  .vars-section { margin-bottom: 10px; }
+  .vars-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-secondary); margin-bottom: 6px; }
+  .var-row { font-family: var(--font-mono); font-size: 12px; margin: 3px 0; }
+  .var-name { color: var(--accent); }
+  .var-val { color: var(--text-primary); }
+  .history-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-secondary); margin-bottom: 6px; }
+  .history-item { padding: 5px 8px; border-radius: 5px; font-size: 11.5px; margin: 3px 0; cursor: pointer; }
+  .history-item.current { background: var(--accent); color: #fff; }
+  .history-item:not(.current) { color: var(--text-secondary); }
+  .history-item:not(.current):hover { background: var(--bg-secondary); }
+
+  /* ── INTUITION MODE ── */
+  #intuition-container { display: flex; width: 100%; height: 100%; overflow: hidden; }
+  .int-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
+  .int-panel:last-child { border-right: none; }
+  .int-panel .panel-header { padding: 10px 16px; font-size: 12px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
+  .int-panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+  .int-stage { margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;
+    transition: opacity 0.3s, box-shadow 0.3s; }
+  .int-stage.active { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+  .int-stage.past { opacity: 0.55; }
+  .int-stage.future { opacity: 0.25; }
+  .int-stage-header { padding: 10px 14px; background: var(--bg-secondary); display: flex; align-items: center; gap: 10px; }
+  .stage-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .stage-title { font-size: 13px; font-weight: 700; }
+  .int-stage-body { padding: 12px 14px; background: var(--bg-primary); font-size: 13px; line-height: 1.6; }
+  .thought-bubble { background: rgba(96,165,250,0.08); border-left: 3px solid var(--accent); padding: 8px 12px;
+    font-style: italic; border-radius: 0 6px 6px 0; margin-bottom: 10px; font-size: 13px; color: var(--text-secondary); }
+  .key-insight { background: rgba(16,185,129,0.08); border-left: 3px solid #10b981; padding: 8px 12px;
+    border-radius: 0 6px 6px 0; margin-top: 10px; font-size: 12.5px; }
+  .key-insight strong { color: #10b981; }
+  .int-content { color: var(--text-secondary); font-size: 12.5px; line-height: 1.7; white-space: pre-line; }
+
+  .int-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px 16px;
+    border-top: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; }
+
+  /* Intuition Viz */
+  .int-viz-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .viz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  .viz-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--accent); }
+  .approach-box { border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; font-size: 12.5px; line-height: 1.6; }
+  .approach-good { background: rgba(16,185,129,0.1); border-left: 4px solid #10b981; }
+  .approach-bad { background: rgba(239,68,68,0.1); border-left: 4px solid #ef4444; }
+  .approach-box strong { display: block; margin-bottom: 4px; }
+  .approach-good strong { color: #10b981; }
+  .approach-bad strong { color: #ef4444; }
+  .complexity-row { display: flex; gap: 12px; margin-top: 8px; }
+  .complexity-pill { flex: 1; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px; text-align: center; }
+  .complexity-pill .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; }
+  .complexity-pill .value { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent2); }
+  .tree-demo svg { width: 100%; }
+  .candidates-strip { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cand-pill { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 12px; font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .cand-pill.target { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pruning-demo { font-family: var(--font-mono); font-size: 12.5px; line-height: 2; color: var(--text-secondary); }
+  .pruning-demo .prune { color: var(--node-pruned); text-decoration: line-through; }
+  .pruning-demo .keep { color: var(--node-found); font-weight: 600; }
+
+  /* Step progress indicator */
+  .step-dots { display: flex; gap: 5px; justify-content: center; padding: 6px 0; flex-wrap: wrap; }
+  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.2s; }
+  .step-dot.done { background: var(--accent); }
+  .step-dot.current { background: var(--highlight-border); width: 12px; border-radius: 4px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 </style>
 </head>
-<body>
-<header>
-  <div class="h-num">39</div>
-  <div class="h-title">Combination Sum</div>
-  <div class="h-badge">MEDIUM</div>
-  <div class="h-right">
-    <input id="candInput" class="inp" placeholder="e.g., 2,3,6,7"/>
-    <input id="targetInput" class="inp" placeholder="target = 7" style="width:100px;"/>
-    <button class="btn btn-p" onclick="init()">Reset</button>
-  </div>
-</header>
+<body data-theme="dark">
 
-<main>
-  <div class="code-panel">
-    <div class="plabel">Backtracking Algorithm</div>
-    <div class="code-scroll" id="codePanel"></div>
+<div id="header">
+  <div class="header-row1">
+    <div class="problem-title"><span>39.</span> Combination Sum</div>
+    <div class="header-btns">
+      <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Light</button>
+    </div>
   </div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mode-intuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
+    <button class="mode-btn" id="mode-execution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
+  </div>
+  <div class="input-row" id="exec-input-row" style="display:none">
+    <label>candidates:</label>
+    <input id="inp-candidates" value="[2,3,6,7]" />
+    <label>target:</label>
+    <input id="inp-target" value="7" style="width:70px" />
+    <button class="btn" onclick="runWithInput()">▶ Run</button>
+  </div>
+</div>
 
-  <div class="viz-panel">
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Combinations Found</div>
-        <div class="stat-val" id="combCount" style="color:var(--valid);">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Target Sum</div>
-        <div class="stat-val" id="targetVal">7</div>
-      </div>
-    </div>
-    
-    <div class="tree-viz">
-      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
-      <div id="treeCanvas" class="recursion-tree"></div>
-    </div>
-    
-    <div class="results" id="resultsBox">
-      <div class="results-title">Valid Combinations</div>
-      <div class="result-list" id="resultList"></div>
-    </div>
-    
-    <div id="decision" class="decision">Exploring combinations...</div>
-    
-    <div class="bot">
-      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
-      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
-      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
-      <span class="step-info" id="stepInfo">0 / 0</span>
-      <div class="spd-wrap">
-        <label>Speed:</label>
-        <input type="range" id="speedSlider" min="200" max="1400" value="700"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="log-panel">
-    <div class="plabel">
-      Backtracking Log
-      <button class="lc" onclick="clearLog()">Clear</button>
-    </div>
-    <div class="log-scroll" id="logScroll"></div>
-  </div>
-</main>
+<div id="main"></div>
 
 <script>
-const code=[
-  {t:'def combinationSum(candidates, target):',cm:true},
-  {t:'    result = []',ln:1},
-  {t:'    ',ln:2},
-  {t:'    def backtrack(start, path, total):',ln:3},
-  {t:'        if total == target:',ln:4},
-  {t:'            result.append(path[:])  # Found!',ln:5},
-  {t:'            return',ln:6},
-  {t:'        if total > target:',ln:7},
-  {t:'            return  # Exceeded target',ln:8},
-  {t:'        ',ln:9},
-  {t:'        for i in range(start, len(candidates)):',ln:10},
-  {t:'            path.append(candidates[i])',ln:11},
-  {t:'            backtrack(i, path, total + candidates[i])',ln:12},
-  {t:'            path.pop()  # Backtrack',ln:13},
-  {t:'    ',ln:14},
-  {t:'    backtrack(0, [], 0)',ln:15},
-  {t:'    return result',ln:16}
-];
+/* ═══════════════════════════════════════════════════
+   SYNTAX HIGHLIGHTER
+═══════════════════════════════════════════════════ */
+function highlightPython(line) {
+  // Use DOM for safe escaping
+  const tmp = document.createElement('div');
+  tmp.textContent = line;
+  let safe = tmp.innerHTML;
 
-let candidates,target,steps=[],cursor=0,playing=false,playTimer;
+  // Comments (process first)
+  if (safe.trim().startsWith('#')) {
+    return `<span class="tok-cmt">${safe}</span>`;
+  }
 
-function buildCode(){
-  const panel=document.getElementById('codePanel');
-  code.forEach((c,i)=>{
-    const line=document.createElement('div');
-    line.className='cl';
-    line.id=`line${c.ln||i}`;
-    const ln=document.createElement('div');ln.className='ln';
-    ln.textContent=c.ln!==undefined?c.ln:'';
-    const ct=document.createElement('div');ct.className='ct';
-    if(c.cm){
-      ct.innerHTML=`<span class="cm">${c.t}</span>`;
-    }else{
-      ct.innerHTML=c.t
-        .replace(/(def|if|for|in|return|range|len)/g,'<span class="kw">$1</span>')
-        .replace(/(combinationSum|backtrack|append|pop)/g,'<span class="fn">$1</span>')
-        .replace(/(candidates|target|result|start|path|total|i)/g,'<span class="nm">$1</span>');
-    }
-    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  // Strings (triple then single/double)
+  safe = safe.replace(/&quot;&quot;&quot;([\s\S]*?)&quot;&quot;&quot;/g, m => `<span class="tok-str">${m}</span>`);
+  safe = safe.replace(/&#39;&#39;&#39;([\s\S]*?)&#39;&#39;&#39;/g, m => `<span class="tok-str">${m}</span>`);
+  safe = safe.replace(/((?:&quot;|&#39;)(?:(?!(?:&quot;|&#39;)).)*(?:&quot;|&#39;))/g, m => `<span class="tok-str">${m}</span>`);
+
+  // Inline comments
+  safe = safe.replace(/(#[^<]*)$/, m => `<span class="tok-cmt">${m}</span>`);
+
+  // Type annotations
+  safe = safe.replace(/\b(List|Optional|Dict|Tuple|Set|int|str|bool|float|None)\b/g, '<span class="tok-type">$1</span>');
+
+  // Keywords
+  const kws = ['class','def','return','if','elif','else','for','while','in','and','or','not',
+                'True','False','None','import','from','as','break','continue','pass','lambda','yield','with'];
+  kws.forEach(k => {
+    safe = safe.replace(new RegExp(`(?<![\\w\\-])${k}(?![\\w\\-])`, 'g'), `<span class="tok-kw">${k}</span>`);
   });
+
+  // Function names after def
+  safe = safe.replace(/(<span class="tok-kw">def<\/span>\s+)(\w+)/g, (_, d, fn) => `${d}<span class="tok-fn">${fn}</span>`);
+
+  // Built-in calls
+  safe = safe.replace(/\b(range|len|append|pop|copy|sort|sorted|print|enumerate|zip|map|filter|sum|min|max)\b(?=\s*\()/g,
+    '<span class="tok-fn">$1</span>');
+
+  // Numbers
+  safe = safe.replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
+
+  // Operators
+  safe = safe.replace(/\b(self)\b/g, '<span class="tok-type">self</span>');
+
+  return safe;
 }
 
-function highlight(ln){
-  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
-  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
-}
+/* ═══════════════════════════════════════════════════
+   THE SOLUTION CODE (for display)
+═══════════════════════════════════════════════════ */
+const CODE = `class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        results = []
+        candidates.sort()  # Sort to enable early termination
+        
+        def backtrack(start: int, current: List[int], remaining: int) -> None:
+            if remaining == 0:
+                results.append(current.copy())
+                return
+            
+            for i in range(start, len(candidates)):
+                candidate = candidates[i]
+                if candidate > remaining:  # Prune: sorted, so all further too large
+                    break
+                current.append(candidate)
+                backtrack(i, current, remaining - candidate)  # i allows reuse
+                current.pop()
+        
+        backtrack(0, [], target)
+        return results`;
 
-function buildSteps(cand,tar){
-  const s=[];
-  const result=[];
-  let nodeId=0;
-  const nodes=[];
-  
-  s.push({line:-1,nodes:[],activeNode:null,results:[],msg:'Starting combination search...',log:{type:'explore',text:'Begin backtracking'}});
-  
-  function backtrack(start,path,total,parentId=null,depth=0){
-    const currentId=nodeId++;
-    const node={id:currentId,path:[...path],sum:total,parentId:parentId,depth:depth,children:[]};
-    nodes.push(node);
-    
-    if(parentId!==null){
-      const parent=nodes.find(n=>n.id===parentId);
-      if(parent)parent.children.push(currentId);
-    }
-    
-    s.push({line:4,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Exploring path [${path.join(', ')}], sum=${total}`,log:{type:'explore',text:`Path: [${path.join(', ')}], sum=${total}`}});
-    
-    if(total===tar){
-      result.push([...path]);
-      s.push({line:5,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Found valid combination: [${path.join(', ')}]`,validNode:currentId,log:{type:'found',text:`Valid: [${path.join(', ')}]`}});
+const CODE_LINES = CODE.split('\n');
+
+/* ═══════════════════════════════════════════════════
+   STEP SIMULATOR
+═══════════════════════════════════════════════════ */
+let STEPS = [];
+
+function simulate(candidates, target) {
+  const steps = [];
+  const results = [];
+  const sorted = [...candidates].sort((a,b)=>a-b);
+  let stepId = 0;
+
+  function snap(line, desc, extra={}) {
+    steps.push({
+      id: stepId++,
+      line,
+      description: desc,
+      results: results.map(r=>[...r]),
+      ...extra
+    });
+  }
+
+  snap(3, `Initialize results=[], sort candidates → [${sorted.join(', ')}]`, {
+    current: [], remaining: target, start: 0,
+    vars: { candidates: JSON.stringify(sorted), results: '[]', target }
+  });
+
+  function backtrack(start, current, remaining, depth=0) {
+    snap(7, `Check: remaining == ${remaining}? ${remaining===0?'YES → found solution!':'No, keep going'}`, {
+      current: [...current], remaining, start, depth,
+      vars: { remaining, current: JSON.stringify(current), start, depth }
+    });
+
+    if (remaining === 0) {
+      results.push([...current]);
+      snap(8, `✅ Found combination! [${current.join(', ')}] → add to results`, {
+        current: [...current], remaining, start, depth, found: true,
+        vars: { 'results (updated)': JSON.stringify(results.map(r=>[...r])), combination: JSON.stringify([...current]) }
+      });
       return;
     }
-    
-    if(total>tar){
-      s.push({line:8,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Sum ${total} > target, backtracking`,backtrackNode:currentId,log:{type:'back',text:`Exceeded target, backtrack`}});
-      return;
-    }
-    
-    for(let i=start;i<cand.length;i++){
-      path.push(cand[i]);
-      s.push({line:11,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Adding ${cand[i]} to path`,log:{type:'explore',text:`Add ${cand[i]}`}});
-      
-      backtrack(i,path,total+cand[i],currentId,depth+1);
-      
-      path.pop();
-      s.push({line:13,nodes:[...nodes],activeNode:currentId,results:[...result],msg:`Backtracking, removed ${cand[i]}`,log:{type:'back',text:`Remove ${cand[i]}, backtrack`}});
+
+    for (let i = start; i < sorted.length; i++) {
+      const candidate = sorted[i];
+      snap(11, `Loop i=${i}: candidate = ${candidate}`, {
+        current: [...current], remaining, start, depth, loopI: i,
+        vars: { i, candidate, remaining, current: JSON.stringify(current) }
+      });
+
+      if (candidate > remaining) {
+        snap(12, `🔴 Prune! ${candidate} > ${remaining} → break (all further candidates also too large)`, {
+          current: [...current], remaining, start, depth, pruned: true, loopI: i,
+          vars: { candidate, remaining, action: 'BREAK - prune branch' }
+        });
+        break;
+      }
+
+      current.push(candidate);
+      snap(13, `Push ${candidate} → current = [${current.join(', ')}]`, {
+        current: [...current], remaining, start, depth, loopI: i,
+        vars: { candidate, current: JSON.stringify([...current]), remaining }
+      });
+
+      snap(14, `Recurse: backtrack(i=${i}, current=[${current.join(', ')}], remaining=${remaining-candidate})`, {
+        current: [...current], remaining: remaining - candidate, start: i, depth: depth+1, loopI: i,
+        vars: { 'new remaining': remaining-candidate, 'allow reuse?': 'Yes (i not i+1)', depth: depth+1 }
+      });
+      backtrack(i, current, remaining - candidate, depth + 1);
+
+      current.pop();
+      snap(15, `Pop → backtrack: current = [${current.join(', ')}]`, {
+        current: [...current], remaining, start, depth, loopI: i,
+        vars: { current: JSON.stringify([...current]), action: 'backtrack to try next candidate' }
+      });
     }
   }
-  
-  backtrack(0,[],0);
-  s.push({line:16,nodes:[...nodes],activeNode:null,results:[...result],msg:`Found ${result.length} valid combinations`,done:true,log:{type:'found',text:`Total: ${result.length} combinations`}});
-  
-  return s;
+
+  snap(18, `Call backtrack(start=0, current=[], remaining=${target})`, {
+    current: [], remaining: target, start: 0, depth: 0,
+    vars: { start: 0, current: '[]', remaining: target }
+  });
+  backtrack(0, [], target);
+  snap(19, `Return results: ${JSON.stringify(results)}`, {
+    current: [], remaining: 0, start: 0, depth: 0, done: true,
+    vars: { results: JSON.stringify(results), count: results.length }
+  });
+
+  return steps;
 }
 
-function layoutTree(nodes){
-  const positions=new Map();
-  const levelNodes=new Map();
-  
-  nodes.forEach(node=>{
-    if(!levelNodes.has(node.depth))levelNodes.set(node.depth,[]);
-    levelNodes.get(node.depth).push(node);
-  });
-  
-  levelNodes.forEach((nodesAtLevel,depth)=>{
-    const spacing=Math.max(100,900/Math.max(nodesAtLevel.length,1));
-    nodesAtLevel.forEach((node,i)=>{
-      positions.set(node.id,{x:i*spacing+100,y:depth*90+30});
-    });
-  });
-  
-  return positions;
-}
+/* ═══════════════════════════════════════════════════
+   BACKTRACK TREE for visualization
+═══════════════════════════════════════════════════ */
+function buildTree(candidates, target) {
+  const sorted = [...candidates].sort((a,b)=>a-b);
+  let nodeId = 0;
 
-function renderTree(st){
-  const canvas=document.getElementById('treeCanvas');
-  const svg=document.getElementById('edgeSvg');
-  canvas.innerHTML='';
-  svg.innerHTML='';
-  
-  if(!st.nodes.length)return;
-  
-  const positions=layoutTree(st.nodes);
-  
-  // Draw edges
-  st.nodes.forEach(node=>{
-    if(node.parentId!==null){
-      const parentPos=positions.get(node.parentId);
-      const nodePos=positions.get(node.id);
-      if(parentPos&&nodePos){
-        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1',parentPos.x+40);
-        line.setAttribute('y1',parentPos.y+50);
-        line.setAttribute('x2',nodePos.x+40);
-        line.setAttribute('y2',nodePos.y);
-        line.classList.add('tree-edge');
-        if(node.id===st.activeNode)line.classList.add('active');
-        svg.appendChild(line);
-      }
+  function build(start, current, remaining, depth) {
+    const id = nodeId++;
+    const node = { id, current: [...current], remaining, depth, children: [], pruned: false, found: remaining===0 };
+    if (remaining === 0) return node;
+    if (depth > 5) return node; // limit visual depth
+
+    for (let i = start; i < sorted.length; i++) {
+      const c = sorted[i];
+      if (c > remaining) { node.pruned = true; break; }
+      current.push(c);
+      node.children.push(build(i, current, remaining - c, depth + 1));
+      current.pop();
     }
+    return node;
+  }
+
+  return build(0, [], target, 0);
+}
+
+/* ═══════════════════════════════════════════════════
+   SVG TREE RENDERER
+═══════════════════════════════════════════════════ */
+function renderTreeSVG(tree, activeStep) {
+  const NODE_R = 22;
+  const H_GAP = 48;
+  const V_GAP = 62;
+
+  // Calculate subtree widths
+  function calcWidth(node) {
+    if (!node.children.length) return 1;
+    const sum = node.children.reduce((a, c) => a + calcWidth(c), 0);
+    node._width = Math.max(1, sum);
+    return node._width;
+  }
+  calcWidth(tree);
+
+  const nodes = [];
+  const edges = [];
+
+  function layout(node, cx, cy) {
+    node._x = cx;
+    node._y = cy;
+    nodes.push(node);
+
+    const totalW = (node.children.reduce((a,c)=>a+(c._width||1),0)-1) * H_GAP;
+    let ox = cx - totalW / 2;
+
+    node.children.forEach(child => {
+      const childCX = ox + ((child._width||1)-1)*H_GAP/2;
+      edges.push({ x1: cx, y1: cy, x2: childCX, y2: cy + V_GAP, found: child.found, pruned: child.pruned });
+      layout(child, childCX, cy + V_GAP);
+      ox += (child._width||1) * H_GAP;
+    });
+  }
+
+  const treeWidth = (tree._width || 1) * H_GAP;
+  const W = Math.max(500, treeWidth + 60);
+  const depths = new Set(nodes.map(n=>n.depth));
+  const H = Math.max(200, (Math.max(...[...depths])+1) * V_GAP + 60);
+
+  // Layout pass
+  layout(tree, W/2, 36);
+
+  // Find active node from step
+  let activeCurrentStr = null;
+  if (activeStep) {
+    activeCurrentStr = JSON.stringify(activeStep.current);
+  }
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:340px">`;
+  svg += `<defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <polygon points="0 0,6 3,0 6" fill="#4b5563"/>
+    </marker>
+  </defs>`;
+
+  // Edges
+  edges.forEach(e => {
+    const color = e.found ? '#10b981' : e.pruned ? '#ef4444' : '#4b5563';
+    svg += `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="${e.pruned?'4,3':'none'}" opacity="0.6"/>`;
   });
-  
-  // Draw nodes
-  st.nodes.forEach(node=>{
-    const pos=positions.get(node.id);
-    const nodeDiv=document.createElement('div');
-    nodeDiv.className='tree-node';
-    if(node.id===st.activeNode)nodeDiv.classList.add('active');
-    if(st.validNode===node.id)nodeDiv.classList.add('valid');
-    if(st.backtrackNode===node.id)nodeDiv.classList.add('backtrack');
-    nodeDiv.style.left=`${pos.x}px`;
-    nodeDiv.style.top=`${pos.y}px`;
-    
-    const box=document.createElement('div');
-    box.className='node-box';
-    
-    const pathDiv=document.createElement('div');
-    pathDiv.className='node-path';
-    pathDiv.textContent=node.path.length?`[${node.path.join(',')}]`:'[]';
-    
-    const sumDiv=document.createElement('div');
-    sumDiv.className='node-sum';
-    sumDiv.textContent=`Σ=${node.sum}`;
-    
-    box.appendChild(pathDiv);
-    box.appendChild(sumDiv);
-    nodeDiv.appendChild(box);
-    canvas.appendChild(nodeDiv);
+
+  // Nodes
+  nodes.forEach(n => {
+    const isActive = activeCurrentStr && JSON.stringify(n.current) === activeCurrentStr;
+    const fill = n.found ? '#10b981' : n.pruned ? '#991b1b' : isActive ? '#3b82f6' : '#374151';
+    const stroke = isActive ? '#fbbf24' : n.found ? '#34d399' : '#4b5563';
+    const sw = isActive ? 3 : 1.5;
+    const label = n.current.length ? `[${n.current.join(',')}]` : '[]';
+    const rem = `r=${n.remaining}`;
+
+    svg += `<g>
+      <ellipse cx="${n._x}" cy="${n._y}" rx="${NODE_R+4}" ry="${NODE_R-4}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+      <text x="${n._x}" y="${n._y-3}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-family="monospace">${label}</text>
+      <text x="${n._x}" y="${n._y+7}" text-anchor="middle" dominant-baseline="middle" fill="${n.found?'#d1fae5':'#9ca3af'}" font-size="8" font-family="monospace">${rem}</text>
+    </g>`;
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ═══════════════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════════════ */
+let state = {
+  mode: 'intuition',
+  theme: 'dark',
+  // execution
+  steps: [],
+  currentStep: 0,
+  isPlaying: false,
+  playTimer: null,
+  speed: 1,
+  candidates: [2,3,6,7],
+  target: 7,
+  tree: null,
+  // intuition
+  intuitionStage: 0,
+  intuitionPlaying: false,
+  intuitionTimer: null
+};
+
+/* ═══════════════════════════════════════════════════
+   INTUITION STAGES
+═══════════════════════════════════════════════════ */
+const INTUITION_STAGES = [
+  {
+    title: "Understanding the Problem",
+    thought: "What are we really being asked? We need ALL combinations, not just one. And we can reuse numbers!",
+    content: `Given candidates = [2,3,6,7] and target = 7, find every combination that sums to 7.
+
+Key observations:
+• Elements can be reused unlimited times
+• Each combination must be unique (order doesn't matter)
+• We want ALL valid combinations, not just the count
+• Constraints: 1 ≤ candidates.length ≤ 30, 1 ≤ target ≤ 40`,
+    insight: "This is a search problem — we need to explore all possibilities systematically without duplicates.",
+    viz: 'problem'
+  },
+  {
+    title: "Exploring Approaches",
+    thought: "Could I use DP? Maybe greedy? Or should I enumerate all subsets?",
+    content: `Approach A — Brute Force (enumerate all subsets):
+  Try every possible multiset of candidates. This explodes in complexity and is hard to avoid duplicates.
+
+Approach B — Dynamic Programming:
+  Can solve the count, but reconstructing all actual combinations is awkward and memory-heavy.
+
+Approach C — Backtracking (recursive search):
+  Build combinations incrementally. At each step, choose a candidate or stop. 
+  Backtrack when the path exceeds the target.
+
+→ Backtracking wins: it naturally generates all combinations, avoids duplicates by always moving forward (start index), and lets us prune bad branches early.`,
+    insight: "Backtracking = DFS on a decision tree. We explore, prune aggressively, and collect leaves that sum to target.",
+    viz: 'approaches'
+  },
+  {
+    title: "Avoiding Duplicates (The Start Index Trick)",
+    thought: "Wait — if I pick [2,3] and [3,2], those are the same combination! How do I avoid that?",
+    content: `The trick: always pick from index ≥ start.
+
+• When we pick candidates[i], the next recursive call uses start=i (not i+1)
+  → This allows reusing candidates[i] again (unlimited reuse)
+• But we never go back to index < i
+  → This prevents [3,2] after we've already explored starting with 2
+
+This is the elegant invariant:
+  "Within each recursive call, only consider candidates from start onwards."`,
+    insight: "start index enforces forward-only exploration — eliminating all permutation duplicates in one simple rule.",
+    viz: 'dedup'
+  },
+  {
+    title: "Pruning with Sorting",
+    thought: "Even with start index, some branches are clearly dead ends. Can I cut them early?",
+    content: `Sort the candidates array first: [2, 3, 6, 7]
+
+Then inside the loop:
+  if candidate > remaining: break  ← early termination!
+
+Why does this work?
+  • Because the array is sorted, if candidates[i] > remaining,
+    then candidates[i+1], candidates[i+2], ... are ALL also > remaining
+  • So we can break the entire loop (not just continue)
+  • This prunes entire subtrees without exploring them`,
+    insight: "Sorting turns a linear scan with continue into a break — eliminating all right-siblings in one shot.",
+    viz: 'pruning'
+  },
+  {
+    title: "Writing the Backtracking Code",
+    thought: "OK, I have the mental model. Now let me structure the code. Closure for backtrack, outer results list...",
+    content: `Structure:
+  1. Sort candidates (enables pruning)
+  2. results = [] (collect solutions)
+  3. backtrack(start, current, remaining):
+       Base case: remaining == 0 → append copy
+       For each i from start to end:
+         Prune: if candidate > remaining → break
+         Choose: current.append(candidate)
+         Recurse: backtrack(i, current, remaining-candidate)  ← i not i+1!
+         Unchoose: current.pop()
+  4. Call backtrack(0, [], target)
+
+The choose → recurse → unchoose pattern is the heartbeat of backtracking.`,
+    insight: "current.pop() is the 'undo' — it restores state before trying the next branch. This is backtracking.",
+    viz: 'code_flow'
+  },
+  {
+    title: "Complexity Analysis",
+    thought: "Is this optimal? What's the worst case? Let me think about the recursion tree...",
+    content: `Time Complexity: O(N^(T/M) + N) where:
+  N = number of candidates
+  T = target value  
+  M = smallest candidate value
+  The recursion tree has at most T/M depth and N branches at each level.
+
+Space Complexity: O(T/M)
+  Maximum recursion depth = target / min_candidate
+  current array size at most T/M
+
+Example: candidates=[2,3,6,7], target=7
+  Max depth = 7/2 ≈ 3-4 levels
+  Pruning cuts most branches early (sorted array)`,
+    insight: "Pruning makes this very efficient in practice. The sort ensures we fail fast on impossible branches.",
+    viz: 'complexity'
+  },
+  {
+    title: "Edge Cases & Final Synthesis",
+    thought: "What could trip this up? Empty candidates? Target smaller than all candidates? Let's verify...",
+    content: `Edge cases handled automatically:
+  • No valid combination: results stays [] → return []
+  • Single candidate equals target: [7] found immediately
+  • All candidates > target: pruned at first loop iteration
+  • Large target: depth limited by pruning + T/M bound
+
+Final mental model:
+  Imagine a tree where each path from root to leaf is a candidate sequence.
+  We prune right-subtrees when the current candidate is already too large.
+  We collect leaves where remaining == 0.
+  The start index prevents revisiting earlier choices.`,
+    insight: "This solution demonstrates mastery of backtracking: decision trees, pruning, state restoration, and duplicate avoidance.",
+    viz: 'final'
+  }
+];
+
+/* ═══════════════════════════════════════════════════
+   RENDER ENGINE
+═══════════════════════════════════════════════════ */
+function render() {
+  const main = document.getElementById('main');
+  if (state.mode === 'intuition') {
+    document.getElementById('exec-input-row').style.display = 'none';
+    main.innerHTML = renderIntuition();
+  } else {
+    document.getElementById('exec-input-row').style.display = 'flex';
+    main.innerHTML = renderExecution();
+    setupDividers();
+    scrollLogToStep();
+  }
+}
+
+/* ─── EXECUTION MODE ─── */
+function renderExecution() {
+  const step = state.steps[state.currentStep] || {};
+  const progress = state.steps.length > 1 ? (state.currentStep / (state.steps.length - 1)) * 100 : 0;
+  const treeSVG = state.tree ? renderTreeSVG(state.tree, step) : '';
+
+  return `
+  <div class="panel" id="code-panel" style="width:${state.pw[0]}%">
+    <div class="panel-header">Code<span style="color:var(--accent);margin-left:6px">Python</span></div>
+    <div class="panel-body">
+      <pre class="code-pre">${CODE_LINES.map((line,i)=>`<div class="code-line${step.line===i?'':''}" id="cl${i}" style="display:flex;align-items:stretch;min-height:20px;padding:1px 0;background:${step.line===i?'var(--highlight-line)':'transparent'};border-left:${step.line===i?'3px solid var(--highlight-border)':'3px solid transparent'}"><span class="line-num">${i+1}</span><span class="line-code">${highlightPython(line)||'&nbsp;'}</span></div>`).join('')}</pre>
+    </div>
+  </div>
+  <div class="divider" id="div1"></div>
+  <div class="panel" id="viz-panel" style="width:${state.pw[1]}%">
+    <div class="panel-header">
+      <span>Decision Tree Visualization</span>
+      <span style="font-size:11px;color:var(--text-secondary)">
+        🟢 found &nbsp; 🔴 pruned &nbsp; 🔵 active
+      </span>
+    </div>
+    <div class="panel-body">
+      <div class="result-box">
+        <h4>Results found so far</h4>
+        <div class="result-chips" id="result-chips">
+          ${(step.results||[]).map(r=>`<span class="chip">[${r.join(',')}]</span>`).join('')}
+          ${step.current && step.current.length && !step.found ? `<span class="chip-current">→ [${step.current.join(',')}] (r=${step.remaining??'?'})</span>` : ''}
+          ${!(step.results||[]).length && !(step.current&&step.current.length) ? '<span style="color:var(--text-secondary);font-size:12px">None yet...</span>' : ''}
+        </div>
+      </div>
+      <div class="tree-demo" style="overflow-x:auto">
+        ${treeSVG}
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    </div>
+    <div class="viz-controls">
+      <button class="ctrl-btn" title="Reset" onclick="resetStep()">⏮</button>
+      <button class="ctrl-btn" title="Step Back" onclick="stepBack()" ${state.currentStep<=0?'disabled':''}>◀</button>
+      <button class="ctrl-btn" title="${state.isPlaying?'Pause':'Play'}" onclick="togglePlay()" id="play-btn">${state.isPlaying?'⏸':'▶'}</button>
+      <button class="ctrl-btn" title="Step Forward" onclick="stepFwd()" ${state.currentStep>=state.steps.length-1?'disabled':''}>▶</button>
+      <button class="ctrl-btn" title="Skip to End" onclick="skipEnd()">⏭</button>
+      <select class="speed-select" onchange="setSpeed(this.value)">
+        <option value="0.5" ${state.speed===0.5?'selected':''}>0.5×</option>
+        <option value="1" ${state.speed===1?'selected':''}>1×</option>
+        <option value="2" ${state.speed===2?'selected':''}>2×</option>
+        <option value="4" ${state.speed===4?'selected':''}>4×</option>
+      </select>
+      <span class="step-counter">${state.currentStep+1} / ${state.steps.length}</span>
+    </div>
+  </div>
+  <div class="divider" id="div2"></div>
+  <div class="panel" id="log-panel" style="width:${state.pw[2]}%">
+    <div class="panel-header">Step Log</div>
+    <div class="panel-body" id="log-body">
+      <div class="log-step-desc">${step.description||'—'}</div>
+      <div class="vars-section">
+        <h4>Variables</h4>
+        ${Object.entries(step.vars||{}).map(([k,v])=>`<div class="var-row"><span class="var-name">${k}</span><span class="var-val">: ${v}</span></div>`).join('')}
+      </div>
+      <div class="history-section">
+        <h4>History</h4>
+        ${state.steps.slice(0, state.currentStep+1).map((s,i)=>`<div class="history-item ${i===state.currentStep?'current':''}" onclick="gotoStep(${i})">${i+1}. ${s.description}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── INTUITION MODE ─── */
+function renderIntuition() {
+  const stage = INTUITION_STAGES[state.intuitionStage];
+
+  const stagesHTML = INTUITION_STAGES.map((s, i) => {
+    const cls = i === state.intuitionStage ? 'active' : i < state.intuitionStage ? 'past' : 'future';
+    return `<div class="int-stage ${cls}" id="istage${i}">
+      <div class="int-stage-header">
+        <div class="stage-num">${i+1}</div>
+        <div class="stage-title">${s.title}</div>
+      </div>
+      ${cls !== 'future' ? `<div class="int-stage-body">
+        <div class="thought-bubble">💭 "${s.thought}"</div>
+        <div class="int-content">${s.content}</div>
+        <div class="key-insight"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  return `<div id="intuition-container">
+    <div class="int-panel" style="flex:1">
+      <div class="panel-header">Senior Engineer's Thought Process <span style="float:right">Stage ${state.intuitionStage+1} / ${INTUITION_STAGES.length}</span></div>
+      <div class="int-panel-body" id="int-stages-body">${stagesHTML}</div>
+      <div class="int-controls">
+        <button class="btn" onclick="prevStage()" ${state.intuitionStage<=0?'disabled':''}>← Prev</button>
+        <button class="btn ${state.intuitionPlaying?'active':''}" onclick="toggleIntuitionPlay()">${state.intuitionPlaying?'⏸ Pause':'▶ Auto'}</button>
+        <button class="btn" onclick="nextStage()" ${state.intuitionStage>=INTUITION_STAGES.length-1?'disabled':''}>Next →</button>
+        <div class="step-dots">${INTUITION_STAGES.map((_,i)=>`<div class="step-dot ${i<state.intuitionStage?'done':i===state.intuitionStage?'current':''}"></div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="int-panel" style="flex:1">
+      <div class="panel-header">Visual Explanation</div>
+      <div class="int-viz-body">${renderIntuitionViz(stage)}</div>
+    </div>
+  </div>`;
+}
+
+function renderIntuitionViz(stage) {
+  switch(stage.viz) {
+    case 'problem': return `
+      <div class="viz-card">
+        <h3>Example Input</h3>
+        <div style="margin-bottom:10px;font-size:12.5px;color:var(--text-secondary)">candidates =</div>
+        <div class="candidates-strip" style="margin-bottom:14px">
+          ${[2,3,6,7].map(c=>`<div class="cand-pill">${c}</div>`).join('')}
+        </div>
+        <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:6px">target =</div>
+        <div class="cand-pill target" style="display:inline-block">7</div>
+      </div>
+      <div class="viz-card">
+        <h3>Valid Combinations</h3>
+        <div class="result-chips">
+          <span class="chip">[2,2,3]</span>
+          <span class="chip">[7]</span>
+        </div>
+        <div style="color:var(--text-secondary);font-size:12px;margin-top:8px">2+2+3=7 ✓ &nbsp;&nbsp; 7=7 ✓</div>
+      </div>
+      <div class="viz-card">
+        <h3>Key Constraints</h3>
+        <div style="font-size:12.5px;color:var(--text-secondary);line-height:2">
+          ♻️ Unlimited reuse of each number<br>
+          📋 Each combination counted once<br>
+          🎯 Must sum to exactly target<br>
+          📦 Return ALL valid combinations
+        </div>
+      </div>`;
+
+    case 'approaches': return `
+      <div class="viz-card">
+        <h3>Approach Comparison</h3>
+        <div class="approach-box approach-bad">
+          <strong>❌ Brute Force — enumerate all multisets</strong>
+          Time: exponential, deduplication is hard
+        </div>
+        <div class="approach-box approach-bad">
+          <strong>❌ Dynamic Programming</strong>
+          Works for count, but reconstructing paths is messy
+        </div>
+        <div class="approach-box approach-good">
+          <strong>✅ Backtracking — DFS on decision tree</strong>
+          Time: O(N^(T/M)), Space: O(T/M)<br>
+          Natural pruning, elegant duplicate avoidance
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Decision Tree (abbreviated)</h3>
+        <svg viewBox="0 0 320 160" style="width:100%" xmlns="http://www.w3.org/2000/svg">
+          <!-- Root -->
+          <ellipse cx="160" cy="20" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="160" y="21" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[] r=7</text>
+          <!-- Level 1 -->
+          <line x1="160" y1="34" x2="80" y2="70" stroke="#4b5563" stroke-width="1.2"/>
+          <line x1="160" y1="34" x2="160" y2="70" stroke="#4b5563" stroke-width="1.2"/>
+          <line x1="160" y1="34" x2="240" y2="70" stroke="#4b5563" stroke-width="1.2"/>
+          <ellipse cx="80" cy="80" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="80" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[2] r=5</text>
+          <ellipse cx="160" cy="80" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="160" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[3] r=4</text>
+          <ellipse cx="240" cy="80" rx="28" ry="14" fill="#374151" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="240" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[7] r=0</text>
+          <!-- [7] found -->
+          <text x="240" y="104" text-anchor="middle" fill="#10b981" font-size="9">✅</text>
+          <!-- Level 2 from [2] -->
+          <line x1="80" y1="94" x2="50" y2="126" stroke="#4b5563" stroke-width="1.2"/>
+          <line x1="80" y1="94" x2="90" y2="126" stroke="#4b5563" stroke-width="1.2"/>
+          <ellipse cx="50" cy="136" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="50" y="137" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace">[2,2]r=3</text>
+          <ellipse cx="110" cy="136" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="110" y="137" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace">[2,3]r=2</text>
+          <line x1="80" y1="94" x2="110" y2="126" stroke="#4b5563" stroke-width="1.2"/>
+          <text x="280" y="140" text-anchor="middle" fill="#6272a4" font-size="9" font-style="italic">... and so on</text>
+        </svg>
+      </div>`;
+
+    case 'dedup': return `
+      <div class="viz-card">
+        <h3>Without Start Index — Duplicates!</h3>
+        <div style="font-size:12.5px;color:var(--text-secondary);line-height:2">
+          Pick 2 → then 3 → [2, 3] ✓<br>
+          Pick 3 → then 2 → [3, 2] ✗ (same!)<br>
+          <span style="color:#ef4444">→ We'd generate each combo multiple times</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>With Start Index — No Duplicates</h3>
+        <div style="font-size:12.5px;color:var(--text-secondary);line-height:2">
+          backtrack(start=<span style="color:#60a5fa">0</span>, ...)<br>
+          &nbsp;&nbsp;pick 2 (i=0) → backtrack(start=<span style="color:#10b981">0</span>, ...) ← reuse allowed<br>
+          &nbsp;&nbsp;pick 3 (i=1) → backtrack(start=<span style="color:#10b981">1</span>, ...) ← can't go back to 2<br>
+          &nbsp;&nbsp;pick 6 (i=2) → backtrack(start=<span style="color:#10b981">2</span>, ...)<br>
+          <span style="color:#10b981">→ [3,2] is impossible: once we start at i=1, i=0 is gone</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>The i vs i+1 Choice</h3>
+        <div class="approach-box approach-good">
+          <strong>backtrack(i, ...)</strong> — use i (allow reuse of current element)
+        </div>
+        <div class="approach-box approach-bad">
+          <strong>backtrack(i+1, ...)</strong> — would prevent reuse (wrong for this problem)
+        </div>
+      </div>`;
+
+    case 'pruning': return `
+      <div class="viz-card">
+        <h3>Without Sorting — Must Check All</h3>
+        <div class="pruning-demo">
+          candidates = [3, 7, 2, 6], target = 5<br>
+          i=0: 3 ≤ 5 ✓ recurse<br>
+          i=1: 7 > 5 → <span class="keep">continue</span> (check next!)<br>
+          i=2: 2 ≤ 5 ✓ recurse<br>
+          i=3: 6 > 5 → continue<br>
+          <span style="color:#ef4444">Must check every element even if too large</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>With Sorting — Break Early</h3>
+        <div class="pruning-demo">
+          candidates = [2, 3, 6, 7], target = 5<br>
+          i=0: 2 ≤ 5 ✓ recurse<br>
+          i=1: 3 ≤ 5 ✓ recurse<br>
+          i=2: 6 > 5 → <span class="keep">BREAK</span> (7 is also > 5, skip!)<br>
+          <span style="color:#10b981">Entire right portion pruned in one step</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Impact: Pruned Subtrees</h3>
+        <svg viewBox="0 0 300 100" style="width:100%" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="150" cy="20" rx="32" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="150" y="21" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[] r=5</text>
+          <line x1="150" y1="34" x2="60" y2="70" stroke="#10b981" stroke-width="1.5"/>
+          <line x1="150" y1="34" x2="140" y2="70" stroke="#10b981" stroke-width="1.5"/>
+          <line x1="150" y1="34" x2="230" y2="70" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="150" y1="34" x2="280" y2="70" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <ellipse cx="60" cy="80" rx="22" ry="12" fill="#374151" stroke="#10b981" stroke-width="1.5"/>
+          <text x="60" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">2✓</text>
+          <ellipse cx="140" cy="80" rx="22" ry="12" fill="#374151" stroke="#10b981" stroke-width="1.5"/>
+          <text x="140" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">3✓</text>
+          <ellipse cx="230" cy="80" rx="22" ry="12" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="230" y="81" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">6✗</text>
+          <ellipse cx="280" cy="80" rx="22" ry="12" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="280" y="81" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">7✗</text>
+          <text x="255" y="100" text-anchor="middle" fill="#ef4444" font-size="8">PRUNED by sort+break</text>
+        </svg>
+      </div>`;
+
+    case 'code_flow': return `
+      <div class="viz-card">
+        <h3>Choose → Recurse → Unchoose</h3>
+        <div style="font-family:var(--font-mono);font-size:12.5px;line-height:2;color:var(--text-secondary)">
+          <span style="color:#ff79c6">for</span> i <span style="color:#ff79c6">in</span> <span style="color:#50fa7b">range</span>(start, <span style="color:#50fa7b">len</span>(candidates)):<br>
+          &nbsp;&nbsp;<span style="color:#8be9fd">candidate</span> = candidates[i]<br>
+          &nbsp;&nbsp;<span style="color:#ff79c6">if</span> candidate &gt; remaining: <span style="color:#ff79c6">break</span><br>
+          &nbsp;&nbsp;current.<span style="color:#50fa7b">append</span>(candidate) <span style="color:#6272a4"># ← CHOOSE</span><br>
+          &nbsp;&nbsp;<span style="color:#50fa7b">backtrack</span>(i, current, remaining-candidate) <span style="color:#6272a4"># ← EXPLORE</span><br>
+          &nbsp;&nbsp;current.<span style="color:#50fa7b">pop</span>() <span style="color:#6272a4"># ← UNCHOOSE (backtrack)</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Call Stack Example</h3>
+        <div style="font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);line-height:2">
+          backtrack(0, [], 7)<br>
+          &nbsp;→ backtrack(0, [2], 5)<br>
+          &nbsp;&nbsp;→ backtrack(0, [2,2], 3)<br>
+          &nbsp;&nbsp;&nbsp;→ backtrack(0, [2,2,2], 1) ← prune 3>1, break<br>
+          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,2,3], 0) ← <span style="color:#10b981">FOUND! [2,2,3]</span><br>
+          &nbsp;&nbsp;pop 2 → try 3...<br>
+          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,3], 2) ← prune 3>2... wait 6>2, break
+        </div>
+      </div>`;
+
+    case 'complexity': return `
+      <div class="viz-card">
+        <h3>Complexity</h3>
+        <div class="complexity-row">
+          <div class="complexity-pill"><div class="label">Time</div><div class="value">O(N^(T/M))</div></div>
+          <div class="complexity-pill"><div class="label">Space</div><div class="value">O(T/M)</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:12px;line-height:1.8">
+          N = number of candidates<br>
+          T = target value<br>
+          M = minimum candidate value<br><br>
+          The recursion tree has depth ≤ T/M and branching factor ≤ N.
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Example: [2,3,6,7], target=7</h3>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:2">
+          Max depth = 7/2 = 3-4 levels<br>
+          Branching = up to 4 (candidates)<br>
+          But pruning cuts most branches!<br>
+          <span style="color:#10b981">In practice: much fewer than 4^4 = 256 nodes</span>
+        </div>
+      </div>`;
+
+    case 'final': return `
+      <div class="viz-card">
+        <h3>Complete Decision Tree for [2,3,6,7], target=7</h3>
+        ${renderTreeSVG(buildTree([2,3,6,7], 7), null)}
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:8px">
+          🟢 Green nodes = found solutions &nbsp; 🔴 Red dashes = pruned branches
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Solutions</h3>
+        <div class="result-chips">
+          <span class="chip">[2,2,3]</span>
+          <span class="chip">[7]</span>
+        </div>
+      </div>
+      <div class="viz-card">
+        <h3>Concepts Demonstrated</h3>
+        <div style="font-size:12.5px;line-height:2;color:var(--text-secondary)">
+          🔁 Backtracking (choose/recurse/unchoose)<br>
+          ✂️ Pruning (sort + break)<br>
+          🚫 Duplicate avoidance (start index)<br>
+          ♻️ Unlimited reuse (i not i+1)<br>
+          📋 Collecting all solutions (results array)
+        </div>
+      </div>`;
+
+    default: return '<div class="viz-card"><h3>Visualization</h3><div style="color:var(--text-secondary)">See left panel</div></div>';
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   PANEL RESIZING
+═══════════════════════════════════════════════════ */
+function setupDividers() {
+  ['div1','div2'].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let dragging = false;
+    el.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const main = document.getElementById('main');
+      const rect = main.getBoundingClientRect();
+      const total = rect.width;
+      const panels = main.querySelectorAll('.panel');
+      if (idx === 0) {
+        let p0 = ((e.clientX - rect.left) / total) * 100;
+        p0 = Math.max(15, Math.min(50, p0));
+        const rest = 100 - p0 - state.pw[2];
+        state.pw[0] = p0;
+        state.pw[1] = Math.max(20, rest);
+      } else {
+        let p2 = ((rect.right - e.clientX) / total) * 100;
+        p2 = Math.max(15, Math.min(40, p2));
+        const rest = 100 - state.pw[0] - p2;
+        state.pw[2] = p2;
+        state.pw[1] = Math.max(20, rest);
+      }
+      panels[0].style.width = state.pw[0]+'%';
+      panels[1].style.width = state.pw[1]+'%';
+      panels[2].style.width = state.pw[2]+'%';
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
   });
 }
 
-function renderResults(st){
-  const list=document.getElementById('resultList');
-  list.innerHTML='';
-  
-  st.results.forEach(combo=>{
-    const item=document.createElement('div');
-    item.className='result-item';
-    item.textContent=`[${combo.join(', ')}]`;
-    list.appendChild(item);
-  });
-  
-  document.getElementById('combCount').textContent=st.results.length;
+function scrollLogToStep() {
+  setTimeout(()=>{
+    const lb = document.getElementById('log-body');
+    if (!lb) return;
+    const items = lb.querySelectorAll('.history-item.current');
+    if (items.length) items[0].scrollIntoView({ block:'nearest', behavior:'smooth' });
+  }, 50);
 }
 
-function renderDecision(st){
-  const d=document.getElementById('decision');
-  d.className='decision';
-  d.textContent=st.msg;
-  if(st.activeNode!==null&&!st.validNode&&!st.backtrackNode)d.classList.add('explore');
-  if(st.validNode)d.classList.add('found');
-  if(st.backtrackNode)d.classList.add('back');
+/* ═══════════════════════════════════════════════════
+   ACTIONS
+═══════════════════════════════════════════════════ */
+function setMode(m) {
+  clearTimers();
+  state.mode = m;
+  document.getElementById('mode-intuition').classList.toggle('active', m==='intuition');
+  document.getElementById('mode-execution').classList.toggle('active', m==='execution');
+  if (m === 'execution' && !state.steps.length) {
+    runSim();
+  }
+  render();
 }
 
-function addLog(idx,log){
-  const el=document.getElementById('logScroll');
-  const d=document.createElement('div');d.className=`le ${log.type}`;
-  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', state.theme);
+  document.getElementById('theme-btn').textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
 }
 
-function clearLog(){document.getElementById('logScroll').innerHTML='';}
-
-function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
-
-function renderStep(idx){
-  const st=steps[idx];
-  highlight(st.line);
-  renderTree(st);
-  renderResults(st);
-  renderDecision(st);
-  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
-  document.getElementById('btnPrev').disabled=idx===0;
-  document.getElementById('btnNext').disabled=idx===steps.length-1;
+function runWithInput() {
+  try {
+    state.candidates = JSON.parse(document.getElementById('inp-candidates').value);
+    state.target = parseInt(document.getElementById('inp-target').value);
+  } catch(e) { alert('Invalid input format'); return; }
+  runSim();
+  render();
 }
 
-function stepFwd(){
-  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
+function runSim() {
+  clearTimers();
+  state.steps = simulate(state.candidates, state.target);
+  state.tree = buildTree(state.candidates, state.target);
+  state.currentStep = 0;
+  state.isPlaying = false;
 }
 
-function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
-
-function togglePlay(){
-  playing=!playing;
-  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
-  if(playing)runPlay();else clearTimeout(playTimer);
+function togglePlay() {
+  state.isPlaying ? pause() : play();
 }
 
-function runPlay(){
-  if(!playing)return;
-  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
-  stepFwd();
-  const spd=1600-parseInt(document.getElementById('speedSlider').value);
-  playTimer=setTimeout(runPlay,spd);
+function play() {
+  if (state.currentStep >= state.steps.length - 1) { state.currentStep = 0; }
+  state.isPlaying = true;
+  clearInterval(state.playTimer);
+  state.playTimer = setInterval(() => {
+    if (state.currentStep >= state.steps.length - 1) {
+      pause(); return;
+    }
+    state.currentStep++;
+    render();
+    scrollLogToStep();
+  }, 800 / state.speed);
+  render();
 }
 
-function init(){
-  clearTimeout(playTimer);playing=false;
-  document.getElementById('btnPlay').textContent='▶ Play';
-  clearLog();
-  
-  const rawCand=document.getElementById('candInput').value.trim();
-  candidates=rawCand?rawCand.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x)):[];
-  if(!candidates.length)candidates=[2,3,6,7];
-  
-  const rawTarget=document.getElementById('targetInput').value.trim();
-  target=rawTarget?parseInt(rawTarget):7;
-  if(isNaN(target))target=7;
-  
-  document.getElementById('targetVal').textContent=target;
-  
-  steps=buildSteps(candidates,target);
-  
-  cursor=0;
-  highlight(-1);
-  if(steps[0]?.log)addLog(0,steps[0].log);
-  renderStep(0);
+function pause() {
+  state.isPlaying = false;
+  clearInterval(state.playTimer);
+  render();
 }
 
-buildCode();
-init();
+function stepFwd() {
+  if (state.currentStep < state.steps.length - 1) {
+    state.currentStep++;
+    render();
+    scrollLogToStep();
+  }
+}
+
+function stepBack() {
+  if (state.currentStep > 0) {
+    state.currentStep--;
+    render();
+  }
+}
+
+function resetStep() {
+  pause();
+  state.currentStep = 0;
+  render();
+}
+
+function skipEnd() {
+  pause();
+  state.currentStep = state.steps.length - 1;
+  render();
+}
+
+function gotoStep(i) {
+  state.currentStep = i;
+  render();
+}
+
+function setSpeed(v) {
+  state.speed = parseFloat(v);
+  if (state.isPlaying) { pause(); play(); }
+}
+
+/* Intuition controls */
+function nextStage() {
+  if (state.intuitionStage < INTUITION_STAGES.length - 1) {
+    state.intuitionStage++;
+    render();
+    scrollToActiveStage();
+  }
+}
+
+function prevStage() {
+  if (state.intuitionStage > 0) {
+    state.intuitionStage--;
+    render();
+    scrollToActiveStage();
+  }
+}
+
+function toggleIntuitionPlay() {
+  state.intuitionPlaying ? stopIntuitionPlay() : startIntuitionPlay();
+}
+
+function startIntuitionPlay() {
+  state.intuitionPlaying = true;
+  clearInterval(state.intuitionTimer);
+  state.intuitionTimer = setInterval(() => {
+    if (state.intuitionStage >= INTUITION_STAGES.length - 1) {
+      stopIntuitionPlay(); return;
+    }
+    state.intuitionStage++;
+    render();
+    scrollToActiveStage();
+  }, 4000);
+  render();
+}
+
+function stopIntuitionPlay() {
+  state.intuitionPlaying = false;
+  clearInterval(state.intuitionTimer);
+  render();
+}
+
+function scrollToActiveStage() {
+  setTimeout(()=>{
+    const el = document.getElementById(`istage${state.intuitionStage}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+function clearTimers() {
+  clearInterval(state.playTimer);
+  clearInterval(state.intuitionTimer);
+  state.isPlaying = false;
+  state.intuitionPlaying = false;
+}
+
+/* ═══════════════════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault();
+    state.mode === 'execution' ? togglePlay() : toggleIntuitionPlay(); }
+  else if (e.code === 'ArrowRight') { e.preventDefault();
+    state.mode === 'execution' ? stepFwd() : nextStage(); }
+  else if (e.code === 'ArrowLeft') { e.preventDefault();
+    state.mode === 'execution' ? stepBack() : prevStage(); }
+  else if (e.code === 'Home') { e.preventDefault(); resetStep(); }
+  else if (e.code === 'End') { e.preventDefault(); skipEnd(); }
+});
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+state.pw = [30, 50, 20]; // panel widths %
+runSim();
+render();
 </script>
 </body>
 </html>
