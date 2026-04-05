@@ -16,7 +16,6 @@
   --accent2: #cba6f7;
   --highlight-line: rgba(249,226,175,0.12);
   --font-mono: 'Consolas','Monaco','Courier New',monospace;
-
   --syn-keyword: #ff79c6;
   --syn-function: #50fa7b;
   --syn-string: #f1fa8c;
@@ -26,7 +25,6 @@
   --syn-decorator: #ffb86c;
   --syn-self: #ff5555;
   --syn-builtin: #ffb86c;
-
   --node-default: #313244;
   --node-stroke: #585b70;
   --node-active: #89b4fa;
@@ -35,15 +33,12 @@
   --node-text: #cdd6f4;
   --edge-default: #585b70;
   --edge-active: #89b4fa;
-
   --btn-bg: #313244;
   --btn-hover: #45475a;
   --btn-active-bg: #89b4fa;
   --btn-active-text: #1e1e2e;
-
   --mode-intuition: #cba6f7;
   --mode-execution: #89b4fa;
-
   --scrollbar-thumb: #45475a;
   --insight-bg: rgba(166,227,161,0.08);
   --insight-border: #a6e3a1;
@@ -61,7 +56,6 @@
   --accent: #1d6fe5;
   --accent2: #8839ef;
   --highlight-line: rgba(255,200,50,0.18);
-
   --syn-keyword: #d73a49;
   --syn-function: #6f42c1;
   --syn-string: #032f62;
@@ -71,7 +65,6 @@
   --syn-decorator: #e36209;
   --syn-self: #d73a49;
   --syn-builtin: #e36209;
-
   --node-default: #e9ecef;
   --node-stroke: #ced4da;
   --node-active: #1d6fe5;
@@ -80,15 +73,12 @@
   --node-text: #1e1e2e;
   --edge-default: #adb5bd;
   --edge-active: #1d6fe5;
-
   --btn-bg: #e9ecef;
   --btn-hover: #dee2e6;
   --btn-active-bg: #1d6fe5;
   --btn-active-text: #ffffff;
-
   --mode-intuition: #8839ef;
   --mode-execution: #1d6fe5;
-
   --scrollbar-thumb: #ced4da;
   --insight-bg: rgba(40,167,69,0.08);
   --insight-border: #28a745;
@@ -110,7 +100,6 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* ── HEADER ── */
 #header {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
@@ -162,7 +151,6 @@ body {
 .btn:hover { background: var(--btn-hover); }
 .btn.primary { background: var(--btn-active-bg); color: var(--btn-active-text); border-color: var(--btn-active-bg); }
 
-/* Input row */
 .input-row {
   display: flex;
   gap: 8px;
@@ -210,7 +198,6 @@ body {
 .remove-op-btn:hover { background: rgba(243,139,168,0.15); }
 .add-op-btn:hover { background: var(--btn-hover); color: var(--text-primary); }
 
-/* ── MAIN ── */
 #main {
   display: flex;
   flex: 1;
@@ -218,7 +205,6 @@ body {
   position: relative;
 }
 
-/* ── PANELS ── */
 .panel {
   display: flex;
   flex-direction: column;
@@ -243,7 +229,6 @@ body {
 }
 .panel-content { flex: 1; overflow: auto; }
 
-/* Divider */
 .divider {
   width: 5px;
   background: var(--border);
@@ -253,7 +238,6 @@ body {
 }
 .divider:hover, .divider.dragging { background: var(--accent); }
 
-/* ── CODE PANEL ── */
 #code-panel { min-width: 160px; }
 .code-inner {
   font-family: var(--font-mono);
@@ -264,7 +248,7 @@ body {
   overflow: auto;
   height: 100%;
 }
-.code-inner pre { margin: 0; padding: 14px 0 14px 0; }
+.code-inner pre { margin: 0; padding: 14px 0; }
 .code-line {
   display: flex;
   align-items: stretch;
@@ -289,7 +273,6 @@ body {
   white-space: pre;
   padding-right: 16px;
 }
-/* Syntax */
 .sk { color: var(--syn-keyword); font-weight: 600; }
 .sf { color: var(--syn-function); }
 .ss { color: var(--syn-string); }
@@ -300,7 +283,6 @@ body {
 .sv { color: var(--syn-self); }
 .sp { color: var(--text-primary); }
 
-/* ── VIZ PANEL ── */
 #viz-panel { min-width: 200px; display: flex; flex-direction: column; }
 #viz-area { flex: 1; overflow: hidden; position: relative; }
 #viz-svg { width: 100%; height: 100%; }
@@ -340,7 +322,6 @@ body {
 .progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.15s; }
 
-/* ── STEP PANEL ── */
 #step-panel { min-width: 130px; }
 .step-content { padding: 12px; }
 .step-description {
@@ -388,7 +369,6 @@ body {
 }
 .history-item:hover { background: var(--btn-hover); }
 
-/* ── INTUITION MODE ── */
 #intuition-main {
   display: flex;
   width: 100%;
@@ -474,8 +454,6 @@ body {
   color: var(--text-primary);
 }
 .key-insight .label { font-weight: 700; color: var(--insight-border); margin-right: 4px; }
-
-/* Trie tree node labels */
 .trie-edge-label {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -483,6 +461,13 @@ body {
   fill: var(--text-primary);
 }
 .trie-node-circle { transition: fill 0.2s, stroke 0.2s; }
+
+/* Intuition viz panel scrollable */
+.intuition-panel-right .panel-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 </style>
 </head>
 <body data-theme="dark">
@@ -520,7 +505,7 @@ body {
         <button class="ctrl-btn play" id="btn-intuition-play" onclick="intuitionTogglePlay()">▶ Play</button>
         <button class="ctrl-btn" onclick="intuitionNext()">▶</button>
         <div class="progress-bar" style="flex:1">
-          <div class="progress-fill" id="intuition-progress" style="width:14%"></div>
+          <div class="progress-fill" id="intuition-progress" style="width:0%"></div>
         </div>
       </div>
     </div>
@@ -530,8 +515,8 @@ body {
     </div>
   </div>
 
-  <!-- EXECUTION MODE (hidden initially) -->
-  <div id="execution-main" style="display:none;width:100%;height:100%;display:none;flex:1;overflow:hidden;">
+  <!-- EXECUTION MODE -->
+  <div id="execution-main" style="display:none;width:100%;height:100%;flex:1;overflow:hidden;">
     <div class="panel" id="code-panel">
       <div class="panel-header">
         <span>Python Code</span>
@@ -577,9 +562,7 @@ body {
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-// PYTHON CODE (for display and highlighting)
-// ─────────────────────────────────────────────
+// ─── PYTHON CODE ───
 const RAW_CODE = `class TrieNode:
     __slots__ = ('children', 'is_end')
 
@@ -600,7 +583,7 @@ class Trie:
         node.is_end = True
 
     def _traverse(self, word: str) -> TrieNode | None:
-        """Return the node at end of word/prefix, or None if path doesn't exist."""
+        """Return the node at end of word/prefix, or None."""
         node = self.root
         for ch in word:
             if ch not in node.children:
@@ -615,40 +598,11 @@ class Trie:
     def startsWith(self, prefix: str) -> bool:
         return self._traverse(prefix) is not None`;
 
-// ─────────────────────────────────────────────
-// SYNTAX HIGHLIGHTING
-// ─────────────────────────────────────────────
+// ─── SYNTAX HIGHLIGHTING ───
 function escHtml(s) {
   const d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
-}
-
-function highlightLine(raw) {
-  // We'll build highlighted HTML token by token
-  let s = raw;
-
-  // 1. Extract leading whitespace
-  const wsMatch = s.match(/^(\s*)/);
-  const ws = wsMatch ? wsMatch[1] : '';
-  s = s.slice(ws.length);
-
-  if (!s) return escHtml(ws);
-
-  // 2. Comment (whole line after #)
-  const commentIdx = findCommentHash(raw);
-  if (commentIdx !== -1) {
-    const pre = raw.slice(0, commentIdx);
-    const comment = raw.slice(commentIdx);
-    return highlightTokens(pre) + `<span class="sc">${escHtml(comment)}</span>`;
-  }
-
-  // 3. Docstring (""" ... """) — triple-quoted
-  if (s.startsWith('"""') || s.startsWith("'''")) {
-    return `<span class="ss">${escHtml(ws + s)}</span>`;
-  }
-
-  return highlightTokens(raw);
 }
 
 function findCommentHash(line) {
@@ -666,21 +620,16 @@ function findCommentHash(line) {
 
 function highlightTokens(line) {
   const KEYWORDS = new Set(['class','def','return','for','if','in','not','and','or','None','True','False','from','import','pass','else','elif','while','with','as','lambda','yield','raise','try','except','finally','is']);
-  const BUILTINS = new Set(['dict','list','str','int','bool','None','set','tuple','len','range','print','type']);
-  const TYPES = new Set(['Optional','TreeNode','TrieNode','Trie']);
-
-  let out = '';
-  let i = 0;
+  const TYPES = new Set(['Optional','TreeNode','TrieNode','Trie','dict','str','bool']);
+  let out = '', i = 0;
   while (i < line.length) {
-    // String
     if (line[i] === '"' || line[i] === "'") {
-      let q = line[i]; let j = i + 1;
+      let q = line[i], j = i + 1;
       while (j < line.length && !(line[j] === q && line[j-1] !== '\\')) j++;
       j++;
       out += `<span class="ss">${escHtml(line.slice(i, j))}</span>`;
       i = j; continue;
     }
-    // Word token
     if (/[a-zA-Z_]/.test(line[i])) {
       let j = i;
       while (j < line.length && /\w/.test(line[j])) j++;
@@ -688,20 +637,17 @@ function highlightTokens(line) {
       if (KEYWORDS.has(word)) out += `<span class="sk">${escHtml(word)}</span>`;
       else if (word === 'self') out += `<span class="sv">${escHtml(word)}</span>`;
       else if (TYPES.has(word)) out += `<span class="st">${escHtml(word)}</span>`;
-      else if (BUILTINS.has(word)) out += `<span class="sp">${escHtml(word)}</span>`;
       else if (j < line.length && line[j] === '(') out += `<span class="sf">${escHtml(word)}</span>`;
       else if (word.startsWith('__') && word.endsWith('__')) out += `<span class="sd">${escHtml(word)}</span>`;
       else out += escHtml(word);
       i = j; continue;
     }
-    // Number
     if (/[0-9]/.test(line[i])) {
       let j = i;
       while (j < line.length && /[0-9.]/.test(line[j])) j++;
       out += `<span class="sn">${escHtml(line.slice(i, j))}</span>`;
       i = j; continue;
     }
-    // Decorator
     if (line[i] === '@') {
       let j = i;
       while (j < line.length && /\S/.test(line[j])) j++;
@@ -712,6 +658,22 @@ function highlightTokens(line) {
     i++;
   }
   return out;
+}
+
+function highlightLine(raw) {
+  if (!raw.trim()) return '&nbsp;';
+  if (raw.trim().startsWith('#')) {
+    const idx = findCommentHash(raw);
+    return highlightTokens(raw.slice(0, idx)) + `<span class="sc">${escHtml(raw.slice(idx))}</span>`;
+  }
+  if (raw.trim().startsWith('"""') || raw.trim().startsWith("'''")) {
+    return `<span class="sc">${escHtml(raw)}</span>`;
+  }
+  const commentIdx = findCommentHash(raw);
+  if (commentIdx !== -1) {
+    return highlightTokens(raw.slice(0, commentIdx)) + `<span class="sc">${escHtml(raw.slice(commentIdx))}</span>`;
+  }
+  return highlightTokens(raw);
 }
 
 function buildCodePanel() {
@@ -727,7 +689,7 @@ function buildCodePanel() {
     numSpan.textContent = idx + 1;
     const codeSpan = document.createElement('span');
     codeSpan.className = 'line-code';
-    codeSpan.innerHTML = highlightLine(line) || '&nbsp;';
+    codeSpan.innerHTML = highlightLine(line);
     div.appendChild(numSpan);
     div.appendChild(codeSpan);
     pre.appendChild(div);
@@ -742,10 +704,7 @@ function setActiveLine(n) {
   }
   if (n >= 0) {
     const el = document.getElementById(`cl-${n}`);
-    if (el) {
-      el.classList.add('active-line');
-      el.scrollIntoView({ block: 'nearest' });
-    }
+    if (el) { el.classList.add('active-line'); el.scrollIntoView({ block: 'nearest' }); }
     document.getElementById('code-line-indicator').textContent = `Line ${n + 1}`;
   } else {
     document.getElementById('code-line-indicator').textContent = 'Line —';
@@ -753,26 +712,13 @@ function setActiveLine(n) {
   lastActiveLine = n;
 }
 
-// ─────────────────────────────────────────────
-// TRIE DATA STRUCTURE (JS simulation)
-// ─────────────────────────────────────────────
+// ─── TRIE SIMULATION ───
 class TrieNode {
-  constructor(id) {
-    this.children = {};
-    this.is_end = false;
-    this.id = id;
-  }
+  constructor(id) { this.children = {}; this.is_end = false; this.id = id; }
 }
-
 class TrieSim {
-  constructor() {
-    this.nodeCounter = 0;
-    this.root = new TrieNode(this.nodeCounter++);
-    this.steps = [];
-  }
-
+  constructor() { this.nodeCounter = 0; this.root = new TrieNode(this.nodeCounter++); this.steps = []; }
   cloneForStep() {
-    // Deep clone the trie tree for snapshot
     const cloneNode = (n) => {
       if (!n) return null;
       const c = { id: n.id, is_end: n.is_end, children: {} };
@@ -781,18 +727,11 @@ class TrieSim {
     };
     return cloneNode(this.root);
   }
-
   addStep(line, desc, vars, highlightNodeId, opType, opLabel, pathHighlight=[]) {
-    this.steps.push({
-      line, desc, vars: JSON.parse(JSON.stringify(vars)),
-      trieSnapshot: this.cloneForStep(),
-      highlightNodeId, opType, opLabel, pathHighlight: [...pathHighlight]
-    });
+    this.steps.push({ line, desc, vars: JSON.parse(JSON.stringify(vars)), trieSnapshot: this.cloneForStep(), highlightNodeId, opType, opLabel, pathHighlight: [...pathHighlight] });
   }
-
   insert(word) {
-    let node = this.root;
-    let pathHighlight = [node.id];
+    let node = this.root, pathHighlight = [node.id];
     this.addStep(12, `insert("${word}") — start at root`, {word, node_id: node.id, ch: '—'}, node.id, 'insert', `insert("${word}")`, pathHighlight);
     for (const ch of word) {
       this.addStep(13, `for ch = '${ch}' in word`, {word, ch, node_id: node.id}, node.id, 'insert', `insert("${word}")`, pathHighlight);
@@ -810,10 +749,8 @@ class TrieSim {
     node.is_end = true;
     this.addStep(17, `Mark node.is_end = True (word complete)`, {node_id: node.id, is_end: true}, node.id, 'insert', `insert("${word}")`, pathHighlight);
   }
-
   _traverse(word, opType, opLabel) {
-    let node = this.root;
-    let pathHighlight = [node.id];
+    let node = this.root, pathHighlight = [node.id];
     this.addStep(21, `_traverse("${word}") — start at root`, {word, node_id: node.id}, node.id, opType, opLabel, pathHighlight);
     for (const ch of word) {
       this.addStep(22, `for ch = '${ch}' in word`, {word, ch, node_id: node.id}, node.id, opType, opLabel, pathHighlight);
@@ -828,7 +765,6 @@ class TrieSim {
     this.addStep(25, `_traverse complete → return node id=${node.id}`, {node_id: node.id, is_end: node.is_end}, node.id, opType, opLabel, pathHighlight);
     return node;
   }
-
   search(word) {
     this.addStep(28, `search("${word}") — call _traverse`, {word}, this.root.id, 'search', `search("${word}")`, [this.root.id]);
     const node = this._traverse(word, 'search', `search("${word}")`);
@@ -836,7 +772,6 @@ class TrieSim {
     this.addStep(29, `return node is not None and node.is_end → ${result}`, {node: node ? node.id : null, is_end: node ? node.is_end : false, result}, node ? node.id : null, 'search', `search("${word}")`);
     return result;
   }
-
   startsWith(prefix) {
     this.addStep(32, `startsWith("${prefix}") — call _traverse`, {prefix}, this.root.id, 'startsWith', `startsWith("${prefix}")`, [this.root.id]);
     const node = this._traverse(prefix, 'startsWith', `startsWith("${prefix}")`);
@@ -846,23 +781,12 @@ class TrieSim {
   }
 }
 
-// ─────────────────────────────────────────────
-// EXECUTION STATE
-// ─────────────────────────────────────────────
-let steps = [];
-let currentStep = 0;
-let isPlaying = false;
-let playInterval = null;
-let playSpeed = 1;
-
+// ─── EXECUTION STATE ───
+let steps = [], currentStep = 0, isPlaying = false, playInterval = null, playSpeed = 1;
 let defaultOps = [
-  { op: 'insert', arg: 'apple' },
-  { op: 'insert', arg: 'app' },
-  { op: 'search', arg: 'apple' },
-  { op: 'search', arg: 'app' },
-  { op: 'search', arg: 'ap' },
-  { op: 'startsWith', arg: 'app' },
-  { op: 'startsWith', arg: 'b' },
+  { op: 'insert', arg: 'apple' }, { op: 'insert', arg: 'app' },
+  { op: 'search', arg: 'apple' }, { op: 'search', arg: 'app' },
+  { op: 'search', arg: 'ap' }, { op: 'startsWith', arg: 'app' }, { op: 'startsWith', arg: 'b' },
 ];
 
 function runOps() {
@@ -870,8 +794,7 @@ function runOps() {
   const opEls = document.querySelectorAll('.op-entry');
   const ops = [];
   opEls.forEach(el => {
-    const sel = el.querySelector('select');
-    const inp = el.querySelector('input');
+    const sel = el.querySelector('select'), inp = el.querySelector('input');
     if (sel && inp) ops.push({ op: sel.value, arg: inp.value.trim() });
   });
   for (const { op, arg } of ops) {
@@ -879,32 +802,18 @@ function runOps() {
     else if (op === 'search') sim.search(arg);
     else if (op === 'startsWith') sim.startsWith(arg);
   }
-  steps = sim.steps;
-  currentStep = 0;
-  stopPlay();
-  renderStep();
+  steps = sim.steps; currentStep = 0; stopPlay(); renderStep();
 }
 
-function gotoStep(n) {
-  currentStep = Math.max(0, Math.min(n, steps.length - 1));
-  renderStep();
-}
+function gotoStep(n) { currentStep = Math.max(0, Math.min(n, steps.length - 1)); renderStep(); }
 function stepForward() { gotoStep(currentStep + 1); }
 function stepBack() { gotoStep(currentStep - 1); }
-
-function togglePlay() {
-  if (isPlaying) stopPlay();
-  else startPlay();
-}
+function togglePlay() { if (isPlaying) stopPlay(); else startPlay(); }
 function startPlay() {
   if (currentStep >= steps.length - 1) currentStep = 0;
   isPlaying = true;
   document.getElementById('btn-play').textContent = '⏸';
-  playInterval = setInterval(() => {
-    if (currentStep >= steps.length - 1) { stopPlay(); return; }
-    currentStep++;
-    renderStep();
-  }, 900 / playSpeed);
+  playInterval = setInterval(() => { if (currentStep >= steps.length - 1) { stopPlay(); return; } currentStep++; renderStep(); }, 900 / playSpeed);
 }
 function stopPlay() {
   isPlaying = false;
@@ -919,24 +828,18 @@ function renderStep() {
   const s = steps[currentStep];
   setActiveLine(s.line);
   document.getElementById('step-counter').textContent = `Step ${currentStep + 1} / ${steps.length}`;
-  document.getElementById('exec-progress').style.width = `${((currentStep) / (steps.length - 1)) * 100}%`;
+  document.getElementById('exec-progress').style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
   document.getElementById('op-indicator').textContent = s.opLabel || '';
   renderTrie(s);
   renderStepLog(s);
 }
 
-// ─────────────────────────────────────────────
-// TRIE SVG RENDERING
-// ─────────────────────────────────────────────
-const NODE_R = 18;
-const LEVEL_H = 80;
-const MIN_SEP = 54;
+// ─── TRIE SVG RENDERING ───
+const NODE_R = 18, LEVEL_H = 80, MIN_SEP = 56;
 
 function layoutTrie(root) {
   if (!root) return { nodes: [], edges: [] };
-  // BFS to collect structure, then assign x positions bottom-up
-  const info = {}; // id -> {node, level, children_ids, x}
-
+  const info = {};
   const queue = [{ node: root, level: 0, parentId: null, edgeLabel: '' }];
   const order = [];
   while (queue.length) {
@@ -944,203 +847,204 @@ function layoutTrie(root) {
     info[node.id] = { node, level, parentId, edgeLabel, childIds: [] };
     order.push(node.id);
     if (parentId !== null) info[parentId].childIds.push(node.id);
-    for (const [ch, child] of Object.entries(node.children)) {
+    for (const [ch, child] of Object.entries(node.children))
       queue.push({ node: child, level: level + 1, parentId: node.id, edgeLabel: ch });
-    }
   }
-
-  // Assign x via postorder
   let leafX = 0;
   const assignX = (id) => {
     const d = info[id];
-    if (d.childIds.length === 0) {
-      d.x = leafX * MIN_SEP;
-      leafX++;
-    } else {
+    if (d.childIds.length === 0) { d.x = leafX * MIN_SEP; leafX++; }
+    else {
       d.childIds.forEach(cid => assignX(cid));
       const xs = d.childIds.map(cid => info[cid].x);
       d.x = (Math.min(...xs) + Math.max(...xs)) / 2;
     }
   };
   assignX(root.id);
-
-  const nodes = order.map(id => ({
-    id,
-    x: info[id].x,
-    y: info[id].level * LEVEL_H,
-    is_end: info[id].node.is_end,
-    children: info[id].node.children
-  }));
-
+  const nodes = order.map(id => ({ id, x: info[id].x, y: info[id].level * LEVEL_H, is_end: info[id].node.is_end }));
   const edges = order.filter(id => info[id].parentId !== null).map(id => ({
     from: { x: info[info[id].parentId].x, y: info[info[id].parentId].level * LEVEL_H },
     to: { x: info[id].x, y: info[id].level * LEVEL_H },
-    label: info[id].edgeLabel,
-    toId: id,
-    fromId: info[id].parentId
+    label: info[id].edgeLabel, toId: id, fromId: info[id].parentId
   }));
-
   return { nodes, edges };
 }
 
 function renderTrie(step) {
   const svg = document.getElementById('viz-svg');
   const area = document.getElementById('viz-area');
-  const W = area.clientWidth || 600;
-  const H = area.clientHeight || 400;
-
+  const W = area.clientWidth || 600, H = area.clientHeight || 400;
   const root = step.trieSnapshot;
   const { nodes, edges } = layoutTrie(root);
-
   if (!nodes.length) { svg.innerHTML = ''; return; }
-
-  // Compute bounds
-  const xs = nodes.map(n => n.x);
-  const ys = nodes.map(n => n.y);
-  const minX = Math.min(...xs); const maxX = Math.max(...xs);
-  const minY = Math.min(...ys); const maxY = Math.max(...ys);
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
   const padX = 60, padY = 40;
   const scaleX = (maxX - minX > 0) ? (W - padX * 2) / (maxX - minX) : 1;
   const scaleY = (maxY - minY > 0) ? (H - padY * 2) / (maxY - minY) : 1;
-  const scale = Math.min(scaleX, scaleY, 1.4);
-
+  const scale = Math.min(scaleX, scaleY, 1.5);
   const tx = (x) => padX + (x - minX) * scale;
   const ty = (y) => padY + (y - minY) * scale;
-
   const pathSet = new Set(step.pathHighlight || []);
-
   let html = `<defs>
-    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
-      <polygon points="0 0,8 3,0 6" fill="var(--edge-default)" opacity="0.7"/>
-    </marker>
-    <marker id="arr-active" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
-      <polygon points="0 0,8 3,0 6" fill="var(--edge-active)"/>
-    </marker>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--edge-default)" opacity="0.7"/></marker>
+    <marker id="arr-active" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--edge-active)"/></marker>
   </defs>`;
-
-  // Edges
   for (const e of edges) {
-    const x1 = tx(e.from.x), y1 = ty(e.from.y);
-    const x2 = tx(e.to.x), y2 = ty(e.to.y);
+    const x1 = tx(e.from.x), y1 = ty(e.from.y), x2 = tx(e.to.x), y2 = ty(e.to.y);
     const active = pathSet.has(e.toId) && pathSet.has(e.fromId);
-    const dx = x2 - x1, dy = y2 - y1;
-    const len = Math.sqrt(dx*dx + dy*dy);
+    const dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx*dx + dy*dy);
     const ux = dx/len, uy = dy/len;
-    const ex1 = x1 + ux * NODE_R, ey1 = y1 + uy * NODE_R;
-    const ex2 = x2 - ux * NODE_R, ey2 = y2 - uy * NODE_R;
-    const stroke = active ? 'var(--edge-active)' : 'var(--edge-default)';
-    const sw = active ? 2.5 : 1.5;
-    html += `<line x1="${ex1}" y1="${ey1}" x2="${ex2}" y2="${ey2}" stroke="${stroke}" stroke-width="${sw}" marker-end="url(#${active?'arr-active':'arr'})"/>`;
-    // Edge label (character)
-    const mx = (ex1 + ex2) / 2, my = (ey1 + ey2) / 2;
-    const off = 12;
-    const nx = -uy * off + mx, ny = ux * off + my;
-    html += `<text x="${nx}" y="${ny}" class="trie-edge-label" text-anchor="middle" dominant-baseline="middle" fill="${active ? 'var(--accent)' : 'var(--text-secondary)'}" font-size="${scale > 0.8 ? 14 : 11}">${e.label}</text>`;
+    const ex1 = x1 + ux * NODE_R, ey1 = y1 + uy * NODE_R, ex2 = x2 - ux * NODE_R, ey2 = y2 - uy * NODE_R;
+    html += `<line x1="${ex1}" y1="${ey1}" x2="${ex2}" y2="${ey2}" stroke="${active?'var(--edge-active)':'var(--edge-default)'}" stroke-width="${active?2.5:1.5}" marker-end="url(#${active?'arr-active':'arr'})"/>`;
+    const mx = (ex1+ex2)/2, my = (ey1+ey2)/2, off = 13;
+    html += `<text x="${-uy*off+mx}" y="${ux*off+my}" class="trie-edge-label" text-anchor="middle" dominant-baseline="middle" fill="${active?'var(--accent)':'var(--text-secondary)'}" font-size="${scale > 0.8 ? 14 : 11}">${e.label}</text>`;
   }
-
-  // Nodes
   for (const n of nodes) {
     const cx = tx(n.x), cy = ty(n.y);
     const isHighlight = n.id === step.highlightNodeId;
     const isPath = pathSet.has(n.id);
     const isRoot = n.id === 0;
-
-    let fill = 'var(--node-default)';
-    let stroke = 'var(--node-stroke)';
-    let sw = 1.5;
+    let fill = 'var(--node-default)', stroke = 'var(--node-stroke)', sw = 1.5;
     if (n.is_end) { fill = 'var(--node-end)'; stroke = 'var(--node-end)'; }
     if (isPath && !n.is_end) { fill = 'rgba(137,180,250,0.18)'; stroke = 'var(--node-path)'; }
     if (isHighlight) { fill = 'var(--node-active)'; stroke = 'var(--accent)'; sw = 3; }
-    if (isRoot) { stroke = 'var(--text-secondary)'; }
-
+    if (isRoot && !isHighlight) stroke = 'var(--text-secondary)';
     html += `<circle cx="${cx}" cy="${cy}" r="${NODE_R}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" class="trie-node-circle"/>`;
-
-    // Label: 'R' for root, or show nothing (letter is on edge)
-    if (isRoot) {
-      html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="11" font-weight="600">root</text>`;
-    } else if (n.is_end) {
-      html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#1e1e2e" font-size="11">●</text>`;
-    }
-
-    // is_end indicator ring
-    if (n.is_end) {
-      html += `<circle cx="${cx}" cy="${cy}" r="${NODE_R + 4}" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>`;
-    }
+    if (isRoot) html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="10" font-weight="600">root</text>`;
+    else if (n.is_end) html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#1e1e2e" font-size="11">●</text>`;
+    if (n.is_end) html += `<circle cx="${cx}" cy="${cy}" r="${NODE_R+4}" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>`;
   }
-
   svg.innerHTML = html;
 }
 
-// ─────────────────────────────────────────────
-// STEP LOG RENDERING
-// ─────────────────────────────────────────────
+// ─── STEP LOG ───
 function renderStepLog(s) {
   const panel = document.getElementById('step-log-panel');
   const vars = s.vars || {};
   let varHtml = Object.entries(vars).map(([k, v]) =>
     `<div class="var-row"><span class="var-name">${escHtml(k)}</span><span class="var-val"> = ${escHtml(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span></div>`
   ).join('');
-
   let histHtml = steps.slice(0, currentStep + 1).map((step, i) =>
     `<div class="history-item ${i === currentStep ? 'current' : ''}" onclick="gotoStep(${i})">${i+1}. ${escHtml(step.desc)}</div>`
   ).join('');
-
   panel.innerHTML = `<div class="step-content">
     <div class="step-description">${escHtml(s.desc)}</div>
-    <div class="vars-section">
-      <div class="vars-title">Variables</div>
-      ${varHtml || '<div style="color:var(--text-secondary);font-size:12px">—</div>'}
-    </div>
-    <div class="vars-section">
-      <div class="vars-title">History</div>
-      <div id="history-list">${histHtml}</div>
-    </div>
+    <div class="vars-section"><div class="vars-title">Variables</div>${varHtml || '<div style="color:var(--text-secondary);font-size:12px">—</div>'}</div>
+    <div class="vars-section"><div class="vars-title">History</div><div id="history-list">${histHtml}</div></div>
   </div>`;
-  // Auto-scroll history
-  setTimeout(() => {
-    const cur = panel.querySelector('.history-item.current');
-    if (cur) cur.scrollIntoView({ block: 'nearest' });
-  }, 50);
+  setTimeout(() => { const cur = panel.querySelector('.history-item.current'); if (cur) cur.scrollIntoView({ block: 'nearest' }); }, 50);
 }
 
-// ─────────────────────────────────────────────
-// OP LIST UI
-// ─────────────────────────────────────────────
+// ─── OP LIST UI ───
 function renderOpList() {
   const list = document.getElementById('op-list');
   list.innerHTML = '';
   defaultOps.forEach((op, i) => {
     const div = document.createElement('div');
     div.className = 'op-entry';
-    div.innerHTML = `
-      <select onchange="defaultOps[${i}].op=this.value">
-        ${['insert','search','startsWith'].map(o => `<option value="${o}" ${op.op===o?'selected':''}>${o}</option>`).join('')}
-      </select>
-      (<input value="${escHtml(op.arg)}" style="width:64px" oninput="defaultOps[${i}].arg=this.value" placeholder="word"/>)
-      <button class="remove-op-btn" onclick="removeOp(${i})">×</button>
-    `;
+    div.innerHTML = `<select onchange="defaultOps[${i}].op=this.value">${['insert','search','startsWith'].map(o => `<option value="${o}" ${op.op===o?'selected':''}>${o}</option>`).join('')}</select>(<input value="${escHtml(op.arg)}" style="width:64px" oninput="defaultOps[${i}].arg=this.value" placeholder="word"/>)<button class="remove-op-btn" onclick="removeOp(${i})">×</button>`;
     list.appendChild(div);
   });
 }
+function addOp() { defaultOps.push({ op: 'insert', arg: '' }); renderOpList(); }
+function removeOp(i) { defaultOps.splice(i, 1); renderOpList(); }
 
-function addOp() {
-  defaultOps.push({ op: 'insert', arg: '' });
-  renderOpList();
-}
-function removeOp(i) {
-  defaultOps.splice(i, 1);
-  renderOpList();
+// ─── INTUITION: CONCEPT SVG USING COMPUTED LAYOUT ───
+function buildTrieData(words) {
+  // Build a trie from words and return nodes/edges for SVG layout
+  let nodeId = 0;
+  const root = { id: nodeId++, children: {}, is_end: false };
+  for (const word of words) {
+    let node = root;
+    for (const ch of word) {
+      if (!(ch in node.children)) node.children[ch] = { id: nodeId++, children: {}, is_end: false };
+      node = node.children[ch];
+    }
+    node.is_end = true;
+  }
+  return root;
 }
 
-// ─────────────────────────────────────────────
-// INTUITION MODE
-// ─────────────────────────────────────────────
+function layoutTrieForSvg(root, levelH, minSep) {
+  const info = {};
+  const queue = [{ node: root, level: 0, parentId: null, edgeLabel: '' }];
+  const order = [];
+  while (queue.length) {
+    const { node, level, parentId, edgeLabel } = queue.shift();
+    info[node.id] = { node, level, parentId, edgeLabel, childIds: [] };
+    order.push(node.id);
+    if (parentId !== null) info[parentId].childIds.push(node.id);
+    for (const [ch, child] of Object.entries(node.children))
+      queue.push({ node: child, level: level + 1, parentId: node.id, edgeLabel: ch });
+  }
+  let leafX = 0;
+  const assignX = (id) => {
+    const d = info[id];
+    if (d.childIds.length === 0) { d.x = leafX * minSep; leafX++; }
+    else { d.childIds.forEach(cid => assignX(cid)); const xs = d.childIds.map(cid => info[cid].x); d.x = (Math.min(...xs) + Math.max(...xs)) / 2; }
+  };
+  assignX(root.id);
+  const nodes = order.map(id => ({ id, x: info[id].x, y: info[id].level * levelH, is_end: info[id].node.is_end }));
+  const edges = order.filter(id => info[id].parentId !== null).map(id => ({
+    from: { x: info[info[id].parentId].x, y: info[info[id].parentId].level * levelH },
+    to: { x: info[id].x, y: info[id].level * levelH },
+    label: info[id].edgeLabel, toId: id, fromId: info[id].parentId,
+    is_end_to: info[id].node.is_end
+  }));
+  return { nodes, edges };
+}
+
+function renderInlineTrie(words, highlightSet, W, H, NR) {
+  NR = NR || 16;
+  const levelH = Math.min(70, (H - 30) / 4);
+  const minSep = NR * 3.2;
+  const root = buildTrieData(words);
+  const { nodes, edges } = layoutTrieForSvg(root, levelH, minSep);
+  if (!nodes.length) return '';
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const padX = NR + 10, padY = NR + 8;
+  const scaleX = (maxX - minX > 0) ? (W - padX * 2) / (maxX - minX) : 1;
+  const scaleY = (maxY - minY > 0) ? (H - padY * 2) / (maxY - minY) : 1;
+  const scale = Math.min(scaleX, scaleY, 1.6);
+  const tx = x => padX + (x - minX) * scale;
+  const ty = y => padY + (y - minY) * scale;
+  const hSet = new Set(highlightSet || []);
+  let s = '';
+  for (const e of edges) {
+    const x1 = tx(e.from.x), y1 = ty(e.from.y), x2 = tx(e.to.x), y2 = ty(e.to.y);
+    const dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx+dy*dy)||1;
+    const ux = dx/len, uy = dy/len;
+    const ex1 = x1+ux*NR, ey1 = y1+uy*NR, ex2 = x2-ux*NR, ey2 = y2-uy*NR;
+    const active = hSet.has(e.toId);
+    s += `<line x1="${ex1.toFixed(1)}" y1="${ey1.toFixed(1)}" x2="${ex2.toFixed(1)}" y2="${ey2.toFixed(1)}" stroke="${active?'var(--edge-active)':'var(--edge-default)'}" stroke-width="${active?2.5:1.5}"/>`;
+    const mx=(ex1+ex2)/2, my=(ey1+ey2)/2;
+    s += `<text x="${(-uy*12+mx).toFixed(1)}" y="${(ux*12+my).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${active?'var(--accent)':'var(--text-secondary)'}" font-size="13" font-weight="700" font-family="monospace">${e.label}</text>`;
+  }
+  for (const n of nodes) {
+    const cx = tx(n.x), cy = ty(n.y);
+    const isRoot = n.id === 0, active = hSet.has(n.id);
+    let fill = 'var(--node-default)', stroke = 'var(--node-stroke)', sw = 1.5;
+    if (n.is_end) { fill = 'var(--node-end)'; stroke = 'var(--node-end)'; }
+    if (active && !n.is_end) { fill = 'rgba(137,180,250,0.25)'; stroke = 'var(--accent)'; sw = 2.5; }
+    if (active && n.is_end) { stroke = 'var(--accent)'; sw = 2.5; }
+    if (isRoot) stroke = 'var(--text-secondary)';
+    s += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${NR}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    if (isRoot) s += `<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="9" font-weight="600">R</text>`;
+    else if (n.is_end) s += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${NR+5}" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.7"/>`;
+  }
+  return s;
+}
+
+// ─── INTUITION STAGES ───
 const INTUITION_STAGES = [
   {
     title: "What is a Trie, Really?",
     thought: "Let me re-read the problem... It wants me to store strings and query prefixes fast. What data structure is built for this?",
     body: `A <strong>Trie</strong> (pronounced "try") is a tree where each <strong>edge represents a character</strong>, not a node. The path from root to any node spells out a prefix.<br><br>
-Think of it like an autocomplete tree: every word you've ever typed is traced as a path from the root, character by character.`,
+Think of it like an autocomplete tree: every word you've typed is traced as a path from the root, character by character.`,
     insight: "A Trie trades space for speed — it stores every prefix explicitly so any prefix query is O(k) where k is the length of the query.",
     viz: 'concept'
   },
@@ -1150,7 +1054,7 @@ Think of it like an autocomplete tree: every word you've ever typed is traced as
     body: `The key property: <strong>words with shared prefixes share nodes</strong>.<br><br>
 Insert <code style="color:var(--accent)">"apple"</code> → creates nodes for a, p, p, l, e<br>
 Insert <code style="color:var(--accent)">"app"</code> → <em>reuses</em> a, p, p — only the <code>is_end</code> flag changes on the third 'p' node<br><br>
-This is why tries are memory-efficient for real-world dictionaries where words share common prefixes.`,
+This is why tries are memory-efficient for real-world dictionaries.`,
     insight: "is_end is the magic flag: it distinguishes 'app' (a complete word) from 'ap' (just a prefix) — both share the same path but only 'app' has is_end=True.",
     viz: 'shared'
   },
@@ -1163,24 +1067,24 @@ This is why tries are memory-efficient for real-world dictionaries where words s
 &nbsp;&nbsp;• If <code>ch</code> not in <code>node.children</code> → create new TrieNode<br>
 &nbsp;&nbsp;• Move <code>node = node.children[ch]</code><br>
 3. After loop: set <code>node.is_end = True</code><br><br>
-Time: <strong>O(k)</strong> where k = len(word). We touch each character exactly once.`,
+Time: <strong>O(k)</strong> where k = len(word).`,
     insight: "The insert loop never backtracks — it's a pure forward walk through the word, creating missing links as needed.",
     viz: 'insert'
   },
   {
     title: "_traverse() — The Shared Core",
-    thought: "Both search() and startsWith() need to walk the trie and find the end node. I should factor that out. If the path breaks at any point, return None.",
+    thought: "Both search() and startsWith() need to walk the trie. I should factor that out. If the path breaks at any point, return None.",
     body: `<strong>_traverse(word)</strong> is the private helper both operations share:<br><br>
 • Walk character by character from root<br>
 • If any character is <em>missing</em> from children → return <code>None</code> immediately<br>
 • If we reach the end → return that node<br><br>
 This returns the node <em>at the end of the path</em>, which callers interpret differently.`,
-    insight: "By factoring out _traverse, search and startsWith become one-liners — they just differ in what they check about the returned node.",
+    insight: "By factoring out _traverse, search and startsWith become one-liners — they differ only in what they check about the returned node.",
     viz: 'traverse'
   },
   {
     title: "search() vs startsWith() — One Difference",
-    thought: "search needs an exact word match — so the end node must have is_end=True. startsWith just needs the path to exist — is_end doesn't matter.",
+    thought: "search needs an exact word match — so the end node must have is_end=True. startsWith just needs the path to exist.",
     body: `<pre style="font-family:var(--font-mono);background:var(--bg-secondary);padding:12px;border-radius:8px;font-size:13px;overflow:auto">def search(self, word):
     node = self._traverse(word)
     return node is not None <strong>and node.is_end</strong>
@@ -1190,38 +1094,36 @@ def startsWith(self, prefix):
 <br>The difference is exactly one condition:<br>
 • <code>search</code>: path exists <strong>AND</strong> it marks a complete word<br>
 • <code>startsWith</code>: path exists, period`,
-    insight: "This design is elegant — the trie inherently stores both complete words (is_end=True) and all their prefixes (every intermediate node) simultaneously.",
+    insight: "The trie inherently stores both complete words (is_end=True) and all their prefixes (every intermediate node) simultaneously.",
     viz: 'compare'
   },
   {
     title: "Complexity & Why Tries Beat Hash Maps for Prefixes",
     thought: "A hash map gives O(1) lookup for exact words but O(n·k) for startsWith — you'd have to check every stored word. A trie gives O(k) for both.",
     body: `<strong>Operation complexities:</strong><br><br>
-• <code>insert(word)</code>: O(k) time, O(k) space (worst case)<br>
+• <code>insert(word)</code>: O(k) time, O(k) space<br>
 • <code>search(word)</code>: O(k) time, O(1) space<br>
 • <code>startsWith(prefix)</code>: O(k) time, O(1) space<br><br>
 where k = length of the word/prefix<br><br>
 <strong>vs Hash Map for startsWith:</strong> O(n·k) — must scan all n stored words`,
-    insight: "Tries are the go-to for prefix-heavy problems: autocomplete, spell check, IP routing tables. When the query is a prefix, not an exact key, tries win.",
+    insight: "Tries are the go-to for prefix-heavy problems: autocomplete, spell check, IP routing. When the query is a prefix, tries win.",
     viz: 'complexity'
   },
   {
     title: "Edge Cases & Python Tricks",
     thought: "What about empty strings? __slots__? Let me think through the robustness...",
     body: `<strong>Robustness:</strong><br><br>
-• <code>insert("")</code>: loop doesn't run, root gets <code>is_end=True</code> — <code>search("")</code> returns True ✓<br>
+• <code>insert("")</code>: loop doesn't run, root gets <code>is_end=True</code><br>
 • <code>search("xyz")</code>: _traverse returns None immediately at first missing char ✓<br>
-• <code>startsWith("")</code>: _traverse("") returns root (never enters loop) → True ✓<br><br>
+• <code>startsWith("")</code>: _traverse("") returns root → True ✓<br><br>
 <strong>Python trick: <code>__slots__</code></strong><br>
-Declaring <code>__slots__ = ('children', 'is_end')</code> prevents dynamic attribute creation, reducing per-object memory overhead — crucial when millions of TrieNodes may exist.`,
-    insight: "In a production trie storing a large vocabulary, __slots__ can cut memory by 40-50% per node vs. the default __dict__-based approach.",
+Declaring <code>__slots__ = ('children', 'is_end')</code> prevents dynamic attribute creation, reducing per-object memory — crucial when millions of TrieNodes may exist.`,
+    insight: "In a production trie with a large vocabulary, __slots__ can cut memory by 40-50% per node vs. the default __dict__-based approach.",
     viz: 'edge'
   }
 ];
 
-let currentIntuitionStage = 0;
-let intuitionPlaying = false;
-let intuitionInterval = null;
+let currentIntuitionStage = 0, intuitionPlaying = false, intuitionInterval = null;
 
 function renderIntuitionMode() {
   renderIntuitionContent();
@@ -1231,9 +1133,7 @@ function renderIntuitionMode() {
 function renderIntuitionContent() {
   const content = document.getElementById('intuition-content');
   content.innerHTML = INTUITION_STAGES.map((stage, i) => {
-    let cls = 'future';
-    if (i === currentIntuitionStage) cls = 'current';
-    else if (i < currentIntuitionStage) cls = 'past';
+    let cls = i === currentIntuitionStage ? 'current' : i < currentIntuitionStage ? 'past' : 'future';
     return `<div class="stage-block ${cls}" id="istage-${i}">
       <div class="stage-num-title">
         <div class="stage-num">${i+1}</div>
@@ -1245,7 +1145,8 @@ function renderIntuitionContent() {
     </div>`;
   }).join('');
   document.getElementById('intuition-stage-counter').textContent = `Stage ${currentIntuitionStage+1} / ${INTUITION_STAGES.length}`;
-  document.getElementById('intuition-progress').style.width = `${((currentIntuitionStage) / (INTUITION_STAGES.length-1)) * 100}%`;
+  const pct = INTUITION_STAGES.length > 1 ? (currentIntuitionStage / (INTUITION_STAGES.length-1)) * 100 : 0;
+  document.getElementById('intuition-progress').style.width = `${pct}%`;
   setTimeout(() => {
     const el = document.getElementById(`istage-${currentIntuitionStage}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1259,349 +1160,227 @@ function renderIntuitionViz() {
 }
 
 function getIntuitionViz(type) {
-  const svgHead = (content, vb="0 0 460 300") => `<div style="padding:20px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" style="max-height:280px">${content}</svg></div>`;
-
   switch(type) {
-    case 'concept': return svgHead(trieConceptSvg());
-    case 'shared': return svgHead(sharedPrefixSvg());
+    case 'concept': return conceptViz();
+    case 'shared': return sharedViz();
     case 'insert': return insertExplainHtml();
     case 'traverse': return traverseExplainHtml();
     case 'compare': return compareHtml();
     case 'complexity': return complexityHtml();
     case 'edge': return edgeCaseHtml();
-    default: return svgHead(trieConceptSvg());
+    default: return conceptViz();
   }
 }
 
-function trieConceptSvg() {
-  // Simple trie: root -> a -> p -> p -> (l->e, end) and (end)
-  const nodes = [
-    {id:0, x:230, y:30, label:'root', end:false},
-    {id:1, x:230, y:100, label:'', end:false},
-    {id:2, x:230, y:170, label:'', end:false},
-    {id:3, x:150, y:240, label:'', end:true},
-    {id:4, x:310, y:240, label:'', end:false},
-    {id:5, x:150, y:280, label:'', end:true},
-  ];
-  const edges = [
-    {f:0, t:1, lbl:'a'},{f:1, t:2, lbl:'p'},{f:2, t:3, lbl:'p'},{f:3, t:5, lbl:'l'},{f:2, t:4, lbl:'p'},{f:4, t:-1, lbl:'l'}
-  ];
-  // draw a simple version
-  let s = '';
-  // edges
-  const pos = {}; nodes.forEach(n => pos[n.id]={x:n.x,y:n.y});
-  const realEdges = [
-    {f:{x:230,y:30}, t:{x:230,y:100}, lbl:'a'},
-    {f:{x:230,y:100}, t:{x:230,y:170}, lbl:'p'},
-    {f:{x:230,y:170}, t:{x:150,y:240}, lbl:'p'},
-    {f:{x:230,y:170}, t:{x:310,y:240}, lbl:'p'},
-    {f:{x:150,y:240}, t:{x:150,y:295}, lbl:'l'},
-    {f:{x:310,y:240}, t:{x:310,y:295}, lbl:'l'},
-  ];
-  realEdges.forEach(e => {
-    s += `<line x1="${e.f.x}" y1="${e.f.y+16}" x2="${e.t.x}" y2="${e.t.y-16}" stroke="var(--edge-default)" stroke-width="2"/>`;
-    s += `<text x="${(e.f.x+e.t.x)/2-10}" y="${(e.f.y+e.t.y)/2}" fill="var(--accent)" font-size="14" font-weight="700" font-family="monospace">${e.lbl}</text>`;
-  });
-  // nodes
-  const ns = [
-    {x:230,y:30,end:false,label:'root'},
-    {x:230,y:100,end:false,label:''},
-    {x:230,y:170,end:false,label:''},
-    {x:150,y:240,end:true,label:''},
-    {x:310,y:240,end:false,label:''},
-    {x:150,y:295,end:true,label:''},
-    {x:310,y:295,end:false,label:''},
-  ];
-  ns.forEach(n => {
-    const fill = n.end ? 'var(--node-end)' : 'var(--node-default)';
-    const stroke = n.end ? 'var(--node-end)' : 'var(--node-stroke)';
-    s += `<circle cx="${n.x}" cy="${n.y}" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
-    if (n.label) s += `<text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="9">${n.label}</text>`;
-    if (n.end) s += `<circle cx="${n.x}" cy="${n.y}" r="20" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>`;
-  });
-  // Legend
-  s += `<circle cx="30" cy="255" r="9" fill="var(--node-end)" stroke="var(--node-end)" stroke-width="2"/>`;
-  s += `<text x="45" y="259" fill="var(--text-secondary)" font-size="11">= word endpoint (is_end=True)</text>`;
-  // Words
-  s += `<text x="10" y="30" fill="var(--text-secondary)" font-size="12">Trie storing: "apple", "apply", "app"</text>`;
-  return s;
+function conceptViz() {
+  // Render trie for ["apple","apply","app"] using computed layout
+  const W = 380, H = 280, NR = 16;
+  const svgContent = renderInlineTrie(['apple','apply','app'], [], W, H, NR);
+  return `<div style="padding:16px">
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;text-align:center">Trie storing: "apple", "apply", "app"</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-height:260px;display:block">${svgContent}</svg>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-secondary)">
+      <svg width="24" height="24"><circle cx="12" cy="12" r="9" fill="var(--node-end)"/><circle cx="12" cy="12" r="13" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2"/></svg>
+      = word endpoint (is_end = True)
+    </div>
+  </div>`;
 }
 
-function sharedPrefixSvg() {
-  let s = '';
-  // Show two rows: "without sharing" and "with trie"
-  s += `<text x="10" y="22" fill="var(--text-primary)" font-size="13" font-weight="600">Inserting "apple" then "app":</text>`;
-  // Trie path: root - a - p - p*(is_end) - l - e*(is_end)
-  const ys = 70;
-  const xs = [40,100,160,220,280,340];
-  const labels = ['root','a','p','p','l','e'];
-  const ends = [false,false,false,true,false,true];
-  for (let i=0;i<xs.length;i++) {
-    if (i>0) {
-      const active = i<=3;
-      s += `<line x1="${xs[i-1]+16}" y1="${ys}" x2="${xs[i]-16}" y2="${ys}" stroke="${active?'var(--edge-active)':'var(--edge-default)'}" stroke-width="${active?2.5:2}"/>`;
-      s += `<text x="${(xs[i-1]+xs[i])/2}" y="${ys-12}" fill="${active?'var(--accent)':'var(--text-secondary)'}" font-size="13" font-weight="700" text-anchor="middle" font-family="monospace">${labels[i]}</text>`;
-    }
-    const fill = ends[i]?'var(--node-end)':'var(--node-default)';
-    const stroke = ends[i]?'var(--node-end)':'var(--node-stroke)';
-    const isShared = i <= 3;
-    s += `<circle cx="${xs[i]}" cy="${ys}" r="16" fill="${fill}" stroke="${isShared?'var(--accent)':stroke}" stroke-width="${isShared?2.5:2}"/>`;
-    if (ends[i]) s += `<circle cx="${xs[i]}" cy="${ys}" r="21" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+function sharedViz() {
+  // Show trie for ["apple","app"] with shared prefix nodes highlighted
+  const root = buildTrieData(['apple','app']);
+  // Find node IDs along path a->p->p (first 3 non-root nodes)
+  const sharedIds = [];
+  let n = root;
+  for (const ch of ['a','p','p']) {
+    n = n.children[ch];
+    if (n) sharedIds.push(n.id);
   }
-  s += `<text x="10" y="${ys+40}" fill="var(--text-secondary)" font-size="12">Blue border = nodes <strong>shared</strong> between "apple" and "app"</text>`;
-  s += `<rect x="5" y="${ys-30}" width="${xs[3]+20}" height="60" rx="6" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5"/>`;
-  s += `<text x="${xs[3]+26}" y="${ys-15}" fill="var(--accent)" font-size="11">← shared prefix "app"</text>`;
-  s += `<text x="${xs[3]+10}" y="${ys+10}" fill="var(--node-end)" font-size="11">← is_end=True</text>`;
-  // Space saving note
-  s += `<text x="10" y="190" fill="var(--text-primary)" font-size="13" font-weight="600">Memory: 6 nodes total, not 5+3=8</text>`;
-  s += `<text x="10" y="212" fill="var(--text-secondary)" font-size="12">Without sharing: insert "apple" creates 5 nodes,</text>`;
-  s += `<text x="10" y="230" fill="var(--text-secondary)" font-size="12">insert "app" would create 3 more = 8 nodes total.</text>`;
-  s += `<text x="10" y="252" fill="var(--node-end)" font-size="12" font-weight="600">With Trie: only 6 nodes. Savings grow with vocabulary size!</text>`;
-  return s;
+  const W = 320, H = 240, NR = 16;
+  const svgContent = renderInlineTrie(['apple','app'], sharedIds, W, H, NR);
+  return `<div style="padding:16px">
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;text-align:center">Trie after inserting "apple" then "app"</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-height:230px;display:block">${svgContent}</svg>
+    <div style="margin-top:12px;background:var(--thought-bg);border-left:3px solid var(--thought-border);padding:10px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--text-secondary)">
+      <strong style="color:var(--accent)">Blue-highlighted nodes</strong> are shared between "apple" and "app". Inserting "app" only flips <code>is_end=True</code> on an existing node — no new nodes created for the shared prefix.
+    </div>
+    <div style="margin-top:10px;background:var(--bg-secondary);border-radius:6px;padding:10px 12px;font-size:12px">
+      <strong>Memory: 6 nodes</strong> instead of 5+3=8 &nbsp;·&nbsp; Savings grow with vocabulary size
+    </div>
+  </div>`;
 }
 
 function insertExplainHtml() {
-  return `<div style="padding:20px;font-size:13px;line-height:1.7">
-  <div style="background:var(--bg-secondary);border-radius:8px;padding:16px;margin-bottom:14px">
-    <strong style="color:var(--accent)">Step-by-step for insert("app"):</strong><br>
+  return `<div style="padding:16px;font-size:13px;line-height:1.7;overflow-y:auto;max-height:100%">
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:14px">
+    <strong style="color:var(--accent)">Step-by-step for insert("app"):</strong>
     <table style="margin-top:10px;width:100%;border-collapse:collapse">
-      <tr style="color:var(--text-secondary);font-size:11px"><th align="left">Step</th><th align="left">ch</th><th align="left">Action</th><th align="left">node.children</th></tr>
-      ${[
-        ['1','—','node = root','{}'],
-        ['2','a','a not in children → create node_1','{"a": node_1}'],
-        ['3','a','move node = node_1','{}'],
-        ['4','p','p not in children → create node_2','{"p": node_2}'],
-        ['5','p','move node = node_2','{}'],
-        ['6','p','p not in children → create node_3','{"p": node_3}'],
-        ['7','p','move node = node_3','{}'],
-        ['8','—','node.is_end = True','—'],
-      ].map(([step,ch,action,chn]) =>
-        `<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px 4px 0;color:var(--text-secondary)">${step}</td><td style="padding:4px 8px;font-family:monospace;color:var(--syn-string)">'${ch}'</td><td style="padding:4px 8px;color:var(--text-primary)">${action}</td><td style="padding:4px 0;font-family:monospace;color:var(--text-secondary);font-size:11px">${chn}</td></tr>`
+      <tr style="color:var(--text-secondary);font-size:11px;border-bottom:1px solid var(--border)"><th align="left" style="padding:4px 8px 4px 0">#</th><th align="left" style="padding:4px 8px">ch</th><th align="left" style="padding:4px 8px">Action</th></tr>
+      ${[['1','—','node = root'],['2','a',"'a' missing → create node_1"],['3','a','node = node_1'],['4','p',"'p' missing → create node_2"],['5','p','node = node_2'],['6','p',"'p' missing → create node_3"],['7','p','node = node_3'],['8','—','node.is_end = True ✓']].map(([s,c,a]) =>
+        `<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px 4px 0;color:var(--text-secondary)">${s}</td><td style="padding:4px 8px;font-family:monospace;color:var(--syn-string)">'${c}'</td><td style="padding:4px 8px;color:var(--text-primary)">${a}</td></tr>`
       ).join('')}
     </table>
   </div>
   <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
-    <strong>Key:</strong> The loop only creates new nodes when the edge is missing. If already there, it just moves forward.
-  </div>
-  </div>`;
+    <strong>Key:</strong> The loop only creates new nodes when the edge is missing. If already there, it just moves forward — that's how prefix sharing happens automatically.
+  </div></div>`;
 }
 
 function traverseExplainHtml() {
-  return `<div style="padding:20px;font-size:13px;line-height:1.7">
-  <div style="background:var(--bg-secondary);border-radius:8px;padding:16px;margin-bottom:14px">
-    <strong style="color:var(--accent)">_traverse("ap") after inserting "apple", "app":</strong><br><br>
-    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px">
-      node = root → children has 'a' ✓<br>
-      node = root.children['a'] → children has 'p' ✓<br>
-      node = node.children['p'] → return this node
+  return `<div style="padding:16px;font-size:13px;line-height:1.7;overflow-y:auto;max-height:100%">
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:14px">
+    <strong style="color:var(--accent)">_traverse("ap") — path exists:</strong>
+    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px;margin-top:8px">
+      node = root → 'a' in children ✓<br>
+      node = children['a'] → 'p' in children ✓<br>
+      node = children['p'] → return this node
     </div>
-    <br>
-    <strong style="color:var(--accent)">_traverse("ax") — missing path:</strong><br><br>
-    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px">
-      node = root → children has 'a' ✓<br>
-      node = root.children['a'] → 'x' <span style="color:var(--syn-keyword)">NOT</span> in children<br>
+  </div>
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:14px">
+    <strong style="color:var(--syn-keyword)">_traverse("ax") — path missing:</strong>
+    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px;margin-top:8px">
+      node = root → 'a' in children ✓<br>
+      node = children['a'] → 'x' NOT in children<br>
       → return <span style="color:var(--syn-keyword)">None</span>
     </div>
   </div>
   <div style="background:var(--thought-bg);border-left:3px solid var(--thought-border);padding:10px 14px;border-radius:0 8px 8px 0">
-    <strong>Why a helper?</strong> Both search() and startsWith() do the exact same walk. Factoring it out avoids code duplication and makes both methods trivially simple.
-  </div>
-  </div>`;
+    <strong>Why a helper?</strong> Both search() and startsWith() do the exact same walk. Factoring it out avoids code duplication and makes both methods trivially simple one-liners.
+  </div></div>`;
 }
 
 function compareHtml() {
-  return `<div style="padding:20px;font-size:13px;line-height:1.7">
-  <div style="background:rgba(239,68,68,0.08);border-left:4px solid #f38ba8;padding:16px;border-radius:0 8px 8px 0;margin-bottom:14px">
-    <strong style="color:#f38ba8">search("app") → must check is_end</strong><br>
-    <code style="font-size:12px">node = _traverse("app")  # node_3<br>return node is not None <u>and node.is_end</u>  # True ✓</code><br><br>
-    <strong style="color:#f38ba8">search("ap") → path exists but is_end=False</strong><br>
-    <code style="font-size:12px">node = _traverse("ap")   # node_2<br>return node is not None and node.is_end  # False ✓</code>
+  return `<div style="padding:16px;font-size:13px;line-height:1.7;overflow-y:auto;max-height:100%">
+  <div style="background:rgba(243,139,168,0.08);border-left:4px solid #f38ba8;padding:14px;border-radius:0 8px 8px 0;margin-bottom:14px">
+    <strong style="color:#f38ba8">search("app") — must check is_end</strong><br>
+    <code style="font-size:12px;display:block;margin-top:6px">node = _traverse("app")  # node at 3rd 'p'<br>return node is not None <u>and node.is_end</u>  # True ✓</code>
+    <br><strong style="color:#f38ba8">search("ap") — path exists but is_end=False</strong><br>
+    <code style="font-size:12px;display:block;margin-top:6px">node = _traverse("ap")   # node at 1st 'p'<br>return node is not None and node.is_end  # False ✓</code>
   </div>
-  <div style="background:rgba(166,227,161,0.08);border-left:4px solid var(--node-end);padding:16px;border-radius:0 8px 8px 0;margin-bottom:14px">
-    <strong style="color:var(--node-end)">startsWith("ap") → just needs the path</strong><br>
-    <code style="font-size:12px">return _traverse("ap") is not None  # True ✓</code><br><br>
-    <strong style="color:var(--node-end)">startsWith("b") → path missing</strong><br>
-    <code style="font-size:12px">return _traverse("b") is not None   # False ✓</code>
+  <div style="background:rgba(166,227,161,0.08);border-left:4px solid var(--node-end);padding:14px;border-radius:0 8px 8px 0;margin-bottom:14px">
+    <strong style="color:var(--node-end)">startsWith("ap") — just needs path</strong><br>
+    <code style="font-size:12px;display:block;margin-top:6px">return _traverse("ap") is not None  # True ✓</code>
+    <br><strong style="color:var(--node-end)">startsWith("b") — path missing</strong><br>
+    <code style="font-size:12px;display:block;margin-top:6px">return _traverse("b") is not None   # False ✓</code>
   </div>
   <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
-    <strong>The Trie stores both complete words AND all prefixes simultaneously.</strong> is_end is the lightweight marker that distinguishes them.
-  </div>
-  </div>`;
+    <strong>The Trie stores both complete words AND all prefixes simultaneously.</strong> is_end is the lightweight flag that distinguishes them.
+  </div></div>`;
 }
 
 function complexityHtml() {
-  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  return `<div style="padding:16px;font-size:13px;line-height:1.7;overflow-y:auto;max-height:100%">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px">
-      <strong style="color:var(--accent)">Trie</strong><br><br>
+    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;border-top:3px solid var(--accent)">
+      <strong style="color:var(--accent)">✅ Trie</strong><br><br>
       insert: <strong>O(k)</strong><br>
       search: <strong>O(k)</strong><br>
       startsWith: <strong>O(k)</strong><br><br>
-      <span style="color:var(--text-secondary);font-size:12px">k = length of word/prefix</span>
+      <span style="color:var(--text-secondary);font-size:11px">k = query length</span>
     </div>
-    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px">
-      <strong style="color:var(--syn-keyword)">Hash Map</strong><br><br>
+    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;border-top:3px solid #f38ba8">
+      <strong style="color:#f38ba8">❌ Hash Map</strong><br><br>
       insert: O(k)<br>
       search: O(k)<br>
       startsWith: <strong style="color:#f38ba8">O(n·k)</strong><br><br>
-      <span style="color:var(--text-secondary);font-size:12px">n = number of stored words</span>
+      <span style="color:var(--text-secondary);font-size:11px">n = stored words</span>
     </div>
   </div>
   <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
-    <strong>Space: O(A · k · n)</strong> — A = alphabet size, k = avg word length, n = number of words<br>
-    <span style="color:var(--text-secondary);font-size:12px">In the worst case every word is unique with no shared prefixes.</span>
+    <strong>Space: O(A · k · n)</strong><br>
+    <span style="color:var(--text-secondary);font-size:12px">A = alphabet size (26), k = avg word length, n = word count. Worst case: all words unique with no shared prefixes.</span>
   </div>
   <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
-    Real-world use: autocomplete has n=millions of words, querying prefixes constantly. Hash map would be unusably slow. Trie is the standard solution.
-  </div>
-  </div>`;
+    Real-world use: autocomplete has n=millions of words. Hash map startsWith = O(millions × k). Trie = O(k). The trie wins decisively.
+  </div></div>`;
 }
 
 function edgeCaseHtml() {
-  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  return `<div style="padding:16px;font-size:13px;line-height:1.7;overflow-y:auto;max-height:100%">
   <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
-    <strong style="color:var(--accent)">Edge Case: Empty String ""</strong><br>
-    <code style="font-size:12px;display:block;margin-top:8px">insert(""):  loop → no iterations → root.is_end = True<br>search(""):  _traverse("") returns root → root.is_end = True ✓<br>startsWith(""): _traverse returns root → True ✓</code>
+    <strong style="color:var(--accent)">Edge Case: Empty String ""</strong>
+    <code style="font-size:12px;display:block;margin-top:8px;background:var(--bg-primary);padding:10px;border-radius:6px">insert(""):  no iterations → root.is_end = True<br>search(""):  _traverse → root → root.is_end = True ✓<br>startsWith(""): _traverse → root (not None) → True ✓</code>
   </div>
   <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
     <strong style="color:var(--accent)">__slots__ trick</strong><br><br>
     Normally Python stores instance attributes in a <code>__dict__</code> per object. With millions of TrieNodes, that's millions of dicts.<br><br>
-    <code style="font-size:12px">__slots__ = ('children', 'is_end')</code><br><br>
+    <code style="background:var(--bg-primary);padding:4px 8px;border-radius:4px;font-size:12px">__slots__ = ('children', 'is_end')</code><br><br>
     This replaces per-instance <code>__dict__</code> with fixed-size slot descriptors. Result: <strong>~40-50% less memory per node</strong>.
   </div>
   <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
     <strong>Interview tip:</strong> Mentioning __slots__ signals you understand Python's object model at a deeper level — a great talking point in senior-level interviews.
-  </div>
-  </div>`;
+  </div></div>`;
 }
 
-function intuitionNext() {
-  if (currentIntuitionStage < INTUITION_STAGES.length - 1) {
-    currentIntuitionStage++;
-    renderIntuitionMode();
-  }
-}
-function intuitionPrev() {
-  if (currentIntuitionStage > 0) {
-    currentIntuitionStage--;
-    renderIntuitionMode();
-  }
-}
+function intuitionNext() { if (currentIntuitionStage < INTUITION_STAGES.length - 1) { currentIntuitionStage++; renderIntuitionMode(); } }
+function intuitionPrev() { if (currentIntuitionStage > 0) { currentIntuitionStage--; renderIntuitionMode(); } }
 function intuitionTogglePlay() {
   if (intuitionPlaying) {
-    intuitionPlaying = false;
-    clearInterval(intuitionInterval);
+    intuitionPlaying = false; clearInterval(intuitionInterval);
     document.getElementById('btn-intuition-play').textContent = '▶ Play';
   } else {
     intuitionPlaying = true;
     document.getElementById('btn-intuition-play').textContent = '⏸ Pause';
     intuitionInterval = setInterval(() => {
       if (currentIntuitionStage >= INTUITION_STAGES.length - 1) {
-        intuitionPlaying = false;
-        clearInterval(intuitionInterval);
-        document.getElementById('btn-intuition-play').textContent = '▶ Play';
-        return;
+        intuitionPlaying = false; clearInterval(intuitionInterval);
+        document.getElementById('btn-intuition-play').textContent = '▶ Play'; return;
       }
       intuitionNext();
     }, 4000);
   }
 }
 
-// ─────────────────────────────────────────────
-// MODE SWITCHING
-// ─────────────────────────────────────────────
+// ─── MODE SWITCHING ───
 let currentMode = 'intuition';
-
 function setMode(mode) {
-  currentMode = mode;
-  stopPlay();
-  if (intuitionPlaying) {
-    intuitionPlaying = false;
-    clearInterval(intuitionInterval);
-    const pb = document.getElementById('btn-intuition-play');
-    if (pb) pb.textContent = '▶ Play';
-  }
-
-  const iMain = document.getElementById('intuition-main');
-  const eMain = document.getElementById('execution-main');
-  const iBtn = document.getElementById('btn-intuition');
-  const eBtn = document.getElementById('btn-execution');
+  currentMode = mode; stopPlay();
+  if (intuitionPlaying) { intuitionPlaying = false; clearInterval(intuitionInterval); const pb = document.getElementById('btn-intuition-play'); if (pb) pb.textContent = '▶ Play'; }
+  const iMain = document.getElementById('intuition-main'), eMain = document.getElementById('execution-main');
+  const iBtn = document.getElementById('btn-intuition'), eBtn = document.getElementById('btn-execution');
   const inputRow = document.getElementById('input-row');
-
   iBtn.className = 'mode-btn' + (mode==='intuition'?' active-intuition':'');
   eBtn.className = 'mode-btn' + (mode==='execution'?' active-execution':'');
-
   if (mode === 'intuition') {
-    iMain.style.display = 'flex';
-    eMain.style.display = 'none';
-    inputRow.style.display = 'none';
+    iMain.style.display = 'flex'; eMain.style.display = 'none'; inputRow.style.display = 'none';
     renderIntuitionMode();
   } else {
-    iMain.style.display = 'none';
-    eMain.style.display = 'flex';
-    inputRow.style.display = 'flex';
-    if (steps.length === 0) {
-      renderOpList();
-      runOps();
-    }
-    renderStep();
+    iMain.style.display = 'none'; eMain.style.display = 'flex'; inputRow.style.display = 'flex';
+    if (steps.length === 0) { renderOpList(); runOps(); } else renderStep();
   }
 }
 
-// ─────────────────────────────────────────────
-// THEME
-// ─────────────────────────────────────────────
+// ─── THEME ───
 function toggleTheme() {
-  const body = document.body;
-  const isDark = body.getAttribute('data-theme') === 'dark';
+  const body = document.body, isDark = body.getAttribute('data-theme') === 'dark';
   body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  const btn = document.querySelector('.btn[onclick="toggleTheme()"]');
-  if (btn) btn.textContent = isDark ? '🌙 Theme' : '☀️ Theme';
-  if (steps.length > 0) renderTrie(steps[currentStep]);
+  document.querySelector('.btn[onclick="toggleTheme()"]').textContent = isDark ? '☀️ Theme' : '🌙 Theme';
+  if (currentMode === 'execution' && steps.length > 0) renderTrie(steps[currentStep]);
+  else renderIntuitionViz();
 }
 
-// ─────────────────────────────────────────────
-// PANEL RESIZING
-// ─────────────────────────────────────────────
+// ─── PANEL RESIZING ───
 function initDividers() {
   const main = document.getElementById('execution-main');
   makeDraggable(document.getElementById('div1'), 'code-panel', 'viz-panel', main);
   makeDraggable(document.getElementById('div2'), 'viz-panel', 'step-panel', main);
 }
-
 function makeDraggable(divider, leftId, rightId, container) {
   let dragging = false;
-  divider.addEventListener('mousedown', e => {
-    dragging = true;
-    divider.classList.add('dragging');
-    e.preventDefault();
-  });
+  divider.addEventListener('mousedown', e => { dragging = true; divider.classList.add('dragging'); e.preventDefault(); });
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const rect = container.getBoundingClientRect();
-    const left = document.getElementById(leftId);
-    const right = document.getElementById(rightId);
-    const totalW = rect.width;
-    const mouseX = e.clientX - rect.left;
-    const leftRect = left.getBoundingClientRect();
-    const rightRect = right.getBoundingClientRect();
-    const combined = leftRect.width + rightRect.width;
-    const newLeftW = mouseX - (leftRect.left - rect.left);
+    const rect = container.getBoundingClientRect(), left = document.getElementById(leftId), totalW = rect.width;
+    const newLeftW = e.clientX - rect.left - (left.getBoundingClientRect().left - rect.left);
     const pct = Math.max(10, Math.min(80, (newLeftW / totalW) * 100));
-    left.style.width = pct + '%';
-    left.style.flex = 'none';
-    right.style.flex = '1';
+    left.style.width = pct + '%'; left.style.flex = 'none';
+    document.getElementById(rightId).style.flex = '1';
     if (steps.length > 0) renderTrie(steps[currentStep]);
   });
-  document.addEventListener('mouseup', () => {
-    dragging = false;
-    divider.classList.remove('dragging');
-  });
+  document.addEventListener('mouseup', () => { dragging = false; divider.classList.remove('dragging'); });
 }
 
-// ─────────────────────────────────────────────
-// KEYBOARD
-// ─────────────────────────────────────────────
+// ─── KEYBOARD ───
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
   if (e.code === 'Space') { e.preventDefault(); if (currentMode==='execution') togglePlay(); else intuitionTogglePlay(); }
@@ -1609,20 +1388,15 @@ document.addEventListener('keydown', e => {
   if (e.code === 'ArrowLeft') { e.preventDefault(); if (currentMode==='execution') stepBack(); else intuitionPrev(); }
 });
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
+// ─── INIT ───
 window.addEventListener('load', () => {
-  buildCodePanel();
-  renderOpList();
-  initDividers();
+  buildCodePanel(); renderOpList(); initDividers();
+  runOps(); // pre-run silently
   renderIntuitionMode();
-  // pre-run ops silently
-  runOps();
 });
-
 window.addEventListener('resize', () => {
   if (currentMode === 'execution' && steps.length > 0) renderTrie(steps[currentStep]);
+  else renderIntuitionViz();
 });
 </script>
 </body>
