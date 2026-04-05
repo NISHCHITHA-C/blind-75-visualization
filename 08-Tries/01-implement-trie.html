@@ -1,386 +1,1629 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>208. Implement Trie</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<title>208. Implement Trie (Prefix Tree) - Visualizer</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
-  --insert:#3b82f6;--search:#10b981;--prefix:#f59e0b;--end:#a78bfa;
-  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
+:root {
+  --bg-primary: #1e1e2e;
+  --bg-secondary: #181825;
+  --bg-panel: #1e1e2e;
+  --bg-panel-header: #181825;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --border: #313244;
+  --accent: #89b4fa;
+  --accent2: #cba6f7;
+  --highlight-line: rgba(249,226,175,0.12);
+  --font-mono: 'Consolas','Monaco','Courier New',monospace;
+
+  --syn-keyword: #ff79c6;
+  --syn-function: #50fa7b;
+  --syn-string: #f1fa8c;
+  --syn-comment: #6272a4;
+  --syn-type: #8be9fd;
+  --syn-number: #bd93f9;
+  --syn-decorator: #ffb86c;
+  --syn-self: #ff5555;
+  --syn-builtin: #ffb86c;
+
+  --node-default: #313244;
+  --node-stroke: #585b70;
+  --node-active: #89b4fa;
+  --node-end: #a6e3a1;
+  --node-path: #cba6f7;
+  --node-text: #cdd6f4;
+  --edge-default: #585b70;
+  --edge-active: #89b4fa;
+
+  --btn-bg: #313244;
+  --btn-hover: #45475a;
+  --btn-active-bg: #89b4fa;
+  --btn-active-text: #1e1e2e;
+
+  --mode-intuition: #cba6f7;
+  --mode-execution: #89b4fa;
+
+  --scrollbar-thumb: #45475a;
+  --insight-bg: rgba(166,227,161,0.08);
+  --insight-border: #a6e3a1;
+  --thought-bg: rgba(137,180,250,0.08);
+  --thought-border: #89b4fa;
 }
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f2;
+  --bg-panel: #ffffff;
+  --bg-panel-header: #f3f4f6;
+  --text-primary: #1e1e2e;
+  --text-secondary: #6c6f85;
+  --border: #e0e0e6;
+  --accent: #1d6fe5;
+  --accent2: #8839ef;
+  --highlight-line: rgba(255,200,50,0.18);
 
-header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
-.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
-.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--prefix);}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  --syn-keyword: #d73a49;
+  --syn-function: #6f42c1;
+  --syn-string: #032f62;
+  --syn-comment: #6a737d;
+  --syn-type: #005cc5;
+  --syn-number: #6f42c1;
+  --syn-decorator: #e36209;
+  --syn-self: #d73a49;
+  --syn-builtin: #e36209;
 
-main{display:grid;grid-template-columns:320px 1fr 260px;flex:1;overflow:hidden;}
+  --node-default: #e9ecef;
+  --node-stroke: #ced4da;
+  --node-active: #1d6fe5;
+  --node-end: #28a745;
+  --node-path: #8839ef;
+  --node-text: #1e1e2e;
+  --edge-default: #adb5bd;
+  --edge-active: #1d6fe5;
 
-.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
-.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
-.cl.active{background:rgba(59,130,246,.1);}
-.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
-.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
-.cl.active .ln{color:#3b82f6;}
-.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
-.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}.op{color:#56b6c2;}
+  --btn-bg: #e9ecef;
+  --btn-hover: #dee2e6;
+  --btn-active-bg: #1d6fe5;
+  --btn-active-text: #ffffff;
 
-.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.controls{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;}
-.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:140px;}
-.inp:focus{border-color:#3b82f6;}
-.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;padding:5px 12px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
-.btn-insert{background:var(--insert);color:#fff;}.btn-insert:hover{background:#2563eb;}
-.btn-search{background:var(--search);color:#fff;}.btn-search:hover{background:#059669;}
-.btn-prefix{background:var(--prefix);color:#fff;}.btn-prefix:hover{background:#d97706;}
+  --mode-intuition: #8839ef;
+  --mode-execution: #1d6fe5;
 
-.trie-viz{flex:1;overflow:auto;padding:20px;}
-.trie-canvas{min-height:300px;position:relative;}
+  --scrollbar-thumb: #ced4da;
+  --insight-bg: rgba(40,167,69,0.08);
+  --insight-border: #28a745;
+  --thought-bg: rgba(29,111,229,0.08);
+  --thought-border: #1d6fe5;
+}
 
-.trie-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
-.node-box{width:40px;height:40px;border-radius:8px;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:var(--text);transition:all .3s;position:relative;}
-.trie-node.active .node-box{border-color:var(--insert);box-shadow:0 0 14px rgba(59,130,246,.3);color:var(--insert);}
-.trie-node.found .node-box{border-color:var(--search);box-shadow:0 0 14px rgba(16,185,129,.3);color:var(--search);}
-.trie-node.is-end .node-box::after{content:'*';position:absolute;top:-8px;right:-8px;width:16px;height:16px;border-radius:50%;background:var(--end);color:#fff;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
-.edge-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:3px;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
 
-.trie-edge{position:absolute;stroke:var(--border);stroke-width:2;fill:none;transition:all .3s;}
-.trie-edge.active{stroke:var(--insert);stroke-width:3;}
-.trie-edge.found{stroke:var(--search);stroke-width:3;}
+/* ── HEADER ── */
+#header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+.header-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.problem-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.2px;
+}
+.header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mode-toggle { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.mode-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--btn-bg);
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active-intuition { background: var(--mode-intuition); color: #1e1e2e; }
+.mode-btn.active-execution { background: var(--mode-execution); color: #1e1e2e; }
+.mode-btn:hover:not(.active-intuition):not(.active-execution) { background: var(--btn-hover); color: var(--text-primary); }
+.btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn:hover { background: var(--btn-hover); }
+.btn.primary { background: var(--btn-active-bg); color: var(--btn-active-text); border-color: var(--btn-active-bg); }
 
-.result{margin:12px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
-.result.success{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--search);}
-.result.fail{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07);color:#ef4444;}
+/* Input row */
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.op-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.op-entry {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+.op-entry select, .op-entry input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.op-entry select option { background: var(--bg-secondary); }
+.add-op-btn, .remove-op-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 5px;
+  padding: 3px 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+}
+.remove-op-btn { border-color: #f38ba8; color: #f38ba8; padding: 3px 6px; }
+.remove-op-btn:hover { background: rgba(243,139,168,0.15); }
+.add-op-btn:hover { background: var(--btn-hover); color: var(--text-primary); }
 
-.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
-.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
-.lc:hover{color:var(--text);}
-.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
-.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
-.le.insert{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--insert);}
-.le.search{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--search);}
-.le.prefix{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);color:var(--prefix);}
-.ls{color:var(--muted);margin-right:6px;}
+/* ── MAIN ── */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── PANELS ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+}
+.panel:last-child { border-right: none; }
+.panel-header {
+  background: var(--bg-panel-header);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.panel-content { flex: 1; overflow: auto; }
+
+/* Divider */
+.divider {
+  width: 5px;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.divider:hover, .divider.dragging { background: var(--accent); }
+
+/* ── CODE PANEL ── */
+#code-panel { min-width: 160px; }
+.code-inner {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  overflow: auto;
+  height: 100%;
+}
+.code-inner pre { margin: 0; padding: 14px 0 14px 0; }
+.code-line {
+  display: flex;
+  align-items: stretch;
+  min-height: 22px;
+  transition: background 0.18s;
+  padding: 0;
+}
+.code-line.active-line { background: var(--highlight-line) !important; }
+.line-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 38px;
+  padding-right: 14px;
+  color: var(--syn-comment);
+  user-select: none;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.line-code {
+  flex: 1;
+  white-space: pre;
+  padding-right: 16px;
+}
+/* Syntax */
+.sk { color: var(--syn-keyword); font-weight: 600; }
+.sf { color: var(--syn-function); }
+.ss { color: var(--syn-string); }
+.sc { color: var(--syn-comment); font-style: italic; }
+.st { color: var(--syn-type); }
+.sn { color: var(--syn-number); }
+.sd { color: var(--syn-decorator); }
+.sv { color: var(--syn-self); }
+.sp { color: var(--text-primary); }
+
+/* ── VIZ PANEL ── */
+#viz-panel { min-width: 200px; display: flex; flex-direction: column; }
+#viz-area { flex: 1; overflow: hidden; position: relative; }
+#viz-svg { width: 100%; height: 100%; }
+.viz-bottom-bar {
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel-header);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.ctrl-btn {
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.12s;
+  line-height: 1;
+}
+.ctrl-btn:hover { background: var(--btn-hover); }
+.ctrl-btn.play { background: var(--accent); color: #1e1e2e; border-color: var(--accent); font-size: 13px; padding: 5px 14px; }
+.ctrl-btn.play:hover { opacity: 0.85; }
+.step-counter { font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); }
+.speed-sel {
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.15s; }
+
+/* ── STEP PANEL ── */
+#step-panel { min-width: 130px; }
+.step-content { padding: 12px; }
+.step-description {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: var(--thought-bg);
+  border-left: 3px solid var(--thought-border);
+  border-radius: 0 6px 6px 0;
+}
+.vars-section { margin-bottom: 14px; }
+.vars-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.var-row {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  margin-bottom: 5px;
+  display: flex;
+  gap: 4px;
+}
+.var-name { color: var(--accent); }
+.var-val { color: var(--text-secondary); word-break: break-all; }
+.history-item {
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-left: 2px solid transparent;
+  color: var(--text-secondary);
+}
+.history-item.current {
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border-left-color: var(--accent);
+}
+.history-item:hover { background: var(--btn-hover); }
+
+/* ── INTUITION MODE ── */
+#intuition-main {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.intuition-panel-left {
+  width: 50%;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.intuition-panel-right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.intuition-content { flex: 1; overflow-y: auto; padding: 20px; }
+.intuition-bottom {
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel-header);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.stage-block {
+  margin-bottom: 24px;
+  transition: opacity 0.3s;
+}
+.stage-block.future { opacity: 0.25; }
+.stage-block.past { opacity: 0.55; }
+.stage-block.current { opacity: 1; }
+.stage-num-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.stage-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--btn-bg);
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.stage-block.current .stage-num {
+  background: var(--mode-intuition);
+  color: #1e1e2e;
+  border-color: var(--mode-intuition);
+}
+.stage-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.thought-bubble {
+  background: var(--thought-bg);
+  border-left: 3px solid var(--thought-border);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.stage-body {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.stage-body strong { color: var(--text-primary); }
+.key-insight {
+  background: var(--insight-bg);
+  border-left: 3px solid var(--insight-border);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.key-insight .label { font-weight: 700; color: var(--insight-border); margin-right: 4px; }
+
+/* Trie tree node labels */
+.trie-edge-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--text-primary);
+}
+.trie-node-circle { transition: fill 0.2s, stroke 0.2s; }
 </style>
 </head>
-<body>
-<header>
-  <div class="h-num">208</div>
-  <div class="h-title">Implement Trie (Prefix Tree)</div>
-  <div class="h-badge">MEDIUM</div>
-</header>
+<body data-theme="dark">
 
-<main>
-  <div class="code-panel">
-    <div class="plabel">Trie Implementation</div>
-    <div class="code-scroll" id="codePanel"></div>
-  </div>
-
-  <div class="viz-panel">
-    <div class="controls">
-      <input id="wordInput" class="inp" placeholder="Enter word..."/>
-      <button class="btn btn-insert" onclick="insertWord()">Insert</button>
-      <button class="btn btn-search" onclick="searchWord()">Search</button>
-      <button class="btn btn-prefix" onclick="searchPrefix()">Prefix</button>
-    </div>
-    <div class="trie-viz">
-      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
-      <div id="trieCanvas" class="trie-canvas"></div>
-    </div>
-    <div id="result" class="result">Ready to insert, search, or check prefixes</div>
-    <div style="margin-top:auto;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);font-family:'JetBrains Mono';font-size:.65rem;color:var(--muted);">
-      Inserted words: <span id="wordList" style="color:var(--text);">[]</span>
+<div id="header">
+  <div class="header-row1">
+    <span class="problem-title">208. Implement Trie (Prefix Tree)</span>
+    <div class="header-controls">
+      <div class="mode-toggle">
+        <button class="mode-btn active-intuition" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition</button>
+        <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶ Execution</button>
+      </div>
+      <button class="btn" onclick="toggleTheme()">🌙 Theme</button>
     </div>
   </div>
-
-  <div class="log-panel">
-    <div class="plabel">
-      Operation Log
-      <button class="lc" onclick="clearLog()">Clear</button>
-    </div>
-    <div class="log-scroll" id="logScroll"></div>
+  <div id="input-row" class="input-row" style="display:none;">
+    <span style="font-weight:600;color:var(--text-primary);white-space:nowrap;">Operations:</span>
+    <div id="op-list" class="op-list"></div>
+    <button class="add-op-btn" onclick="addOp()">+ Add</button>
+    <button class="btn primary" style="margin-left:4px" onclick="runOps()">▶ Run</button>
   </div>
-</main>
+</div>
+
+<div id="main">
+  <!-- INTUITION MODE -->
+  <div id="intuition-main">
+    <div class="intuition-panel-left">
+      <div class="panel-header">
+        <span>Senior Engineer's Thought Process</span>
+        <span id="intuition-stage-counter" style="font-family:var(--font-mono)">Stage 1 / 7</span>
+      </div>
+      <div class="intuition-content" id="intuition-content"></div>
+      <div class="intuition-bottom">
+        <button class="ctrl-btn" onclick="intuitionPrev()">◀</button>
+        <button class="ctrl-btn play" id="btn-intuition-play" onclick="intuitionTogglePlay()">▶ Play</button>
+        <button class="ctrl-btn" onclick="intuitionNext()">▶</button>
+        <div class="progress-bar" style="flex:1">
+          <div class="progress-fill" id="intuition-progress" style="width:14%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="intuition-panel-right">
+      <div class="panel-header">Visual Explanation</div>
+      <div class="panel-content" id="intuition-viz"></div>
+    </div>
+  </div>
+
+  <!-- EXECUTION MODE (hidden initially) -->
+  <div id="execution-main" style="display:none;width:100%;height:100%;display:none;flex:1;overflow:hidden;">
+    <div class="panel" id="code-panel">
+      <div class="panel-header">
+        <span>Python Code</span>
+        <span id="code-line-indicator" style="font-family:var(--font-mono)">Line —</span>
+      </div>
+      <div class="panel-content">
+        <div class="code-inner"><pre id="code-pre"></pre></div>
+      </div>
+    </div>
+    <div class="divider" id="div1"></div>
+    <div class="panel" id="viz-panel" style="flex:1">
+      <div class="panel-header">
+        <span>Trie Visualization</span>
+        <span id="op-indicator" style="font-family:var(--font-mono);color:var(--accent)"></span>
+      </div>
+      <div id="viz-area">
+        <svg id="viz-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="viz-bottom-bar">
+        <button class="ctrl-btn" title="Reset" onclick="gotoStep(0)">⏮</button>
+        <button class="ctrl-btn" onclick="stepBack()">◀</button>
+        <button class="ctrl-btn play" id="btn-play" onclick="togglePlay()">▶</button>
+        <button class="ctrl-btn" onclick="stepForward()">▶</button>
+        <button class="ctrl-btn" title="End" onclick="gotoStep(steps.length-1)">⏭</button>
+        <select class="speed-sel" id="speed-sel" onchange="setSpeed(this.value)">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+        <span class="step-counter" id="step-counter">Step 0 / 0</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="exec-progress" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider" id="div2"></div>
+    <div class="panel" id="step-panel">
+      <div class="panel-header">Step Log</div>
+      <div class="panel-content" id="step-log-panel"></div>
+    </div>
+  </div>
+</div>
 
 <script>
-const code=[
-  {t:'class TrieNode:',cm:true},
-  {t:'    def __init__(self):',ln:1},
-  {t:'        self.children = {}',ln:2},
-  {t:'        self.is_end = False',ln:3},
-  {t:'',ln:4},
-  {t:'class Trie:',cm:true},
-  {t:'    def __init__(self):',ln:5},
-  {t:'        self.root = TrieNode()',ln:6},
-  {t:'    ',ln:7},
-  {t:'    def insert(self, word):',ln:8},
-  {t:'        node = self.root',ln:9},
-  {t:'        for char in word:',ln:10},
-  {t:'            if char not in node.children:',ln:11},
-  {t:'                node.children[char] = TrieNode()',ln:12},
-  {t:'            node = node.children[char]',ln:13},
-  {t:'        node.is_end = True',ln:14},
-  {t:'    ',ln:15},
-  {t:'    def search(self, word):',ln:16},
-  {t:'        node = self.root',ln:17},
-  {t:'        for char in word:',ln:18},
-  {t:'            if char not in node.children:',ln:19},
-  {t:'                return False',ln:20},
-  {t:'            node = node.children[char]',ln:21},
-  {t:'        return node.is_end',ln:22},
-  {t:'    ',ln:23},
-  {t:'    def startsWith(self, prefix):',ln:24},
-  {t:'        node = self.root',ln:25},
-  {t:'        for char in prefix:',ln:26},
-  {t:'            if char not in node.children:',ln:27},
-  {t:'                return False',ln:28},
-  {t:'            node = node.children[char]',ln:29},
-  {t:'        return True',ln:30}
+// ─────────────────────────────────────────────
+// PYTHON CODE (for display and highlighting)
+// ─────────────────────────────────────────────
+const RAW_CODE = `class TrieNode:
+    __slots__ = ('children', 'is_end')
+
+    def __init__(self):
+        self.children: dict[str, 'TrieNode'] = {}
+        self.is_end: bool = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.is_end = True
+
+    def _traverse(self, word: str) -> TrieNode | None:
+        """Return the node at end of word/prefix, or None if path doesn't exist."""
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                return None
+            node = node.children[ch]
+        return node
+
+    def search(self, word: str) -> bool:
+        node = self._traverse(word)
+        return node is not None and node.is_end
+
+    def startsWith(self, prefix: str) -> bool:
+        return self._traverse(prefix) is not None`;
+
+// ─────────────────────────────────────────────
+// SYNTAX HIGHLIGHTING
+// ─────────────────────────────────────────────
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function highlightLine(raw) {
+  // We'll build highlighted HTML token by token
+  let s = raw;
+
+  // 1. Extract leading whitespace
+  const wsMatch = s.match(/^(\s*)/);
+  const ws = wsMatch ? wsMatch[1] : '';
+  s = s.slice(ws.length);
+
+  if (!s) return escHtml(ws);
+
+  // 2. Comment (whole line after #)
+  const commentIdx = findCommentHash(raw);
+  if (commentIdx !== -1) {
+    const pre = raw.slice(0, commentIdx);
+    const comment = raw.slice(commentIdx);
+    return highlightTokens(pre) + `<span class="sc">${escHtml(comment)}</span>`;
+  }
+
+  // 3. Docstring (""" ... """) — triple-quoted
+  if (s.startsWith('"""') || s.startsWith("'''")) {
+    return `<span class="ss">${escHtml(ws + s)}</span>`;
+  }
+
+  return highlightTokens(raw);
+}
+
+function findCommentHash(line) {
+  let inStr = false, strChar = '';
+  for (let i = 0; i < line.length; i++) {
+    if (inStr) {
+      if (line[i] === strChar && line[i-1] !== '\\') inStr = false;
+    } else {
+      if (line[i] === '"' || line[i] === "'") { inStr = true; strChar = line[i]; }
+      else if (line[i] === '#') return i;
+    }
+  }
+  return -1;
+}
+
+function highlightTokens(line) {
+  const KEYWORDS = new Set(['class','def','return','for','if','in','not','and','or','None','True','False','from','import','pass','else','elif','while','with','as','lambda','yield','raise','try','except','finally','is']);
+  const BUILTINS = new Set(['dict','list','str','int','bool','None','set','tuple','len','range','print','type']);
+  const TYPES = new Set(['Optional','TreeNode','TrieNode','Trie']);
+
+  let out = '';
+  let i = 0;
+  while (i < line.length) {
+    // String
+    if (line[i] === '"' || line[i] === "'") {
+      let q = line[i]; let j = i + 1;
+      while (j < line.length && !(line[j] === q && line[j-1] !== '\\')) j++;
+      j++;
+      out += `<span class="ss">${escHtml(line.slice(i, j))}</span>`;
+      i = j; continue;
+    }
+    // Word token
+    if (/[a-zA-Z_]/.test(line[i])) {
+      let j = i;
+      while (j < line.length && /\w/.test(line[j])) j++;
+      const word = line.slice(i, j);
+      if (KEYWORDS.has(word)) out += `<span class="sk">${escHtml(word)}</span>`;
+      else if (word === 'self') out += `<span class="sv">${escHtml(word)}</span>`;
+      else if (TYPES.has(word)) out += `<span class="st">${escHtml(word)}</span>`;
+      else if (BUILTINS.has(word)) out += `<span class="sp">${escHtml(word)}</span>`;
+      else if (j < line.length && line[j] === '(') out += `<span class="sf">${escHtml(word)}</span>`;
+      else if (word.startsWith('__') && word.endsWith('__')) out += `<span class="sd">${escHtml(word)}</span>`;
+      else out += escHtml(word);
+      i = j; continue;
+    }
+    // Number
+    if (/[0-9]/.test(line[i])) {
+      let j = i;
+      while (j < line.length && /[0-9.]/.test(line[j])) j++;
+      out += `<span class="sn">${escHtml(line.slice(i, j))}</span>`;
+      i = j; continue;
+    }
+    // Decorator
+    if (line[i] === '@') {
+      let j = i;
+      while (j < line.length && /\S/.test(line[j])) j++;
+      out += `<span class="sd">${escHtml(line.slice(i, j))}</span>`;
+      i = j; continue;
+    }
+    out += escHtml(line[i]);
+    i++;
+  }
+  return out;
+}
+
+function buildCodePanel() {
+  const pre = document.getElementById('code-pre');
+  const lines = RAW_CODE.split('\n');
+  pre.innerHTML = '';
+  lines.forEach((line, idx) => {
+    const div = document.createElement('div');
+    div.className = 'code-line';
+    div.id = `cl-${idx}`;
+    const numSpan = document.createElement('span');
+    numSpan.className = 'line-num';
+    numSpan.textContent = idx + 1;
+    const codeSpan = document.createElement('span');
+    codeSpan.className = 'line-code';
+    codeSpan.innerHTML = highlightLine(line) || '&nbsp;';
+    div.appendChild(numSpan);
+    div.appendChild(codeSpan);
+    pre.appendChild(div);
+  });
+}
+
+let lastActiveLine = -1;
+function setActiveLine(n) {
+  if (lastActiveLine >= 0) {
+    const el = document.getElementById(`cl-${lastActiveLine}`);
+    if (el) el.classList.remove('active-line');
+  }
+  if (n >= 0) {
+    const el = document.getElementById(`cl-${n}`);
+    if (el) {
+      el.classList.add('active-line');
+      el.scrollIntoView({ block: 'nearest' });
+    }
+    document.getElementById('code-line-indicator').textContent = `Line ${n + 1}`;
+  } else {
+    document.getElementById('code-line-indicator').textContent = 'Line —';
+  }
+  lastActiveLine = n;
+}
+
+// ─────────────────────────────────────────────
+// TRIE DATA STRUCTURE (JS simulation)
+// ─────────────────────────────────────────────
+class TrieNode {
+  constructor(id) {
+    this.children = {};
+    this.is_end = false;
+    this.id = id;
+  }
+}
+
+class TrieSim {
+  constructor() {
+    this.nodeCounter = 0;
+    this.root = new TrieNode(this.nodeCounter++);
+    this.steps = [];
+  }
+
+  cloneForStep() {
+    // Deep clone the trie tree for snapshot
+    const cloneNode = (n) => {
+      if (!n) return null;
+      const c = { id: n.id, is_end: n.is_end, children: {} };
+      for (const [ch, child] of Object.entries(n.children)) c.children[ch] = cloneNode(child);
+      return c;
+    };
+    return cloneNode(this.root);
+  }
+
+  addStep(line, desc, vars, highlightNodeId, opType, opLabel, pathHighlight=[]) {
+    this.steps.push({
+      line, desc, vars: JSON.parse(JSON.stringify(vars)),
+      trieSnapshot: this.cloneForStep(),
+      highlightNodeId, opType, opLabel, pathHighlight: [...pathHighlight]
+    });
+  }
+
+  insert(word) {
+    let node = this.root;
+    let pathHighlight = [node.id];
+    this.addStep(12, `insert("${word}") — start at root`, {word, node_id: node.id, ch: '—'}, node.id, 'insert', `insert("${word}")`, pathHighlight);
+    for (const ch of word) {
+      this.addStep(13, `for ch = '${ch}' in word`, {word, ch, node_id: node.id}, node.id, 'insert', `insert("${word}")`, pathHighlight);
+      if (!(ch in node.children)) {
+        const newNode = new TrieNode(this.nodeCounter++);
+        node.children[ch] = newNode;
+        this.addStep(15, `'${ch}' not in children → create new TrieNode`, {ch, new_node_id: newNode.id}, newNode.id, 'insert', `insert("${word}")`, [...pathHighlight, newNode.id]);
+      } else {
+        this.addStep(14, `'${ch}' already in children`, {ch, existing_node_id: node.children[ch].id}, node.children[ch].id, 'insert', `insert("${word}")`, pathHighlight);
+      }
+      node = node.children[ch];
+      pathHighlight.push(node.id);
+      this.addStep(16, `move node = children['${ch}'] (id=${node.id})`, {ch, node_id: node.id}, node.id, 'insert', `insert("${word}")`, pathHighlight);
+    }
+    node.is_end = true;
+    this.addStep(17, `Mark node.is_end = True (word complete)`, {node_id: node.id, is_end: true}, node.id, 'insert', `insert("${word}")`, pathHighlight);
+  }
+
+  _traverse(word, opType, opLabel) {
+    let node = this.root;
+    let pathHighlight = [node.id];
+    this.addStep(21, `_traverse("${word}") — start at root`, {word, node_id: node.id}, node.id, opType, opLabel, pathHighlight);
+    for (const ch of word) {
+      this.addStep(22, `for ch = '${ch}' in word`, {word, ch, node_id: node.id}, node.id, opType, opLabel, pathHighlight);
+      if (!(ch in node.children)) {
+        this.addStep(23, `'${ch}' not in children → return None`, {ch, result: null}, node.id, opType, opLabel, pathHighlight);
+        return null;
+      }
+      node = node.children[ch];
+      pathHighlight.push(node.id);
+      this.addStep(24, `found '${ch}' → move to node id=${node.id}`, {ch, node_id: node.id}, node.id, opType, opLabel, pathHighlight);
+    }
+    this.addStep(25, `_traverse complete → return node id=${node.id}`, {node_id: node.id, is_end: node.is_end}, node.id, opType, opLabel, pathHighlight);
+    return node;
+  }
+
+  search(word) {
+    this.addStep(28, `search("${word}") — call _traverse`, {word}, this.root.id, 'search', `search("${word}")`, [this.root.id]);
+    const node = this._traverse(word, 'search', `search("${word}")`);
+    const result = node !== null && node.is_end;
+    this.addStep(29, `return node is not None and node.is_end → ${result}`, {node: node ? node.id : null, is_end: node ? node.is_end : false, result}, node ? node.id : null, 'search', `search("${word}")`);
+    return result;
+  }
+
+  startsWith(prefix) {
+    this.addStep(32, `startsWith("${prefix}") — call _traverse`, {prefix}, this.root.id, 'startsWith', `startsWith("${prefix}")`, [this.root.id]);
+    const node = this._traverse(prefix, 'startsWith', `startsWith("${prefix}")`);
+    const result = node !== null;
+    this.addStep(33, `return _traverse is not None → ${result}`, {node: node ? node.id : null, result}, node ? node.id : null, 'startsWith', `startsWith("${prefix}")`);
+    return result;
+  }
+}
+
+// ─────────────────────────────────────────────
+// EXECUTION STATE
+// ─────────────────────────────────────────────
+let steps = [];
+let currentStep = 0;
+let isPlaying = false;
+let playInterval = null;
+let playSpeed = 1;
+
+let defaultOps = [
+  { op: 'insert', arg: 'apple' },
+  { op: 'insert', arg: 'app' },
+  { op: 'search', arg: 'apple' },
+  { op: 'search', arg: 'app' },
+  { op: 'search', arg: 'ap' },
+  { op: 'startsWith', arg: 'app' },
+  { op: 'startsWith', arg: 'b' },
 ];
 
-class TrieNode{
-  constructor(){this.children={};this.isEnd=false;this.id=nodeIdCounter++;}
+function runOps() {
+  const sim = new TrieSim();
+  const opEls = document.querySelectorAll('.op-entry');
+  const ops = [];
+  opEls.forEach(el => {
+    const sel = el.querySelector('select');
+    const inp = el.querySelector('input');
+    if (sel && inp) ops.push({ op: sel.value, arg: inp.value.trim() });
+  });
+  for (const { op, arg } of ops) {
+    if (op === 'insert') sim.insert(arg);
+    else if (op === 'search') sim.search(arg);
+    else if (op === 'startsWith') sim.startsWith(arg);
+  }
+  steps = sim.steps;
+  currentStep = 0;
+  stopPlay();
+  renderStep();
 }
 
-class Trie{
-  constructor(){this.root=new TrieNode();}
-  insert(word){
-    let node=this.root;
-    for(let c of word){
-      if(!node.children[c])node.children[c]=new TrieNode();
-      node=node.children[c];
-    }
-    node.isEnd=true;
-  }
-  search(word){
-    let node=this.root;
-    for(let c of word){
-      if(!node.children[c])return false;
-      node=node.children[c];
-    }
-    return node.isEnd;
-  }
-  startsWith(prefix){
-    let node=this.root;
-    for(let c of prefix){
-      if(!node.children[c])return false;
-      node=node.children[c];
-    }
-    return true;
-  }
+function gotoStep(n) {
+  currentStep = Math.max(0, Math.min(n, steps.length - 1));
+  renderStep();
+}
+function stepForward() { gotoStep(currentStep + 1); }
+function stepBack() { gotoStep(currentStep - 1); }
+
+function togglePlay() {
+  if (isPlaying) stopPlay();
+  else startPlay();
+}
+function startPlay() {
+  if (currentStep >= steps.length - 1) currentStep = 0;
+  isPlaying = true;
+  document.getElementById('btn-play').textContent = '⏸';
+  playInterval = setInterval(() => {
+    if (currentStep >= steps.length - 1) { stopPlay(); return; }
+    currentStep++;
+    renderStep();
+  }, 900 / playSpeed);
+}
+function stopPlay() {
+  isPlaying = false;
+  const btn = document.getElementById('btn-play');
+  if (btn) btn.textContent = '▶';
+  clearInterval(playInterval);
+}
+function setSpeed(v) { playSpeed = parseFloat(v); if (isPlaying) { stopPlay(); startPlay(); } }
+
+function renderStep() {
+  if (!steps.length) return;
+  const s = steps[currentStep];
+  setActiveLine(s.line);
+  document.getElementById('step-counter').textContent = `Step ${currentStep + 1} / ${steps.length}`;
+  document.getElementById('exec-progress').style.width = `${((currentStep) / (steps.length - 1)) * 100}%`;
+  document.getElementById('op-indicator').textContent = s.opLabel || '';
+  renderTrie(s);
+  renderStepLog(s);
 }
 
-let trie,nodeIdCounter=0,insertedWords=[];
+// ─────────────────────────────────────────────
+// TRIE SVG RENDERING
+// ─────────────────────────────────────────────
+const NODE_R = 18;
+const LEVEL_H = 80;
+const MIN_SEP = 54;
 
-function buildCode(){
-  const panel=document.getElementById('codePanel');
-  code.forEach((c,i)=>{
-    const line=document.createElement('div');
-    line.className='cl';
-    line.id=`line${c.ln||i}`;
-    const ln=document.createElement('div');ln.className='ln';
-    ln.textContent=c.ln!==undefined?c.ln:'';
-    const ct=document.createElement('div');ct.className='ct';
-    if(c.cm){
-      ct.innerHTML=`<span class="cm">${c.t}</span>`;
-    }else{
-      ct.innerHTML=c.t
-        .replace(/(class|def|if|not|in|for|return|True|False)/g,'<span class="kw">$1</span>')
-        .replace(/(TrieNode|Trie|insert|search|startsWith)/g,'<span class="fn">$1</span>')
-        .replace(/(self|root|node|children|is_end|word|char|prefix)/g,'<span class="nm">$1</span>');
+function layoutTrie(root) {
+  if (!root) return { nodes: [], edges: [] };
+  // BFS to collect structure, then assign x positions bottom-up
+  const info = {}; // id -> {node, level, children_ids, x}
+
+  const queue = [{ node: root, level: 0, parentId: null, edgeLabel: '' }];
+  const order = [];
+  while (queue.length) {
+    const { node, level, parentId, edgeLabel } = queue.shift();
+    info[node.id] = { node, level, parentId, edgeLabel, childIds: [] };
+    order.push(node.id);
+    if (parentId !== null) info[parentId].childIds.push(node.id);
+    for (const [ch, child] of Object.entries(node.children)) {
+      queue.push({ node: child, level: level + 1, parentId: node.id, edgeLabel: ch });
     }
-    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  }
+
+  // Assign x via postorder
+  let leafX = 0;
+  const assignX = (id) => {
+    const d = info[id];
+    if (d.childIds.length === 0) {
+      d.x = leafX * MIN_SEP;
+      leafX++;
+    } else {
+      d.childIds.forEach(cid => assignX(cid));
+      const xs = d.childIds.map(cid => info[cid].x);
+      d.x = (Math.min(...xs) + Math.max(...xs)) / 2;
+    }
+  };
+  assignX(root.id);
+
+  const nodes = order.map(id => ({
+    id,
+    x: info[id].x,
+    y: info[id].level * LEVEL_H,
+    is_end: info[id].node.is_end,
+    children: info[id].node.children
+  }));
+
+  const edges = order.filter(id => info[id].parentId !== null).map(id => ({
+    from: { x: info[info[id].parentId].x, y: info[info[id].parentId].level * LEVEL_H },
+    to: { x: info[id].x, y: info[id].level * LEVEL_H },
+    label: info[id].edgeLabel,
+    toId: id,
+    fromId: info[id].parentId
+  }));
+
+  return { nodes, edges };
+}
+
+function renderTrie(step) {
+  const svg = document.getElementById('viz-svg');
+  const area = document.getElementById('viz-area');
+  const W = area.clientWidth || 600;
+  const H = area.clientHeight || 400;
+
+  const root = step.trieSnapshot;
+  const { nodes, edges } = layoutTrie(root);
+
+  if (!nodes.length) { svg.innerHTML = ''; return; }
+
+  // Compute bounds
+  const xs = nodes.map(n => n.x);
+  const ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs); const maxX = Math.max(...xs);
+  const minY = Math.min(...ys); const maxY = Math.max(...ys);
+  const padX = 60, padY = 40;
+  const scaleX = (maxX - minX > 0) ? (W - padX * 2) / (maxX - minX) : 1;
+  const scaleY = (maxY - minY > 0) ? (H - padY * 2) / (maxY - minY) : 1;
+  const scale = Math.min(scaleX, scaleY, 1.4);
+
+  const tx = (x) => padX + (x - minX) * scale;
+  const ty = (y) => padY + (y - minY) * scale;
+
+  const pathSet = new Set(step.pathHighlight || []);
+
+  let html = `<defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="var(--edge-default)" opacity="0.7"/>
+    </marker>
+    <marker id="arr-active" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="var(--edge-active)"/>
+    </marker>
+  </defs>`;
+
+  // Edges
+  for (const e of edges) {
+    const x1 = tx(e.from.x), y1 = ty(e.from.y);
+    const x2 = tx(e.to.x), y2 = ty(e.to.y);
+    const active = pathSet.has(e.toId) && pathSet.has(e.fromId);
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.sqrt(dx*dx + dy*dy);
+    const ux = dx/len, uy = dy/len;
+    const ex1 = x1 + ux * NODE_R, ey1 = y1 + uy * NODE_R;
+    const ex2 = x2 - ux * NODE_R, ey2 = y2 - uy * NODE_R;
+    const stroke = active ? 'var(--edge-active)' : 'var(--edge-default)';
+    const sw = active ? 2.5 : 1.5;
+    html += `<line x1="${ex1}" y1="${ey1}" x2="${ex2}" y2="${ey2}" stroke="${stroke}" stroke-width="${sw}" marker-end="url(#${active?'arr-active':'arr'})"/>`;
+    // Edge label (character)
+    const mx = (ex1 + ex2) / 2, my = (ey1 + ey2) / 2;
+    const off = 12;
+    const nx = -uy * off + mx, ny = ux * off + my;
+    html += `<text x="${nx}" y="${ny}" class="trie-edge-label" text-anchor="middle" dominant-baseline="middle" fill="${active ? 'var(--accent)' : 'var(--text-secondary)'}" font-size="${scale > 0.8 ? 14 : 11}">${e.label}</text>`;
+  }
+
+  // Nodes
+  for (const n of nodes) {
+    const cx = tx(n.x), cy = ty(n.y);
+    const isHighlight = n.id === step.highlightNodeId;
+    const isPath = pathSet.has(n.id);
+    const isRoot = n.id === 0;
+
+    let fill = 'var(--node-default)';
+    let stroke = 'var(--node-stroke)';
+    let sw = 1.5;
+    if (n.is_end) { fill = 'var(--node-end)'; stroke = 'var(--node-end)'; }
+    if (isPath && !n.is_end) { fill = 'rgba(137,180,250,0.18)'; stroke = 'var(--node-path)'; }
+    if (isHighlight) { fill = 'var(--node-active)'; stroke = 'var(--accent)'; sw = 3; }
+    if (isRoot) { stroke = 'var(--text-secondary)'; }
+
+    html += `<circle cx="${cx}" cy="${cy}" r="${NODE_R}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" class="trie-node-circle"/>`;
+
+    // Label: 'R' for root, or show nothing (letter is on edge)
+    if (isRoot) {
+      html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="11" font-weight="600">root</text>`;
+    } else if (n.is_end) {
+      html += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#1e1e2e" font-size="11">●</text>`;
+    }
+
+    // is_end indicator ring
+    if (n.is_end) {
+      html += `<circle cx="${cx}" cy="${cy}" r="${NODE_R + 4}" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>`;
+    }
+  }
+
+  svg.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// STEP LOG RENDERING
+// ─────────────────────────────────────────────
+function renderStepLog(s) {
+  const panel = document.getElementById('step-log-panel');
+  const vars = s.vars || {};
+  let varHtml = Object.entries(vars).map(([k, v]) =>
+    `<div class="var-row"><span class="var-name">${escHtml(k)}</span><span class="var-val"> = ${escHtml(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span></div>`
+  ).join('');
+
+  let histHtml = steps.slice(0, currentStep + 1).map((step, i) =>
+    `<div class="history-item ${i === currentStep ? 'current' : ''}" onclick="gotoStep(${i})">${i+1}. ${escHtml(step.desc)}</div>`
+  ).join('');
+
+  panel.innerHTML = `<div class="step-content">
+    <div class="step-description">${escHtml(s.desc)}</div>
+    <div class="vars-section">
+      <div class="vars-title">Variables</div>
+      ${varHtml || '<div style="color:var(--text-secondary);font-size:12px">—</div>'}
+    </div>
+    <div class="vars-section">
+      <div class="vars-title">History</div>
+      <div id="history-list">${histHtml}</div>
+    </div>
+  </div>`;
+  // Auto-scroll history
+  setTimeout(() => {
+    const cur = panel.querySelector('.history-item.current');
+    if (cur) cur.scrollIntoView({ block: 'nearest' });
+  }, 50);
+}
+
+// ─────────────────────────────────────────────
+// OP LIST UI
+// ─────────────────────────────────────────────
+function renderOpList() {
+  const list = document.getElementById('op-list');
+  list.innerHTML = '';
+  defaultOps.forEach((op, i) => {
+    const div = document.createElement('div');
+    div.className = 'op-entry';
+    div.innerHTML = `
+      <select onchange="defaultOps[${i}].op=this.value">
+        ${['insert','search','startsWith'].map(o => `<option value="${o}" ${op.op===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      (<input value="${escHtml(op.arg)}" style="width:64px" oninput="defaultOps[${i}].arg=this.value" placeholder="word"/>)
+      <button class="remove-op-btn" onclick="removeOp(${i})">×</button>
+    `;
+    list.appendChild(div);
   });
 }
 
-function layoutTrie(){
-  const positions=new Map();
-  const levelNodes=[];
-  
-  function traverse(node,level=0,offset=0){
-    if(!levelNodes[level])levelNodes[level]=[];
-    levelNodes[level].push(node);
-    const children=Object.values(node.children);
-    let childOffset=offset;
-    children.forEach(child=>{
-      childOffset=traverse(child,level+1,childOffset);
-    });
-    return Math.max(offset+1,childOffset);
-  }
-  
-  traverse(trie.root);
-  
-  levelNodes.forEach((nodes,level)=>{
-    const spacing=Math.max(70,800/Math.max(nodes.length,1));
-    nodes.forEach((node,i)=>{
-      positions.set(node.id,{x:i*spacing+100,y:level*80+50});
-    });
-  });
-  
-  return positions;
+function addOp() {
+  defaultOps.push({ op: 'insert', arg: '' });
+  renderOpList();
+}
+function removeOp(i) {
+  defaultOps.splice(i, 1);
+  renderOpList();
 }
 
-function renderTrie(highlightPath=[]){
-  const canvas=document.getElementById('trieCanvas');
-  const svg=document.getElementById('edgeSvg');
-  canvas.innerHTML='';
-  svg.innerHTML='';
-  
-  const positions=layoutTrie();
-  
-  function drawEdges(node,parentPos=null){
-    const pos=positions.get(node.id);
-    if(parentPos){
-      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
-      line.setAttribute('d',`M ${parentPos.x+20} ${parentPos.y+40} L ${pos.x+20} ${pos.y}`);
-      line.classList.add('trie-edge');
-      if(highlightPath.includes(node.id))line.classList.add('active');
-      svg.appendChild(line);
+// ─────────────────────────────────────────────
+// INTUITION MODE
+// ─────────────────────────────────────────────
+const INTUITION_STAGES = [
+  {
+    title: "What is a Trie, Really?",
+    thought: "Let me re-read the problem... It wants me to store strings and query prefixes fast. What data structure is built for this?",
+    body: `A <strong>Trie</strong> (pronounced "try") is a tree where each <strong>edge represents a character</strong>, not a node. The path from root to any node spells out a prefix.<br><br>
+Think of it like an autocomplete tree: every word you've ever typed is traced as a path from the root, character by character.`,
+    insight: "A Trie trades space for speed — it stores every prefix explicitly so any prefix query is O(k) where k is the length of the query.",
+    viz: 'concept'
+  },
+  {
+    title: "The Core Insight: Shared Prefixes",
+    thought: "If I insert 'apple' and 'app', they share the path a→p→p. Why store those three nodes twice?",
+    body: `The key property: <strong>words with shared prefixes share nodes</strong>.<br><br>
+Insert <code style="color:var(--accent)">"apple"</code> → creates nodes for a, p, p, l, e<br>
+Insert <code style="color:var(--accent)">"app"</code> → <em>reuses</em> a, p, p — only the <code>is_end</code> flag changes on the third 'p' node<br><br>
+This is why tries are memory-efficient for real-world dictionaries where words share common prefixes.`,
+    insight: "is_end is the magic flag: it distinguishes 'app' (a complete word) from 'ap' (just a prefix) — both share the same path but only 'app' has is_end=True.",
+    viz: 'shared'
+  },
+  {
+    title: "insert() — Walking and Building",
+    thought: "For insert, I walk from root, character by character. If an edge doesn't exist, I create a new node. At the end, I flip is_end=True.",
+    body: `<strong>Algorithm for insert(word):</strong><br><br>
+1. Start at <code>root</code><br>
+2. For each character <code>ch</code> in word:<br>
+&nbsp;&nbsp;• If <code>ch</code> not in <code>node.children</code> → create new TrieNode<br>
+&nbsp;&nbsp;• Move <code>node = node.children[ch]</code><br>
+3. After loop: set <code>node.is_end = True</code><br><br>
+Time: <strong>O(k)</strong> where k = len(word). We touch each character exactly once.`,
+    insight: "The insert loop never backtracks — it's a pure forward walk through the word, creating missing links as needed.",
+    viz: 'insert'
+  },
+  {
+    title: "_traverse() — The Shared Core",
+    thought: "Both search() and startsWith() need to walk the trie and find the end node. I should factor that out. If the path breaks at any point, return None.",
+    body: `<strong>_traverse(word)</strong> is the private helper both operations share:<br><br>
+• Walk character by character from root<br>
+• If any character is <em>missing</em> from children → return <code>None</code> immediately<br>
+• If we reach the end → return that node<br><br>
+This returns the node <em>at the end of the path</em>, which callers interpret differently.`,
+    insight: "By factoring out _traverse, search and startsWith become one-liners — they just differ in what they check about the returned node.",
+    viz: 'traverse'
+  },
+  {
+    title: "search() vs startsWith() — One Difference",
+    thought: "search needs an exact word match — so the end node must have is_end=True. startsWith just needs the path to exist — is_end doesn't matter.",
+    body: `<pre style="font-family:var(--font-mono);background:var(--bg-secondary);padding:12px;border-radius:8px;font-size:13px;overflow:auto">def search(self, word):
+    node = self._traverse(word)
+    return node is not None <strong>and node.is_end</strong>
+
+def startsWith(self, prefix):
+    return self._traverse(prefix) <strong>is not None</strong></pre>
+<br>The difference is exactly one condition:<br>
+• <code>search</code>: path exists <strong>AND</strong> it marks a complete word<br>
+• <code>startsWith</code>: path exists, period`,
+    insight: "This design is elegant — the trie inherently stores both complete words (is_end=True) and all their prefixes (every intermediate node) simultaneously.",
+    viz: 'compare'
+  },
+  {
+    title: "Complexity & Why Tries Beat Hash Maps for Prefixes",
+    thought: "A hash map gives O(1) lookup for exact words but O(n·k) for startsWith — you'd have to check every stored word. A trie gives O(k) for both.",
+    body: `<strong>Operation complexities:</strong><br><br>
+• <code>insert(word)</code>: O(k) time, O(k) space (worst case)<br>
+• <code>search(word)</code>: O(k) time, O(1) space<br>
+• <code>startsWith(prefix)</code>: O(k) time, O(1) space<br><br>
+where k = length of the word/prefix<br><br>
+<strong>vs Hash Map for startsWith:</strong> O(n·k) — must scan all n stored words`,
+    insight: "Tries are the go-to for prefix-heavy problems: autocomplete, spell check, IP routing tables. When the query is a prefix, not an exact key, tries win.",
+    viz: 'complexity'
+  },
+  {
+    title: "Edge Cases & Python Tricks",
+    thought: "What about empty strings? __slots__? Let me think through the robustness...",
+    body: `<strong>Robustness:</strong><br><br>
+• <code>insert("")</code>: loop doesn't run, root gets <code>is_end=True</code> — <code>search("")</code> returns True ✓<br>
+• <code>search("xyz")</code>: _traverse returns None immediately at first missing char ✓<br>
+• <code>startsWith("")</code>: _traverse("") returns root (never enters loop) → True ✓<br><br>
+<strong>Python trick: <code>__slots__</code></strong><br>
+Declaring <code>__slots__ = ('children', 'is_end')</code> prevents dynamic attribute creation, reducing per-object memory overhead — crucial when millions of TrieNodes may exist.`,
+    insight: "In a production trie storing a large vocabulary, __slots__ can cut memory by 40-50% per node vs. the default __dict__-based approach.",
+    viz: 'edge'
+  }
+];
+
+let currentIntuitionStage = 0;
+let intuitionPlaying = false;
+let intuitionInterval = null;
+
+function renderIntuitionMode() {
+  renderIntuitionContent();
+  renderIntuitionViz();
+}
+
+function renderIntuitionContent() {
+  const content = document.getElementById('intuition-content');
+  content.innerHTML = INTUITION_STAGES.map((stage, i) => {
+    let cls = 'future';
+    if (i === currentIntuitionStage) cls = 'current';
+    else if (i < currentIntuitionStage) cls = 'past';
+    return `<div class="stage-block ${cls}" id="istage-${i}">
+      <div class="stage-num-title">
+        <div class="stage-num">${i+1}</div>
+        <div class="stage-title">${stage.title}</div>
+      </div>
+      <div class="thought-bubble">💭 "${escHtml(stage.thought)}"</div>
+      <div class="stage-body">${stage.body}</div>
+      <div class="key-insight"><span class="label">💡 Key Insight:</span>${escHtml(stage.insight)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('intuition-stage-counter').textContent = `Stage ${currentIntuitionStage+1} / ${INTUITION_STAGES.length}`;
+  document.getElementById('intuition-progress').style.width = `${((currentIntuitionStage) / (INTUITION_STAGES.length-1)) * 100}%`;
+  setTimeout(() => {
+    const el = document.getElementById(`istage-${currentIntuitionStage}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 60);
+}
+
+function renderIntuitionViz() {
+  const viz = document.getElementById('intuition-viz');
+  const stage = INTUITION_STAGES[currentIntuitionStage];
+  viz.innerHTML = getIntuitionViz(stage.viz);
+}
+
+function getIntuitionViz(type) {
+  const svgHead = (content, vb="0 0 460 300") => `<div style="padding:20px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="100%" style="max-height:280px">${content}</svg></div>`;
+
+  switch(type) {
+    case 'concept': return svgHead(trieConceptSvg());
+    case 'shared': return svgHead(sharedPrefixSvg());
+    case 'insert': return insertExplainHtml();
+    case 'traverse': return traverseExplainHtml();
+    case 'compare': return compareHtml();
+    case 'complexity': return complexityHtml();
+    case 'edge': return edgeCaseHtml();
+    default: return svgHead(trieConceptSvg());
+  }
+}
+
+function trieConceptSvg() {
+  // Simple trie: root -> a -> p -> p -> (l->e, end) and (end)
+  const nodes = [
+    {id:0, x:230, y:30, label:'root', end:false},
+    {id:1, x:230, y:100, label:'', end:false},
+    {id:2, x:230, y:170, label:'', end:false},
+    {id:3, x:150, y:240, label:'', end:true},
+    {id:4, x:310, y:240, label:'', end:false},
+    {id:5, x:150, y:280, label:'', end:true},
+  ];
+  const edges = [
+    {f:0, t:1, lbl:'a'},{f:1, t:2, lbl:'p'},{f:2, t:3, lbl:'p'},{f:3, t:5, lbl:'l'},{f:2, t:4, lbl:'p'},{f:4, t:-1, lbl:'l'}
+  ];
+  // draw a simple version
+  let s = '';
+  // edges
+  const pos = {}; nodes.forEach(n => pos[n.id]={x:n.x,y:n.y});
+  const realEdges = [
+    {f:{x:230,y:30}, t:{x:230,y:100}, lbl:'a'},
+    {f:{x:230,y:100}, t:{x:230,y:170}, lbl:'p'},
+    {f:{x:230,y:170}, t:{x:150,y:240}, lbl:'p'},
+    {f:{x:230,y:170}, t:{x:310,y:240}, lbl:'p'},
+    {f:{x:150,y:240}, t:{x:150,y:295}, lbl:'l'},
+    {f:{x:310,y:240}, t:{x:310,y:295}, lbl:'l'},
+  ];
+  realEdges.forEach(e => {
+    s += `<line x1="${e.f.x}" y1="${e.f.y+16}" x2="${e.t.x}" y2="${e.t.y-16}" stroke="var(--edge-default)" stroke-width="2"/>`;
+    s += `<text x="${(e.f.x+e.t.x)/2-10}" y="${(e.f.y+e.t.y)/2}" fill="var(--accent)" font-size="14" font-weight="700" font-family="monospace">${e.lbl}</text>`;
+  });
+  // nodes
+  const ns = [
+    {x:230,y:30,end:false,label:'root'},
+    {x:230,y:100,end:false,label:''},
+    {x:230,y:170,end:false,label:''},
+    {x:150,y:240,end:true,label:''},
+    {x:310,y:240,end:false,label:''},
+    {x:150,y:295,end:true,label:''},
+    {x:310,y:295,end:false,label:''},
+  ];
+  ns.forEach(n => {
+    const fill = n.end ? 'var(--node-end)' : 'var(--node-default)';
+    const stroke = n.end ? 'var(--node-end)' : 'var(--node-stroke)';
+    s += `<circle cx="${n.x}" cy="${n.y}" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    if (n.label) s += `<text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-secondary)" font-size="9">${n.label}</text>`;
+    if (n.end) s += `<circle cx="${n.x}" cy="${n.y}" r="20" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>`;
+  });
+  // Legend
+  s += `<circle cx="30" cy="255" r="9" fill="var(--node-end)" stroke="var(--node-end)" stroke-width="2"/>`;
+  s += `<text x="45" y="259" fill="var(--text-secondary)" font-size="11">= word endpoint (is_end=True)</text>`;
+  // Words
+  s += `<text x="10" y="30" fill="var(--text-secondary)" font-size="12">Trie storing: "apple", "apply", "app"</text>`;
+  return s;
+}
+
+function sharedPrefixSvg() {
+  let s = '';
+  // Show two rows: "without sharing" and "with trie"
+  s += `<text x="10" y="22" fill="var(--text-primary)" font-size="13" font-weight="600">Inserting "apple" then "app":</text>`;
+  // Trie path: root - a - p - p*(is_end) - l - e*(is_end)
+  const ys = 70;
+  const xs = [40,100,160,220,280,340];
+  const labels = ['root','a','p','p','l','e'];
+  const ends = [false,false,false,true,false,true];
+  for (let i=0;i<xs.length;i++) {
+    if (i>0) {
+      const active = i<=3;
+      s += `<line x1="${xs[i-1]+16}" y1="${ys}" x2="${xs[i]-16}" y2="${ys}" stroke="${active?'var(--edge-active)':'var(--edge-default)'}" stroke-width="${active?2.5:2}"/>`;
+      s += `<text x="${(xs[i-1]+xs[i])/2}" y="${ys-12}" fill="${active?'var(--accent)':'var(--text-secondary)'}" font-size="13" font-weight="700" text-anchor="middle" font-family="monospace">${labels[i]}</text>`;
     }
-    Object.values(node.children).forEach(child=>drawEdges(child,pos));
+    const fill = ends[i]?'var(--node-end)':'var(--node-default)';
+    const stroke = ends[i]?'var(--node-end)':'var(--node-stroke)';
+    const isShared = i <= 3;
+    s += `<circle cx="${xs[i]}" cy="${ys}" r="16" fill="${fill}" stroke="${isShared?'var(--accent)':stroke}" stroke-width="${isShared?2.5:2}"/>`;
+    if (ends[i]) s += `<circle cx="${xs[i]}" cy="${ys}" r="21" fill="none" stroke="var(--node-end)" stroke-width="1.5" stroke-dasharray="3,2"/>`;
   }
-  
-  drawEdges(trie.root);
-  
-  function drawNodes(node,char='∅'){
-    const pos=positions.get(node.id);
-    const nodeDiv=document.createElement('div');
-    nodeDiv.className='trie-node';
-    if(node.isEnd)nodeDiv.classList.add('is-end');
-    if(highlightPath.includes(node.id))nodeDiv.classList.add('active');
-    nodeDiv.style.left=`${pos.x}px`;
-    nodeDiv.style.top=`${pos.y}px`;
-    
-    const box=document.createElement('div');
-    box.className='node-box';
-    box.textContent=char;
-    
-    const label=document.createElement('div');
-    label.className='edge-label';
-    label.textContent=`#${node.id}`;
-    
-    nodeDiv.appendChild(box);
-    nodeDiv.appendChild(label);
-    canvas.appendChild(nodeDiv);
-    
-    Object.entries(node.children).forEach(([c,child])=>drawNodes(child,c));
+  s += `<text x="10" y="${ys+40}" fill="var(--text-secondary)" font-size="12">Blue border = nodes <strong>shared</strong> between "apple" and "app"</text>`;
+  s += `<rect x="5" y="${ys-30}" width="${xs[3]+20}" height="60" rx="6" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5"/>`;
+  s += `<text x="${xs[3]+26}" y="${ys-15}" fill="var(--accent)" font-size="11">← shared prefix "app"</text>`;
+  s += `<text x="${xs[3]+10}" y="${ys+10}" fill="var(--node-end)" font-size="11">← is_end=True</text>`;
+  // Space saving note
+  s += `<text x="10" y="190" fill="var(--text-primary)" font-size="13" font-weight="600">Memory: 6 nodes total, not 5+3=8</text>`;
+  s += `<text x="10" y="212" fill="var(--text-secondary)" font-size="12">Without sharing: insert "apple" creates 5 nodes,</text>`;
+  s += `<text x="10" y="230" fill="var(--text-secondary)" font-size="12">insert "app" would create 3 more = 8 nodes total.</text>`;
+  s += `<text x="10" y="252" fill="var(--node-end)" font-size="12" font-weight="600">With Trie: only 6 nodes. Savings grow with vocabulary size!</text>`;
+  return s;
+}
+
+function insertExplainHtml() {
+  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:16px;margin-bottom:14px">
+    <strong style="color:var(--accent)">Step-by-step for insert("app"):</strong><br>
+    <table style="margin-top:10px;width:100%;border-collapse:collapse">
+      <tr style="color:var(--text-secondary);font-size:11px"><th align="left">Step</th><th align="left">ch</th><th align="left">Action</th><th align="left">node.children</th></tr>
+      ${[
+        ['1','—','node = root','{}'],
+        ['2','a','a not in children → create node_1','{"a": node_1}'],
+        ['3','a','move node = node_1','{}'],
+        ['4','p','p not in children → create node_2','{"p": node_2}'],
+        ['5','p','move node = node_2','{}'],
+        ['6','p','p not in children → create node_3','{"p": node_3}'],
+        ['7','p','move node = node_3','{}'],
+        ['8','—','node.is_end = True','—'],
+      ].map(([step,ch,action,chn]) =>
+        `<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px 4px 0;color:var(--text-secondary)">${step}</td><td style="padding:4px 8px;font-family:monospace;color:var(--syn-string)">'${ch}'</td><td style="padding:4px 8px;color:var(--text-primary)">${action}</td><td style="padding:4px 0;font-family:monospace;color:var(--text-secondary);font-size:11px">${chn}</td></tr>`
+      ).join('')}
+    </table>
+  </div>
+  <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
+    <strong>Key:</strong> The loop only creates new nodes when the edge is missing. If already there, it just moves forward.
+  </div>
+  </div>`;
+}
+
+function traverseExplainHtml() {
+  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:16px;margin-bottom:14px">
+    <strong style="color:var(--accent)">_traverse("ap") after inserting "apple", "app":</strong><br><br>
+    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px">
+      node = root → children has 'a' ✓<br>
+      node = root.children['a'] → children has 'p' ✓<br>
+      node = node.children['p'] → return this node
+    </div>
+    <br>
+    <strong style="color:var(--accent)">_traverse("ax") — missing path:</strong><br><br>
+    <div style="font-family:monospace;font-size:12px;background:var(--bg-primary);padding:10px;border-radius:6px">
+      node = root → children has 'a' ✓<br>
+      node = root.children['a'] → 'x' <span style="color:var(--syn-keyword)">NOT</span> in children<br>
+      → return <span style="color:var(--syn-keyword)">None</span>
+    </div>
+  </div>
+  <div style="background:var(--thought-bg);border-left:3px solid var(--thought-border);padding:10px 14px;border-radius:0 8px 8px 0">
+    <strong>Why a helper?</strong> Both search() and startsWith() do the exact same walk. Factoring it out avoids code duplication and makes both methods trivially simple.
+  </div>
+  </div>`;
+}
+
+function compareHtml() {
+  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  <div style="background:rgba(239,68,68,0.08);border-left:4px solid #f38ba8;padding:16px;border-radius:0 8px 8px 0;margin-bottom:14px">
+    <strong style="color:#f38ba8">search("app") → must check is_end</strong><br>
+    <code style="font-size:12px">node = _traverse("app")  # node_3<br>return node is not None <u>and node.is_end</u>  # True ✓</code><br><br>
+    <strong style="color:#f38ba8">search("ap") → path exists but is_end=False</strong><br>
+    <code style="font-size:12px">node = _traverse("ap")   # node_2<br>return node is not None and node.is_end  # False ✓</code>
+  </div>
+  <div style="background:rgba(166,227,161,0.08);border-left:4px solid var(--node-end);padding:16px;border-radius:0 8px 8px 0;margin-bottom:14px">
+    <strong style="color:var(--node-end)">startsWith("ap") → just needs the path</strong><br>
+    <code style="font-size:12px">return _traverse("ap") is not None  # True ✓</code><br><br>
+    <strong style="color:var(--node-end)">startsWith("b") → path missing</strong><br>
+    <code style="font-size:12px">return _traverse("b") is not None   # False ✓</code>
+  </div>
+  <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
+    <strong>The Trie stores both complete words AND all prefixes simultaneously.</strong> is_end is the lightweight marker that distinguishes them.
+  </div>
+  </div>`;
+}
+
+function complexityHtml() {
+  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px">
+      <strong style="color:var(--accent)">Trie</strong><br><br>
+      insert: <strong>O(k)</strong><br>
+      search: <strong>O(k)</strong><br>
+      startsWith: <strong>O(k)</strong><br><br>
+      <span style="color:var(--text-secondary);font-size:12px">k = length of word/prefix</span>
+    </div>
+    <div style="background:var(--bg-secondary);border-radius:8px;padding:14px">
+      <strong style="color:var(--syn-keyword)">Hash Map</strong><br><br>
+      insert: O(k)<br>
+      search: O(k)<br>
+      startsWith: <strong style="color:#f38ba8">O(n·k)</strong><br><br>
+      <span style="color:var(--text-secondary);font-size:12px">n = number of stored words</span>
+    </div>
+  </div>
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
+    <strong>Space: O(A · k · n)</strong> — A = alphabet size, k = avg word length, n = number of words<br>
+    <span style="color:var(--text-secondary);font-size:12px">In the worst case every word is unique with no shared prefixes.</span>
+  </div>
+  <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
+    Real-world use: autocomplete has n=millions of words, querying prefixes constantly. Hash map would be unusably slow. Trie is the standard solution.
+  </div>
+  </div>`;
+}
+
+function edgeCaseHtml() {
+  return `<div style="padding:20px;font-size:13px;line-height:1.7">
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
+    <strong style="color:var(--accent)">Edge Case: Empty String ""</strong><br>
+    <code style="font-size:12px;display:block;margin-top:8px">insert(""):  loop → no iterations → root.is_end = True<br>search(""):  _traverse("") returns root → root.is_end = True ✓<br>startsWith(""): _traverse returns root → True ✓</code>
+  </div>
+  <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;margin-bottom:12px">
+    <strong style="color:var(--accent)">__slots__ trick</strong><br><br>
+    Normally Python stores instance attributes in a <code>__dict__</code> per object. With millions of TrieNodes, that's millions of dicts.<br><br>
+    <code style="font-size:12px">__slots__ = ('children', 'is_end')</code><br><br>
+    This replaces per-instance <code>__dict__</code> with fixed-size slot descriptors. Result: <strong>~40-50% less memory per node</strong>.
+  </div>
+  <div style="background:var(--insight-bg);border-left:3px solid var(--insight-border);padding:10px 14px;border-radius:0 8px 8px 0">
+    <strong>Interview tip:</strong> Mentioning __slots__ signals you understand Python's object model at a deeper level — a great talking point in senior-level interviews.
+  </div>
+  </div>`;
+}
+
+function intuitionNext() {
+  if (currentIntuitionStage < INTUITION_STAGES.length - 1) {
+    currentIntuitionStage++;
+    renderIntuitionMode();
   }
-  
-  drawNodes(trie.root);
 }
-
-function getPathForWord(word){
-  const path=[trie.root.id];
-  let node=trie.root;
-  for(let c of word){
-    if(!node.children[c])break;
-    node=node.children[c];
-    path.push(node.id);
+function intuitionPrev() {
+  if (currentIntuitionStage > 0) {
+    currentIntuitionStage--;
+    renderIntuitionMode();
   }
-  return path;
 }
-
-function insertWord(){
-  const word=document.getElementById('wordInput').value.trim().toLowerCase();
-  if(!word)return;
-  
-  trie.insert(word);
-  insertedWords.push(word);
-  
-  const path=getPathForWord(word);
-  renderTrie(path);
-  
-  const res=document.getElementById('result');
-  res.className='result success';
-  res.textContent=`Inserted "${word}" successfully`;
-  
-  addLog({type:'insert',text:`Inserted word "${word}"`});
-  
-  document.getElementById('wordList').textContent=JSON.stringify(insertedWords);
-  document.getElementById('wordInput').value='';
-}
-
-function searchWord(){
-  const word=document.getElementById('wordInput').value.trim().toLowerCase();
-  if(!word)return;
-  
-  const found=trie.search(word);
-  const path=found?getPathForWord(word):[];
-  renderTrie(path);
-  
-  const res=document.getElementById('result');
-  if(found){
-    res.className='result success';
-    res.textContent=`Found "${word}" in trie`;
-    addLog({type:'search',text:`Search "${word}": FOUND`});
-  }else{
-    res.className='result fail';
-    res.textContent=`"${word}" not found in trie`;
-    addLog({type:'search',text:`Search "${word}": NOT FOUND`});
+function intuitionTogglePlay() {
+  if (intuitionPlaying) {
+    intuitionPlaying = false;
+    clearInterval(intuitionInterval);
+    document.getElementById('btn-intuition-play').textContent = '▶ Play';
+  } else {
+    intuitionPlaying = true;
+    document.getElementById('btn-intuition-play').textContent = '⏸ Pause';
+    intuitionInterval = setInterval(() => {
+      if (currentIntuitionStage >= INTUITION_STAGES.length - 1) {
+        intuitionPlaying = false;
+        clearInterval(intuitionInterval);
+        document.getElementById('btn-intuition-play').textContent = '▶ Play';
+        return;
+      }
+      intuitionNext();
+    }, 4000);
   }
-  
-  document.getElementById('wordInput').value='';
 }
 
-function searchPrefix(){
-  const prefix=document.getElementById('wordInput').value.trim().toLowerCase();
-  if(!prefix)return;
-  
-  const found=trie.startsWith(prefix);
-  const path=found?getPathForWord(prefix):[];
-  renderTrie(path);
-  
-  const res=document.getElementById('result');
-  if(found){
-    res.className='result success';
-    res.textContent=`Prefix "${prefix}" exists in trie`;
-    addLog({type:'prefix',text:`Prefix "${prefix}": EXISTS`});
-  }else{
-    res.className='result fail';
-    res.textContent=`Prefix "${prefix}" does not exist`;
-    addLog({type:'prefix',text:`Prefix "${prefix}": NOT FOUND`});
+// ─────────────────────────────────────────────
+// MODE SWITCHING
+// ─────────────────────────────────────────────
+let currentMode = 'intuition';
+
+function setMode(mode) {
+  currentMode = mode;
+  stopPlay();
+  if (intuitionPlaying) {
+    intuitionPlaying = false;
+    clearInterval(intuitionInterval);
+    const pb = document.getElementById('btn-intuition-play');
+    if (pb) pb.textContent = '▶ Play';
   }
-  
-  document.getElementById('wordInput').value='';
+
+  const iMain = document.getElementById('intuition-main');
+  const eMain = document.getElementById('execution-main');
+  const iBtn = document.getElementById('btn-intuition');
+  const eBtn = document.getElementById('btn-execution');
+  const inputRow = document.getElementById('input-row');
+
+  iBtn.className = 'mode-btn' + (mode==='intuition'?' active-intuition':'');
+  eBtn.className = 'mode-btn' + (mode==='execution'?' active-execution':'');
+
+  if (mode === 'intuition') {
+    iMain.style.display = 'flex';
+    eMain.style.display = 'none';
+    inputRow.style.display = 'none';
+    renderIntuitionMode();
+  } else {
+    iMain.style.display = 'none';
+    eMain.style.display = 'flex';
+    inputRow.style.display = 'flex';
+    if (steps.length === 0) {
+      renderOpList();
+      runOps();
+    }
+    renderStep();
+  }
 }
 
-function addLog(log){
-  const el=document.getElementById('logScroll');
-  const d=document.createElement('div');d.className=`le ${log.type}`;
-  d.innerHTML=`<span class="ls">[${Date.now()%10000}]</span>${log.text}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
+// ─────────────────────────────────────────────
+// THEME
+// ─────────────────────────────────────────────
+function toggleTheme() {
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const btn = document.querySelector('.btn[onclick="toggleTheme()"]');
+  if (btn) btn.textContent = isDark ? '🌙 Theme' : '☀️ Theme';
+  if (steps.length > 0) renderTrie(steps[currentStep]);
 }
 
-function clearLog(){document.getElementById('logScroll').innerHTML='';}
-
-function init(){
-  trie=new Trie();
-  nodeIdCounter=0;
-  insertedWords=[];
-  renderTrie();
-  document.getElementById('wordList').textContent='[]';
+// ─────────────────────────────────────────────
+// PANEL RESIZING
+// ─────────────────────────────────────────────
+function initDividers() {
+  const main = document.getElementById('execution-main');
+  makeDraggable(document.getElementById('div1'), 'code-panel', 'viz-panel', main);
+  makeDraggable(document.getElementById('div2'), 'viz-panel', 'step-panel', main);
 }
 
-buildCode();
-init();
-
-// Sample words for demonstration
-setTimeout(()=>{
-  ['apple','app'].forEach(w=>{
-    document.getElementById('wordInput').value=w;
-    insertWord();
+function makeDraggable(divider, leftId, rightId, container) {
+  let dragging = false;
+  divider.addEventListener('mousedown', e => {
+    dragging = true;
+    divider.classList.add('dragging');
+    e.preventDefault();
   });
-},100);
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const rect = container.getBoundingClientRect();
+    const left = document.getElementById(leftId);
+    const right = document.getElementById(rightId);
+    const totalW = rect.width;
+    const mouseX = e.clientX - rect.left;
+    const leftRect = left.getBoundingClientRect();
+    const rightRect = right.getBoundingClientRect();
+    const combined = leftRect.width + rightRect.width;
+    const newLeftW = mouseX - (leftRect.left - rect.left);
+    const pct = Math.max(10, Math.min(80, (newLeftW / totalW) * 100));
+    left.style.width = pct + '%';
+    left.style.flex = 'none';
+    right.style.flex = '1';
+    if (steps.length > 0) renderTrie(steps[currentStep]);
+  });
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+    divider.classList.remove('dragging');
+  });
+}
+
+// ─────────────────────────────────────────────
+// KEYBOARD
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space') { e.preventDefault(); if (currentMode==='execution') togglePlay(); else intuitionTogglePlay(); }
+  if (e.code === 'ArrowRight') { e.preventDefault(); if (currentMode==='execution') stepForward(); else intuitionNext(); }
+  if (e.code === 'ArrowLeft') { e.preventDefault(); if (currentMode==='execution') stepBack(); else intuitionPrev(); }
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+window.addEventListener('load', () => {
+  buildCodePanel();
+  renderOpList();
+  initDividers();
+  renderIntuitionMode();
+  // pre-run ops silently
+  runOps();
+});
+
+window.addEventListener('resize', () => {
+  if (currentMode === 'execution' && steps.length > 0) renderTrie(steps[currentStep]);
+});
 </script>
 </body>
 </html>
