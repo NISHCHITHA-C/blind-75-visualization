@@ -1,405 +1,1396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>215. Kth Largest Element in an Array</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<title>347. Top K Frequent Elements - Visualizer</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
-  --heap:#3b82f6;--kth:#10b981;--remove:#ef4444;--add:#a78bfa;
-  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
-}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
-.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
-.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:180px;}
-.inp:focus{border-color:#3b82f6;}
-.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
-.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+  :root {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #181825;
+    --bg-tertiary: #313244;
+    --bg-panel: #1e1e2e;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --text-muted: #6c7086;
+    --border: #45475a;
+    --accent: #89b4fa;
+    --accent-green: #a6e3a1;
+    --accent-red: #f38ba8;
+    --accent-yellow: #f9e2af;
+    --accent-pink: #f5c2e7;
+    --accent-mauve: #cba6f7;
+    --accent-teal: #94e2d5;
+    --code-bg: #11111b;
+    --highlight-line: rgba(249,226,175,0.10);
+    --highlight-border: #f9e2af;
+    --font-mono: 'Cascadia Code','Fira Code','JetBrains Mono','Consolas',monospace;
+    --radius: 8px;
 
-main{display:grid;grid-template-columns:330px 1fr 240px;flex:1;overflow:hidden;}
+    /* Syntax - Dark (Catppuccin Mocha) */
+    --syn-keyword: #cba6f7;
+    --syn-function: #89b4fa;
+    --syn-builtin: #89dceb;
+    --syn-string: #a6e3a1;
+    --syn-comment: #6272a4;
+    --syn-number: #fab387;
+    --syn-type: #94e2d5;
+    --syn-decorator: #f38ba8;
+    --syn-operator: #89dceb;
+    --syn-class: #f9e2af;
+  }
 
-.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
-.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
-.cl.active{background:rgba(59,130,246,.1);}
-.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
-.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
-.cl.active .ln{color:#3b82f6;}
-.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
-.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+  [data-theme="light"] {
+    --bg-primary: #eff1f5;
+    --bg-secondary: #e6e9ef;
+    --bg-tertiary: #dce0e8;
+    --bg-panel: #ffffff;
+    --text-primary: #4c4f69;
+    --text-secondary: #5c5f77;
+    --text-muted: #9ca0b0;
+    --border: #ccd0da;
+    --accent: #1e66f5;
+    --accent-green: #40a02b;
+    --accent-red: #d20f39;
+    --accent-yellow: #df8e1d;
+    --accent-pink: #ea76cb;
+    --accent-mauve: #8839ef;
+    --accent-teal: #179299;
+    --code-bg: #f5f5f5;
+    --highlight-line: rgba(223,142,29,0.12);
+    --highlight-border: #df8e1d;
 
-.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.stats{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:20px;}
-.stat{display:flex;flex-direction:column;}
-.stat-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--heap);}
-.stat-val.kth{color:var(--kth);}
+    /* Syntax - Light (GitHub) */
+    --syn-keyword: #d73a49;
+    --syn-function: #6f42c1;
+    --syn-builtin: #005cc5;
+    --syn-string: #032f62;
+    --syn-comment: #6a737d;
+    --syn-number: #005cc5;
+    --syn-type: #22863a;
+    --syn-decorator: #e36209;
+    --syn-operator: #d73a49;
+    --syn-class: #e36209;
+  }
 
-.array-section{padding:10px 18px;border-bottom:1px solid var(--border);}
-.array-section .plabel{padding:0 0 8px;border:none;}
-.arr-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.arr-el{width:42px;height:42px;border-radius:6px;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:var(--text);transition:all .3s;}
-.arr-el.in-heap{border-color:var(--heap);background:rgba(59,130,246,.06);color:var(--heap);}
-.arr-el.is-kth{border-color:var(--kth);background:rgba(16,185,129,.08);color:var(--kth);box-shadow:0 0 12px rgba(16,185,129,.3);}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 13px;
+    transition: background 0.2s, color 0.2s;
+  }
 
-.heap-section{flex:1;overflow:auto;padding:15px;}
-.heap-canvas{min-height:250px;position:relative;}
+  /* ── HEADER ── */
+  .header {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .header-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .problem-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .problem-badge {
+    background: var(--accent);
+    color: var(--bg-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .difficulty-badge {
+    background: rgba(249,226,175,0.15);
+    color: var(--accent-yellow);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(249,226,175,0.3);
+  }
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--border); }
+  .btn.active {
+    background: var(--accent);
+    color: var(--bg-secondary);
+    border-color: var(--accent);
+  }
+  .mode-toggle { display: flex; gap: 4px; }
+  .mode-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mode-btn:hover { color: var(--text-primary); background: var(--border); }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #11111b;
+    border-color: var(--accent);
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .input-label { color: var(--text-muted); font-weight: 500; }
+  .input-field {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    width: 220px;
+    transition: border-color 0.15s;
+  }
+  .input-field:focus { outline: none; border-color: var(--accent); }
+  .k-field { width: 60px; }
 
-.heap-node{position:absolute;display:flex;flex-direction:column;align-items:center;transition:all .4s;}
-.heap-box{width:45px;height:45px;border-radius:50%;border:2px solid var(--heap);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:var(--heap);transition:all .3s;}
-.heap-node.is-root .heap-box{box-shadow:0 0 14px rgba(59,130,246,.35);}
-.heap-node.is-kth .heap-box{border-color:var(--kth);color:var(--kth);background:rgba(16,185,129,.08);box-shadow:0 0 14px rgba(16,185,129,.3);}
-.heap-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:3px;}
+  /* ── MAIN LAYOUT ── */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+  .panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+    transition: background 0.2s;
+  }
+  .panel-header {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-body { flex: 1; overflow: auto; }
+  .divider {
+    width: 4px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    position: relative;
+    z-index: 10;
+  }
+  .divider:hover, .divider.dragging { background: var(--accent); }
 
-.heap-edge{position:absolute;stroke:var(--heap);stroke-width:2;fill:none;opacity:.4;}
+  /* ── CODE PANEL ── */
+  .code-container {
+    background: var(--code-bg);
+    height: 100%;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.0;
+    overflow: auto;
+  }
+  .code-pre { margin: 0; padding: 12px 0; }
+  .code-line {
+    display: flex;
+    align-items: stretch;
+    min-height: 22px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    padding: 1.5px 0;
+  }
+  .code-line.active {
+    background: var(--highlight-line);
+    border-left-color: var(--highlight-border);
+  }
+  .line-num {
+    min-width: 42px;
+    text-align: right;
+    padding-right: 16px;
+    color: var(--text-muted);
+    user-select: none;
+    font-size: 13px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .line-code {
+    flex: 1;
+    white-space: pre;
+    padding-right: 20px;
+    color: var(--text-primary);
+    font-size: 14px;
+  }
 
-.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
-.decision.active{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--heap);}
-.decision.done{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--kth);}
+  /* Syntax token classes */
+  .t-kw    { color: var(--syn-keyword); font-weight: 600; }
+  .t-fn    { color: var(--syn-function); }
+  .t-bi    { color: var(--syn-builtin); }
+  .t-str   { color: var(--syn-string); }
+  .t-cm    { color: var(--syn-comment); font-style: italic; }
+  .t-num   { color: var(--syn-number); }
+  .t-tp    { color: var(--syn-type); }
+  .t-dec   { color: var(--syn-decorator); }
+  .t-cls   { color: var(--syn-class); font-weight: 600; }
+  .t-op    { color: var(--syn-operator); }
 
-.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
-.btn:disabled{opacity:.3;cursor:not-allowed;}
-.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
-.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.spd-wrap label{font-size:.7rem;color:var(--muted);}
-input[type=range]{accent-color:#3b82f6;width:80px;}
+  /* ── VIZ PANEL ── */
+  .viz-panel { flex: 1; }
+  .viz-body { padding: 16px; }
 
-.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
-.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
-.lc:hover{color:var(--text);}
-.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
-.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
-.le.heap{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--heap);}
-.le.kth{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--kth);}
-.ls{color:var(--muted);margin-right:6px;}
+  /* ── STEP LOG ── */
+  .step-log { padding: 12px; }
+  .step-counter { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+  .step-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+  }
+  .vars-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .var-row {
+    display: flex;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-bottom: 4px;
+    align-items: flex-start;
+  }
+  .var-name { color: var(--accent); font-weight: 600; flex-shrink: 0; }
+  .var-val { color: var(--text-secondary); word-break: break-all; }
+  .history-item {
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    margin-bottom: 3px;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: default;
+  }
+  .history-item.current {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border);
+  }
+
+  /* ── CONTROLS BAR ── */
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .ctrl-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .ctrl-btn:hover { background: var(--border); }
+  .ctrl-btn.play { background: var(--accent); color: #11111b; border-color: var(--accent); }
+  .ctrl-btn.play:hover { opacity: 0.85; }
+  .progress-bar-wrap {
+    flex: 1;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.15s;
+  }
+  .speed-sel {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ── VISUALIZATION ELEMENTS ── */
+  .freq-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .freq-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .freq-label {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .freq-bar-track {
+    flex: 1;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    height: 28px;
+    overflow: hidden;
+    position: relative;
+  }
+  .freq-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: width 0.3s, background 0.3s;
+    position: relative;
+  }
+  .freq-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    width: 28px;
+    text-align: left;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .heap-node {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.3s;
+  }
+  .array-box {
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s;
+  }
+
+  /* ── INTUITION MODE ── */
+  .intuition-layout { display: flex; width: 100%; height: 100%; overflow: hidden; }
+  .intuition-stages-panel {
+    width: 50%;
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid var(--border);
+  }
+  .intuition-viz-panel { width: 50%; overflow-y: auto; padding: 20px; }
+
+  .stage-card {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    transition: all 0.3s;
+  }
+  .stage-card.active {
+    border-color: var(--accent);
+    background: var(--bg-tertiary);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .stage-card.past { opacity: 0.55; }
+  .stage-card.future { opacity: 0.25; }
+  .stage-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #11111b;
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .stage-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .thought-bubble {
+    background: rgba(137,180,250,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .stage-content { font-size: 12px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 10px; }
+  .key-insight {
+    background: rgba(166,227,161,0.08);
+    border-left: 3px solid var(--accent-green);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--accent-green);
+    font-weight: 600;
+  }
+  .intuition-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+  }
+  .stage-progress {
+    flex: 1;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    height: 4px;
+  }
+  .stage-progress-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  /* viz boxes */
+  .viz-section { margin-bottom: 20px; }
+  .viz-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .info-box {
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .info-box.green  { background: rgba(166,227,161,0.10); border: 1px solid rgba(166,227,161,0.25); color: var(--accent-green); }
+  .info-box.red    { background: rgba(243,139,168,0.10); border: 1px solid rgba(243,139,168,0.25); color: var(--accent-red); }
+  .info-box.blue   { background: rgba(137,180,250,0.10); border: 1px solid rgba(137,180,250,0.25); color: var(--accent); }
+  .info-box.yellow { background: rgba(249,226,175,0.10); border: 1px solid rgba(249,226,175,0.25); color: var(--accent-yellow); }
+  .info-box.mauve  { background: rgba(203,166,247,0.10); border: 1px solid rgba(203,166,247,0.25); color: var(--accent-mauve); }
+  .info-box.teal   { background: rgba(148,226,213,0.10); border: 1px solid rgba(148,226,213,0.25); color: var(--accent-teal); }
+  .info-box strong { font-weight: 700; }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 </style>
 </head>
 <body>
-<header>
-  <div class="h-num">215</div>
-  <div class="h-title">Kth Largest Element in an Array</div>
-  <div class="h-badge">MEDIUM</div>
-  <div class="h-right">
-    <input id="arrInput" class="inp" placeholder="e.g., 3,2,1,5,6,4"/>
-    <input id="kInput" class="inp" placeholder="k = 2" style="width:80px;"/>
-    <button class="btn btn-p" onclick="init()">Reset</button>
+<div class="header">
+  <div class="header-row1">
+    <div class="problem-title">
+      <span>347.</span>
+      <span>Top K Frequent Elements</span>
+      <span class="problem-badge">LC</span>
+      <span class="difficulty-badge">Medium</span>
+    </div>
+    <div class="header-controls">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition</button>
+        <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶ Execution</button>
+      </div>
+      <button class="btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
+    </div>
   </div>
-</header>
+  <div class="input-row" id="input-row" style="display:none">
+    <span class="input-label">nums =</span>
+    <input class="input-field" id="nums-input" value="[1,1,1,2,2,3]" />
+    <span class="input-label" style="margin-left:6px;">k =</span>
+    <input class="input-field k-field" id="k-input" value="2" />
+    <button class="btn active" onclick="rerun()">Run ↺</button>
+    <span id="result-label" style="font-family:var(--font-mono);font-size:12px;color:var(--accent-green);margin-left:8px;"></span>
+  </div>
+</div>
 
-<main>
-  <div class="code-panel">
-    <div class="plabel">Min Heap Approach</div>
-    <div class="code-scroll" id="codePanel"></div>
-  </div>
-
-  <div class="viz-panel">
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Heap Size</div>
-        <div class="stat-val" id="heapSize">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">k Value</div>
-        <div class="stat-val" id="kVal">2</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Kth Largest</div>
-        <div class="stat-val kth" id="kthVal">-</div>
-      </div>
-    </div>
-    
-    <div class="array-section">
-      <div class="plabel">Input Array</div>
-      <div class="arr-row" id="arrayRow"></div>
-    </div>
-    
-    <div class="heap-section">
-      <svg id="edgeSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
-      <div id="heapCanvas" class="heap-canvas"></div>
-    </div>
-    
-    <div id="decision" class="decision">Building min-heap of size k...</div>
-    
-    <div class="bot">
-      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
-      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
-      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
-      <span class="step-info" id="stepInfo">0 / 0</span>
-      <div class="spd-wrap">
-        <label>Speed:</label>
-        <input type="range" id="speedSlider" min="200" max="1400" value="800"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="log-panel">
-    <div class="plabel">
-      Operation Log
-      <button class="lc" onclick="clearLog()">Clear</button>
-    </div>
-    <div class="log-scroll" id="logScroll"></div>
-  </div>
-</main>
+<div class="main" id="main-area">
+  <!-- Filled by JS -->
+</div>
 
 <script>
-const code=[
-  {t:'def findKthLargest(nums, k):',cm:true},
-  {t:'    # Use min-heap of size k',cm:true},
-  {t:'    import heapq',ln:1},
-  {t:'    heap = []',ln:2},
-  {t:'    ',ln:3},
-  {t:'    for num in nums:',ln:4},
-  {t:'        heapq.heappush(heap, num)',ln:5},
-  {t:'        if len(heap) > k:',ln:6},
-  {t:'            heapq.heappop(heap)',ln:7},
-  {t:'    ',ln:8},
-  {t:'    return heap[0]  # Min of heap is kth largest',ln:9}
+/* ═══════════════════════════════════════════
+   SYNTAX HIGHLIGHTING
+═══════════════════════════════════════════ */
+const PYTHON_CODE = `from typing import List
+import heapq
+from collections import Counter
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        count = Counter(nums)
+        return heapq.nlargest(k, count.keys(), key=count.get)`;
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function highlightPython(line) {
+  if (!line.trim()) return '&nbsp;';
+  const raw = line;
+
+  // Comment
+  if (raw.trim().startsWith('#')) {
+    return `<span class="t-cm">${escapeHtml(raw)}</span>`;
+  }
+
+  // Tokenize step by step
+  let out = '';
+  let i = 0;
+  const chars = raw;
+
+  while (i < chars.length) {
+    // String literals
+    if (chars[i] === '"' || chars[i] === "'") {
+      const q = chars[i];
+      let j = i + 1;
+      while (j < chars.length && chars[j] !== q) {
+        if (chars[j] === '\\') j++;
+        j++;
+      }
+      j++;
+      out += `<span class="t-str">${escapeHtml(chars.slice(i, j))}</span>`;
+      i = j;
+      continue;
+    }
+
+    // Number
+    if (/[0-9]/.test(chars[i]) && (i === 0 || !/[a-zA-Z_]/.test(chars[i-1]))) {
+      let j = i;
+      while (j < chars.length && /[0-9.]/.test(chars[j])) j++;
+      out += `<span class="t-num">${escapeHtml(chars.slice(i, j))}</span>`;
+      i = j;
+      continue;
+    }
+
+    // Identifier or keyword
+    if (/[a-zA-Z_]/.test(chars[i])) {
+      let j = i;
+      while (j < chars.length && /[a-zA-Z0-9_]/.test(chars[j])) j++;
+      const word = chars.slice(i, j);
+      const kwList = ['from','import','class','def','return','if','else','elif','for','while','in','not','and','or','True','False','None','lambda','with','as','pass','break','continue','raise','try','except','finally','yield','global','nonlocal','del','is'];
+      const builtinList = ['print','len','range','list','dict','set','tuple','int','str','float','bool','type','isinstance','hasattr','getattr','sum','min','max','sorted','enumerate','zip','map','filter','open','super','property'];
+      const typeList = ['List','Dict','Set','Tuple','Optional','Union','Any','Counter','heapq'];
+
+      if (kwList.includes(word))       out += `<span class="t-kw">${escapeHtml(word)}</span>`;
+      else if (typeList.includes(word)) out += `<span class="t-tp">${escapeHtml(word)}</span>`;
+      else if (builtinList.includes(word)) out += `<span class="t-bi">${escapeHtml(word)}</span>`;
+      else if (chars[j] === '(')       out += `<span class="t-fn">${escapeHtml(word)}</span>`;
+      else if (word === word.toUpperCase() && word.length > 1) out += `<span class="t-cls">${escapeHtml(word)}</span>`;
+      else                             out += escapeHtml(word);
+      i = j;
+      continue;
+    }
+
+    // Decorator
+    if (chars[i] === '@') {
+      let j = i + 1;
+      while (j < chars.length && /[a-zA-Z_]/.test(chars[j])) j++;
+      out += `<span class="t-dec">${escapeHtml(chars.slice(i, j))}</span>`;
+      i = j;
+      continue;
+    }
+
+    // Operators
+    if ('=+-*/<>!&|^~%'.includes(chars[i])) {
+      out += `<span class="t-op">${escapeHtml(chars[i])}</span>`;
+      i++;
+      continue;
+    }
+
+    out += escapeHtml(chars[i]);
+    i++;
+  }
+  return out;
+}
+
+/* ═══════════════════════════════════════════
+   SIMULATION ENGINE
+═══════════════════════════════════════════ */
+function parseNums(s) {
+  s = s.trim().replace(/^\[/, '').replace(/\]$/, '');
+  return s.split(',').map(x => parseInt(x.trim())).filter(n => !isNaN(n));
+}
+
+function buildSteps(nums, k) {
+  const steps = [];
+
+  const push = (line, desc, vars, vizState) => {
+    steps.push({ line, desc, vars: { ...vars }, vizState: { ...vizState } });
+  };
+
+  // Step 0: start
+  push(0, 'Import modules and set up the Solution class.', {}, { phase: 'init', nums, k });
+
+  // Step 1: Counter
+  const count = {};
+  for (const n of nums) count[n] = (count[n] || 0) + 1;
+
+  push(6, 'Call Counter(nums) — count the frequency of each number.', { nums: JSON.stringify(nums), k }, { phase: 'counter', count: { ...count }, nums, k, building: true });
+
+  // Show counter built
+  push(6, 'Counter is fully built. We now know how often each element appears.', { count: JSON.stringify(count), k }, { phase: 'counter', count: { ...count }, nums, k, building: false });
+
+  // Step 2: heapq.nlargest
+  push(7, 'Call heapq.nlargest(k, count.keys(), key=count.get) to get top-k elements.', { count: JSON.stringify(count), k, 'count.keys()': JSON.stringify(Object.keys(count).map(Number)) }, { phase: 'heap_start', count: { ...count }, nums, k });
+
+  // Simulate nlargest: build a max-heap by frequency
+  const keys = Object.keys(count).map(Number);
+  // nlargest: sort keys by count descending
+  const sorted = [...keys].sort((a, b) => count[b] - count[a]);
+
+  push(7, `Heap processes each key. Internally, it maintains a min-heap of size k using frequencies as keys.`, {
+    all_keys: JSON.stringify(keys),
+    sorted_by_freq: JSON.stringify(sorted),
+    k
+  }, { phase: 'heap_building', count: { ...count }, sorted, nums, k, heap: [] });
+
+  const heap = [];
+  for (let i = 0; i < Math.min(k, sorted.length); i++) {
+    heap.push(sorted[i]);
+    push(7, `Add element ${sorted[i]} (freq=${count[sorted[i]]}) to the result heap.`, {
+      element: sorted[i],
+      freq: count[sorted[i]],
+      current_heap: JSON.stringify(heap)
+    }, { phase: 'heap_building', count: { ...count }, sorted, nums, k, heap: [...heap], highlight: sorted[i] });
+  }
+
+  push(7, `heapq.nlargest returns the top-${k} elements by frequency.`, {
+    result: JSON.stringify(heap)
+  }, { phase: 'result', count: { ...count }, sorted, nums, k, heap: [...heap], result: heap });
+
+  return steps;
+}
+
+/* ═══════════════════════════════════════════
+   INTUITION STAGES
+═══════════════════════════════════════════ */
+const INTUITION_STAGES = [
+  {
+    title: 'Understanding the Problem',
+    thought: '"I need to find the k most frequent elements... classic frequency problem."',
+    content: `Given an integer array nums and an integer k, return the k most frequent elements.\n\n• Input: nums = [1,1,1,2,2,3], k = 2\n• Output: [1,2]\n• Order doesn't matter — I just need the top k by frequency.\n• Constraint: The answer is always unique.`,
+    insight: 'This is fundamentally a frequency-ranking problem. Count first, rank second.',
+    vizType: 'problem'
+  },
+  {
+    title: 'Exploring Approaches',
+    thought: '"I could sort by frequency... but can I do better than O(n log n)?"',
+    content: `Three main approaches exist:\n\n❌ Brute Force: O(n²) — nested loops counting\n⚠️  Sort by frequency: O(n log n) — decent, but not optimal\n✅ Heap (nlargest): O(n log k) — best for small k\n✅ Bucket Sort: O(n) — optimal but more code`,
+    insight: 'For most interviews, the heap approach hits the sweet spot: elegant, fast, and short.',
+    vizType: 'approaches'
+  },
+  {
+    title: 'The Counter Trick',
+    thought: '"Python\'s Counter does the frequency counting in one clean line. No need to loop manually."',
+    content: `Counter(nums) returns a dict subclass:\n• Keys = unique elements\n• Values = their frequencies\n\nFor [1,1,1,2,2,3]:\n  Counter({1: 3, 2: 2, 3: 1})\n\nThis is O(n) time — one pass through the array.`,
+    insight: 'Counter is O(n) and gives us everything we need to rank by frequency.',
+    vizType: 'counter'
+  },
+  {
+    title: 'The Heap Magic',
+    thought: '"heapq.nlargest(k, iterable, key=...) is like argmax but for k elements. Perfect!"',
+    content: `heapq.nlargest(k, count.keys(), key=count.get)\n\n• Iterates over all unique elements (the keys)\n• Uses count.get as the ranking function (returns frequency)\n• Internally maintains a min-heap of size k\n• Result: the k elements with highest frequency\n\nTime: O(n log k) — much better than O(n log n) sort when k << n`,
+    insight: 'nlargest is purpose-built for this: find top-k items by a ranking function in O(n log k).',
+    vizType: 'heap'
+  },
+  {
+    title: 'Complexity Analysis',
+    thought: '"Is this optimal? Time O(n log k), space O(n). The O(n) bucket sort exists, but this is cleaner."',
+    content: `Time Complexity: O(n log k)\n• Counter: O(n) — one pass\n• nlargest with heap of size k: O(n log k)\n• Total: O(n log k)\n\nSpace Complexity: O(n)\n• Counter stores up to n unique elements\n• Heap stores k elements: O(k)\n• Overall: O(n)`,
+    insight: 'When k << n (e.g. top-2 from 10,000 elements), this is nearly O(n). Excellent!',
+    vizType: 'complexity'
+  },
+  {
+    title: 'Edge Cases',
+    thought: '"What if k equals the number of unique elements? Or all elements are the same?"',
+    content: `Edge cases the solution handles:\n\n✅ k = 1: Returns single most frequent element\n✅ k = len(unique): Returns all unique elements\n✅ All same: [1,1,1], k=1 → [1]\n✅ All distinct: [1,2,3], k=2 → any 2 (ties broken arbitrarily)\n✅ Problem guarantees unique answer exists`,
+    insight: 'Counter + nlargest gracefully handles all edge cases with zero extra code.',
+    vizType: 'edge_cases'
+  },
+  {
+    title: 'Final Synthesis',
+    thought: '"Two lines. O(n log k). Readable. Correct. This is what Pythonic solutions look like."',
+    content: `The beauty of this solution:\n\n1. Counter(nums) → frequency map in O(n)\n2. heapq.nlargest(k, ...) → top-k in O(n log k)\n\nTotal: 2 lines of expressive Python that any engineer can read and verify instantly.\n\nCompare to bucket sort (O(n) but 10+ lines) — the heap approach wins on clarity.`,
+    insight: 'Elegance = maximum clarity with minimum code. This solution achieves both.',
+    vizType: 'final'
+  }
 ];
 
-let arr,k,steps=[],cursor=0,playing=false,playTimer;
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+let appState = {
+  theme: 'dark',
+  mode: 'intuition',
+  // execution
+  steps: [],
+  currentStep: 0,
+  isPlaying: false,
+  speed: 1,
+  playTimer: null,
+  // intuition
+  intuitionStage: 0,
+  intuitionTimer: null,
+  isIntuitionPlaying: false,
+  // input
+  nums: [1,1,1,2,2,3],
+  k: 2,
+  // panel widths
+  leftW: 30,
+  rightW: 22
+};
 
-function buildCode(){
-  const panel=document.getElementById('codePanel');
-  code.forEach((c,i)=>{
-    const line=document.createElement('div');
-    line.className='cl';
-    line.id=`line${c.ln||i}`;
-    const ln=document.createElement('div');ln.className='ln';
-    ln.textContent=c.ln!==undefined?c.ln:'';
-    const ct=document.createElement('div');ct.className='ct';
-    if(c.cm){
-      ct.innerHTML=`<span class="cm">${c.t}</span>`;
-    }else{
-      ct.innerHTML=c.t
-        .replace(/(def|if|for|in|import|return)/g,'<span class="kw">$1</span>')
-        .replace(/(findKthLargest|heappush|heappop|heapq|len)/g,'<span class="fn">$1</span>')
-        .replace(/(nums|k|heap|num)/g,'<span class="nm">$1</span>');
-    }
-    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
-  });
+function initExecution() {
+  appState.steps = buildSteps(appState.nums, appState.k);
+  appState.currentStep = 0;
 }
 
-function highlight(ln){
-  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
-  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
-}
+/* ═══════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════ */
+function render() {
+  const main = document.getElementById('main-area');
+  const inputRow = document.getElementById('input-row');
+  const btnI = document.getElementById('btn-intuition');
+  const btnE = document.getElementById('btn-execution');
 
-function buildSteps(nums,k){
-  const s=[];
-  const heap=[];
-  
-  s.push({line:-1,heap:[],currIdx:-1,msg:'Starting to find kth largest element...',log:{type:'heap',text:'Initializing min-heap approach'}});
-  
-  s.push({line:2,heap:[],currIdx:-1,msg:'Created empty heap',log:{type:'heap',text:'Created empty min-heap'}});
-  
-  for(let i=0;i<nums.length;i++){
-    s.push({line:5,heap:[...heap],currIdx:i,msg:`Adding ${nums[i]} to heap`,log:{type:'heap',text:`Push ${nums[i]} into heap`}});
-    
-    heap.push(nums[i]);
-    heap.sort((a,b)=>a-b);
-    
-    s.push({line:5,heap:[...heap],currIdx:i,msg:`Heap after adding ${nums[i]}: [${heap.join(', ')}]`,log:{type:'heap',text:`Heap: [${heap.join(', ')}]`}});
-    
-    if(heap.length>k){
-      const removed=heap.shift();
-      s.push({line:7,heap:[...heap],currIdx:i,msg:`Heap size > ${k}, removed smallest element ${removed}`,log:{type:'heap',text:`Removed ${removed}, heap: [${heap.join(', ')}]`}});
-    }
+  btnI.classList.toggle('active', appState.mode === 'intuition');
+  btnE.classList.toggle('active', appState.mode === 'execution');
+  inputRow.style.display = appState.mode === 'execution' ? 'flex' : 'none';
+
+  if (appState.mode === 'intuition') {
+    main.innerHTML = renderIntuitionLayout();
+    scrollActiveStage();
+  } else {
+    main.innerHTML = renderExecutionLayout();
+    attachDividerDrag();
+    scrollActiveHistory();
   }
-  
-  s.push({line:9,heap:[...heap],currIdx:-1,msg:`The ${k}th largest element is ${heap[0]}`,done:true,log:{type:'kth',text:`Result: ${k}th largest = ${heap[0]}`}});
-  
-  return s;
 }
 
-function layoutHeap(heap){
-  const positions=[];
-  const levels=Math.ceil(Math.log2(heap.length+1));
-  const baseWidth=600;
-  
-  heap.forEach((val,i)=>{
-    const level=Math.floor(Math.log2(i+1));
-    const posInLevel=i-(Math.pow(2,level)-1);
-    const nodesInLevel=Math.pow(2,level);
-    const spacing=baseWidth/(nodesInLevel+1);
-    positions.push({
-      x:spacing*(posInLevel+1),
-      y:level*80+30
-    });
-  });
-  
-  return positions;
+/* ═══════════════════════════════════════════
+   INTUITION LAYOUT
+═══════════════════════════════════════════ */
+function renderIntuitionLayout() {
+  return `
+    <div style="display:flex;flex-direction:column;width:100%;height:100%;">
+      <div class="intuition-layout" id="intuition-body">
+        <div class="intuition-stages-panel" id="stages-scroll">
+          ${INTUITION_STAGES.map((s, i) => renderStageCard(s, i)).join('')}
+        </div>
+        <div class="intuition-viz-panel">
+          ${renderIntuitionViz(INTUITION_STAGES[appState.intuitionStage].vizType)}
+        </div>
+      </div>
+      <div class="intuition-nav">
+        <button class="ctrl-btn" onclick="prevStage()" title="Previous (←)">←</button>
+        <button class="ctrl-btn ${appState.isIntuitionPlaying ? 'play' : ''}" onclick="toggleIntuitionPlay()" title="Play/Pause (Space)">
+          ${appState.isIntuitionPlaying ? '⏸' : '▶'}
+        </button>
+        <button class="ctrl-btn" onclick="nextStage()" title="Next (→)">→</button>
+        <div class="stage-progress" style="flex:1;margin:0 8px;">
+          <div class="stage-progress-fill" style="width:${((appState.intuitionStage+1)/INTUITION_STAGES.length*100).toFixed(1)}%"></div>
+        </div>
+        <span style="font-size:11px;color:var(--text-muted);">Stage ${appState.intuitionStage+1} / ${INTUITION_STAGES.length}</span>
+      </div>
+    </div>
+  `;
 }
 
-function renderHeap(st){
-  const canvas=document.getElementById('heapCanvas');
-  const svg=document.getElementById('edgeSvg');
-  canvas.innerHTML='';
-  svg.innerHTML='';
-  
-  if(!st.heap.length)return;
-  
-  const positions=layoutHeap(st.heap);
-  
-  // Draw edges
-  st.heap.forEach((val,i)=>{
-    const leftChild=2*i+1;
-    const rightChild=2*i+2;
-    const pos=positions[i];
-    
-    if(leftChild<st.heap.length){
-      const childPos=positions[leftChild];
-      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',pos.x);
-      line.setAttribute('y1',pos.y+22);
-      line.setAttribute('x2',childPos.x);
-      line.setAttribute('y2',childPos.y-22);
-      line.classList.add('heap-edge');
-      svg.appendChild(line);
+function renderStageCard(stage, i) {
+  const cls = i === appState.intuitionStage ? 'active' : (i < appState.intuitionStage ? 'past' : 'future');
+  return `
+    <div class="stage-card ${cls}" id="stage-card-${i}" onclick="jumpStage(${i})">
+      <div class="stage-title">
+        <span class="stage-num">${i+1}</span>
+        ${stage.title}
+      </div>
+      ${cls === 'active' ? `
+        <div class="thought-bubble">💭 ${stage.thought}</div>
+        <div class="stage-content">${stage.content.replace(/\n/g, '<br>')}</div>
+        <div class="key-insight">💡 ${stage.insight}</div>
+      ` : `<div style="font-size:11px;color:var(--text-muted);">${stage.insight}</div>`}
+    </div>
+  `;
+}
+
+function renderIntuitionViz(type) {
+  const nums = appState.nums;
+  const k = appState.k;
+  const count = {};
+  for (const n of nums) count[n] = (count[n] || 0) + 1;
+  const sorted = Object.entries(count).sort((a,b) => b[1]-a[1]);
+  const topK = sorted.slice(0, k).map(e => parseInt(e[0]));
+
+  const colors = ['#89b4fa','#cba6f7','#a6e3a1','#f38ba8','#fab387','#f9e2af','#94e2d5'];
+
+  switch (type) {
+    case 'problem': return `
+      <div class="viz-section">
+        <div class="viz-title">Example Input</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          ${nums.map((n,i) => `<div class="array-box" style="width:40px;height:40px;background:var(--bg-tertiary);border:2px solid var(--border);color:var(--text-primary);">${n}</div>`).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);">k = ${k}</div>
+      </div>
+      <div class="viz-section">
+        <div class="viz-title">Goal: Find top-${k} by frequency</div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          ${topK.map(n => `<div class="array-box" style="width:44px;height:44px;background:var(--accent);color:#11111b;border:none;">${n}</div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Expected output: [${topK.join(', ')}]</div>
+      </div>`;
+
+    case 'approaches': return `
+      <div class="info-box red"><strong>❌ Brute Force</strong><br>Nested loops, count every pair. O(n²) time.</div>
+      <div class="info-box yellow"><strong>⚠️ Sort by Frequency</strong><br>Count → sort keys by count. O(n log n) time.</div>
+      <div class="info-box green"><strong>✅ Heap (this solution)</strong><br>Counter + heapq.nlargest. O(n log k) time.</div>
+      <div class="info-box blue"><strong>🚀 Bucket Sort</strong><br>Frequency buckets. O(n) — more code, same result.</div>`;
+
+    case 'counter': return `
+      <div class="viz-section">
+        <div class="viz-title">Counter(nums) result</div>
+        <div class="freq-bar-wrap">
+          ${sorted.map(([el, cnt], i) => {
+            const pct = (cnt / Math.max(...Object.values(count)) * 100).toFixed(0);
+            return `
+              <div class="freq-bar-row">
+                <div class="freq-label">${el}</div>
+                <div class="freq-bar-track">
+                  <div class="freq-bar-fill" style="width:${pct}%;background:${colors[i % colors.length]}22;color:${colors[i % colors.length]};border-left:3px solid ${colors[i % colors.length]};">
+                    <span class="mono" style="font-size:12px;font-weight:700;">nums[${el}]</span>
+                  </div>
+                </div>
+                <div class="freq-count">× ${cnt}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:12px;">Counter = {${sorted.map(([e,c])=>`${e}:${c}`).join(', ')}}</div>
+      </div>`;
+
+    case 'heap': return `
+      <div class="viz-section">
+        <div class="viz-title">nlargest selects top-${k}</div>
+        <div class="freq-bar-wrap">
+          ${sorted.map(([el, cnt], i) => {
+            const inTop = topK.includes(parseInt(el));
+            return `
+              <div class="freq-bar-row">
+                <div class="freq-label" style="color:${inTop ? 'var(--accent-green)' : 'var(--text-muted)'};">${el}</div>
+                <div class="freq-bar-track">
+                  <div class="freq-bar-fill" style="width:${(cnt/Math.max(...Object.values(count))*100).toFixed(0)}%;background:${inTop ? 'rgba(166,227,161,0.15)' : 'var(--bg-tertiary)'};color:${inTop ? 'var(--accent-green)' : 'var(--text-muted)'};border-left:3px solid ${inTop ? 'var(--accent-green)' : 'var(--border)'};"></div>
+                </div>
+                <div class="freq-count" style="color:${inTop ? 'var(--accent-green)' : 'var(--text-muted)'};">× ${cnt} ${inTop ? '✓' : ''}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        <div class="info-box blue" style="margin-top:12px;">
+          <strong>heap selects:</strong> [${topK.join(', ')}] — top ${k} by frequency
+        </div>
+      </div>`;
+
+    case 'complexity': return `
+      <div class="info-box teal">
+        <strong>⏱ Time: O(n log k)</strong><br>
+        • Counter: O(n) — one pass<br>
+        • nlargest: O(n log k) — heap of size k<br>
+        When k=2, log k ≈ 1 → nearly <strong>O(n)</strong>!
+      </div>
+      <div class="info-box mauve" style="margin-top:10px;">
+        <strong>💾 Space: O(n)</strong><br>
+        • Counter: O(u) where u = unique elements ≤ n<br>
+        • Heap: O(k)<br>
+        • Dominated by Counter: O(n)
+      </div>`;
+
+    case 'edge_cases': return `
+      <div class="info-box green"><strong>✅ k = 1</strong><br>Returns [${sorted[0][0]}] — single most frequent.</div>
+      <div class="info-box green" style="margin-top:8px;"><strong>✅ All same</strong><br>[1,1,1], k=1 → Counter({1:3}), nlargest → [1].</div>
+      <div class="info-box green" style="margin-top:8px;"><strong>✅ All distinct</strong><br>[1,2,3], k=2 → any 2 elements (all freq=1).</div>
+      <div class="info-box yellow" style="margin-top:8px;"><strong>⚠️ Ties</strong><br>Problem guarantees unique answer — no tie-breaking needed!</div>`;
+
+    case 'final': return `
+      <div class="viz-section">
+        <div class="viz-title">The Complete Solution</div>
+        <div style="background:var(--code-bg);border-radius:8px;padding:14px;font-family:var(--font-mono);font-size:13px;line-height:1.7;border:1px solid var(--border);">
+          <span class="t-kw">from</span> collections <span class="t-kw">import</span> <span class="t-tp">Counter</span><br>
+          <span class="t-kw">import</span> heapq<br><br>
+          <span class="t-kw">def</span> <span class="t-fn">topKFrequent</span>(nums, k):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;count = <span class="t-tp">Counter</span>(nums)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="t-kw">return</span> heapq.<span class="t-fn">nlargest</span>(k, count.<span class="t-fn">keys</span>(), key=count.get)
+        </div>
+        <div class="info-box blue" style="margin-top:12px;">
+          <strong>Result for your input:</strong> [${topK.join(', ')}]
+        </div>
+      </div>`;
+
+    default: return '';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   EXECUTION LAYOUT
+═══════════════════════════════════════════ */
+function renderExecutionLayout() {
+  const { steps, currentStep, leftW, rightW } = appState;
+  const midW = 100 - leftW - rightW;
+  const step = steps[currentStep] || { line: -1, desc: '', vars: {}, vizState: {} };
+  const lines = PYTHON_CODE.split('\n');
+
+  const pct = steps.length > 1 ? (currentStep / (steps.length - 1) * 100).toFixed(1) : 0;
+
+  const codeHTML = lines.map((line, i) => {
+    const active = i === step.line;
+    return `<div class="code-line${active ? ' active' : ''}">
+      <span class="line-num">${i+1}</span>
+      <span class="line-code">${highlightPython(line)}</span>
+    </div>`;
+  }).join('');
+
+  const varsHTML = Object.entries(step.vars).map(([k, v]) =>
+    `<div class="var-row"><span class="var-name">${k}</span><span style="color:var(--text-muted);">:</span><span class="var-val mono"> ${v}</span></div>`
+  ).join('');
+
+  const histHTML = steps.slice(0, currentStep + 1).map((s, i) =>
+    `<div class="history-item${i === currentStep ? ' current' : ''}" id="hist-${i}">${i+1}. ${s.desc}</div>`
+  ).join('');
+
+  return `
+    <div class="panel" style="width:${leftW}%;border-right:1px solid var(--border);">
+      <div class="panel-header">
+        Code
+        <span>Python · O(n log k)</span>
+      </div>
+      <div class="panel-body">
+        <div class="code-container"><pre class="code-pre" id="code-pre">${codeHTML}</pre></div>
+      </div>
+    </div>
+
+    <div class="divider" id="div-left" data-left="true"></div>
+
+    <div class="panel" style="width:${midW}%;display:flex;flex-direction:column;">
+      <div class="panel-header">
+        Visualization
+        <span style="color:var(--text-muted);">Step ${currentStep+1} / ${steps.length}</span>
+      </div>
+      <div class="panel-body viz-body">
+        ${renderViz(step.vizState)}
+      </div>
+      <div class="controls-bar">
+        <button class="ctrl-btn" onclick="execReset()" title="Reset">⏮</button>
+        <button class="ctrl-btn" onclick="execStepBack()" title="Step Back">⏪</button>
+        <button class="ctrl-btn play" onclick="execPlay()" title="Play/Pause (Space)">${appState.isPlaying ? '⏸' : '▶'}</button>
+        <button class="ctrl-btn" onclick="execStepFwd()" title="Step Forward">⏩</button>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <select class="speed-sel" onchange="setSpeed(this.value)">
+          <option value="0.5" ${appState.speed===0.5?'selected':''}>0.5×</option>
+          <option value="1" ${appState.speed===1?'selected':''}>1×</option>
+          <option value="2" ${appState.speed===2?'selected':''}>2×</option>
+          <option value="4" ${appState.speed===4?'selected':''}>4×</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider" id="div-right" data-left="false"></div>
+
+    <div class="panel" style="width:${rightW}%;">
+      <div class="panel-header">Step Log</div>
+      <div class="panel-body step-log" id="step-log-body">
+        <div class="step-counter">${currentStep+1} <span style="font-size:13px;color:var(--text-muted);">/ ${steps.length}</span></div>
+        <div class="step-desc">${step.desc}</div>
+        <div class="vars-title">Variables</div>
+        ${varsHTML || '<div style="color:var(--text-muted);font-size:11px;">—</div>'}
+        <div class="vars-title" style="margin-top:14px;">History</div>
+        ${histHTML}
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════
+   VIZ RENDERER
+═══════════════════════════════════════════ */
+function renderViz(vs) {
+  if (!vs || !vs.phase) return '<div style="padding:20px;color:var(--text-muted);">—</div>';
+  const { phase, count, nums, k, sorted, heap, result, highlight, building } = vs;
+
+  const colors = {
+    freqBar: ['#89b4fa','#cba6f7','#a6e3a1','#f38ba8','#fab387','#f9e2af','#94e2d5'],
+  };
+
+  const numsCnt = nums || [];
+  const cnt = count || {};
+  const sortedKeys = sorted || Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(e=>parseInt(e[0]));
+  const maxFreq = Math.max(...Object.values(cnt), 1);
+
+  if (phase === 'init') {
+    return `
+      <div style="padding:16px 20px;">
+        <div class="viz-title">Input Array</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          ${numsCnt.map(n => `<div class="array-box" style="width:42px;height:42px;background:var(--bg-tertiary);border:2px solid var(--border);color:var(--text-primary);">${n}</div>`).join('')}
+        </div>
+        <div style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);">k = ${k}</div>
+        <div class="info-box blue" style="margin-top:16px;">Ready to count frequencies and extract top-${k}.</div>
+      </div>`;
+  }
+
+  if (phase === 'counter') {
+    return `
+      <div style="padding:16px 20px;">
+        <div class="viz-title">Frequency Counter ${building ? '(building…)' : '(complete)'}</div>
+        <div class="freq-bar-wrap">
+          ${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([el, c], i) => {
+            const pct = (c / maxFreq * 100).toFixed(0);
+            const col = colors.freqBar[i % colors.freqBar.length];
+            return `
+              <div class="freq-bar-row">
+                <div class="freq-label">${el}</div>
+                <div class="freq-bar-track">
+                  <div class="freq-bar-fill" style="width:${pct}%;background:${col}22;color:${col};border-left:3px solid ${col};">
+                    <span class="mono" style="font-size:11px;">count[${el}]</span>
+                  </div>
+                </div>
+                <div class="freq-count">× ${c}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:12px;font-family:var(--font-mono);font-size:12px;color:var(--text-muted);">
+          Counter = {${Object.entries(cnt).map(([e,c])=>`${e}:${c}`).join(', ')}}
+        </div>
+      </div>`;
+  }
+
+  if (phase === 'heap_start' || phase === 'heap_building') {
+    const hp = heap || [];
+    return `
+      <div style="padding:16px 20px;">
+        <div class="viz-title">Frequency Map → Selecting Top-${k}</div>
+        <div class="freq-bar-wrap" style="margin-bottom:16px;">
+          ${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([el, c], i) => {
+            const inHeap = hp.includes(parseInt(el));
+            const isHL = parseInt(el) === highlight;
+            const col = colors.freqBar[i % colors.freqBar.length];
+            const pct = (c / maxFreq * 100).toFixed(0);
+            return `
+              <div class="freq-bar-row">
+                <div class="freq-label" style="color:${isHL ? 'var(--accent-yellow)' : (inHeap ? 'var(--accent-green)' : 'inherit')};">${el}</div>
+                <div class="freq-bar-track" style="border:1px solid ${isHL ? 'var(--accent-yellow)' : (inHeap ? 'rgba(166,227,161,0.3)' : 'transparent')};transition:border 0.2s;">
+                  <div class="freq-bar-fill" style="width:${pct}%;background:${isHL ? 'rgba(249,226,175,0.2)' : (inHeap ? 'rgba(166,227,161,0.15)' : col+'18')};color:${isHL ? 'var(--accent-yellow)' : (inHeap ? 'var(--accent-green)' : col)};border-left:3px solid ${isHL ? 'var(--accent-yellow)' : (inHeap ? 'var(--accent-green)' : col)};"></div>
+                </div>
+                <div class="freq-count" style="color:${isHL ? 'var(--accent-yellow)' : (inHeap ? 'var(--accent-green)' : 'var(--text-muted)')}">${isHL ? '→' : (inHeap ? '✓' : '')} × ${c}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        ${hp.length > 0 ? `
+          <div class="viz-title">Current Heap Selection</div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            ${hp.map(n => `
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div class="array-box" style="width:44px;height:44px;background:rgba(166,227,161,0.15);border:2px solid var(--accent-green);color:var(--accent-green);">${n}</div>
+                <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">f=${cnt[n]}</div>
+              </div>`).join('')}
+          </div>` : ''}
+      </div>`;
+  }
+
+  if (phase === 'result') {
+    const res = result || [];
+    return `
+      <div style="padding:16px 20px;">
+        <div class="viz-title">Final Result</div>
+        <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+          ${res.map(n => `
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="array-box" style="width:52px;height:52px;background:var(--accent);color:#11111b;border:none;font-size:18px;">${n}</div>
+              <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">freq=${cnt[n]}</div>
+            </div>`).join('')}
+        </div>
+        <div class="info-box green">
+          <strong>✅ heapq.nlargest returned: [${res.join(', ')}]</strong><br>
+          These are the top-${k} elements by frequency.
+        </div>
+        <div class="freq-bar-wrap" style="margin-top:16px;">
+          ${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([el, c], i) => {
+            const inRes = res.includes(parseInt(el));
+            const pct = (c / maxFreq * 100).toFixed(0);
+            const col = colors.freqBar[i % colors.freqBar.length];
+            return `
+              <div class="freq-bar-row">
+                <div class="freq-label" style="color:${inRes ? 'var(--accent-green)' : 'var(--text-muted)'};">${el}</div>
+                <div class="freq-bar-track">
+                  <div class="freq-bar-fill" style="width:${pct}%;background:${inRes ? 'rgba(166,227,161,0.18)' : col+'12'};color:${inRes ? 'var(--accent-green)' : 'var(--text-muted)'};border-left:3px solid ${inRes ? 'var(--accent-green)' : 'var(--border)'};">
+                  </div>
+                </div>
+                <div class="freq-count" style="color:${inRes ? 'var(--accent-green)' : 'var(--text-muted)'};">×${c} ${inRes ? '✓' : ''}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  return '<div style="padding:20px;color:var(--text-muted);">—</div>';
+}
+
+/* ═══════════════════════════════════════════
+   CONTROLS
+═══════════════════════════════════════════ */
+function setMode(m) {
+  stopAll();
+  appState.mode = m;
+  if (m === 'execution' && appState.steps.length === 0) initExecution();
+  render();
+}
+
+function toggleTheme() {
+  appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', appState.theme);
+  document.getElementById('theme-btn').textContent = appState.theme === 'dark' ? '☀ Light' : '🌙 Dark';
+}
+
+function rerun() {
+  try {
+    const nums = parseNums(document.getElementById('nums-input').value);
+    const k = parseInt(document.getElementById('k-input').value);
+    if (!nums.length || isNaN(k) || k < 1) throw new Error();
+    appState.nums = nums;
+    appState.k = k;
+    stopAll();
+    initExecution();
+    const res = appState.steps[appState.steps.length - 1]?.vizState?.result || [];
+    document.getElementById('result-label').textContent = res.length ? `→ [${res.join(', ')}]` : '';
+    render();
+  } catch(e) {
+    document.getElementById('result-label').textContent = '⚠ Invalid input';
+  }
+}
+
+// Intuition controls
+function prevStage() { if(appState.intuitionStage > 0) { appState.intuitionStage--; render(); } }
+function nextStage() { if(appState.intuitionStage < INTUITION_STAGES.length - 1) { appState.intuitionStage++; render(); } else stopIntuitionPlay(); }
+function jumpStage(i) { appState.intuitionStage = i; render(); }
+
+function toggleIntuitionPlay() {
+  if (appState.isIntuitionPlaying) stopIntuitionPlay();
+  else startIntuitionPlay();
+}
+function startIntuitionPlay() {
+  appState.isIntuitionPlaying = true;
+  appState.intuitionTimer = setInterval(() => {
+    if (appState.intuitionStage < INTUITION_STAGES.length - 1) {
+      appState.intuitionStage++;
+      render();
+    } else stopIntuitionPlay();
+  }, 3500);
+  render();
+}
+function stopIntuitionPlay() {
+  appState.isIntuitionPlaying = false;
+  clearInterval(appState.intuitionTimer);
+  render();
+}
+
+// Execution controls
+function execReset() { stopExec(); appState.currentStep = 0; render(); }
+function execStepBack() { if(appState.currentStep > 0) { appState.currentStep--; render(); } }
+function execStepFwd() { if(appState.currentStep < appState.steps.length - 1) { appState.currentStep++; render(); } else stopExec(); }
+function execPlay() {
+  if (appState.isPlaying) { stopExec(); render(); return; }
+  appState.isPlaying = true;
+  const interval = Math.round(900 / appState.speed);
+  appState.playTimer = setInterval(() => {
+    if (appState.currentStep < appState.steps.length - 1) {
+      appState.currentStep++;
+      render();
+    } else stopExec();
+  }, interval);
+  render();
+}
+function stopExec() {
+  appState.isPlaying = false;
+  clearInterval(appState.playTimer);
+}
+function setSpeed(v) { appState.speed = parseFloat(v); if(appState.isPlaying) { stopExec(); execPlay(); } }
+
+function stopAll() { stopExec(); stopIntuitionPlay(); }
+
+/* ═══════════════════════════════════════════
+   DIVIDER DRAG
+═══════════════════════════════════════════ */
+function attachDividerDrag() {
+  const divL = document.getElementById('div-left');
+  const divR = document.getElementById('div-right');
+  if (!divL || !divR) return;
+
+  let dragging = null, startX = 0, startLeftW = 0, startRightW = 0;
+
+  const onMouseMove = (e) => {
+    if (!dragging) return;
+    const main = document.getElementById('main-area');
+    const totalW = main.offsetWidth;
+    const dx = e.clientX - startX;
+    const dxPct = (dx / totalW) * 100;
+
+    if (dragging === 'left') {
+      const newLeft = Math.max(15, Math.min(50, startLeftW + dxPct));
+      appState.leftW = newLeft;
+    } else {
+      const newRight = Math.max(15, Math.min(40, startRightW - dxPct));
+      appState.rightW = newRight;
     }
-    
-    if(rightChild<st.heap.length){
-      const childPos=positions[rightChild];
-      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',pos.x);
-      line.setAttribute('y1',pos.y+22);
-      line.setAttribute('x2',childPos.x);
-      line.setAttribute('y2',childPos.y-22);
-      line.classList.add('heap-edge');
-      svg.appendChild(line);
-    }
+    render();
+  };
+
+  const onMouseUp = () => {
+    dragging = null;
+    document.querySelectorAll('.divider').forEach(d => d.classList.remove('dragging'));
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  divL.addEventListener('mousedown', (e) => {
+    dragging = 'left'; startX = e.clientX; startLeftW = appState.leftW;
+    divL.classList.add('dragging');
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   });
-  
-  // Draw nodes
-  st.heap.forEach((val,i)=>{
-    const pos=positions[i];
-    const nodeDiv=document.createElement('div');
-    nodeDiv.className='heap-node';
-    if(i===0){
-      nodeDiv.classList.add('is-root');
-      if(st.done)nodeDiv.classList.add('is-kth');
-    }
-    nodeDiv.style.left=`${pos.x-22.5}px`;
-    nodeDiv.style.top=`${pos.y-22.5}px`;
-    
-    const box=document.createElement('div');
-    box.className='heap-box';
-    box.textContent=val;
-    
-    const label=document.createElement('div');
-    label.className='heap-label';
-    label.textContent=`idx:${i}`;
-    
-    nodeDiv.appendChild(box);
-    nodeDiv.appendChild(label);
-    canvas.appendChild(nodeDiv);
+
+  divR.addEventListener('mousedown', (e) => {
+    dragging = 'right'; startX = e.clientX; startRightW = appState.rightW;
+    divR.classList.add('dragging');
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   });
 }
 
-function renderArray(st){
-  const row=document.getElementById('arrayRow');
-  row.innerHTML='';
-  
-  arr.forEach((val,i)=>{
-    const el=document.createElement('div');
-    el.className='arr-el';
-    if(i<=st.currIdx)el.classList.add('in-heap');
-    el.textContent=val;
-    row.appendChild(el);
+function scrollActiveStage() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(`stage-card-${appState.intuitionStage}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 }
 
-function renderStats(st){
-  document.getElementById('heapSize').textContent=st.heap.length;
-  document.getElementById('kVal').textContent=k;
-  document.getElementById('kthVal').textContent=st.done?st.heap[0]:'-';
+function scrollActiveHistory() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(`hist-${appState.currentStep}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
 }
 
-function renderDecision(st){
-  const d=document.getElementById('decision');
-  d.className='decision';
-  d.textContent=st.msg;
-  if(st.currIdx>=0)d.classList.add('active');
-  if(st.done)d.classList.add('done');
-}
+/* ═══════════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  if (e.code === 'Space') { e.preventDefault(); appState.mode === 'intuition' ? toggleIntuitionPlay() : execPlay(); }
+  if (e.code === 'ArrowRight') { e.preventDefault(); appState.mode === 'intuition' ? nextStage() : execStepFwd(); }
+  if (e.code === 'ArrowLeft')  { e.preventDefault(); appState.mode === 'intuition' ? prevStage() : execStepBack(); }
+});
 
-function addLog(idx,log){
-  const el=document.getElementById('logScroll');
-  const d=document.createElement('div');d.className=`le ${log.type}`;
-  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-
-function clearLog(){document.getElementById('logScroll').innerHTML='';}
-
-function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
-
-function renderStep(idx){
-  const st=steps[idx];
-  highlight(st.line);
-  renderHeap(st);
-  renderArray(st);
-  renderStats(st);
-  renderDecision(st);
-  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
-  document.getElementById('btnPrev').disabled=idx===0;
-  document.getElementById('btnNext').disabled=idx===steps.length-1;
-}
-
-function stepFwd(){
-  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
-}
-
-function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
-
-function togglePlay(){
-  playing=!playing;
-  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
-  if(playing)runPlay();else clearTimeout(playTimer);
-}
-
-function runPlay(){
-  if(!playing)return;
-  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
-  stepFwd();
-  const spd=1600-parseInt(document.getElementById('speedSlider').value);
-  playTimer=setTimeout(runPlay,spd);
-}
-
-function init(){
-  clearTimeout(playTimer);playing=false;
-  document.getElementById('btnPlay').textContent='▶ Play';
-  clearLog();
-  
-  const rawArr=document.getElementById('arrInput').value.trim();
-  arr=rawArr?rawArr.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x)):[];
-  if(!arr.length)arr=[3,2,1,5,6,4];
-  
-  const rawK=document.getElementById('kInput').value.trim();
-  k=rawK?parseInt(rawK):2;
-  if(isNaN(k)||k<1)k=2;
-  
-  steps=buildSteps(arr,k);
-  
-  cursor=0;
-  highlight(-1);
-  if(steps[0]?.log)addLog(0,steps[0].log);
-  renderStep(0);
-}
-
-buildCode();
-init();
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+initExecution();
+render();
 </script>
 </body>
 </html>
