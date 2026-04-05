@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>79. Word Search - Visualizer</title>
+<style>
+  :root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-panel: #0f3460;
+    --bg-code: #0d0d1a;
+    --text-primary: #e0e0ff;
+    --text-secondary: #8892b0;
+    --border: #1e3a5f;
+    --accent: #64ffda;
+    --accent2: #7c3aed;
+    --highlight-line: rgba(100,255,218,0.08);
+    --font-mono: 'Consolas','Monaco','Courier New',monospace;
+
+    /* Syntax - Dark Dracula */
+    --syn-keyword: #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-type: #8be9fd;
+    --syn-number: #bd93f9;
+    --syn-decorator: #ffb86c;
+    --syn-builtin: #ff5555;
+  }
+  [data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --bg-panel: #e2e8f0;
+    --bg-code: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: #cbd5e1;
+    --accent: #0891b2;
+    --accent2: #7c3aed;
+    --highlight-line: rgba(8,145,178,0.10);
+    --syn-keyword: #d73a49;
+    --syn-function: #6f42c1;
+    --syn-string: #032f62;
+    --syn-comment: #6a737d;
+    --syn-type: #005cc5;
+    --syn-number: #e36209;
+    --syn-decorator: #e36209;
+    --syn-builtin: #d73a49;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+
+  /* ---- HEADER ---- */
+  #header {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 10px 16px; background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  #header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  #header h1 { font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 0.01em; }
+  #header-top-right { display: flex; gap: 8px; align-items: center; }
+
+  .btn { cursor: pointer; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; background: var(--bg-panel); color: var(--text-primary); font-size: 12px; transition: all .15s; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.active { background: var(--accent); color: #0d0d1a; border-color: var(--accent); font-weight: 600; }
+
+  /* Mode toggle */
+  #mode-toggle { display: flex; gap: 6px; }
+  .mode-btn { flex: 1; padding: 7px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; }
+
+  /* Input row */
+  #input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #input-row label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  #board-input, #word-input { background: var(--bg-code); border: 1px solid var(--border); border-radius: 5px; padding: 4px 8px; color: var(--text-primary); font-family: var(--font-mono); font-size: 12px; }
+  #board-input { width: 320px; }
+  #word-input { width: 120px; }
+
+  /* ---- MAIN ---- */
+  #main { display: flex; height: calc(100vh - var(--header-h, 120px)); overflow: hidden; }
+
+  /* ---- PANELS ---- */
+  .panel { display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+  .panel-header { padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); background: var(--bg-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
+  .panel-body { flex: 1; overflow: auto; }
+
+  .divider { width: 4px; background: var(--border); cursor: col-resize; flex-shrink: 0; transition: background .15s; }
+  .divider:hover { background: var(--accent); }
+
+  /* ---- CODE PANEL ---- */
+  #code-panel { background: var(--bg-code); }
+  .code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.65; }
+  .code-line { display: flex; align-items: flex-start; padding: 0 0; min-height: 23px; transition: background .15s; }
+  .code-line.active-line { background: var(--highlight-line); border-left: 2px solid var(--accent); }
+  .line-num { display: inline-block; min-width: 38px; text-align: right; padding-right: 14px; color: var(--text-secondary); user-select: none; font-size: 12px; padding-top: 1px; flex-shrink: 0; }
+  .line-code { flex: 1; white-space: pre; color: var(--text-primary); }
+
+  /* Syntax tokens */
+  .kw { color: var(--syn-keyword); font-weight: 600; }
+  .fn { color: var(--syn-function); }
+  .st { color: var(--syn-string); }
+  .cm { color: var(--syn-comment); font-style: italic; }
+  .tp { color: var(--syn-type); }
+  .nm { color: var(--syn-number); }
+  .dc { color: var(--syn-decorator); }
+  .bi { color: var(--syn-builtin); }
+  .op { color: var(--text-secondary); }
+
+  /* ---- VIZ PANEL ---- */
+  #viz-panel { background: var(--bg-primary); position: relative; }
+  #viz-panel .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+  .board-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .board-grid { display: inline-grid; gap: 4px; }
+  .cell {
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 18px; font-weight: 700;
+    background: var(--bg-secondary); color: var(--text-primary); transition: all .2s; position: relative;
+  }
+  .cell.visited { background: rgba(100,255,218,0.15); border-color: var(--accent); color: var(--accent); }
+  .cell.current { background: rgba(100,255,218,0.35); border-color: var(--accent); box-shadow: 0 0 12px rgba(100,255,218,0.4); color: #0d0d1a; }
+  .cell.mismatch { background: rgba(255,85,85,0.18); border-color: #ff5555; color: #ff5555; }
+  .cell.matched { background: rgba(80,250,123,0.22); border-color: #50fa7b; color: #50fa7b; }
+  .cell.start { background: rgba(189,147,249,0.2); border-color: #bd93f9; color: #bd93f9; }
+  .cell.idx-label { position: absolute; top: 2px; right: 4px; font-size: 9px; color: var(--text-secondary); font-family: var(--font-mono); }
+
+  .word-display { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .word-char {
+    width: 34px; height: 34px; border: 2px solid var(--border); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+    background: var(--bg-secondary); color: var(--text-secondary); transition: all .2s;
+  }
+  .word-char.matched { background: rgba(80,250,123,0.22); border-color: #50fa7b; color: #50fa7b; }
+  .word-char.current { background: rgba(100,255,218,0.3); border-color: var(--accent); color: var(--accent); }
+
+  .result-badge { padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; text-align: center; }
+  .result-badge.found { background: rgba(80,250,123,0.2); border: 2px solid #50fa7b; color: #50fa7b; }
+  .result-badge.not-found { background: rgba(255,85,85,0.2); border: 2px solid #ff5555; color: #ff5555; }
+  .result-badge.searching { background: rgba(100,255,218,0.1); border: 2px solid var(--accent); color: var(--accent); }
+
+  /* Controls */
+  #controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .ctrl-btn { cursor: pointer; border: 1px solid var(--border); border-radius: 6px; padding: 5px 14px; background: var(--bg-panel); color: var(--text-primary); font-size: 16px; transition: all .15s; min-width: 36px; }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ctrl-btn.play-btn { background: var(--accent); color: #0d0d1a; border-color: var(--accent); font-weight: 700; }
+  #speed-select { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; color: var(--text-primary); font-size: 12px; }
+  #step-counter { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+
+  /* ---- STEP LOG PANEL ---- */
+  #log-panel { background: var(--bg-secondary); }
+  .step-desc { font-size: 13px; line-height: 1.5; color: var(--text-primary); padding: 12px; background: var(--bg-panel); border-radius: 8px; margin-bottom: 10px; }
+  .vars-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); margin-bottom: 6px; }
+  .var-row { display: flex; gap: 6px; font-family: var(--font-mono); font-size: 12px; margin: 3px 0; }
+  .var-name { color: var(--accent); }
+  .var-val { color: var(--text-primary); word-break: break-all; }
+  .history-list { margin-top: 12px; }
+  .history-item { padding: 5px 8px; border-radius: 5px; font-size: 11px; margin: 2px 0; color: var(--text-secondary); cursor: default; transition: background .1s; }
+  .history-item.current { background: var(--bg-panel); color: var(--text-primary); font-weight: 600; }
+  .history-item:hover { background: var(--bg-panel); }
+
+  /* ---- INTUITION MODE ---- */
+  #intuition-container { display: flex; width: 100%; height: 100%; overflow: hidden; }
+  .intuition-left { flex: 1; overflow: auto; padding: 20px; border-right: 1px solid var(--border); }
+  .intuition-right { flex: 1; overflow: auto; padding: 20px; }
+
+  .stage-card { padding: 16px; margin-bottom: 14px; border-radius: 10px; border-left: 4px solid var(--border); background: var(--bg-secondary); transition: all .3s; }
+  .stage-card.active { border-left-color: var(--accent); background: var(--bg-panel); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .stage-card.past { opacity: 0.55; }
+  .stage-card.future { opacity: 0.25; }
+  .stage-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+  .stage-num { background: var(--accent); color: #0d0d1a; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+  .thought-bubble { background: rgba(100,255,218,0.06); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; font-style: italic; color: var(--text-secondary); margin-bottom: 10px; font-size: 13px; }
+  .stage-content { font-size: 13px; line-height: 1.65; color: var(--text-primary); margin-bottom: 10px; }
+  .insight-box { background: rgba(80,250,123,0.08); border-left: 3px solid #50fa7b; padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13px; color: #50fa7b; }
+  .insight-box strong { font-weight: 700; }
+
+  .intuition-viz-card { background: var(--bg-secondary); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+  .intuition-viz-card h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
+
+  .intuition-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
+
+  .approach-card { padding: 14px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .approach-card.bad { border-color: #ff5555; background: rgba(255,85,85,0.07); }
+  .approach-card.good { border-color: #50fa7b; background: rgba(80,250,123,0.07); }
+  .approach-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .approach-card.bad h4 { color: #ff5555; }
+  .approach-card.good h4 { color: #50fa7b; }
+  .approach-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  .complexity-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .complexity-label { color: var(--text-secondary); }
+  .complexity-val { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
+
+  .mini-board { display: inline-grid; gap: 3px; margin: 8px 0; }
+  .mini-cell { width: 32px; height: 32px; border: 1.5px solid var(--border); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; background: var(--bg-primary); color: var(--text-primary); }
+  .mini-cell.hi-path { background: rgba(100,255,218,0.2); border-color: var(--accent); color: var(--accent); }
+  .mini-cell.hi-visited { background: rgba(80,250,123,0.15); border-color: #50fa7b; color: #50fa7b; }
+  .mini-cell.hi-backtrack { background: rgba(255,85,85,0.15); border-color: #ff5555; color: #ff5555; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
+  .tag-blue { background: rgba(100,255,218,0.15); color: var(--accent); }
+  .tag-purple { background: rgba(124,58,237,0.2); color: #bd93f9; }
+  .tag-green { background: rgba(80,250,123,0.15); color: #50fa7b; }
+  .tag-red { background: rgba(255,85,85,0.15); color: #ff5555; }
+
+  svg text { font-family: var(--font-mono); }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="header">
+  <div id="header-top">
+    <h1>79. Word Search</h1>
+    <div id="header-top-right">
+      <div id="mode-toggle">
+        <button class="btn mode-btn active" id="btn-intuition" onclick="app.setMode('intuition')">💡 Intuition</button>
+        <button class="btn mode-btn" id="btn-execution" onclick="app.setMode('execution')">▶️ Execution</button>
+      </div>
+      <button class="btn" onclick="app.toggleTheme()">☀️ Light</button>
+    </div>
+  </div>
+  <div id="input-row" style="display:none">
+    <label>Board (JSON):</label>
+    <input id="board-input" type="text" value='[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]'>
+    <label>Word:</label>
+    <input id="word-input" type="text" value="ABCCED">
+    <button class="btn" onclick="app.parseAndRun()">▶ Run</button>
+  </div>
+</div>
+
+<div id="main"></div>
+
+<script>
+const PYTHON_CODE = `from typing import List
+from collections import Counter
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        m, n = len(board), len(board[0])
+        word_len = len(word)
+        # Pruning: check character frequency
+        board_count = Counter(
+            board[i][j] for i in range(m) for j in range(n)
+        )
+        word_count = Counter(word)
+        for ch, cnt in word_count.items():
+            if board_count[ch] < cnt:
+                return False
+        # Optimization: start from rarer end
+        if board_count[word[0]] > board_count[word[-1]]:
+            word = word[::-1]
+        def dfs(r: int, c: int, idx: int) -> bool:
+            if idx == word_len:
+                return True
+            if r < 0 or r >= m or c < 0 or c >= n:
+                return False
+            if board[r][c] != word[idx]:
+                return False
+            # Mark visited in-place
+            temp, board[r][c] = board[r][c], '#'
+            found = (
+                dfs(r + 1, c, idx + 1) or
+                dfs(r - 1, c, idx + 1) or
+                dfs(r, c + 1, idx + 1) or
+                dfs(r, c - 1, idx + 1)
+            )
+            # Restore cell
+            board[r][c] = temp
+            return found
+        return any(
+            dfs(r, c, 0)
+            for r in range(m)
+            for c in range(n)
+            if board[r][c] == word[0]
+        )`;
+
+// Token-based syntax highlighter
+function highlightPython(line) {
+  if (!line.trim()) return '&nbsp;';
+
+  // Helper: escape HTML
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // Check if comment
+  const commentIdx = line.indexOf('#');
+  // String detection
+  const reStr = /(['"])(.*?)\1/g;
+
+  let result = '';
+  let i = 0;
+  const chars = [...line];
+  const len = chars.length;
+  let inStr = false, strChar = '', strStart = -1;
+  let commentStart = -1;
+
+  // Tokenize: pass 1 - find string and comment positions
+  const tokens = []; // {start, end, type, text}
+  let j = 0;
+  while (j < len) {
+    const ch = chars[j];
+    if (!inStr) {
+      if (ch === "'" || ch === '"') {
+        // Triple quote check
+        if (chars[j+1] === ch && chars[j+2] === ch) {
+          const end3 = line.indexOf(ch+ch+ch, j+3);
+          if (end3 !== -1) {
+            tokens.push({start:j, end:end3+3, type:'st', text: line.slice(j, end3+3)});
+            j = end3+3; continue;
+          }
+        }
+        inStr = true; strChar = ch; strStart = j;
+      } else if (ch === '#') {
+        tokens.push({start:j, end:len, type:'cm', text: line.slice(j)});
+        j = len; continue;
+      }
+    } else {
+      if (ch === strChar && chars[j-1] !== '\\') {
+        tokens.push({start:strStart, end:j+1, type:'st', text: line.slice(strStart, j+1)});
+        inStr = false;
+      }
+    }
+    j++;
+  }
+
+  // Build coverage map
+  const covered = new Array(len).fill(false);
+  for (const t of tokens) for (let k=t.start;k<t.end;k++) covered[k]=true;
+
+  // For uncovered segments: tokenize keywords/identifiers/etc.
+  const keywords = new Set(['from','import','class','def','if','elif','else','while','for','return','in','and','or','not','True','False','None','is','with','as','pass','break','continue','lambda','yield','raise','try','except','finally','global','nonlocal']);
+  const builtins = new Set(['len','range','print','any','all','sum','min','max','list','dict','set','int','str','bool','type','Counter','enumerate','zip','map','filter']);
+  const types = new Set(['List','Dict','Set','Optional','Tuple','Union','int','str','bool','float','Any']);
+
+  function tokenizePlain(seg) {
+    // Tokenize identifiers, numbers, operators
+    let out = '';
+    let k = 0;
+    while (k < seg.length) {
+      const c = seg[k];
+      if (/[a-zA-Z_]/.test(c)) {
+        let word = '';
+        while (k < seg.length && /[a-zA-Z0-9_]/.test(seg[k])) { word += seg[k++]; }
+        if (keywords.has(word)) out += `<span class="kw">${esc(word)}</span>`;
+        else if (builtins.has(word)) out += `<span class="bi">${esc(word)}</span>`;
+        else if (types.has(word)) out += `<span class="tp">${esc(word)}</span>`;
+        else if (k < seg.length && seg[k] === '(') out += `<span class="fn">${esc(word)}</span>`;
+        else out += esc(word);
+      } else if (/[0-9]/.test(c)) {
+        let num = '';
+        while (k < seg.length && /[0-9.]/.test(seg[k])) { num += seg[k++]; }
+        out += `<span class="nm">${esc(num)}</span>`;
+      } else {
+        out += esc(c); k++;
+      }
+    }
+    return out;
+  }
+
+  // Merge: output tokens in order with gaps
+  let allTokens = [...tokens].sort((a,b)=>a.start-b.start);
+  let pos = 0;
+  let html = '';
+  for (const t of allTokens) {
+    if (t.start > pos) {
+      html += tokenizePlain(line.slice(pos, t.start));
+    }
+    html += `<span class="${t.type}">${esc(t.text)}</span>`;
+    pos = t.end;
+  }
+  if (pos < len) html += tokenizePlain(line.slice(pos));
+  return html || '&nbsp;';
+}
+
+// ========================= SIMULATION =========================
+function simulateWordSearch(board, word) {
+  const steps = [];
+  const m = board.length, n = board[0].length;
+  const word_len = word.length;
+  let stepNum = 0;
+
+  // Deep clone board
+  function cloneBoard(b) { return b.map(r=>[...r]); }
+
+  // Snapshot type: {line, desc, vars, boardSnap, path, currentCell, wordIdx, result}
+  function snap(line, desc, vars, boardSnap, path, currentCell, wordIdx, result) {
+    steps.push({line, desc, vars: {...vars}, boardSnap: cloneBoard(boardSnap), path:[...path], currentCell, wordIdx, result, stepNum: stepNum++});
+  }
+
+  // Freq pruning
+  const boardCount = {};
+  for (let i=0;i<m;i++) for (let j=0;j<n;j++) {
+    boardCount[board[i][j]] = (boardCount[board[i][j]]||0)+1;
+  }
+  const wordCount = {};
+  for (const ch of word) wordCount[ch] = (wordCount[ch]||0)+1;
+
+  snap(11, 'Count character frequencies on board', {board_count: JSON.stringify(boardCount), word_count: JSON.stringify(wordCount)}, board, [], null, -1, null);
+
+  // Pruning check
+  let pruned = false;
+  for (const [ch, cnt] of Object.entries(wordCount)) {
+    if ((boardCount[ch]||0) < cnt) {
+      snap(14, `Pruning: '${ch}' needed ${cnt} times but board only has ${boardCount[ch]||0}. Return False.`, {ch, needed:cnt, available:boardCount[ch]||0}, board, [], null, -1, false);
+      pruned = true; break;
+    }
+  }
+  if (pruned) return steps;
+
+  // Reversal optimization
+  let actualWord = word;
+  if ((boardCount[word[0]]||0) > (boardCount[word[word.length-1]]||0)) {
+    actualWord = word.split('').reverse().join('');
+    snap(17, `Reverse word: first char '${word[0]}' (freq ${boardCount[word[0]]}) > last char '${word[word.length-1]}' (freq ${boardCount[word[word.length-1]]}). Search for '${actualWord}' instead.`, {original_word: word, reversed_word: actualWord}, board, [], null, -1, null);
+  } else {
+    snap(17, `No reversal: first char '${word[0]}' frequency is OK. Searching for '${actualWord}'.`, {word: actualWord}, board, [], null, -1, null);
+  }
+
+  const wl = actualWord.length;
+  let found = false;
+  const workBoard = cloneBoard(board);
+
+  function dfs(r, c, idx, path) {
+    if (found) return false;
+    if (idx === wl) {
+      snap(20, `idx == word_len (${wl}): Found complete word! Return True ✓`, {r,c,idx,word_matched: actualWord}, workBoard, path, null, idx, true);
+      found = true; return true;
+    }
+    if (r < 0 || r >= m || c < 0 || c >= n) {
+      snap(22, `Out of bounds at (${r},${c}). Return False.`, {r,c,idx}, workBoard, path, [r,c], idx, null);
+      return false;
+    }
+    if (workBoard[r][c] !== actualWord[idx]) {
+      snap(24, `Cell (${r},${c})='${workBoard[r][c]}' ≠ word[${idx}]='${actualWord[idx]}'. Mismatch. Return False.`, {r,c,cell_val: workBoard[r][c], expected: actualWord[idx], idx}, workBoard, path, [r,c], idx, null);
+      return false;
+    }
+    // Mark visited
+    const temp = workBoard[r][c];
+    workBoard[r][c] = '#';
+    const newPath = [...path, [r,c]];
+    snap(27, `Match! Cell (${r},${c})='${temp}' == word[${idx}]. Mark as visited '#'.`, {r,c,matched_char:temp,idx,path_len:newPath.length}, workBoard, newPath, [r,c], idx, null);
+
+    const dirs = [[1,0,'down'],[-1,0,'up'],[0,1,'right'],[0,-1,'left']];
+    let res = false;
+    for (const [dr,dc,dir] of dirs) {
+      if (found) break;
+      snap(28, `DFS ${dir} from (${r},${c}) → (${r+dr},${c+dc}) for word[${idx+1}]='${actualWord[idx+1]||'(end)'}' `, {r,c,next_r:r+dr, next_c:c+dc, idx, next_idx:idx+1}, workBoard, newPath, [r,c], idx+1, null);
+      res = dfs(r+dr, c+dc, idx+1, newPath) || res;
+    }
+
+    // Restore
+    workBoard[r][c] = temp;
+    if (!res) {
+      snap(34, `Backtrack: restore (${r},${c}) = '${temp}'. No path found from here.`, {r,c,restored:temp,idx}, workBoard, path, [r,c], idx, null);
+    }
+    return res;
+  }
+
+  snap(37, `Start searching for '${actualWord}'. Try each cell matching first char '${actualWord[0]}'.`, {word: actualWord, first_char: actualWord[0]}, workBoard, [], null, 0, null);
+
+  outer: for (let r=0; r<m; r++) {
+    for (let c=0; c<n; c++) {
+      if (workBoard[r][c] === actualWord[0]) {
+        snap(39, `Trying start at (${r},${c}) = '${workBoard[r][c]}'`, {r,c,char:workBoard[r][c]}, workBoard, [], [r,c], 0, null);
+        const res = dfs(r, c, 0, []);
+        if (res) break outer;
+      }
+    }
+  }
+
+  if (!found) {
+    snap(37, `All cells tried. Word '${actualWord}' not found. Return False.`, {word:actualWord}, workBoard, [], null, -1, false);
+  }
+
+  return steps;
+}
+
+// ========================= APP =========================
+const app = {
+  mode: 'intuition',
+  theme: 'dark',
+  steps: [],
+  currentStep: 0,
+  isPlaying: false,
+  playInterval: null,
+  speed: 1,
+  board: [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],
+  word: "ABCCED",
+  actualWord: "ABCCED",
+  intuitionStage: 0,
+  intuitionPlaying: false,
+  intuitionInterval: null,
+
+  intuitionStages: [
+    {
+      title: "Understanding the Problem",
+      thought: "We have a 2D grid of characters. We need to find if a word exists by traversing adjacent cells (up/down/left/right) without reusing the same cell.",
+      content: `Key constraints to note:\n• Each cell can be used only once per path\n• Adjacency is 4-directional (no diagonals)\n• The grid can have duplicate characters\n• We need to return True/False — just existence, not the path itself`,
+      insight: "This is a classic backtracking/DFS problem. We explore all 4 directions recursively, marking cells as visited to prevent reuse.",
+      vizType: 'problem'
+    },
+    {
+      title: "Why Brute Force DFS Alone is Costly",
+      thought: "A naive DFS from every cell can be O(m·n·4^L) where L=word length. For large boards + long words, that's brutal. Can we prune early?",
+      content: `Brute force explores exponentially many paths:\n• Start at each of m×n cells: O(m·n)\n• Each step has 4 choices, for word_len steps: O(4^L)\n• Total: O(m·n·4^L) — can be millions of calls\n\nTwo key optimizations before we even DFS:\n1. Frequency pruning — if the board doesn't have enough of any character the word needs, return False immediately\n2. Reversal optimization — start from whichever end of the word has the rarer first character`,
+      insight: "Pruning before backtracking can eliminate the search entirely for impossible cases. The reversal trick reduces the branching factor from the start.",
+      vizType: 'brute_force'
+    },
+    {
+      title: "The Backtracking Pattern",
+      thought: "Backtracking means: try something → explore → undo if it fails. Here, we mark a cell as '#' (visited), recurse, then restore it.",
+      content: `The core DFS loop:\n1. Base case: idx == word_len → return True (found it!)\n2. Bounds check: out of grid → False\n3. Char check: cell != word[idx] → False (mismatch)\n4. Mark cell as '#' to prevent revisiting\n5. Recurse in all 4 directions\n6. Restore cell (backtrack)\n\nIn-place marking (board[r][c] = '#') avoids a separate visited set — saves O(m·n) space!`,
+      insight: "In-place marking is an elegant trick: we use '#' as a sentinel (it never appears in valid words) so we need zero extra memory for visited tracking.",
+      vizType: 'backtrack'
+    },
+    {
+      title: "The Frequency Pruning Trick",
+      thought: "Before even starting DFS, I can count characters. If the board has fewer 'E's than the word needs, it's impossible — quit immediately!",
+      content: `Algorithm:\n• board_count = Counter(all board chars)\n• word_count = Counter(word chars)\n• For each char in word: if board_count[char] < word_count[char] → return False\n\nFor word "ABCCED" on our board:\n• A: need 1, have 2 ✓\n• B: need 1, have 1 ✓\n• C: need 2, have 2 ✓\n• E: need 1, have 2 ✓\n→ No early exit, proceed to DFS`,
+      insight: "This O(m·n + L) check eliminates entire search trees before they start. For impossible inputs, it's an instant O(1) effective answer.",
+      vizType: 'frequency'
+    },
+    {
+      title: "The Reversal Optimization",
+      thought: "Which end should I start searching from? If word[0] appears 10 times but word[-1] appears only once, starting from word[-1] is way faster!",
+      content: `Logic:\n• if board_count[word[0]] > board_count[word[-1]]:\n     word = word[::-1]\n\nExample:\n• word = "ABCCED" — A(×2), D(×1)\n• Starting from A: 2 starting points → more branches\n• Starting from D: 1 starting point → fewer branches\n• Reverse to "DECCBA" → start from D (rarer) → prune faster\n\nThis optimization is subtle but powerful in practice.`,
+      insight: "Always attack from the rarer end. It's like binary search vs linear — you want to reduce the search space as fast as possible from the very first step.",
+      vizType: 'reversal'
+    },
+    {
+      title: "Complexity Analysis",
+      thought: "Let me verify we're not doing anything asymptotically worse with these optimizations…",
+      content: `Time Complexity:\n• Pruning step: O(m·n + L)\n• DFS backtracking: O(m·n·4^L) worst case\n• But in practice, pruning + reversal cut this dramatically\n\nSpace Complexity:\n• O(L) for recursion call stack (max depth = word length)\n• O(1) extra memory (in-place marking — no visited set!)\n• Compare to O(m·n) for a naive visited array\n\nThis is as space-optimal as backtracking can get.`,
+      insight: "O(L) space is the theoretical minimum for any correct solution — you need at least the recursion stack. In-place marking achieves this bound.",
+      vizType: 'complexity'
+    },
+    {
+      title: "Edge Cases & Final Picture",
+      thought: "What could break this? Empty board? Word longer than board? All same characters?",
+      content: `Handled cases:\n• Word impossible by frequency → pruned instantly\n• Single cell: works (idx=0 matches, idx=1 == word_len → True)\n• All same characters: DFS explores all, in-place '#' prevents cycles\n• Word not on board: DFS exhausts all paths → False\n\nThe in-place marking also handles a subtle bug:\nwithout it, we could visit the same cell twice in a path (A→B→A), giving false positives.`,
+      insight: "The solution is complete, optimal in space, and handles all edge cases. The three optimizations (frequency, reversal, in-place) make it production-ready.",
+      vizType: 'edge_cases'
+    }
+  ],
+
+  init() {
+    this.parseAndRun();
+    this.render();
+    this.attachKeys();
+    this.updateHeaderHeight();
+  },
+
+  updateHeaderHeight() {
+    const h = document.getElementById('header');
+    document.getElementById('main').style.height = `calc(100vh - ${h.offsetHeight}px)`;
+  },
+
+  toggleTheme() {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', this.theme);
+    document.querySelector('[onclick="app.toggleTheme()"]').textContent = this.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+  },
+
+  setMode(m) {
+    this.mode = m;
+    document.getElementById('btn-intuition').classList.toggle('active', m === 'intuition');
+    document.getElementById('btn-execution').classList.toggle('active', m === 'execution');
+    document.getElementById('input-row').style.display = m === 'execution' ? 'flex' : 'none';
+    this.stopPlay();
+    this.render();
+    this.updateHeaderHeight();
+  },
+
+  parseAndRun() {
+    try {
+      this.board = JSON.parse(document.getElementById('board-input').value);
+      this.word = document.getElementById('word-input').value.trim();
+    } catch(e) { return; }
+    this.steps = simulateWordSearch(this.board.map(r=>[...r]), this.word);
+    this.currentStep = 0;
+    this.stopPlay();
+    if (this.mode === 'execution') this.renderExecution();
+  },
+
+  stopPlay() {
+    clearInterval(this.playInterval);
+    clearInterval(this.intuitionInterval);
+    this.isPlaying = false; this.intuitionPlaying = false;
+  },
+
+  // ---- RENDER ----
+  render() {
+    const main = document.getElementById('main');
+    if (this.mode === 'intuition') {
+      main.innerHTML = this.renderIntuitionHTML();
+      this.scrollActiveStage();
+    } else {
+      main.innerHTML = this.renderExecutionHTML();
+      this.renderCodeLines();
+      this.renderViz();
+      this.renderLog();
+    }
+  },
+
+  // ======================== INTUITION MODE ========================
+  renderIntuitionHTML() {
+    const stages = this.intuitionStages;
+    const cur = this.intuitionStage;
+
+    const leftHTML = stages.map((s,i) => {
+      let cls = i === cur ? 'active' : (i < cur ? 'past' : 'future');
+      return `<div class="stage-card ${cls}" id="stage-${i}">
+        <div class="stage-title">
+          <span class="stage-num">${i+1}</span>
+          ${s.title}
+        </div>
+        <div class="thought-bubble">💭 "${s.thought}"</div>
+        <div class="stage-content">${s.content.replace(/\n/g,'<br>')}</div>
+        <div class="insight-box"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+      </div>`;
+    }).join('');
+
+    const ctrlHTML = `
+      <div class="intuition-controls">
+        <button class="ctrl-btn" onclick="app.prevStage()">◀</button>
+        <button class="ctrl-btn play-btn" id="i-play-btn" onclick="app.toggleIntuitionPlay()">▶</button>
+        <button class="ctrl-btn" onclick="app.nextStage()">▶▶</button>
+        <span id="stage-counter" style="font-size:12px;color:var(--text-secondary);margin-left:8px;">Stage ${cur+1} / ${stages.length}</span>
+      </div>`;
+
+    return `<div id="intuition-container">
+      <div style="display:flex;flex-direction:column;flex:1;border-right:1px solid var(--border);overflow:hidden;">
+        <div class="panel-header">Senior Engineer's Thought Process <span>Stage ${cur+1}/${stages.length}</span></div>
+        <div class="intuition-left panel-body" style="padding:16px;">${leftHTML}</div>
+        ${ctrlHTML}
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="panel-header">Visual Explanation</div>
+        <div class="intuition-right panel-body">${this.renderIntuitionViz(stages[cur].vizType)}</div>
+      </div>
+    </div>`;
+  },
+
+  scrollActiveStage() {
+    setTimeout(()=>{
+      const el = document.getElementById(`stage-${this.intuitionStage}`);
+      if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 50);
+  },
+
+  prevStage() {
+    if (this.intuitionStage > 0) { this.intuitionStage--; this.render(); this.scrollActiveStage(); }
+  },
+  nextStage() {
+    if (this.intuitionStage < this.intuitionStages.length-1) { this.intuitionStage++; this.render(); this.scrollActiveStage(); }
+  },
+  toggleIntuitionPlay() {
+    this.intuitionPlaying = !this.intuitionPlaying;
+    if (this.intuitionPlaying) {
+      this.intuitionInterval = setInterval(()=>{
+        if (this.intuitionStage < this.intuitionStages.length-1) {
+          this.intuitionStage++; this.render(); this.scrollActiveStage();
+        } else { this.intuitionPlaying=false; clearInterval(this.intuitionInterval); }
+      }, 3000);
+    } else { clearInterval(this.intuitionInterval); }
+  },
+
+  renderIntuitionViz(type) {
+    switch(type) {
+      case 'problem': return this.vizProblem();
+      case 'brute_force': return this.vizBruteForce();
+      case 'backtrack': return this.vizBacktrack();
+      case 'frequency': return this.vizFrequency();
+      case 'reversal': return this.vizReversal();
+      case 'complexity': return this.vizComplexity();
+      case 'edge_cases': return this.vizEdgeCases();
+      default: return this.vizProblem();
+    }
+  },
+
+  vizProblem() {
+    const board = this.board;
+    const word = this.word;
+    // Show board + word
+    let gridHTML = `<div class="mini-board" style="grid-template-columns:repeat(${board[0].length},36px)">`;
+    for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) {
+      gridHTML += `<div class="mini-cell">${board[r][c]}</div>`;
+    }
+    gridHTML += '</div>';
+
+    let wordHTML = `<div style="display:flex;gap:4px;margin-top:10px;">`;
+    for (const ch of word) wordHTML += `<div class="mini-cell" style="width:30px;height:30px;font-size:14px;">${ch}</div>`;
+    wordHTML += '</div>';
+
+    return `<div class="intuition-viz-card">
+      <h3>The Board & Word</h3>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
+        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Board (${board.length}×${board[0].length})</div>${gridHTML}</div>
+        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Word to find</div>${wordHTML}</div>
+      </div>
+      <div style="margin-top:16px;background:var(--bg-primary);padding:12px;border-radius:8px;">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Movement rules:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-blue">↑ Up</span>
+          <span class="tag tag-blue">↓ Down</span>
+          <span class="tag tag-blue">← Left</span>
+          <span class="tag tag-blue">→ Right</span>
+          <span class="tag tag-red">✕ No diagonals</span>
+          <span class="tag tag-red">✕ No reuse</span>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  vizBruteForce() {
+    return `<div class="intuition-viz-card">
+      <h3>Brute Force vs Optimized</h3>
+      <div class="approach-card bad">
+        <h4>❌ Naive DFS (no pruning)</h4>
+        <p>Try every cell as start. At each step, branch 4 ways.<br>
+        <strong>O(m·n·4^L)</strong> — e.g. 4×4 board, 10-char word = 4,194,304 paths!</p>
+      </div>
+      <div class="approach-card good" style="margin-top:10px;">
+        <h4>✅ DFS + Frequency Pruning + Reversal</h4>
+        <p>1. Check frequencies first — O(m·n + L) instant kill<br>
+        2. Reverse word if rarer end is at end<br>
+        3. DFS only from cells matching first char<br>
+        <strong>Practical: orders of magnitude faster</strong></p>
+      </div>
+      <svg viewBox="0 0 340 120" width="100%" style="margin-top:14px;">
+        <rect x="10" y="20" width="120" height="80" rx="8" fill="rgba(255,85,85,0.15)" stroke="#ff5555" stroke-width="1.5"/>
+        <text x="70" y="42" text-anchor="middle" fill="#ff5555" font-size="12" font-weight="700">Naive DFS</text>
+        <text x="70" y="62" text-anchor="middle" fill="#ff5555" font-size="11">O(m·n·4^L)</text>
+        <text x="70" y="82" text-anchor="middle" fill="#ff5555" font-size="10">~4M calls</text>
+        <text x="70" y="96" text-anchor="middle" fill="#ff5555" font-size="10">(4×4 board, L=10)</text>
+
+        <text x="170" y="65" text-anchor="middle" fill="var(--text-secondary)" font-size="20">→</text>
+
+        <rect x="210" y="20" width="120" height="80" rx="8" fill="rgba(80,250,123,0.12)" stroke="#50fa7b" stroke-width="1.5"/>
+        <text x="270" y="42" text-anchor="middle" fill="#50fa7b" font-size="12" font-weight="700">Optimized</text>
+        <text x="270" y="62" text-anchor="middle" fill="#50fa7b" font-size="11">Prune early</text>
+        <text x="270" y="80" text-anchor="middle" fill="#50fa7b" font-size="10">Rare-end start</text>
+        <text x="270" y="96" text-anchor="middle" fill="#50fa7b" font-size="10">In-place marking</text>
+      </svg>
+    </div>`;
+  },
+
+  vizBacktrack() {
+    // Show a mini path with backtracking
+    const board = [["A","B","C"],["S","F","C"],["A","D","E"]];
+    let gridHTML = `<div class="mini-board" style="grid-template-columns:repeat(3,36px)">`;
+    const path = [[0,0],[0,1],[0,2],[1,2]]; // ABCC
+    for (let r=0;r<3;r++) for (let c=0;c<3;c++) {
+      const inPath = path.some(([pr,pc])=>pr===r&&pc===c);
+      const cls = inPath ? 'hi-path' : '';
+      gridHTML += `<div class="mini-cell ${cls}">${board[r][c]}</div>`;
+    }
+    gridHTML += '</div>';
+    return `<div class="intuition-viz-card">
+      <h3>Backtracking Pattern</h3>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Current path highlighted (A→B→C→C)</div>
+      ${gridHTML}
+      <div style="margin-top:14px;background:var(--bg-primary);padding:12px;border-radius:8px;font-family:var(--font-mono);font-size:12px;">
+        <div style="color:var(--syn-keyword);">def <span style="color:var(--syn-function);">dfs</span>(r, c, idx):</div>
+        <div style="padding-left:16px;color:var(--text-primary);">temp, board[r][c] = board[r][c], <span style="color:var(--syn-string);">'#'</span>  <span style="color:var(--syn-comment);"># mark</span></div>
+        <div style="padding-left:16px;color:var(--text-primary);">found = dfs(r+1,c,...) <span style="color:var(--syn-keyword);">or</span> ...</div>
+        <div style="padding-left:16px;color:var(--text-primary);">board[r][c] = temp  <span style="color:var(--syn-comment);"># restore ← KEY</span></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="tag tag-blue">Mark '#'</span>
+        <span class="tag tag-green">Explore 4 dirs</span>
+        <span class="tag tag-purple">Restore on backtrack</span>
+        <span class="tag tag-red">No visited[] needed</span>
+      </div>
+    </div>`;
+  },
+
+  vizFrequency() {
+    const board = this.board;
+    const word = this.word;
+    // Count
+    const bc = {}; for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
+    const wc = {}; for (const ch of word) wc[ch]=(wc[ch]||0)+1;
+
+    const rows = Object.entries(wc).map(([ch,need]) => {
+      const have = bc[ch]||0;
+      const ok = have >= need;
+      return `<tr>
+        <td style="font-family:var(--font-mono);font-size:14px;font-weight:700;padding:6px 10px;color:var(--accent);">'${ch}'</td>
+        <td style="padding:6px 10px;color:var(--text-secondary);">need ${need}</td>
+        <td style="padding:6px 10px;color:var(--text-secondary);">have ${have}</td>
+        <td style="padding:6px 10px;font-weight:700;color:${ok?'#50fa7b':'#ff5555'}">${ok?'✓ OK':'✗ FAIL'}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="intuition-viz-card">
+      <h3>Frequency Pruning Check</h3>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Word: "${word}"</div>
+      <table style="border-collapse:collapse;width:100%;background:var(--bg-primary);border-radius:8px;overflow:hidden;">
+        <thead><tr style="background:var(--bg-secondary);">
+          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Char</th>
+          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Word Needs</th>
+          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Board Has</th>
+          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Status</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:12px;padding:10px;background:rgba(80,250,123,0.08);border-radius:8px;color:#50fa7b;font-size:12px;">
+        All characters available → Proceed to DFS
+      </div>
+    </div>`;
+  },
+
+  vizReversal() {
+    const board = this.board;
+    const word = this.word;
+    const bc = {}; for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
+    const firstFreq = bc[word[0]]||0, lastFreq = bc[word[word.length-1]]||0;
+    const reversed = firstFreq > lastFreq;
+    const actualWord = reversed ? word.split('').reverse().join('') : word;
+
+    return `<div class="intuition-viz-card">
+      <h3>Reversal Optimization</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div style="background:var(--bg-primary);padding:12px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-secondary);">First char '${word[0]}'</div>
+          <div style="font-size:28px;font-weight:700;color:${reversed?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${firstFreq}</div>
+          <div style="font-size:11px;color:var(--text-secondary);">occurrences on board</div>
+        </div>
+        <div style="background:var(--bg-primary);padding:12px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-secondary);">Last char '${word[word.length-1]}'</div>
+          <div style="font-size:28px;font-weight:700;color:${!reversed?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${lastFreq}</div>
+          <div style="font-size:11px;color:var(--text-secondary);">occurrences on board</div>
+        </div>
+      </div>
+      <div style="padding:12px;border-radius:8px;background:${reversed?'rgba(80,250,123,0.1)':'rgba(100,255,218,0.1)'};border:1px solid ${reversed?'#50fa7b':'var(--accent)'};">
+        <div style="font-size:12px;color:var(--text-secondary);">Decision: ${reversed ? `Reverse! '${word[0]}' (${firstFreq}×) > '${word[word.length-1]}' (${lastFreq}×)` : `No reversal. '${word[0]}' ≤ '${word[word.length-1]}'`}</div>
+        <div style="margin-top:6px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:${reversed?'#50fa7b':'var(--accent)'};">Search for: "${actualWord}"</div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">
+        ${reversed ? `Starting from '${actualWord[0]}' (${bc[actualWord[0]]||0} starting points) instead of '${word[0]}' (${firstFreq} starting points)` : `Starting from '${word[0]}' — already the rarer end`}
+      </div>
+    </div>`;
+  },
+
+  vizComplexity() {
+    return `<div class="intuition-viz-card">
+      <h3>Complexity Analysis</h3>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">⏱ Time Complexity</div>
+        <div class="complexity-row"><span class="complexity-label">Frequency pruning</span><span class="complexity-val">O(m·n + L)</span></div>
+        <div class="complexity-row"><span class="complexity-label">DFS worst case</span><span class="complexity-val">O(m·n·4^L)</span></div>
+        <div class="complexity-row"><span class="complexity-label">With pruning (practical)</span><span class="complexity-val">Much better</span></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#50fa7b;margin-bottom:8px;">💾 Space Complexity</div>
+        <div class="complexity-row"><span class="complexity-label">Recursion stack</span><span class="complexity-val">O(L)</span></div>
+        <div class="complexity-row"><span class="complexity-label">In-place marking (no visited[])</span><span class="complexity-val">O(1) extra</span></div>
+        <div class="complexity-row"><span class="complexity-label">Naive approach (visited set)</span><span class="complexity-val">O(m·n)</span></div>
+      </div>
+      <svg viewBox="0 0 320 80" width="100%" style="margin-top:14px;">
+        <rect x="10" y="10" width="90" height="60" rx="6" fill="rgba(255,85,85,0.12)" stroke="#ff5555" stroke-width="1.5"/>
+        <text x="55" y="35" text-anchor="middle" fill="#ff5555" font-size="11" font-weight="700">Naive</text>
+        <text x="55" y="52" text-anchor="middle" fill="#ff5555" font-size="10">O(m·n) space</text>
+        <text x="55" y="65" text-anchor="middle" fill="#ff5555" font-size="10">visited array</text>
+        <text x="165" y="48" text-anchor="middle" fill="var(--text-secondary)" font-size="20">→</text>
+        <rect x="215" y="10" width="95" height="60" rx="6" fill="rgba(80,250,123,0.12)" stroke="#50fa7b" stroke-width="1.5"/>
+        <text x="262" y="35" text-anchor="middle" fill="#50fa7b" font-size="11" font-weight="700">This Solution</text>
+        <text x="262" y="52" text-anchor="middle" fill="#50fa7b" font-size="10">O(L) space</text>
+        <text x="262" y="65" text-anchor="middle" fill="#50fa7b" font-size="10">in-place '#'</text>
+      </svg>
+    </div>`;
+  },
+
+  vizEdgeCases() {
+    return `<div class="intuition-viz-card">
+      <h3>Edge Cases Handled</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
+          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Impossible word (bad frequency)</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Caught instantly by freq check — O(m·n) not O(m·n·4^L)</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
+          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Same cell visited twice</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">In-place '#' sentinel prevents A→B→A false paths</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
+          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Word longer than board</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Freq check eliminates immediately (can't have enough distinct cells)</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
+          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Single cell board</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">DFS: idx==0 match, idx==1==word_len → True (or False)</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
+          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Multiple valid paths</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">any() short-circuits on first True — no wasted work</div>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  // ======================== EXECUTION MODE ========================
+  renderExecutionHTML() {
+    return `
+      <div class="panel" id="code-panel" style="width:32%;background:var(--bg-code);">
+        <div class="panel-header">Code <span style="color:var(--accent);font-size:10px;">Python</span></div>
+        <div class="panel-body" id="code-body"><pre class="code-pre" id="code-pre"></pre></div>
+      </div>
+      <div class="divider" id="div1"></div>
+      <div class="panel" id="viz-panel" style="flex:1;background:var(--bg-primary);">
+        <div class="panel-header">Visualization</div>
+        <div class="panel-body" id="viz-body"></div>
+        <div id="controls">
+          <button class="ctrl-btn" onclick="app.reset()" title="Reset">⏮</button>
+          <button class="ctrl-btn" onclick="app.stepBack()" title="Back">◀</button>
+          <button class="ctrl-btn play-btn" id="play-btn" onclick="app.togglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="app.stepForward()" title="Forward">▶</button>
+          <button class="ctrl-btn" onclick="app.skipEnd()" title="End">⏭</button>
+          <select id="speed-select" onchange="app.setSpeed(this.value)">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+          <span id="step-counter">Step 1 / ${this.steps.length}</span>
+        </div>
+      </div>
+      <div class="divider" id="div2"></div>
+      <div class="panel" id="log-panel" style="width:22%;background:var(--bg-secondary);">
+        <div class="panel-header">Step Log</div>
+        <div class="panel-body" style="padding:12px;" id="log-body"></div>
+      </div>`;
+  },
+
+  renderCodeLines() {
+    const pre = document.getElementById('code-pre');
+    if (!pre) return;
+    const step = this.steps[this.currentStep];
+    const activeLine = step ? step.line - 1 : -1;
+    const lines = PYTHON_CODE.split('\n');
+    pre.innerHTML = '';
+    lines.forEach((line, i) => {
+      const div = document.createElement('div');
+      div.className = 'code-line' + (i === activeLine ? ' active-line' : '');
+      const num = document.createElement('span');
+      num.className = 'line-num'; num.textContent = i+1;
+      const code = document.createElement('code');
+      code.className = 'line-code';
+      code.innerHTML = highlightPython(line);
+      div.appendChild(num); div.appendChild(code);
+      pre.appendChild(div);
+    });
+    // Scroll active line into view
+    if (activeLine >= 0) {
+      const activeEl = pre.children[activeLine];
+      if (activeEl) activeEl.scrollIntoView({block:'nearest', behavior:'smooth'});
+    }
+  },
+
+  renderViz() {
+    const body = document.getElementById('viz-body');
+    if (!body) return;
+    const step = this.steps[this.currentStep] || {};
+    const board = step.boardSnap || this.board;
+    const path = step.path || [];
+    const currentCell = step.currentCell;
+    const wordIdx = step.wordIdx ?? -1;
+    const result = step.result;
+    const m = board.length, n = board[0].length;
+
+    // Determine cell states
+    const pathSet = new Set(path.map(([r,c])=>`${r},${c}`));
+    let cellHTML = `<div class="board-grid" style="grid-template-columns:repeat(${n},48px);gap:5px;">`;
+    for (let r=0;r<m;r++) for (let c=0;c<n;c++) {
+      const key = `${r},${c}`;
+      const isCurrent = currentCell && currentCell[0]===r && currentCell[1]===c;
+      const isPath = pathSet.has(key) && !isCurrent;
+      const isVisited = board[r][c] === '#';
+      let cls = '';
+      if (result === true && isPath) cls = 'matched';
+      else if (isCurrent && result === false) cls = 'mismatch';
+      else if (isCurrent) cls = 'current';
+      else if (isPath) cls = 'visited';
+      else if (isVisited) cls = 'visited';
+      cellHTML += `<div class="cell ${cls}">${this.board[r][c]}<span class="idx-label">${r},${c}</span></div>`;
+    }
+    cellHTML += '</div>';
+
+    // Word display
+    const displayWord = step.vars && step.vars.reversed_word ? step.vars.reversed_word : (step.vars && step.vars.word ? step.vars.word : this.word);
+    let wordHTML = `<div class="word-display">`;
+    for (let i=0;i<displayWord.length;i++) {
+      const cls = (result === true) ? 'matched' : (i < wordIdx ? 'matched' : (i === wordIdx ? 'current' : ''));
+      wordHTML += `<div class="word-char ${cls}">${displayWord[i]}</div>`;
+    }
+    wordHTML += '</div>';
+
+    let badgeCls = 'searching', badgeTxt = `Searching... (step ${this.currentStep+1}/${this.steps.length})`;
+    if (result === true) { badgeCls = 'found'; badgeTxt = '✓ Word Found!'; }
+    else if (result === false) { badgeCls = 'not-found'; badgeTxt = '✗ Not Found'; }
+
+    body.innerHTML = `<div class="board-wrap">
+      ${cellHTML}
+      <div style="margin-top:8px;font-size:11px;color:var(--text-secondary);">
+        <span class="tag tag-blue">■ Current</span>
+        <span class="tag tag-green">■ Path</span>
+        <span class="tag tag-red">■ Mismatch</span>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">Word characters matched:</div>
+      ${wordHTML}
+      <div class="result-badge ${badgeCls}" style="margin-top:10px;">${badgeTxt}</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">Stack depth: ${path.length} | Path: [${path.map(([r,c])=>`(${r},${c})`).join('→')||'—'}]</div>
+    </div>`;
+
+    document.getElementById('step-counter').textContent = `Step ${this.currentStep+1} / ${this.steps.length}`;
+  },
+
+  renderLog() {
+    const body = document.getElementById('log-body');
+    if (!body) return;
+    const step = this.steps[this.currentStep] || {};
+    const vars = step.vars || {};
+
+    const varsHTML = Object.entries(vars).map(([k,v]) =>
+      `<div class="var-row"><span class="var-name">${k}</span><span style="color:var(--text-secondary)">: </span><span class="var-val">${typeof v === 'object' ? JSON.stringify(v) : v}</span></div>`
+    ).join('');
+
+    const historyHTML = this.steps.slice(0, this.currentStep+1).map((s,i) =>
+      `<div class="history-item ${i===this.currentStep?'current':''}" onclick="app.goToStep(${i})">${i+1}. ${s.desc}</div>`
+    ).join('');
+
+    body.innerHTML = `
+      <div class="step-desc">${step.desc||'—'}</div>
+      <div class="vars-section"><h4>Variables</h4>${varsHTML||'<div style="color:var(--text-secondary);font-size:12px;">No vars</div>'}</div>
+      <div class="history-list"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;">History</div>${historyHTML}</div>`;
+
+    // Auto-scroll history to bottom
+    setTimeout(()=>{ body.scrollTop = body.scrollHeight; }, 50);
+  },
+
+  goToStep(i) {
+    this.currentStep = i;
+    this.renderCodeLines(); this.renderViz(); this.renderLog();
+  },
+
+  stepForward() {
+    if (this.currentStep < this.steps.length-1) {
+      this.currentStep++;
+      this.renderCodeLines(); this.renderViz(); this.renderLog();
+    }
+  },
+  stepBack() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.renderCodeLines(); this.renderViz(); this.renderLog();
+    }
+  },
+  reset() { this.currentStep=0; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
+  skipEnd() { this.currentStep=this.steps.length-1; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
+  setSpeed(v) { this.speed = parseFloat(v); },
+  togglePlay() {
+    this.isPlaying = !this.isPlaying;
+    const btn = document.getElementById('play-btn');
+    if (btn) btn.textContent = this.isPlaying ? '⏸' : '▶';
+    if (this.isPlaying) {
+      this.playInterval = setInterval(()=>{
+        if (this.currentStep < this.steps.length-1) { this.stepForward(); }
+        else { this.isPlaying=false; clearInterval(this.playInterval); if(btn)btn.textContent='▶'; }
+      }, 700 / this.speed);
+    } else { clearInterval(this.playInterval); }
+  },
+
+  attachKeys() {
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.code === 'Space') { e.preventDefault(); this.mode==='execution'?this.togglePlay():this.toggleIntuitionPlay(); }
+      else if (e.code === 'ArrowRight') { e.preventDefault(); this.mode==='execution'?this.stepForward():this.nextStage(); }
+      else if (e.code === 'ArrowLeft') { e.preventDefault(); this.mode==='execution'?this.stepBack():this.prevStage(); }
+    });
+
+    // Divider drag
+    setTimeout(()=>this.setupDividers(), 100);
+  },
+
+  setupDividers() {
+    const makeResizer = (divId, leftId, rightId, isRight) => {
+      const div = document.getElementById(divId);
+      if (!div) return;
+      let dragging = false, startX = 0;
+      div.addEventListener('mousedown', e => { dragging=true; startX=e.clientX; e.preventDefault(); });
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - startX; startX = e.clientX;
+        const left = document.getElementById(leftId);
+        const right = document.getElementById(rightId);
+        if (!left||!right) return;
+        const lw = left.offsetWidth + dx;
+        const rw = right.offsetWidth - dx;
+        if (lw > 80 && rw > 80) { left.style.width = lw + 'px'; right.style.width = rw + 'px'; right.style.flex = 'none'; }
+      });
+      document.addEventListener('mouseup', ()=>{ dragging=false; });
+    };
+    makeResizer('div1','code-panel','viz-panel',false);
+    makeResizer('div2','viz-panel','log-panel',true);
+  }
+};
+
+app.init();
+</script>
+</body>
+</html>
