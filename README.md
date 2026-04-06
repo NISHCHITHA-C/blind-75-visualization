@@ -84,7 +84,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 
 | # | Problem | Difficulty | Live Demo | Status |
 |---|---------|------------|-----------|--------|
-| 1 | Kth Largest Element in an Array | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/01-kth-largest-element.html) | ✅ Available |
+| 1 | Kth Frequent Element in an Array | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/01-kth-frequent-element.html) | ✅ Available |
 | 2 | Find Median from Data Stream | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/02-median-data-stream.html) | 🔜 Coming Soon |
 
 ## 10 - Backtracking
