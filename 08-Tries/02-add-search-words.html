@@ -18,7 +18,6 @@
     --accent2: #10b981;
     --danger: #ef4444;
     --font-mono: 'Consolas','Monaco','Courier New',monospace;
-    /* syntax - light (GitHub) */
     --syn-keyword: #d73a49;
     --syn-func: #6f42c1;
     --syn-string: #032f62;
@@ -41,8 +40,6 @@
     --accent: #8be9fd;
     --accent2: #50fa7b;
     --danger: #ff5555;
-    --font-mono: 'Consolas','Monaco','Courier New',monospace;
-    /* syntax - dark (Dracula) */
     --syn-keyword: #ff79c6;
     --syn-func: #50fa7b;
     --syn-string: #f1fa8c;
@@ -52,7 +49,6 @@
     --syn-deco: #ffb86c;
     --syn-self: #ffb86c;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -78,157 +74,85 @@
     gap: 12px;
     margin-bottom: 8px;
   }
-  .problem-title {
-    font-size: 16px;
-    font-weight: 700;
-    flex: 1;
-    color: var(--text-primary);
+  .problem-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--text-primary); }
+  .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: rgba(239,68,68,0.15); color: #ef4444; }
+  .btn-theme { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 12px; }
+  .mode-toggle { display: flex; gap: 6px; margin-bottom: 8px; }
+  .mode-btn { flex: 1; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+  .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── OPERATION INPUT BAR ── */
+  #op-bar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
   }
-  .badge {
-    padding: 2px 8px;
+  #op-bar label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  #op-bar select, #op-bar input {
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 12px;
+  }
+  #op-bar select { min-width: 100px; }
+  #op-bar input { width: 160px; font-family: var(--font-mono); }
+  .btn-run { padding: 5px 14px; border-radius: 6px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .btn-run:hover { opacity: 0.88; }
+  .btn-ghost { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; font-size: 12px; white-space: nowrap; }
+  .btn-ghost:hover { border-color: var(--accent); }
+
+  /* Op queue chips */
+  #op-queue-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  #op-queue-label { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+  .op-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
     border-radius: 12px;
     font-size: 11px;
+    font-family: var(--font-mono);
     font-weight: 600;
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
-  }
-  .btn-theme {
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
     cursor: pointer;
-    font-size: 12px;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
   }
-  .mode-toggle {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 6px;
-  }
-  .mode-btn {
-    flex: 1;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  .mode-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-  .input-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .input-row label { font-size: 12px; color: var(--text-secondary); }
-  .input-row select, .input-row input {
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 12px;
-  }
-  .input-row input { width: 160px; font-family: var(--font-mono); }
-  .btn-small {
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-  }
+  .op-chip.add { background: rgba(16,185,129,0.12); color: var(--accent2); border-color: rgba(16,185,129,0.3); }
+  .op-chip.search { background: rgba(139,233,253,0.1); color: var(--accent); border-color: rgba(139,233,253,0.3); }
+  .op-chip.active { box-shadow: 0 0 0 2px var(--accent); }
+  .op-chip .chip-x { cursor: pointer; opacity: 0.6; font-size: 10px; }
+  .op-chip .chip-x:hover { opacity: 1; color: var(--danger); }
 
   /* ── MAIN PANELS ── */
-  #main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    gap: 0;
-  }
-
-  .panel {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border-right: 1px solid var(--border);
-  }
+  #main { display: flex; flex: 1; overflow: hidden; }
+  .panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
   .panel:last-child { border-right: none; }
-  .panel-header {
-    padding: 8px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--text-secondary);
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .panel-body {
-    flex: 1;
-    overflow: auto;
-  }
+  .panel-header { padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); background: var(--bg-primary); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .panel-body { flex: 1; overflow: auto; }
 
   /* ── CODE PANEL ── */
   #code-panel { width: 32%; min-width: 220px; }
-  .code-wrap {
-    background: var(--code-bg);
-    height: 100%;
-    overflow: auto;
-  }
-  pre.code-pre {
-    margin: 0;
-    padding: 12px 0;
-    font-family: var(--font-mono);
-    font-size: 14px;
-    line-height: 0;
-  }
-  .code-line {
-    display: flex;
-    align-items: stretch;
-    min-height: 22px;
-    transition: background 0.15s;
-    line-height: 1.55;
-  }
-  .code-line.active {
-    background: var(--highlight);
-    border-left: 3px solid var(--highlight-border);
-  }
-  .ln {
-    display: inline-flex;
-    align-items: center;
-    min-width: 38px;
-    padding-right: 12px;
-    padding-left: 6px;
-    text-align: right;
-    color: var(--text-secondary);
-    user-select: none;
-    font-size: 12px;
-    flex-shrink: 0;
-    justify-content: flex-end;
-  }
+  .code-wrap { background: var(--code-bg); height: 100%; overflow: auto; }
+  pre.code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 0; }
+  .code-line { display: flex; align-items: stretch; min-height: 22px; transition: background 0.15s; line-height: 1.55; }
+  .code-line.active { background: var(--highlight); border-left: 3px solid var(--highlight-border); }
+  .ln { display: inline-flex; align-items: center; min-width: 38px; padding-right: 12px; padding-left: 6px; text-align: right; color: var(--text-secondary); user-select: none; font-size: 12px; flex-shrink: 0; justify-content: flex-end; }
   .code-line.active .ln { color: var(--highlight-border); }
-  code.lc {
-    flex: 1;
-    white-space: pre;
-    font-family: var(--font-mono);
-    font-size: 14px;
-    line-height: 1.55;
-    padding-right: 16px;
-  }
-  /* syntax colors */
+  code.lc { flex: 1; white-space: pre; font-family: var(--font-mono); font-size: 14px; line-height: 1.55; padding-right: 16px; }
   .sk { color: var(--syn-keyword); font-weight: 600; }
   .sf { color: var(--syn-func); }
   .ss { color: var(--syn-string); }
@@ -239,226 +163,66 @@
   .se { color: var(--syn-self); }
 
   /* ── VIZ PANEL ── */
-  #viz-panel { flex: 1; min-width: 0; background: var(--bg-secondary); }
-  #viz-canvas {
-    width: 100%;
-    height: calc(100% - 52px);
-    overflow: auto;
-    padding: 16px;
-  }
-  .controls-bar {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    padding: 8px 12px;
-    background: var(--bg-primary);
-    border-top: 1px solid var(--border);
-  }
-  .ctrl-btn {
-    padding: 5px 11px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.15s;
-  }
+  #viz-panel { flex: 1; min-width: 0; background: var(--bg-secondary); display: flex; flex-direction: column; }
+  #viz-canvas { flex: 1; overflow: auto; padding: 16px; }
+  .controls-bar { display: flex; gap: 6px; align-items: center; padding: 8px 12px; background: var(--bg-primary); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .ctrl-btn { padding: 5px 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 14px; transition: background 0.15s; }
   .ctrl-btn:hover { background: var(--bg-tertiary); }
   .ctrl-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .speed-sel {
-    padding: 4px 6px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 12px;
-  }
-  .step-counter {
-    margin-left: auto;
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-  }
+  .speed-sel { padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 12px; }
+  .step-counter { margin-left: auto; font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); }
 
   /* ── STEP LOG PANEL ── */
   #log-panel { width: 22%; min-width: 180px; }
-  .log-desc {
-    padding: 10px 12px;
-    font-size: 12px;
-    color: var(--text-primary);
-    line-height: 1.5;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-primary);
-    min-height: 60px;
-  }
-  .vars-section {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .vars-title {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
-  .var-row {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    margin: 3px 0;
-    display: flex;
-    gap: 4px;
-  }
+  .log-desc { padding: 10px 12px; font-size: 12px; color: var(--text-primary); line-height: 1.5; border-bottom: 1px solid var(--border); background: var(--bg-primary); min-height: 60px; }
+  .vars-section { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .vars-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); margin-bottom: 6px; }
+  .var-row { font-family: var(--font-mono); font-size: 11.5px; margin: 3px 0; display: flex; gap: 4px; }
   .var-name { color: var(--accent); }
   .var-val { color: var(--text-primary); word-break: break-all; }
   .history-list { padding: 8px 12px; }
-  .hist-item {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    margin: 2px 0;
-    cursor: pointer;
-    color: var(--text-secondary);
-  }
-  .hist-item.current {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    font-weight: 500;
-  }
+  .hist-item { padding: 4px 8px; border-radius: 4px; font-size: 11px; margin: 2px 0; cursor: pointer; color: var(--text-secondary); }
+  .hist-item.current { background: var(--bg-tertiary); color: var(--text-primary); font-weight: 500; }
 
-  /* ── TRIE VIZ ── */
-  .trie-svg { width: 100%; }
-  .trie-node circle { transition: fill 0.2s, stroke 0.2s; }
-  .trie-node text { pointer-events: none; font-size: 13px; font-family: var(--font-mono); }
-  .trie-edge { transition: stroke 0.2s; }
+  /* ── RESULT BADGE ── */
+  .result-banner {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 8px 12px;
+    text-align: center;
+  }
+  .result-true { background: rgba(16,185,129,0.15); color: var(--accent2); border: 1px solid rgba(16,185,129,0.3); }
+  .result-false { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .result-add { background: rgba(59,130,246,0.1); color: var(--accent); border: 1px solid rgba(59,130,246,0.2); }
 
   /* ── INTUITION MODE ── */
-  #intuition-wrap {
-    display: flex;
-    height: 100%;
-    overflow: hidden;
-  }
-  .int-left {
-    width: 50%;
-    overflow-y: auto;
-    border-right: 1px solid var(--border);
-    padding: 20px;
-  }
-  .int-right {
-    width: 50%;
-    overflow-y: auto;
-    padding: 20px;
-    background: var(--bg-secondary);
-  }
-  .stage-card {
-    border-radius: 10px;
-    border: 1.5px solid var(--border);
-    background: var(--bg-primary);
-    padding: 16px 18px;
-    margin-bottom: 14px;
-    transition: opacity 0.3s, border-color 0.3s;
-  }
-  .stage-card.active {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-  }
+  #intuition-container { width: 100%; display: flex; flex-direction: column; overflow: hidden; }
+  #intuition-wrap { display: flex; flex: 1; overflow: hidden; }
+  .int-left { width: 50%; overflow-y: auto; border-right: 1px solid var(--border); padding: 20px; }
+  .int-right { width: 50%; overflow-y: auto; padding: 20px; background: var(--bg-secondary); }
+  .stage-card { border-radius: 10px; border: 1.5px solid var(--border); background: var(--bg-primary); padding: 16px 18px; margin-bottom: 14px; transition: opacity 0.3s, border-color 0.3s; }
+  .stage-card.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
   .stage-card.past { opacity: 0.55; }
   .stage-card.future { opacity: 0.28; }
-  .stage-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    margin-right: 8px;
-    flex-shrink: 0;
-  }
-  .stage-title {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-  .thought-bubble {
-    background: rgba(59,130,246,0.08);
-    border-left: 3px solid var(--accent);
-    padding: 8px 12px;
-    font-style: italic;
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    border-radius: 0 6px 6px 0;
-    margin-bottom: 10px;
-  }
-  .insight-box {
-    background: rgba(16,185,129,0.08);
-    border-left: 3px solid var(--accent2);
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: 0 6px 6px 0;
-    margin-top: 10px;
-  }
+  .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+  .stage-title { display: flex; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .thought-bubble { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent); padding: 8px 12px; font-style: italic; font-size: 12.5px; color: var(--text-secondary); border-radius: 0 6px 6px 0; margin-bottom: 10px; }
+  .insight-box { background: rgba(16,185,129,0.08); border-left: 3px solid var(--accent2); padding: 8px 12px; font-size: 12px; border-radius: 0 6px 6px 0; margin-top: 10px; }
   .insight-box strong { color: var(--accent2); }
-  .stage-content {
-    font-size: 12.5px;
-    line-height: 1.65;
-    color: var(--text-primary);
-    white-space: pre-wrap;
-  }
-  .int-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-primary);
-    flex-shrink: 0;
-  }
-  .int-viz-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 14px;
-  }
-  .approach-card {
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 12px;
-    font-size: 12.5px;
-    line-height: 1.6;
-  }
+  .stage-content { font-size: 12.5px; line-height: 1.65; color: var(--text-primary); white-space: pre-wrap; }
+  .int-controls { display: flex; gap: 8px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--bg-primary); flex-shrink: 0; }
+  .int-viz-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+  .approach-card { border-radius: 8px; padding: 14px; margin-bottom: 12px; font-size: 12.5px; line-height: 1.6; }
   .approach-bad { background: rgba(239,68,68,0.08); border-left: 3px solid #ef4444; }
   .approach-good { background: rgba(16,185,129,0.08); border-left: 3px solid #10b981; }
   .approach-card h4 { margin-bottom: 6px; font-size: 13px; }
-  .complexity-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 4px;
-  }
-  .complexity-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    font-size: 12.5px;
-  }
+  .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .complexity-card { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 12.5px; }
   .complexity-card h4 { color: var(--accent); margin-bottom: 8px; font-size: 13px; }
-
   .op-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .op-table th, .op-table td {
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    text-align: left;
-  }
+  .op-table th, .op-table td { padding: 6px 10px; border: 1px solid var(--border); text-align: left; }
   .op-table th { background: var(--bg-tertiary); font-weight: 600; }
   .op-table td:first-child { font-family: var(--font-mono); color: var(--accent); }
 </style>
@@ -475,21 +239,31 @@
     <button class="mode-btn active" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
     <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
   </div>
-  <div id="exec-input-row" class="input-row" style="display:none">
+
+  <!-- OPERATION INPUT BAR (execution mode only) -->
+  <div id="op-bar">
     <label>Operation:</label>
     <select id="op-select" onchange="updateOpInput()">
       <option value="addWord">addWord</option>
       <option value="search">search</option>
     </select>
-    <input id="op-arg" type="text" value="bad" placeholder='word' />
-    <button class="btn-small" onclick="runOperation()">Run ▶</button>
-    <button class="btn-small" style="background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border)" onclick="resetAll()">Reset</button>
+    <input id="op-arg" type="text" placeholder="word to add" maxlength="30"
+           onkeydown="if(event.key==='Enter') queueOperation()" />
+    <button class="btn-run" onclick="queueOperation()">+ Add to Queue</button>
+
+    <div id="op-queue-wrap">
+      <span id="op-queue-label">Queue: (empty)</span>
+    </div>
+
+    <button class="btn-run" id="btn-run-all" onclick="runAll()" style="background:var(--accent2);display:none">▶ Run All</button>
+    <button class="btn-ghost" onclick="clearQueue()">Clear Queue</button>
+    <button class="btn-ghost" onclick="resetAll()">Reset Trie</button>
   </div>
 </div>
 
 <div id="main">
   <!-- ═══ INTUITION MODE ═══ -->
-  <div id="intuition-container" style="width:100%;display:flex;flex-direction:column;overflow:hidden;">
+  <div id="intuition-container">
     <div id="intuition-wrap">
       <div class="int-left" id="int-stages"></div>
       <div class="int-right" id="int-viz"></div>
@@ -503,8 +277,7 @@
   </div>
 
   <!-- ═══ EXECUTION MODE ═══ -->
-  <div id="execution-container" style="width:100%;display:none;overflow:hidden;height:100%;">
-    <!-- Code Panel -->
+  <div id="execution-container" style="width:100%;display:none;overflow:hidden;height:100%;flex-direction:row;">
     <div class="panel" id="code-panel">
       <div class="panel-header">Python Solution</div>
       <div class="panel-body">
@@ -512,12 +285,11 @@
       </div>
     </div>
 
-    <!-- Viz Panel -->
-    <div class="panel" id="viz-panel" style="display:flex;flex-direction:column;">
-      <div class="panel-header">Trie Visualization</div>
+    <div class="panel" id="viz-panel">
+      <div class="panel-header" id="viz-panel-title">Trie Visualization</div>
       <div id="viz-canvas"></div>
       <div class="controls-bar">
-        <button class="ctrl-btn" onclick="resetSteps()" title="Reset">⏮</button>
+        <button class="ctrl-btn" onclick="resetSteps()" title="Reset to first step">⏮</button>
         <button class="ctrl-btn" onclick="stepBack()" title="Step back">◀</button>
         <button class="ctrl-btn primary" id="play-btn" onclick="togglePlay()">▶</button>
         <button class="ctrl-btn" onclick="stepForward()" title="Step forward">▶|</button>
@@ -531,11 +303,11 @@
       </div>
     </div>
 
-    <!-- Log Panel -->
     <div class="panel" id="log-panel">
       <div class="panel-header">Step Log</div>
       <div class="panel-body" id="log-body">
-        <div class="log-desc" id="log-desc">Run an operation to begin tracing.</div>
+        <div class="log-desc" id="log-desc">Add words to the queue above, then click "Run All" to trace.</div>
+        <div id="result-banner-wrap"></div>
         <div class="vars-section" id="vars-section"></div>
         <div class="history-list" id="history-list"></div>
       </div>
@@ -545,63 +317,118 @@
 
 <script>
 /* ═══════════════════════════════════════════
-   PYTHON SOURCE (for display, with tokens)
+   PYTHON SOURCE LINES (syntax-highlighted HTML)
 ═══════════════════════════════════════════ */
 const CODE_LINES = [
-/* 0 */  { t: `<span class="sk">class</span> <span class="st">TrieNode</span>:` },
-/* 1 */  { t: `    <span class="sd">__slots__</span> = (<span class="ss">'children'</span>, <span class="ss">'is_end'</span>)` },
-/* 2 */  { t: `` },
-/* 3 */  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
-/* 4 */  { t: `        <span class="se">self</span>.children: <span class="st">dict</span>[<span class="st">str</span>, <span class="ss">'TrieNode'</span>] = {}` },
-/* 5 */  { t: `        <span class="se">self</span>.is_end: <span class="st">bool</span> = <span class="sk">False</span>` },
-/* 6 */  { t: `` },
-/* 7 */  { t: `<span class="sk">class</span> <span class="st">WordDictionary</span>:` },
-/* 8 */  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
-/* 9 */  { t: `        <span class="se">self</span>.root = <span class="sf">TrieNode</span>()` },
-/* 10 */ { t: `` },
-/* 11 */ { t: `    <span class="sk">def</span> <span class="sf">addWord</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="sk">None</span>:` },
-/* 12 */ { t: `        node = <span class="se">self</span>.root` },
-/* 13 */ { t: `        <span class="sk">for</span> ch <span class="sk">in</span> word:` },
-/* 14 */ { t: `            <span class="sk">if</span> ch <span class="sk">not in</span> node.children:` },
-/* 15 */ { t: `                node.children[ch] = <span class="sf">TrieNode</span>()` },
-/* 16 */ { t: `            node = node.children[ch]` },
-/* 17 */ { t: `        node.is_end = <span class="sk">True</span>` },
-/* 18 */ { t: `` },
-/* 19 */ { t: `    <span class="sk">def</span> <span class="sf">search</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="st">bool</span>:` },
-/* 20 */ { t: `        <span class="sk">return</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, <span class="sn">0</span>, <span class="se">self</span>.root)` },
-/* 21 */ { t: `` },
-/* 22 */ { t: `    <span class="sk">def</span> <span class="sf">_dfs</span>(<span class="se">self</span>, word: <span class="st">str</span>, idx: <span class="st">int</span>, node: <span class="st">TrieNode</span>) -> <span class="st">bool</span>:` },
-/* 23 */ { t: `        <span class="sk">if</span> idx == <span class="sf">len</span>(word):` },
-/* 24 */ { t: `            <span class="sk">return</span> node.is_end` },
-/* 25 */ { t: `        ch = word[idx]` },
-/* 26 */ { t: `        <span class="sk">if</span> ch != <span class="ss">'.'</span>:` },
-/* 27 */ { t: `            child = node.children.<span class="sf">get</span>(ch)` },
-/* 28 */ { t: `            <span class="sk">return</span> child <span class="sk">is not None</span> <span class="sk">and</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child)` },
-/* 29 */ { t: `        <span class="sc"># Wildcard: try all children</span>` },
-/* 30 */ { t: `        <span class="sk">return</span> <span class="sf">any</span>(<span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child) <span class="sk">for</span> child <span class="sk">in</span> node.children.<span class="sf">values</span>())` },
+  { t: `<span class="sk">class</span> <span class="st">TrieNode</span>:` },
+  { t: `    <span class="sd">__slots__</span> = (<span class="ss">'children'</span>, <span class="ss">'is_end'</span>)` },
+  { t: `` },
+  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
+  { t: `        <span class="se">self</span>.children: <span class="st">dict</span>[<span class="st">str</span>, <span class="ss">'TrieNode'</span>] = {}` },
+  { t: `        <span class="se">self</span>.is_end: <span class="st">bool</span> = <span class="sk">False</span>` },
+  { t: `` },
+  { t: `<span class="sk">class</span> <span class="st">WordDictionary</span>:` },
+  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
+  { t: `        <span class="se">self</span>.root = <span class="sf">TrieNode</span>()` },
+  { t: `` },
+  { t: `    <span class="sk">def</span> <span class="sf">addWord</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="sk">None</span>:` },
+  { t: `        node = <span class="se">self</span>.root` },
+  { t: `        <span class="sk">for</span> ch <span class="sk">in</span> word:` },
+  { t: `            <span class="sk">if</span> ch <span class="sk">not in</span> node.children:` },
+  { t: `                node.children[ch] = <span class="sf">TrieNode</span>()` },
+  { t: `            node = node.children[ch]` },
+  { t: `        node.is_end = <span class="sk">True</span>` },
+  { t: `` },
+  { t: `    <span class="sk">def</span> <span class="sf">search</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="st">bool</span>:` },
+  { t: `        <span class="sk">return</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, <span class="sn">0</span>, <span class="se">self</span>.root)` },
+  { t: `` },
+  { t: `    <span class="sk">def</span> <span class="sf">_dfs</span>(<span class="se">self</span>, word: <span class="st">str</span>, idx: <span class="st">int</span>, node: <span class="st">TrieNode</span>) -> <span class="st">bool</span>:` },
+  { t: `        <span class="sk">if</span> idx == <span class="sf">len</span>(word):` },
+  { t: `            <span class="sk">return</span> node.is_end` },
+  { t: `        ch = word[idx]` },
+  { t: `        <span class="sk">if</span> ch != <span class="ss">'.'</span>:` },
+  { t: `            child = node.children.<span class="sf">get</span>(ch)` },
+  { t: `            <span class="sk">return</span> child <span class="sk">is not None</span> <span class="sk">and</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child)` },
+  { t: `        <span class="sc"># Wildcard: try all children</span>` },
+  { t: `        <span class="sk">return</span> <span class="sf">any</span>(<span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child) <span class="sk">for</span> child <span class="sk">in</span> node.children.<span class="sf">values</span>())` },
 ];
 
 /* ═══════════════════════════════════════════
-   TRIE DATA STRUCTURE (in-memory simulation)
+   TRIE DATA STRUCTURE
 ═══════════════════════════════════════════ */
 class TrieNode {
   constructor(id) { this.children = {}; this.is_end = false; this.id = id; }
 }
-
 let nodeIdCounter = 0;
 let root = new TrieNode(nodeIdCounter++);
-let trieWords = []; // words added so far
 
 /* ═══════════════════════════════════════════
-   STEP GENERATION
+   OPERATION QUEUE
 ═══════════════════════════════════════════ */
-let steps = [];
+// Each item: { op: 'addWord'|'search', arg: string }
+let opQueue = [];
+
+function updateOpInput() {
+  const op = document.getElementById('op-select').value;
+  document.getElementById('op-arg').placeholder = op === 'addWord' ? 'word to add' : 'pattern to search';
+}
+
+function queueOperation() {
+  const op = document.getElementById('op-select').value;
+  const arg = document.getElementById('op-arg').value.trim().toLowerCase();
+  if (!arg) { flashInput(); return; }
+  opQueue.push({ op, arg });
+  document.getElementById('op-arg').value = '';
+  document.getElementById('op-arg').focus();
+  renderQueue();
+}
+
+function flashInput() {
+  const inp = document.getElementById('op-arg');
+  inp.style.border = '1.5px solid var(--danger)';
+  setTimeout(() => inp.style.border = '', 800);
+}
+
+function removeFromQueue(idx) {
+  opQueue.splice(idx, 1);
+  renderQueue();
+}
+
+function clearQueue() {
+  opQueue = [];
+  renderQueue();
+}
+
+function renderQueue() {
+  const wrap = document.getElementById('op-queue-wrap');
+  const runBtn = document.getElementById('btn-run-all');
+  if (opQueue.length === 0) {
+    wrap.innerHTML = '<span id="op-queue-label" style="font-size:11px;color:var(--text-secondary)">Queue: (empty — add operations above)</span>';
+    runBtn.style.display = 'none';
+    return;
+  }
+  let html = '<span id="op-queue-label" style="font-size:11px;color:var(--text-secondary);white-space:nowrap">Queue:</span>';
+  opQueue.forEach((item, i) => {
+    const cls = item.op === 'addWord' ? 'add' : 'search';
+    const label = item.op === 'addWord' ? `add("${item.arg}")` : `search("${item.arg}")`;
+    html += `<span class="op-chip ${cls}" title="Click × to remove">
+      ${label}
+      <span class="chip-x" onclick="removeFromQueue(${i})">✕</span>
+    </span>`;
+  });
+  wrap.innerHTML = html;
+  runBtn.style.display = 'inline-block';
+}
+
+/* ═══════════════════════════════════════════
+   STEP GENERATION — runs ALL queued ops
+═══════════════════════════════════════════ */
+let allSteps = [];   // flat list of all steps across ops
 let currentStep = 0;
 let playInterval = null;
 let speedMs = 1000;
 
 function snapshotTrie() {
-  // Deep clone the trie for snapshot
   function cloneNode(n) {
     const c = { id: n.id, is_end: n.is_end, children: {} };
     for (const [k, v] of Object.entries(n.children)) c.children[k] = cloneNode(v);
@@ -611,237 +438,147 @@ function snapshotTrie() {
 }
 
 function generateAddSteps(word) {
-  steps = [];
+  const steps = [];
   let node = root;
-  steps.push({
-    line: 12,
-    desc: `addWord("${word}"): start at root node`,
-    vars: { word, node_id: node.id, char_idx: '-' },
-    trie: snapshotTrie(),
-    highlight: [node.id],
-    result: null,
-  });
+  steps.push({ line: 12, desc: `addWord("${word}"): start at root`, vars: { word, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
   for (let i = 0; i < word.length; i++) {
     const ch = word[i];
-    steps.push({
-      line: 13,
-      desc: `Iterating: ch = '${ch}' (index ${i})`,
-      vars: { word, ch, idx: i, node_id: node.id },
-      trie: snapshotTrie(),
-      highlight: [node.id],
-      result: null,
-    });
-    steps.push({
-      line: 14,
-      desc: `Is '${ch}' in node.children? ${ch in node.children ? 'Yes, skip create' : 'No, create new node'}`,
-      vars: { ch, exists: ch in node.children },
-      trie: snapshotTrie(),
-      highlight: [node.id],
-      result: null,
-    });
+    steps.push({ line: 13, desc: `Loop: ch = '${ch}' (index ${i})`, vars: { ch, idx: i, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
+    steps.push({ line: 14, desc: `Is '${ch}' in node.children? ${ch in node.children ? '✓ Yes, skip' : '✗ No → create'}`, vars: { ch, exists: ch in node.children }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
     if (!(ch in node.children)) {
       node.children[ch] = new TrieNode(nodeIdCounter++);
-      steps.push({
-        line: 15,
-        desc: `Created new TrieNode for '${ch}' (id=${node.children[ch].id})`,
-        vars: { ch, new_node_id: node.children[ch].id },
-        trie: snapshotTrie(),
-        highlight: [node.children[ch].id],
-        result: null,
-      });
+      steps.push({ line: 15, desc: `Created new TrieNode for '${ch}' (id=${node.children[ch].id})`, vars: { ch, new_node_id: node.children[ch].id }, trie: snapshotTrie(), highlight: [node.children[ch].id], result: null, op: 'addWord', opWord: word });
     }
     node = node.children[ch];
-    steps.push({
-      line: 16,
-      desc: `Move to node for '${ch}' (id=${node.id})`,
-      vars: { ch, node_id: node.id, is_end: node.is_end },
-      trie: snapshotTrie(),
-      highlight: [node.id],
-      result: null,
-    });
+    steps.push({ line: 16, desc: `Advance node → '${ch}' node (id=${node.id})`, vars: { ch, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
   }
   node.is_end = true;
-  trieWords.push(word);
-  steps.push({
-    line: 17,
-    desc: `Mark node id=${node.id} as end-of-word ✓ Word "${word}" added!`,
-    vars: { node_id: node.id, is_end: true },
-    trie: snapshotTrie(),
-    highlight: [node.id],
-    result: `"${word}" added`,
-  });
-  currentStep = 0;
+  steps.push({ line: 17, desc: `Mark node id=${node.id} as end-of-word ✓ "${word}" added!`, vars: { node_id: node.id, is_end: true }, trie: snapshotTrie(), highlight: [node.id], result: `"${word}" added to trie`, op: 'addWord', opWord: word });
+  return steps;
 }
 
 function generateSearchSteps(word) {
-  steps = [];
-  steps.push({
-    line: 20,
-    desc: `search("${word}"): call _dfs(word, 0, root)`,
-    vars: { word, idx: 0 },
-    trie: snapshotTrie(),
-    highlight: [root.id],
-    result: null,
-  });
-
-  let finalResult = false;
+  const steps = [];
+  steps.push({ line: 20, desc: `search("${word}"): call _dfs(word, 0, root)`, vars: { word, idx: 0 }, trie: snapshotTrie(), highlight: [root.id], result: null, op: 'search', opWord: word });
   const dfsSteps = [];
-  function dfs(node, idx, path) {
-    dfsSteps.push({
-      line: 23,
-      desc: `_dfs: idx=${idx}, len(word)=${word.length}. ${idx === word.length ? 'At end — check is_end' : 'Not at end yet'}`,
-      vars: { idx, word: word.slice(0, idx), node_id: node.id, is_end: node.is_end },
-      trie: snapshotTrie(),
-      highlight: [node.id],
-      result: null,
-    });
+  let finalResult = false;
+  function dfs(node, idx) {
+    dfsSteps.push({ line: 23, desc: `_dfs idx=${idx}: ${idx === word.length ? 'reached end → check is_end' : `word[${idx}]='${word[idx]}'`}`, vars: { idx, node_id: node.id, is_end: node.is_end }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
     if (idx === word.length) {
-      dfsSteps.push({
-        line: 24,
-        desc: `idx == len(word). Return node.is_end = ${node.is_end}`,
-        vars: { is_end: node.is_end, node_id: node.id },
-        trie: snapshotTrie(),
-        highlight: [node.id],
-        result: null,
-      });
+      dfsSteps.push({ line: 24, desc: `idx == len(word). Return node.is_end = ${node.is_end}`, vars: { is_end: node.is_end, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
       return node.is_end;
     }
     const ch = word[idx];
-    dfsSteps.push({
-      line: 25,
-      desc: `ch = word[${idx}] = '${ch}'`,
-      vars: { idx, ch, node_id: node.id },
-      trie: snapshotTrie(),
-      highlight: [node.id],
-      result: null,
-    });
+    dfsSteps.push({ line: 25, desc: `ch = word[${idx}] = '${ch}'`, vars: { idx, ch, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
     if (ch !== '.') {
-      dfsSteps.push({
-        line: 26,
-        desc: `'${ch}' is not a wildcard. Check node.children.get('${ch}')`,
-        vars: { ch, has_child: ch in node.children },
-        trie: snapshotTrie(),
-        highlight: [node.id],
-        result: null,
-      });
+      dfsSteps.push({ line: 26, desc: `'${ch}' ≠ '.' → exact match. Check children.get('${ch}')`, vars: { ch, has_child: ch in node.children }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
       const child = node.children[ch];
-      dfsSteps.push({
-        line: 27,
-        desc: child
-          ? `Found child for '${ch}' (id=${child.id}). Recurse.`
-          : `No child for '${ch}'. Return False.`,
-        vars: { ch, child_found: !!child, child_id: child ? child.id : null },
-        trie: snapshotTrie(),
-        highlight: child ? [child.id] : [node.id],
-        result: null,
-      });
+      dfsSteps.push({ line: 27, desc: child ? `Found child for '${ch}' (id=${child.id}) → recurse` : `No child '${ch}' → return False`, vars: { ch, found: !!child, child_id: child ? child.id : null }, trie: snapshotTrie(), highlight: child ? [child.id] : [node.id], result: null, op: 'search', opWord: word });
       if (!child) return false;
-      return dfs(child, idx + 1, path + ch);
+      return dfs(child, idx + 1);
     } else {
-      dfsSteps.push({
-        line: 29,
-        desc: `'.' wildcard! Try all ${Object.keys(node.children).length} children: [${Object.keys(node.children).join(', ')}]`,
-        vars: { ch: '.', children: Object.keys(node.children) },
-        trie: snapshotTrie(),
-        highlight: Object.values(node.children).map(c => c.id),
-        result: null,
-      });
+      const childKeys = Object.keys(node.children);
+      dfsSteps.push({ line: 29, desc: `'.' wildcard! Branch into ${childKeys.length} children: [${childKeys.join(', ')}]`, vars: { wildcard: true, children: childKeys }, trie: snapshotTrie(), highlight: Object.values(node.children).map(c => c.id), result: null, op: 'search', opWord: word });
       for (const [k, child] of Object.entries(node.children)) {
-        dfsSteps.push({
-          line: 30,
-          desc: `Trying wildcard branch '${k}' (id=${child.id})…`,
-          vars: { trying: k, child_id: child.id },
-          trie: snapshotTrie(),
-          highlight: [child.id],
-          result: null,
-        });
-        if (dfs(child, idx + 1, path + k)) return true;
+        dfsSteps.push({ line: 30, desc: `Trying branch '${k}' (id=${child.id}) for wildcard...`, vars: { branch: k, child_id: child.id }, trie: snapshotTrie(), highlight: [child.id], result: null, op: 'search', opWord: word });
+        if (dfs(child, idx + 1)) return true;
       }
       return false;
     }
   }
-  finalResult = dfs(root, 0, '');
+  finalResult = dfs(root, 0);
   steps.push(...dfsSteps);
-  steps.push({
-    line: 20,
-    desc: `search("${word}") → ${finalResult} ✓`,
-    vars: { result: finalResult },
-    trie: snapshotTrie(),
-    highlight: [],
-    result: String(finalResult),
+  steps.push({ line: 20, desc: `search("${word}") complete → ${finalResult}`, vars: { word, result: finalResult }, trie: snapshotTrie(), highlight: [], result: finalResult, op: 'search', opWord: word });
+  return steps;
+}
+
+function runAll() {
+  if (opQueue.length === 0) return;
+  pausePlay();
+
+  // Reset trie
+  nodeIdCounter = 0;
+  root = new TrieNode(nodeIdCounter++);
+
+  allSteps = [];
+  const ops = [...opQueue];
+  ops.forEach(item => {
+    if (item.op === 'addWord') allSteps.push(...generateAddSteps(item.arg));
+    else allSteps.push(...generateSearchSteps(item.arg));
   });
+
   currentStep = 0;
+  renderStep(currentStep);
+
+  // Highlight active chip
+  highlightChip(0);
+}
+
+function highlightChip(stepIdx) {
+  if (!allSteps.length) return;
+  const s = allSteps[stepIdx];
+  document.querySelectorAll('.op-chip').forEach((el, i) => {
+    el.classList.toggle('active', opQueue[i] && opQueue[i].op === s.op && opQueue[i].arg === s.opWord);
+  });
+}
+
+function resetAll() {
+  pausePlay();
+  nodeIdCounter = 0;
+  root = new TrieNode(nodeIdCounter++);
+  allSteps = [];
+  opQueue = [];
+  renderQueue();
+  document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
+  document.getElementById('log-desc').textContent = 'Trie reset. Add operations above and click Run All.';
+  document.getElementById('result-banner-wrap').innerHTML = '';
+  document.getElementById('vars-section').innerHTML = '';
+  document.getElementById('history-list').innerHTML = '';
+  document.getElementById('step-counter').textContent = 'Step 0 / 0';
+  document.getElementById('viz-panel-title').textContent = 'Trie Visualization';
+  renderCode(-1);
 }
 
 /* ═══════════════════════════════════════════
-   RENDERING HELPERS
+   TRIE SVG RENDERING
 ═══════════════════════════════════════════ */
-
-function renderCode(activeLine) {
-  const wrap = document.getElementById('code-wrap');
-  let html = '<pre class="code-pre">';
-  CODE_LINES.forEach((l, i) => {
-    const active = activeLine === i ? ' active' : '';
-    html += `<div class="code-line${active}"><span class="ln">${i + 1}</span><code class="lc">${l.t || '\u00a0'}</code></div>`;
-  });
-  html += '</pre>';
-  wrap.innerHTML = html;
-  // Scroll active line into view
-  const lines = wrap.querySelectorAll('.code-line');
-  if (lines[activeLine]) lines[activeLine].scrollIntoView({ block: 'nearest' });
-}
-
-// Layout trie nodes for SVG
 function layoutTrie(trieRoot) {
-  const nodes = [];
+  const nodeMap = {};
   const edges = [];
-  // BFS to assign positions
-  const queue = [{ node: trieRoot, x: 0, depth: 0, label: 'root' }];
   const depthGroups = {};
-  const visited = [];
-
-  function collect(node, depth, label, parentId) {
-    if (!depthGroups[depth]) depthGroups[depth] = [];
-    depthGroups[depth].push({ node, label, parentId });
-  }
 
   function bfs(node, depth, label, parentId) {
-    collect(node, depth, label, parentId);
-    for (const [k, child] of Object.entries(node.children)) {
-      bfs(child, depth + 1, k, node.id);
-    }
+    if (!depthGroups[depth]) depthGroups[depth] = [];
+    depthGroups[depth].push({ node, label, parentId });
+    for (const [k, child] of Object.entries(node.children)) bfs(child, depth + 1, k, node.id);
   }
   bfs(trieRoot, 0, 'ROOT', null);
 
   const W = 700;
-  const levelH = 70;
-
-  const nodeMap = {};
+  const levelH = 74;
   for (const [depth, group] of Object.entries(depthGroups)) {
     const d = parseInt(depth);
     const count = group.length;
-    const startX = W / 2 - ((count - 1) * 60) / 2;
+    const spread = Math.min(60, Math.floor(600 / Math.max(count, 1)));
+    const startX = W / 2 - ((count - 1) * spread) / 2;
     group.forEach((item, i) => {
-      const x = count === 1 ? W / 2 : startX + i * 60;
+      const x = count === 1 ? W / 2 : startX + i * spread;
       const y = 40 + d * levelH;
       nodeMap[item.node.id] = { x, y, ...item };
     });
   }
-
   for (const [id, info] of Object.entries(nodeMap)) {
     if (info.parentId !== null) {
       const par = nodeMap[info.parentId];
       if (par) edges.push({ x1: par.x, y1: par.y, x2: info.x, y2: info.y, label: info.label, childId: info.node.id });
     }
-    nodes.push({ x: info.x, y: info.y, id: info.node.id, label: info.label, is_end: info.node.is_end });
   }
   const maxDepth = Math.max(...Object.keys(depthGroups).map(Number));
-  const svgH = 60 + maxDepth * levelH + 40;
-  return { nodes, edges, svgH };
+  return { nodeMap, edges, svgH: 60 + maxDepth * levelH + 50 };
 }
 
 function renderTrie(trieSnap, highlightIds) {
-  const { nodes, edges, svgH } = layoutTrie(trieSnap);
+  const { nodeMap, edges, svgH } = layoutTrie(trieSnap);
   const hl = new Set(highlightIds || []);
   const isDark = document.body.dataset.theme === 'dark';
   const nodeColor = isDark ? '#252840' : '#e2e8f0';
@@ -851,52 +588,80 @@ function renderTrie(trieSnap, highlightIds) {
   const edgeColor = isDark ? '#4b5563' : '#9ca3af';
   const hlEdgeColor = isDark ? '#8be9fd' : '#3b82f6';
 
-  let svg = `<svg class="trie-svg" viewBox="0 0 700 ${svgH}" style="max-height:${svgH}px">`;
-  // defs arrowhead
+  let svg = `<svg viewBox="0 0 700 ${svgH}" style="width:100%;max-height:${svgH}px">`;
   svg += `<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
     <polygon points="0 0,8 3,0 6" fill="${edgeColor}"/></marker></defs>`;
 
-  // edges
   for (const e of edges) {
     const hlEdge = hl.has(e.childId);
-    svg += `<line class="trie-edge" x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"
+    svg += `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"
       stroke="${hlEdge ? hlEdgeColor : edgeColor}" stroke-width="${hlEdge ? 2.5 : 1.5}"
       marker-end="url(#arr)"/>`;
-    // edge label
-    const mx = (e.x1 + e.x2) / 2;
-    const my = (e.y1 + e.y2) / 2 - 4;
+    const mx = (e.x1 + e.x2) / 2, my = (e.y1 + e.y2) / 2 - 4;
     svg += `<text x="${mx}" y="${my}" text-anchor="middle" font-size="12" font-family="monospace"
       font-weight="600" fill="${hlEdge ? hlEdgeColor : (isDark ? '#94a3b8' : '#6b7280')}">${e.label}</text>`;
   }
-
-  // nodes
-  for (const n of nodes) {
+  for (const [id, info] of Object.entries(nodeMap)) {
+    const n = info.node;
     const isHL = hl.has(n.id);
     const fill = isHL ? hlColor : (n.is_end ? endColor : nodeColor);
-    const strokeW = isHL ? 3 : 1.5;
     const stroke = isHL ? hlEdgeColor : (n.is_end ? endColor : (isDark ? '#4b5563' : '#cbd5e1'));
-    const displayLabel = n.label === 'ROOT' ? '∅' : n.label;
-    svg += `<g class="trie-node">
-      <circle cx="${n.x}" cy="${n.y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}"/>
-      <text x="${n.x}" y="${n.y + 1}" text-anchor="middle" dominant-baseline="middle"
-        font-size="13" font-weight="700" fill="${isHL ? '#fff' : textColor}">${displayLabel}</text>
-      ${n.is_end ? `<text x="${n.x}" y="${n.y + 32}" text-anchor="middle" font-size="9" fill="${endColor}">END</text>` : ''}
+    const displayLabel = info.label === 'ROOT' ? '∅' : info.label;
+    svg += `<g>
+      <circle cx="${info.x}" cy="${info.y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${isHL ? 3 : 1.5}"/>
+      <text x="${info.x}" y="${info.y + 1}" text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="700" fill="${isHL || n.is_end ? '#fff' : textColor}">${displayLabel}</text>
+      ${n.is_end ? `<text x="${info.x}" y="${info.y + 34}" text-anchor="middle" font-size="9" fill="${endColor}">END</text>` : ''}
     </g>`;
   }
   svg += '</svg>';
   return svg;
 }
 
+/* ═══════════════════════════════════════════
+   STEP RENDERING
+═══════════════════════════════════════════ */
+function renderCode(activeLine) {
+  const wrap = document.getElementById('code-wrap');
+  let html = '<pre class="code-pre">';
+  CODE_LINES.forEach((l, i) => {
+    const active = activeLine === i ? ' active' : '';
+    html += `<div class="code-line${active}"><span class="ln">${i + 1}</span><code class="lc">${l.t || '\u00a0'}</code></div>`;
+  });
+  html += '</pre>';
+  wrap.innerHTML = html;
+  const lines = wrap.querySelectorAll('.code-line');
+  if (activeLine >= 0 && lines[activeLine]) lines[activeLine].scrollIntoView({ block: 'nearest' });
+}
+
 function renderStep(idx) {
-  if (!steps.length) return;
-  const s = steps[idx];
+  if (!allSteps.length) return;
+  const s = allSteps[idx];
   renderCode(s.line);
 
-  // Trie viz
+  // Update panel title
+  const opLabel = s.op === 'addWord' ? `addWord("${s.opWord}")` : `search("${s.opWord}")`;
+  document.getElementById('viz-panel-title').textContent = `Trie — ${opLabel}`;
+
+  // Trie
   document.getElementById('viz-canvas').innerHTML = renderTrie(s.trie, s.highlight);
 
-  // Log
+  // Step desc
   document.getElementById('log-desc').textContent = s.desc;
+
+  // Result banner (only on final step of each op, or last step)
+  const rWrap = document.getElementById('result-banner-wrap');
+  if (s.result !== null && s.result !== undefined) {
+    let cls = 'result-add', text = `✓ ${s.result}`;
+    if (s.op === 'search') {
+      cls = s.result === true ? 'result-true' : 'result-false';
+      text = s.result === true ? `✓ search("${s.opWord}") → True` : `✗ search("${s.opWord}") → False`;
+    }
+    rWrap.innerHTML = `<div class="result-banner ${cls}">${text}</div>`;
+  } else {
+    rWrap.innerHTML = '';
+  }
+
   // Vars
   let vhtml = '<div class="vars-title">Variables</div>';
   for (const [k, v] of Object.entries(s.vars)) {
@@ -904,81 +669,41 @@ function renderStep(idx) {
     vhtml += `<div class="var-row"><span class="var-name">${k}</span><span style="color:var(--text-secondary)"> = </span><span class="var-val">${vStr}</span></div>`;
   }
   document.getElementById('vars-section').innerHTML = vhtml;
+
   // History
   let hhtml = '<div class="vars-title" style="margin-top:10px">History</div>';
-  steps.slice(0, idx + 1).forEach((st, i) => {
+  allSteps.slice(0, idx + 1).forEach((st, i) => {
     hhtml += `<div class="hist-item ${i === idx ? 'current' : ''}" onclick="jumpStep(${i})">${i + 1}. ${st.desc}</div>`;
   });
   document.getElementById('history-list').innerHTML = hhtml;
-  // Scroll history to current
-  const items = document.querySelectorAll('.hist-item.current');
-  if (items[0]) items[0].scrollIntoView({ block: 'nearest' });
+  const curItem = document.querySelector('.hist-item.current');
+  if (curItem) curItem.scrollIntoView({ block: 'nearest' });
 
-  document.getElementById('step-counter').textContent = `Step ${idx + 1} / ${steps.length}`;
-}
-
-function jumpStep(i) {
-  currentStep = i;
-  renderStep(currentStep);
+  document.getElementById('step-counter').textContent = `Step ${idx + 1} / ${allSteps.length}`;
+  highlightChip(idx);
 }
 
-function stepForward() {
-  if (currentStep < steps.length - 1) { currentStep++; renderStep(currentStep); }
-}
-function stepBack() {
-  if (currentStep > 0) { currentStep--; renderStep(currentStep); }
-}
-function resetSteps() {
-  pausePlay();
-  currentStep = 0;
-  if (steps.length) renderStep(0);
-}
+function jumpStep(i) { currentStep = i; renderStep(currentStep); }
+function stepForward() { if (currentStep < allSteps.length - 1) { currentStep++; renderStep(currentStep); } }
+function stepBack() { if (currentStep > 0) { currentStep--; renderStep(currentStep); } }
+function resetSteps() { pausePlay(); currentStep = 0; if (allSteps.length) renderStep(0); }
+
 function togglePlay() {
-  if (playInterval) pausePlay();
-  else {
-    document.getElementById('play-btn').textContent = '⏸';
-    playInterval = setInterval(() => {
-      if (currentStep < steps.length - 1) { currentStep++; renderStep(currentStep); }
-      else pausePlay();
-    }, speedMs);
-  }
+  if (playInterval) { pausePlay(); return; }
+  document.getElementById('play-btn').textContent = '⏸';
+  playInterval = setInterval(() => {
+    if (currentStep < allSteps.length - 1) { currentStep++; renderStep(currentStep); }
+    else pausePlay();
+  }, speedMs);
 }
 function pausePlay() {
   clearInterval(playInterval); playInterval = null;
-  document.getElementById('play-btn').textContent = '▶';
+  const btn = document.getElementById('play-btn');
+  if (btn) btn.textContent = '▶';
 }
 function changeSpeed() {
   speedMs = parseInt(document.getElementById('speed-sel').value);
   if (playInterval) { pausePlay(); togglePlay(); }
-}
-
-function runOperation() {
-  pausePlay();
-  const op = document.getElementById('op-select').value;
-  const arg = document.getElementById('op-arg').value.trim();
-  if (!arg) return;
-  if (op === 'addWord') generateAddSteps(arg);
-  else generateSearchSteps(arg);
-  renderStep(0);
-}
-
-function resetAll() {
-  pausePlay();
-  nodeIdCounter = 0;
-  root = new TrieNode(nodeIdCounter++);
-  trieWords = [];
-  steps = [];
-  document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
-  document.getElementById('log-desc').textContent = 'Trie reset. Run an operation.';
-  document.getElementById('vars-section').innerHTML = '';
-  document.getElementById('history-list').innerHTML = '';
-  document.getElementById('step-counter').textContent = 'Step 0 / 0';
-  renderCode(-1);
-}
-
-function updateOpInput() {
-  const op = document.getElementById('op-select').value;
-  document.getElementById('op-arg').placeholder = op === 'addWord' ? 'word to add' : 'word to search';
 }
 
 /* ═══════════════════════════════════════════
@@ -1005,8 +730,8 @@ The wildcard '.' is what makes this non-trivial.`,
     title: "Why Not a Hash Set?",
     thought: "Could I just store all words in a set and match with regex? Let me think...",
     content: `Approach 1: Hash Set + regex
-• addWord: O(n), search: O(W × L) — scan every word
-• Problem: could be 10⁴ words × 25 char = slow at scale
+• addWord: O(1) amortized, search: O(W × L) — scan every word
+• Problem: could be 10⁴ words × 25 chars = slow at scale
 
 Approach 2: Trie (prefix tree)
 • addWord: O(L) — one node per character
@@ -1030,7 +755,7 @@ Approach 2: Trie (prefix tree)
 
 Each path from root to a marked node = a word.
 Shared prefixes share nodes — efficient storage!`,
-    insight: "is_end flag marks where a word terminates — a node mid-path is just a prefix, not a word.",
+    insight: "is_end flag marks where a word terminates — a node mid-path is just a prefix, not a complete word.",
     viz: 'trie_example',
   },
   {
@@ -1081,10 +806,8 @@ search(word):
   • But d ≤ 25, and real tries are sparse
   • In practice, much faster due to pruning
 
-Space per search: O(L) recursion stack depth
-
-Total space: O(ΣWORDS × avg_length) for all insertions`,
-    insight: "Wildcard search is exponential in theory but practical because (a) tries are sparse and (b) is_end pruning cuts short many branches.",
+Space per search: O(L) recursion stack depth`,
+    insight: "Wildcard search is exponential in theory but practical because tries are sparse and is_end pruning cuts many branches short.",
     viz: 'complexity',
   },
   {
@@ -1110,7 +833,6 @@ let currentStage = 0;
 let intPlayInterval = null;
 
 function renderIntuition() {
-  // Stages
   let html = '';
   INTUITION_STAGES.forEach((s, i) => {
     const cls = i === currentStage ? 'active' : i < currentStage ? 'past' : 'future';
@@ -1122,13 +844,9 @@ function renderIntuition() {
     </div>`;
   });
   document.getElementById('int-stages').innerHTML = html;
-  // Auto-scroll active into view
-  const cards = document.querySelectorAll('.stage-card.active');
-  if (cards[0]) cards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-
+  const card = document.querySelector('.stage-card.active');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   document.getElementById('int-counter').textContent = `Stage ${currentStage + 1} / ${INTUITION_STAGES.length}`;
-
-  // Viz
   document.getElementById('int-viz').innerHTML = buildIntViz(INTUITION_STAGES[currentStage].viz);
 }
 
@@ -1137,7 +855,6 @@ function buildIntViz(type) {
   const accent = isDark ? '#8be9fd' : '#3b82f6';
   const g = isDark ? '#50fa7b' : '#059669';
   const r = '#ef4444';
-
   switch(type) {
     case 'problem': return `
       <div class="int-viz-title">🔍 Problem: Two Operations</div>
@@ -1153,104 +870,64 @@ function buildIntViz(type) {
       </div>`;
     case 'comparison': return `
       <div class="int-viz-title">⚖️ Approaches Compared</div>
-      <div class="approach-card approach-bad">
-        <h4 style="color:${r}">❌ Hash Set + Linear Scan</h4>
-        addWord: O(1) amortized<br>
-        search: O(W × L) — scan every word with regex<br>
-        <strong>Problem:</strong> 10⁴ words × 25 chars = 250k ops per query
-      </div>
-      <div class="approach-card approach-good">
-        <h4 style="color:${g}">✅ Trie + DFS</h4>
-        addWord: O(L) — follow/create one node per char<br>
-        search: O(26^d × L) — prunes dead branches early<br>
-        <strong>Win:</strong> Structure-aware — wildcards branch only into actual children
-      </div>`;
-    case 'trie_example': {
-      // Build a small sample trie svg inline
-      const sampleWords = ['bad','dad','mad','ba'];
-      // Manually lay out for clarity
-      return `
-        <div class="int-viz-title">🌲 Trie after adding: "bad", "dad", "mad", "ba"</div>
-        <svg viewBox="0 0 400 220" style="width:100%;max-height:220px">
-          <!-- root -->
-          <circle cx="200" cy="30" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
-          <text x="200" y="31" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">∅</text>
-          <!-- b, d, m -->
-          <line x1="200" y1="48" x2="80" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="132" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">b</text>
-          <circle cx="80" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-          <text x="80" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">b</text>
-
-          <line x1="200" y1="48" x2="200" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="207" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
-          <circle cx="200" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-          <text x="200" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">d</text>
-
-          <line x1="200" y1="48" x2="320" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="268" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">m</text>
-          <circle cx="320" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-          <text x="320" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">m</text>
-
-          <!-- a nodes -->
-          <line x1="80" y1="118" x2="80" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="87" y="137" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">a</text>
-          <circle cx="80" cy="160" r="18" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-          <text x="80" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#fff">a</text>
-          <text x="80" y="185" text-anchor="middle" font-size="9" fill="${g}">END</text>
-
-          <line x1="200" y1="118" x2="200" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="207" y="137" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">a</text>
-          <circle cx="200" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-          <text x="200" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
-
-          <line x1="320" y1="118" x2="320" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="327" y="137" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">a</text>
-          <circle cx="320" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-          <text x="320" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
-
-          <!-- d leaf -->
-          <line x1="80" y1="178" x2="80" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="87" y="192" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
-          <circle cx="80" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-          <text x="80" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-
-          <line x1="200" y1="178" x2="200" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="207" y="192" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
-          <circle cx="200" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-          <text x="200" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-
-          <line x1="320" y1="178" x2="320" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-          <text x="327" y="192" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
-          <circle cx="320" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-          <text x="320" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-        </svg>
-        <div style="margin-top:8px;font-size:11.5px;color:var(--text-secondary)">
-          🟢 Green nodes = end-of-word markers (is_end=True)
-        </div>`;
-    }
+      <div class="approach-card approach-bad"><h4 style="color:${r}">❌ Hash Set + Linear Scan</h4>addWord: O(1)<br>search: O(W × L) — scan every word with regex<br><strong>Problem:</strong> 10⁴ words × 25 chars = 250k ops per query</div>
+      <div class="approach-card approach-good"><h4 style="color:${g}">✅ Trie + DFS</h4>addWord: O(L) — follow/create one node per char<br>search: O(26^d × L) — prunes dead branches early<br><strong>Win:</strong> Structure-aware — wildcards branch only into actual children</div>`;
+    case 'trie_example': return `
+      <div class="int-viz-title">🌲 Trie after adding: "bad", "dad", "mad", "ba"</div>
+      <svg viewBox="0 0 400 220" style="width:100%;max-height:220px">
+        <circle cx="200" cy="30" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
+        <text x="200" y="31" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">∅</text>
+        <line x1="200" y1="48" x2="80" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <text x="132" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">b</text>
+        <circle cx="80" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
+        <text x="80" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">b</text>
+        <line x1="200" y1="48" x2="200" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <text x="207" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
+        <circle cx="200" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
+        <text x="200" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">d</text>
+        <line x1="200" y1="48" x2="320" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <text x="268" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">m</text>
+        <circle cx="320" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
+        <text x="320" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">m</text>
+        <line x1="80" y1="118" x2="80" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="80" cy="160" r="18" fill="${g}" stroke="${g}" stroke-width="1.5"/>
+        <text x="80" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#fff">a</text>
+        <text x="80" y="185" text-anchor="middle" font-size="9" fill="${g}">END</text>
+        <line x1="200" y1="118" x2="200" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="200" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
+        <text x="200" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
+        <line x1="320" y1="118" x2="320" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="320" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
+        <text x="320" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
+        <line x1="80" y1="178" x2="80" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="80" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
+        <text x="80" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
+        <line x1="200" y1="178" x2="200" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="200" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
+        <text x="200" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
+        <line x1="320" y1="178" x2="320" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
+        <circle cx="320" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
+        <text x="320" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
+      </svg>
+      <div style="margin-top:8px;font-size:11.5px;color:var(--text-secondary)">🟢 Green = end-of-word (is_end=True)</div>`;
     case 'dfs_wildcard': return `
       <div class="int-viz-title">🔀 Wildcard DFS: search("b.d")</div>
       <svg viewBox="0 0 380 180" style="width:100%;max-height:180px">
-        <!-- Root → b (exact) -->
         <circle cx="60" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
         <text x="60" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${accent}">∅</text>
         <line x1="76" y1="30" x2="114" y2="30" stroke="${accent}" stroke-width="2"/>
         <text x="95" y="22" font-size="10" font-family="monospace" fill="${accent}" font-weight="700">b</text>
         <circle cx="130" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
         <text x="130" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${isDark?'#f8f8f2':'#111'}">b</text>
-        <!-- b → a (dot, all children) -->
         <line x1="146" y1="30" x2="184" y2="30" stroke="${isDark?'#ff79c6':'#d73a49'}" stroke-width="2" stroke-dasharray="4,3"/>
         <text x="165" y="22" font-size="10" fill="${isDark?'#ff79c6':'#d73a49'}" font-weight="700">.</text>
         <circle cx="200" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#ff79c6':'#d73a49'}" stroke-width="2" stroke-dasharray="4,3"/>
         <text x="200" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${isDark?'#ff79c6':'#d73a49'}">?</text>
-        <!-- a (matched) → d (exact) -->
         <line x1="216" y1="30" x2="254" y2="30" stroke="${accent}" stroke-width="2"/>
         <text x="235" y="22" font-size="10" font-family="monospace" fill="${accent}" font-weight="700">d</text>
         <circle cx="270" cy="30" r="16" fill="${g}" stroke="${g}" stroke-width="2"/>
         <text x="270" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
         <text x="270" y="55" text-anchor="middle" font-size="9" fill="${g}">END ✓</text>
-
-        <!-- Legend -->
         <rect x="20" y="90" width="340" height="70" rx="8" fill="${isDark?'#252840':'#f1f5f9'}" stroke="${isDark?'#2d3154':'#e2e8f0'}"/>
         <text x="36" y="112" font-size="11" fill="${isDark?'#f8f8f2':'#111'}">Steps:</text>
         <text x="36" y="128" font-size="11" fill="${accent}">1. 'b' → follow exact edge to b-node</text>
@@ -1266,61 +943,41 @@ function buildIntViz(type) {
         <br>
         <div style="color:var(--syn-keyword)">class <span style="color:var(--syn-type)">WordDictionary</span>:</div>
         <div style="padding-left:16px;color:var(--text-secondary)">  root: TrieNode</div>
-        <div style="padding-left:16px;color:var(--syn-func)">  addWord(word)</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">→ walk + create nodes → mark is_end</div>
-        <div style="padding-left:16px;color:var(--syn-func)">  search(word)  →  _dfs(word, 0, root)</div>
+        <div style="padding-left:16px;color:var(--syn-func)">  addWord(word)  →  walk + create → mark is_end</div>
+        <div style="padding-left:16px;color:var(--syn-func)">  search(word)   →  _dfs(word, 0, root)</div>
         <div style="padding-left:16px;color:var(--syn-func)">  _dfs(word, idx, node)</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">→ base: idx==len → is_end</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">→ letter: follow one child</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">→ dot: try ALL children</div>
+        <div style="padding-left:32px;color:var(--text-secondary)">  base: idx==len → is_end</div>
+        <div style="padding-left:32px;color:var(--text-secondary)">  letter: follow one child</div>
+        <div style="padding-left:32px;color:var(--text-secondary)">  dot: try ALL children</div>
       </div>`;
     case 'complexity': return `
       <div class="int-viz-title">📊 Complexity Breakdown</div>
       <div class="complexity-grid">
-        <div class="complexity-card">
-          <h4>addWord(word)</h4>
-          Time: <strong>O(L)</strong><br>
-          Space: <strong>O(L)</strong><br>
-          <span style="color:var(--text-secondary);font-size:11px">One node per new character</span>
-        </div>
-        <div class="complexity-card">
-          <h4>search(word)</h4>
-          Time: <strong>O(26^d × L)</strong><br>
-          Space: <strong>O(L)</strong> stack<br>
-          <span style="color:var(--text-secondary);font-size:11px">d = number of '.' wildcards</span>
-        </div>
-        <div class="complexity-card" style="grid-column:1/-1">
-          <h4>Total Space</h4>
-          <strong>O(Σ word lengths)</strong> for all insertions<br>
-          Shared prefixes save memory vs a hash set of full strings
-        </div>
+        <div class="complexity-card"><h4>addWord(word)</h4>Time: <strong>O(L)</strong><br>Space: <strong>O(L)</strong><br><span style="color:var(--text-secondary);font-size:11px">One node per new character</span></div>
+        <div class="complexity-card"><h4>search(word)</h4>Time: <strong>O(26^d × L)</strong><br>Space: <strong>O(L)</strong> stack<br><span style="color:var(--text-secondary);font-size:11px">d = number of '.' wildcards</span></div>
+        <div class="complexity-card" style="grid-column:1/-1"><h4>Total Space</h4><strong>O(Σ word lengths)</strong> for all insertions<br>Shared prefixes save memory vs hash set of strings</div>
       </div>`;
     case 'final': return `
       <div class="int-viz-title">✅ Edge Cases</div>
       <table class="op-table">
         <tr><th>Query</th><th>Result</th><th>Why</th></tr>
-        <tr><td>search("")</td><td>False</td><td>root.is_end = False (never added "")</td></tr>
+        <tr><td>search("")</td><td>False</td><td>root.is_end = False</td></tr>
         <tr><td>search("...")</td><td>True/False</td><td>Explores all 3-char paths</td></tr>
         <tr><td>search("b.d")</td><td>True</td><td>b→a→d matches "bad"</td></tr>
-        <tr><td>search("xyz")</td><td>False</td><td>No child 'x' from root → False immediately</td></tr>
-        <tr><td>search("b.")</td><td>True</td><td>b→a has is_end=True ("ba" was added)</td></tr>
+        <tr><td>search("xyz")</td><td>False</td><td>No child 'x' from root</td></tr>
+        <tr><td>search("b.")</td><td>True</td><td>b→a is_end=True ("ba" added)</td></tr>
       </table>
       <div style="margin-top:14px;padding:12px;background:rgba(16,185,129,0.08);border-radius:8px;font-size:12.5px;line-height:1.6;border-left:3px solid #10b981">
         <strong style="color:#10b981">Pattern to remember:</strong><br>
-        Trie = prefix-aware storage<br>
-        DFS on Trie = wildcard/pattern matching<br>
+        Trie = prefix-aware storage<br>DFS on Trie = wildcard/pattern matching<br>
         This combo appears in: Word Search II, Auto-Complete, Boggle
       </div>`;
     default: return '<div style="color:var(--text-secondary);padding:20px">Select a stage to see visualization.</div>';
   }
 }
 
-function nextStage() {
-  if (currentStage < INTUITION_STAGES.length - 1) { currentStage++; renderIntuition(); }
-}
-function prevStage() {
-  if (currentStage > 0) { currentStage--; renderIntuition(); }
-}
+function nextStage() { if (currentStage < INTUITION_STAGES.length - 1) { currentStage++; renderIntuition(); } }
+function prevStage() { if (currentStage > 0) { currentStage--; renderIntuition(); } }
 function toggleIntPlay() {
   if (intPlayInterval) {
     clearInterval(intPlayInterval); intPlayInterval = null;
@@ -1335,7 +992,7 @@ function toggleIntPlay() {
 }
 
 /* ═══════════════════════════════════════════
-   MODE / THEME SWITCHING
+   MODE / THEME
 ═══════════════════════════════════════════ */
 let currentMode = 'intuition';
 
@@ -1343,28 +1000,28 @@ function setMode(mode) {
   currentMode = mode;
   pausePlay();
   if (intPlayInterval) { clearInterval(intPlayInterval); intPlayInterval = null; document.getElementById('int-play-btn').textContent = '▶ Auto'; }
-
   document.getElementById('btn-intuition').classList.toggle('active', mode === 'intuition');
   document.getElementById('btn-execution').classList.toggle('active', mode === 'execution');
   document.getElementById('intuition-container').style.display = mode === 'intuition' ? 'flex' : 'none';
-  document.getElementById('execution-container').style.display = mode === 'execution' ? 'flex' : 'none';
-  document.getElementById('exec-input-row').style.display = mode === 'execution' ? 'flex' : 'none';
+  const execEl = document.getElementById('execution-container');
+  execEl.style.display = mode === 'execution' ? 'flex' : 'none';
+  document.getElementById('op-bar').style.display = mode === 'execution' ? 'flex' : 'none';
 
   if (mode === 'execution') {
-    // Init with some default words
-    if (trieWords.length === 0) {
-      generateAddSteps('bad');
-      // Actually run them silently
-      nodeIdCounter = 0; root = new TrieNode(nodeIdCounter++);
-      ['bad','dad','mad'].forEach(w => {
-        let node = root;
-        for (const ch of w) { if (!(ch in node.children)) node.children[ch] = new TrieNode(nodeIdCounter++); node = node.children[ch]; }
-        node.is_end = true; trieWords.push(w);
-      });
-      // Generate steps for a search as demo
-      generateSearchSteps('b.d');
-      renderStep(0);
-      renderCode(steps[0].line);
+    renderCode(-1);
+    document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
+    // Pre-populate queue with a default example if empty
+    if (opQueue.length === 0 && allSteps.length === 0) {
+      opQueue = [
+        { op: 'addWord', arg: 'bad' },
+        { op: 'addWord', arg: 'dad' },
+        { op: 'addWord', arg: 'mad' },
+        { op: 'search', arg: 'pad' },
+        { op: 'search', arg: 'bad' },
+        { op: 'search', arg: '.ad' },
+        { op: 'search', arg: 'b..' },
+      ];
+      renderQueue();
     }
   }
 }
@@ -1373,9 +1030,9 @@ function toggleTheme() {
   const isDark = document.body.dataset.theme === 'dark';
   document.body.dataset.theme = isDark ? 'light' : 'dark';
   document.querySelector('.btn-theme').textContent = isDark ? '🌙 Dark' : '☀️ Light';
-  // Re-render current state
   if (currentMode === 'intuition') renderIntuition();
-  else if (steps.length) renderStep(currentStep);
+  else if (allSteps.length) renderStep(currentStep);
+  else document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
 }
 
 /* ═══════════════════════════════════════════
@@ -1383,16 +1040,9 @@ function toggleTheme() {
 ═══════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-  if (e.code === 'Space') {
-    e.preventDefault();
-    currentMode === 'execution' ? togglePlay() : toggleIntPlay();
-  } else if (e.code === 'ArrowRight') {
-    e.preventDefault();
-    currentMode === 'execution' ? stepForward() : nextStage();
-  } else if (e.code === 'ArrowLeft') {
-    e.preventDefault();
-    currentMode === 'execution' ? stepBack() : prevStage();
-  }
+  if (e.code === 'Space') { e.preventDefault(); currentMode === 'execution' ? togglePlay() : toggleIntPlay(); }
+  else if (e.code === 'ArrowRight') { e.preventDefault(); currentMode === 'execution' ? stepForward() : nextStage(); }
+  else if (e.code === 'ArrowLeft') { e.preventDefault(); currentMode === 'execution' ? stepBack() : prevStage(); }
 });
 
 /* ═══════════════════════════════════════════
@@ -1401,8 +1051,6 @@ document.addEventListener('keydown', e => {
 window.onload = () => {
   renderIntuition();
   renderCode(-1);
-  // Pre-build trie silently for execution mode
-  nodeIdCounter = 0; root = new TrieNode(nodeIdCounter++);
 };
 </script>
 </body>
