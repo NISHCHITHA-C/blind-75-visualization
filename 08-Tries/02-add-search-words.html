@@ -2,54 +2,60 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>211. Design Add and Search Words Data Structure - Visualizer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>572. Subtree of Another Tree — Visualizer</title>
 <style>
   :root {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #181825;
+    --bg-tertiary: #313244;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --text-muted: #6c7086;
+    --border: #45475a;
+    --accent: #89b4fa;
+    --accent2: #cba6f7;
+    --highlight-line: rgba(249,226,175,0.10);
+    --font-mono: 'Cascadia Code','Fira Code','JetBrains Mono','Consolas','Monaco',monospace;
+
+    /* Syntax – Dark (Catppuccin Mocha) */
+    --syn-keyword:  #ff79c6;
+    --syn-builtin:  #cba6f7;
+    --syn-funcname: #89dceb;
+    --syn-string:   #a6e3a1;
+    --syn-comment:  #6272a4;
+    --syn-number:   #fab387;
+    --syn-type:     #f38ba8;
+    --syn-self:     #f5c2e7;
+    --syn-decorator:#fab387;
+    --syn-param:    #cdd6f4;
+  }
+  [data-theme="light"] {
     --bg-primary: #ffffff;
-    --bg-secondary: #f3f4f6;
-    --bg-tertiary: #e9ecef;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --border: #e5e7eb;
-    --code-bg: #f6f8fa;
-    --highlight: #fff8c5;
-    --highlight-border: #e3b341;
-    --accent: #3b82f6;
-    --accent2: #10b981;
-    --danger: #ef4444;
-    --font-mono: 'Consolas','Monaco','Courier New',monospace;
-    --syn-keyword: #d73a49;
-    --syn-func: #6f42c1;
-    --syn-string: #032f62;
-    --syn-comment: #6a737d;
-    --syn-type: #005cc5;
-    --syn-number: #098658;
-    --syn-deco: #6f42c1;
-    --syn-self: #e36209;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e8e8e8;
+    --text-primary: #24292f;
+    --text-secondary: #57606a;
+    --text-muted: #8c959f;
+    --border: #d0d7de;
+    --accent: #0969da;
+    --accent2: #8250df;
+    --highlight-line: rgba(255,220,0,0.18);
+
+    --syn-keyword:  #d73a49;
+    --syn-builtin:  #6f42c1;
+    --syn-funcname: #005cc5;
+    --syn-string:   #22863a;
+    --syn-comment:  #6a737d;
+    --syn-number:   #e36209;
+    --syn-type:     #e36209;
+    --syn-self:     #e36209;
+    --syn-decorator:#6f42c1;
+    --syn-param:    #24292f;
   }
-  [data-theme="dark"] {
-    --bg-primary: #1e2130;
-    --bg-secondary: #13151f;
-    --bg-tertiary: #252840;
-    --text-primary: #f8f8f2;
-    --text-secondary: #94a3b8;
-    --border: #2d3154;
-    --code-bg: #0d0f1a;
-    --highlight: rgba(241,250,140,0.12);
-    --highlight-border: #f1fa8c;
-    --accent: #8be9fd;
-    --accent2: #50fa7b;
-    --danger: #ff5555;
-    --syn-keyword: #ff79c6;
-    --syn-func: #50fa7b;
-    --syn-string: #f1fa8c;
-    --syn-comment: #6272a4;
-    --syn-type: #8be9fd;
-    --syn-number: #bd93f9;
-    --syn-deco: #ffb86c;
-    --syn-self: #ffb86c;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg-secondary);
@@ -58,1000 +64,1458 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    font-size: 13px;
+    transition: background .25s, color .25s;
   }
 
   /* ── HEADER ── */
   #header {
+    flex-shrink: 0;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border);
     padding: 10px 16px 8px;
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   .header-row1 {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
-  }
-  .problem-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--text-primary); }
-  .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: rgba(239,68,68,0.15); color: #ef4444; }
-  .btn-theme { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 12px; }
-  .mode-toggle { display: flex; gap: 6px; margin-bottom: 8px; }
-  .mode-btn { flex: 1; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
-  .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  /* ── OPERATION INPUT BAR ── */
-  #op-bar {
-    display: none;
-    align-items: center;
-    gap: 8px;
     flex-wrap: wrap;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
   }
-  #op-bar label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
-  #op-bar select, #op-bar input {
-    padding: 5px 8px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg-primary);
+  .problem-title {
+    font-size: 16px;
+    font-weight: 700;
     color: var(--text-primary);
-    font-size: 12px;
-  }
-  #op-bar select { min-width: 100px; }
-  #op-bar input { width: 160px; font-family: var(--font-mono); }
-  .btn-run { padding: 5px 14px; border-radius: 6px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .btn-run:hover { opacity: 0.88; }
-  .btn-ghost { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; font-size: 12px; white-space: nowrap; }
-  .btn-ghost:hover { border-color: var(--accent); }
-
-  /* Op queue chips */
-  #op-queue-wrap {
-    display: flex;
-    align-items: center;
-    gap: 6px;
     flex: 1;
-    flex-wrap: wrap;
     min-width: 0;
   }
-  #op-queue-label { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
-  .op-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-family: var(--font-mono);
+  .problem-title span { color: var(--accent); }
+
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 11px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, border-color .15s;
+  }
+  .btn:hover { background: var(--border); }
+  .btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+  .btn.ctrl { padding: 5px 9px; font-size: 14px; }
+
+  .mode-row { display: flex; gap: 8px; }
+  .mode-btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: all 0.15s;
+    text-align: center;
+    transition: all .15s;
   }
-  .op-chip.add { background: rgba(16,185,129,0.12); color: var(--accent2); border-color: rgba(16,185,129,0.3); }
-  .op-chip.search { background: rgba(139,233,253,0.1); color: var(--accent); border-color: rgba(139,233,253,0.3); }
-  .op-chip.active { box-shadow: 0 0 0 2px var(--accent); }
-  .op-chip .chip-x { cursor: pointer; opacity: 0.6; font-size: 10px; }
-  .op-chip .chip-x:hover { opacity: 1; color: var(--danger); }
+  .mode-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
 
-  /* ── MAIN PANELS ── */
-  #main { display: flex; flex: 1; overflow: hidden; }
-  .panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
-  .panel:last-child { border-right: none; }
-  .panel-header { padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); background: var(--bg-primary); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .panel-body { flex: 1; overflow: auto; }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .input-row label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .input-row input {
+    flex: 1;
+    min-width: 160px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  .input-row input:focus { outline: none; border-color: var(--accent); }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-primary);
+  }
+  .panel-header {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-secondary);
+  }
+  .panel-body {
+    flex: 1;
+    overflow: auto;
+  }
+
+  /* drag handle */
+  .divider {
+    width: 4px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background .15s;
+  }
+  .divider:hover, .divider.dragging { background: var(--accent); }
 
   /* ── CODE PANEL ── */
-  #code-panel { width: 32%; min-width: 220px; }
-  .code-wrap { background: var(--code-bg); height: 100%; overflow: auto; }
-  pre.code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 0; }
-  .code-line { display: flex; align-items: stretch; min-height: 22px; transition: background 0.15s; line-height: 1.55; }
-  .code-line.active { background: var(--highlight); border-left: 3px solid var(--highlight-border); }
-  .ln { display: inline-flex; align-items: center; min-width: 38px; padding-right: 12px; padding-left: 6px; text-align: right; color: var(--text-secondary); user-select: none; font-size: 12px; flex-shrink: 0; justify-content: flex-end; }
-  .code-line.active .ln { color: var(--highlight-border); }
-  code.lc { flex: 1; white-space: pre; font-family: var(--font-mono); font-size: 14px; line-height: 1.55; padding-right: 16px; }
-  .sk { color: var(--syn-keyword); font-weight: 600; }
-  .sf { color: var(--syn-func); }
-  .ss { color: var(--syn-string); }
-  .sc { color: var(--syn-comment); font-style: italic; }
-  .st { color: var(--syn-type); }
-  .sn { color: var(--syn-number); }
-  .sd { color: var(--syn-deco); }
-  .se { color: var(--syn-self); }
+  #code-panel {
+    min-width: 180px;
+  }
+  .code-scroller {
+    height: 100%;
+    overflow: auto;
+    background: var(--bg-secondary);
+  }
+  pre.code-pre {
+    margin: 0;
+    padding: 12px 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+  .code-line {
+    display: flex;
+    align-items: stretch;
+    min-height: 23px;
+    transition: background .15s;
+  }
+  .code-line.active-line {
+    background: var(--highlight-line);
+  }
+  .line-num {
+    flex-shrink: 0;
+    min-width: 44px;
+    text-align: right;
+    padding-right: 16px;
+    color: var(--text-muted);
+    user-select: none;
+    font-size: 12px;
+    line-height: inherit;
+    padding-top: 1px;
+  }
+  .line-code {
+    flex: 1;
+    padding-right: 24px;
+    white-space: pre;
+    color: var(--text-primary);
+  }
+
+  /* syntax token colors */
+  .t-kw   { color: var(--syn-keyword); font-weight: 600; }
+  .t-bi   { color: var(--syn-builtin); }
+  .t-fn   { color: var(--syn-funcname); }
+  .t-str  { color: var(--syn-string); }
+  .t-cmt  { color: var(--syn-comment); font-style: italic; }
+  .t-num  { color: var(--syn-number); }
+  .t-typ  { color: var(--syn-type); }
+  .t-slf  { color: var(--syn-self); }
+  .t-dec  { color: var(--syn-decorator); }
+  .t-pm   { color: var(--syn-param); }
 
   /* ── VIZ PANEL ── */
-  #viz-panel { flex: 1; min-width: 0; background: var(--bg-secondary); display: flex; flex-direction: column; }
-  #viz-canvas { flex: 1; overflow: auto; padding: 16px; }
-  .controls-bar { display: flex; gap: 6px; align-items: center; padding: 8px 12px; background: var(--bg-primary); border-top: 1px solid var(--border); flex-shrink: 0; }
-  .ctrl-btn { padding: 5px 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 14px; transition: background 0.15s; }
-  .ctrl-btn:hover { background: var(--bg-tertiary); }
-  .ctrl-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .speed-sel { padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 12px; }
-  .step-counter { margin-left: auto; font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); }
+  #viz-panel { min-width: 200px; }
+  .viz-body {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px;
+    gap: 12px;
+  }
+  .viz-controls {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-secondary);
+    flex-wrap: wrap;
+  }
+  .speed-select {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 4px 6px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .step-badge {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  svg.tree-svg { width: 100%; max-width: 780px; }
 
   /* ── STEP LOG PANEL ── */
-  #log-panel { width: 22%; min-width: 180px; }
-  .log-desc { padding: 10px 12px; font-size: 12px; color: var(--text-primary); line-height: 1.5; border-bottom: 1px solid var(--border); background: var(--bg-primary); min-height: 60px; }
-  .vars-section { padding: 8px 12px; border-bottom: 1px solid var(--border); }
-  .vars-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); margin-bottom: 6px; }
-  .var-row { font-family: var(--font-mono); font-size: 11.5px; margin: 3px 0; display: flex; gap: 4px; }
-  .var-name { color: var(--accent); }
-  .var-val { color: var(--text-primary); word-break: break-all; }
-  .history-list { padding: 8px 12px; }
-  .hist-item { padding: 4px 8px; border-radius: 4px; font-size: 11px; margin: 2px 0; cursor: pointer; color: var(--text-secondary); }
-  .hist-item.current { background: var(--bg-tertiary); color: var(--text-primary); font-weight: 500; }
-
-  /* ── RESULT BADGE ── */
-  .result-banner {
-    padding: 6px 12px;
+  #log-panel { min-width: 160px; }
+  .log-body { padding: 12px; }
+  .log-desc {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    padding: 8px 10px;
+    background: var(--bg-secondary);
     border-radius: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    margin: 8px 12px;
-    text-align: center;
+    border-left: 3px solid var(--accent);
   }
-  .result-true { background: rgba(16,185,129,0.15); color: var(--accent2); border: 1px solid rgba(16,185,129,0.3); }
-  .result-false { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-  .result-add { background: rgba(59,130,246,0.1); color: var(--accent); border: 1px solid rgba(59,130,246,0.2); }
+  .log-vars-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .log-var {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    margin-bottom: 4px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  .log-var .vname { color: var(--accent); }
+  .log-var .vval  { color: var(--syn-string); word-break: break-all; }
+  .log-history { margin-top: 16px; }
+  .log-history-item {
+    font-size: 11.5px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    margin-bottom: 3px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background .1s;
+  }
+  .log-history-item.current {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .log-history-item:hover { background: var(--bg-secondary); }
 
   /* ── INTUITION MODE ── */
-  #intuition-container { width: 100%; display: flex; flex-direction: column; overflow: hidden; }
-  #intuition-wrap { display: flex; flex: 1; overflow: hidden; }
-  .int-left { width: 50%; overflow-y: auto; border-right: 1px solid var(--border); padding: 20px; }
-  .int-right { width: 50%; overflow-y: auto; padding: 20px; background: var(--bg-secondary); }
-  .stage-card { border-radius: 10px; border: 1.5px solid var(--border); background: var(--bg-primary); padding: 16px 18px; margin-bottom: 14px; transition: opacity 0.3s, border-color 0.3s; }
-  .stage-card.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
-  .stage-card.past { opacity: 0.55; }
-  .stage-card.future { opacity: 0.28; }
-  .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
-  .stage-title { display: flex; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-  .thought-bubble { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent); padding: 8px 12px; font-style: italic; font-size: 12.5px; color: var(--text-secondary); border-radius: 0 6px 6px 0; margin-bottom: 10px; }
-  .insight-box { background: rgba(16,185,129,0.08); border-left: 3px solid var(--accent2); padding: 8px 12px; font-size: 12px; border-radius: 0 6px 6px 0; margin-top: 10px; }
-  .insight-box strong { color: var(--accent2); }
-  .stage-content { font-size: 12.5px; line-height: 1.65; color: var(--text-primary); white-space: pre-wrap; }
-  .int-controls { display: flex; gap: 8px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--bg-primary); flex-shrink: 0; }
-  .int-viz-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
-  .approach-card { border-radius: 8px; padding: 14px; margin-bottom: 12px; font-size: 12.5px; line-height: 1.6; }
-  .approach-bad { background: rgba(239,68,68,0.08); border-left: 3px solid #ef4444; }
-  .approach-good { background: rgba(16,185,129,0.08); border-left: 3px solid #10b981; }
-  .approach-card h4 { margin-bottom: 6px; font-size: 13px; }
-  .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
-  .complexity-card { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 12.5px; }
-  .complexity-card h4 { color: var(--accent); margin-bottom: 8px; font-size: 13px; }
-  .op-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .op-table th, .op-table td { padding: 6px 10px; border: 1px solid var(--border); text-align: left; }
-  .op-table th { background: var(--bg-tertiary); font-weight: 600; }
-  .op-table td:first-child { font-family: var(--font-mono); color: var(--accent); }
+  #intuition-wrap {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .int-left, .int-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .int-left { border-right: 1px solid var(--border); }
+
+  .int-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+  .stage-block {
+    margin-bottom: 22px;
+    transition: opacity .3s;
+  }
+  .stage-block.future { opacity: 0.28; pointer-events: none; }
+  .stage-block.past   { opacity: 0.55; }
+  .stage-block.active { opacity: 1; }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stage-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stage-block.past .stage-num { background: var(--bg-tertiary); color: var(--text-muted); }
+  .stage-block.future .stage-num { background: var(--bg-tertiary); color: var(--text-muted); }
+
+  .stage-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+
+  .thought-bubble {
+    background: rgba(137,180,250,0.08);
+    border-left: 3px solid var(--accent);
+    padding: 9px 13px;
+    margin-bottom: 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .stage-content {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    white-space: pre-line;
+  }
+  .key-insight {
+    background: rgba(166,227,161,0.10);
+    border-left: 3px solid #a6e3a1;
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12.5px;
+    color: #a6e3a1;
+    line-height: 1.5;
+  }
+  [data-theme="light"] .key-insight { background: rgba(34,134,58,0.08); color: #22863a; border-color: #22863a; }
+
+  .int-controls {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-secondary);
+  }
+  .int-stage-badge { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+
+  .int-viz { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  .viz-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .viz-card h4 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .approach-box {
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .approach-bad  { background: rgba(243,139,168,.08); border-left: 3px solid #f38ba8; }
+  .approach-good { background: rgba(166,227,161,.08); border-left: 3px solid #a6e3a1; }
+  .approach-box strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+  .complexity-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 12px;
+  }
+  .complexity-cell {
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .complexity-cell .c-label { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .complexity-cell .c-val   { font-family: var(--font-mono); font-size: 16px; font-weight: 800; color: var(--accent); }
+  .complexity-cell .c-why   { color: var(--text-secondary); font-size: 11.5px; margin-top: 4px; }
+
+  .traversal-compare { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+  .trav-row { display: flex; align-items: center; gap: 8px; background: var(--bg-tertiary); border-radius: 5px; padding: 8px 10px; }
+  .trav-row .badge {
+    font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
+    background: var(--bg-primary); border: 1px solid var(--border); white-space: nowrap;
+  }
+  .trav-row .seq { font-family: var(--font-mono); color: var(--accent); font-size: 12px; }
+  .trav-row .reason { color: var(--text-muted); font-size: 11.5px; margin-left: auto; }
+
+  .edge-cases-list { display: flex; flex-direction: column; gap: 8px; }
+  .ec-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 12.5px; line-height: 1.5;
+  }
+  .ec-icon { font-size: 16px; flex-shrink: 0; }
+  .ec-text strong { display: block; color: var(--text-primary); margin-bottom: 2px; }
+  .ec-text span { color: var(--text-secondary); }
+
+  /* result pill */
+  .result-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+  }
+  .result-true  { background: rgba(166,227,161,.15); color: #a6e3a1; }
+  .result-false { background: rgba(243,139,168,.15); color: #f38ba8; }
 </style>
 </head>
 <body data-theme="dark">
 
 <div id="header">
   <div class="header-row1">
-    <div class="problem-title">211. Design Add and Search Words Data Structure</div>
-    <span class="badge">Medium</span>
-    <button class="btn-theme" onclick="toggleTheme()">☀️ Light</button>
+    <div class="problem-title"><span>572.</span> Subtree of Another Tree</div>
+    <button class="btn" id="theme-btn" onclick="toggleTheme()">☀️ Light</button>
   </div>
-  <div class="mode-toggle">
-    <button class="mode-btn active" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
-    <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
+  <div class="mode-row">
+    <button class="mode-btn active" id="mode-intuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
+    <button class="mode-btn" id="mode-execution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
   </div>
-
-  <!-- OPERATION INPUT BAR (execution mode only) -->
-  <div id="op-bar">
-    <label>Operation:</label>
-    <select id="op-select" onchange="updateOpInput()">
-      <option value="addWord">addWord</option>
-      <option value="search">search</option>
-    </select>
-    <input id="op-arg" type="text" placeholder="word to add" maxlength="30"
-           onkeydown="if(event.key==='Enter') queueOperation()" />
-    <button class="btn-run" onclick="queueOperation()">+ Add to Queue</button>
-
-    <div id="op-queue-wrap">
-      <span id="op-queue-label">Queue: (empty)</span>
-    </div>
-
-    <button class="btn-run" id="btn-run-all" onclick="runAll()" style="background:var(--accent2);display:none">▶ Run All</button>
-    <button class="btn-ghost" onclick="clearQueue()">Clear Queue</button>
-    <button class="btn-ghost" onclick="resetAll()">Reset Trie</button>
+  <div class="input-row" id="input-row" style="display:none">
+    <label>root =</label>
+    <input id="input-root" value="[3,4,5,1,2]" placeholder="[3,4,5,1,2]">
+    <label>subRoot =</label>
+    <input id="input-sub" value="[4,1,2]" placeholder="[4,1,2]">
+    <button class="btn" onclick="reparse()">⟳ Run</button>
   </div>
 </div>
 
 <div id="main">
-  <!-- ═══ INTUITION MODE ═══ -->
-  <div id="intuition-container">
-    <div id="intuition-wrap">
-      <div class="int-left" id="int-stages"></div>
-      <div class="int-right" id="int-viz"></div>
+  <!-- Intuition layout -->
+  <div id="intuition-wrap">
+    <div class="int-left">
+      <div class="panel-header">Senior Engineer's Thought Process <span id="int-stage-info">Stage 1 / 7</span></div>
+      <div class="int-body" id="int-body"></div>
+      <div class="int-controls">
+        <button class="btn ctrl" onclick="intStep(-1)">←</button>
+        <button class="btn ctrl" id="int-play-btn" onclick="intPlayPause()">▶</button>
+        <button class="btn ctrl" onclick="intStep(1)">→</button>
+        <span class="int-stage-badge" id="int-badge"></span>
+      </div>
     </div>
-    <div class="int-controls">
-      <button class="ctrl-btn" onclick="prevStage()">◀ Prev</button>
-      <button class="ctrl-btn primary" id="int-play-btn" onclick="toggleIntPlay()">▶ Auto</button>
-      <button class="ctrl-btn" onclick="nextStage()">Next ▶</button>
-      <span class="step-counter" id="int-counter">Stage 1 / 7</span>
+    <div class="int-right">
+      <div class="panel-header">Visual Explanation</div>
+      <div class="int-viz" id="int-viz"></div>
     </div>
   </div>
 
-  <!-- ═══ EXECUTION MODE ═══ -->
-  <div id="execution-container" style="width:100%;display:none;overflow:hidden;height:100%;flex-direction:row;">
-    <div class="panel" id="code-panel">
-      <div class="panel-header">Python Solution</div>
-      <div class="panel-body">
-        <div class="code-wrap" id="code-wrap"></div>
+  <!-- Execution layout (hidden initially) -->
+  <div id="execution-wrap" style="display:none;width:100%;display:none;overflow:hidden;flex:1;">
+    <!-- Code panel -->
+    <div class="panel" id="code-panel" style="width:32%">
+      <div class="panel-header">Solution Code</div>
+      <div class="panel-body code-scroller" id="code-scroller">
+        <pre class="code-pre" id="code-pre"></pre>
       </div>
     </div>
+    <div class="divider" id="div1"></div>
 
-    <div class="panel" id="viz-panel">
-      <div class="panel-header" id="viz-panel-title">Trie Visualization</div>
-      <div id="viz-canvas"></div>
-      <div class="controls-bar">
-        <button class="ctrl-btn" onclick="resetSteps()" title="Reset to first step">⏮</button>
-        <button class="ctrl-btn" onclick="stepBack()" title="Step back">◀</button>
-        <button class="ctrl-btn primary" id="play-btn" onclick="togglePlay()">▶</button>
-        <button class="ctrl-btn" onclick="stepForward()" title="Step forward">▶|</button>
-        <select class="speed-sel" id="speed-sel" onchange="changeSpeed()">
+    <!-- Viz panel -->
+    <div class="panel" id="viz-panel" style="flex:1">
+      <div class="panel-header">Tree Visualization <span id="viz-result"></span></div>
+      <div class="viz-body" id="viz-body"></div>
+      <div class="viz-controls">
+        <button class="btn ctrl" onclick="exec.reset()" title="Reset">⟪</button>
+        <button class="btn ctrl" onclick="exec.step(-1)" title="Back">←</button>
+        <button class="btn ctrl" id="play-btn" onclick="exec.playPause()" title="Play/Pause">▶</button>
+        <button class="btn ctrl" onclick="exec.step(1)" title="Forward">→</button>
+        <select class="speed-select" id="speed-sel" onchange="exec.setSpeed(this.value)">
           <option value="2000">0.5×</option>
           <option value="1000" selected>1×</option>
           <option value="500">2×</option>
           <option value="250">4×</option>
         </select>
-        <span class="step-counter" id="step-counter">Step 0 / 0</span>
+        <span class="step-badge" id="step-badge">Step 0 / 0</span>
       </div>
     </div>
+    <div class="divider" id="div2"></div>
 
-    <div class="panel" id="log-panel">
+    <!-- Log panel -->
+    <div class="panel" id="log-panel" style="width:22%">
       <div class="panel-header">Step Log</div>
-      <div class="panel-body" id="log-body">
-        <div class="log-desc" id="log-desc">Add words to the queue above, then click "Run All" to trace.</div>
-        <div id="result-banner-wrap"></div>
-        <div class="vars-section" id="vars-section"></div>
-        <div class="history-list" id="history-list"></div>
+      <div class="panel-body">
+        <div class="log-body" id="log-body"></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════
-   PYTHON SOURCE LINES (syntax-highlighted HTML)
-═══════════════════════════════════════════ */
-const CODE_LINES = [
-  { t: `<span class="sk">class</span> <span class="st">TrieNode</span>:` },
-  { t: `    <span class="sd">__slots__</span> = (<span class="ss">'children'</span>, <span class="ss">'is_end'</span>)` },
-  { t: `` },
-  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
-  { t: `        <span class="se">self</span>.children: <span class="st">dict</span>[<span class="st">str</span>, <span class="ss">'TrieNode'</span>] = {}` },
-  { t: `        <span class="se">self</span>.is_end: <span class="st">bool</span> = <span class="sk">False</span>` },
-  { t: `` },
-  { t: `<span class="sk">class</span> <span class="st">WordDictionary</span>:` },
-  { t: `    <span class="sk">def</span> <span class="sf">__init__</span>(<span class="se">self</span>):` },
-  { t: `        <span class="se">self</span>.root = <span class="sf">TrieNode</span>()` },
-  { t: `` },
-  { t: `    <span class="sk">def</span> <span class="sf">addWord</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="sk">None</span>:` },
-  { t: `        node = <span class="se">self</span>.root` },
-  { t: `        <span class="sk">for</span> ch <span class="sk">in</span> word:` },
-  { t: `            <span class="sk">if</span> ch <span class="sk">not in</span> node.children:` },
-  { t: `                node.children[ch] = <span class="sf">TrieNode</span>()` },
-  { t: `            node = node.children[ch]` },
-  { t: `        node.is_end = <span class="sk">True</span>` },
-  { t: `` },
-  { t: `    <span class="sk">def</span> <span class="sf">search</span>(<span class="se">self</span>, word: <span class="st">str</span>) -> <span class="st">bool</span>:` },
-  { t: `        <span class="sk">return</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, <span class="sn">0</span>, <span class="se">self</span>.root)` },
-  { t: `` },
-  { t: `    <span class="sk">def</span> <span class="sf">_dfs</span>(<span class="se">self</span>, word: <span class="st">str</span>, idx: <span class="st">int</span>, node: <span class="st">TrieNode</span>) -> <span class="st">bool</span>:` },
-  { t: `        <span class="sk">if</span> idx == <span class="sf">len</span>(word):` },
-  { t: `            <span class="sk">return</span> node.is_end` },
-  { t: `        ch = word[idx]` },
-  { t: `        <span class="sk">if</span> ch != <span class="ss">'.'</span>:` },
-  { t: `            child = node.children.<span class="sf">get</span>(ch)` },
-  { t: `            <span class="sk">return</span> child <span class="sk">is not None</span> <span class="sk">and</span> <span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child)` },
-  { t: `        <span class="sc"># Wildcard: try all children</span>` },
-  { t: `        <span class="sk">return</span> <span class="sf">any</span>(<span class="se">self</span>.<span class="sf">_dfs</span>(word, idx+<span class="sn">1</span>, child) <span class="sk">for</span> child <span class="sk">in</span> node.children.<span class="sf">values</span>())` },
+// ═══════════════════════════════════════════════
+//  PYTHON CODE (raw string, highlighted in render)
+// ═══════════════════════════════════════════════
+const PYTHON_LINES = [
+  "from typing import Optional",
+  "",
+  "class TreeNode:",
+  "    def __init__(self, val=0, left=None, right=None):",
+  "        self.val = val",
+  "        self.left = left",
+  "        self.right = right",
+  "",
+  "class Solution:",
+  "    def isSubtree(",
+  "        self,",
+  "        root: Optional[TreeNode],",
+  "        subRoot: Optional[TreeNode]",
+  "    ) -> bool:",
+  '        """',
+  "        Check if subRoot is a subtree of root.",
+  "        Strategy: DFS every node; at each node run isSameTree.",
+  "        Time: O(m*n)  Space: O(h) where h = height of root",
+  '        """',
+  "        if not root:",
+  "            return False",
+  "        if self.isSameTree(root, subRoot):",
+  "            return True",
+  "        return (",
+  "            self.isSubtree(root.left, subRoot) or",
+  "            self.isSubtree(root.right, subRoot)",
+  "        )",
+  "",
+  "    def isSameTree(",
+  "        self,",
+  "        p: Optional[TreeNode],",
+  "        q: Optional[TreeNode]",
+  "    ) -> bool:",
+  '        """Check structural & value equality of two trees."""',
+  "        if not p and not q: return True",
+  "        if not p or not q: return False",
+  "        if p.val != q.val: return False",
+  "        return (",
+  "            self.isSameTree(p.left, q.left) and",
+  "            self.isSameTree(p.right, q.right)",
+  "        )"
 ];
 
-/* ═══════════════════════════════════════════
-   TRIE DATA STRUCTURE
-═══════════════════════════════════════════ */
-class TrieNode {
-  constructor(id) { this.children = {}; this.is_end = false; this.id = id; }
+// ═══════════════════════════════════════════════
+//  SYNTAX HIGHLIGHTING
+// ═══════════════════════════════════════════════
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str));
+  return d.innerHTML;
 }
+
+function highlightPython(rawLine) {
+  // Work on the escaped version so we never break HTML
+  let line = escapeHtml(rawLine);
+  if (!line.trim()) return line;
+
+  // Comment
+  const commentIdx = rawLine.indexOf('#');
+  if (commentIdx !== -1) {
+    const before = escapeHtml(rawLine.slice(0, commentIdx));
+    const comment = escapeHtml(rawLine.slice(commentIdx));
+    return before + `<span class="t-cmt">${comment}</span>`;
+  }
+
+  // Docstring lines (triple-quoted, simplified: lines that are only """)
+  const trimmed = rawLine.trim();
+  if (trimmed === '"""' || trimmed.startsWith('"""')) {
+    return `<span class="t-str">${line}</span>`;
+  }
+
+  // Decorators
+  if (trimmed.startsWith('@')) {
+    return `<span class="t-dec">${line}</span>`;
+  }
+
+  // Strings: replace "..." and '...' patterns on escaped line
+  // But we already escaped, so quotes are literal
+  line = line.replace(/(&quot;.*?&quot;|&#39;.*?&#39;)/g, '<span class="t-str">$1</span>');
+
+  // Keywords (word boundaries via space/start/end checks)
+  const keywords = ['from','import','class','def','return','if','elif','else',
+                    'and','or','not','in','True','False','None','while','for','pass','raise'];
+  for (const kw of keywords) {
+    const re = new RegExp(`(?<![\\w])${kw}(?![\\w])`, 'g');
+    line = line.replace(re, `<span class="t-kw">${kw}</span>`);
+  }
+
+  // Type hints (Optional, bool, int, str, list, dict)
+  line = line.replace(/\b(Optional|bool|int|str|list|dict|List|Dict|Tuple)\b/g, '<span class="t-typ">$1</span>');
+
+  // self keyword
+  line = line.replace(/\bself\b/g, '<span class="t-slf">self</span>');
+
+  // Function definitions — highlight name after def
+  line = line.replace(/(<span class="t-kw">def<\/span>\s+)(\w+)/g, '$1<span class="t-fn">$2</span>');
+
+  // Built-in calls
+  line = line.replace(/\b(print|len|range|enumerate|zip|map|filter|sorted|list|dict|set|tuple|type|isinstance|hasattr|getattr|super)\b(?=\s*\()/g,
+    '<span class="t-bi">$1</span>');
+
+  // Numbers
+  line = line.replace(/\b(\d+)\b/g, '<span class="t-num">$1</span>');
+
+  return line;
+}
+
+function buildCodePanel() {
+  const pre = document.getElementById('code-pre');
+  pre.innerHTML = PYTHON_LINES.map((raw, i) => {
+    const hl = highlightPython(raw);
+    // preserve indentation: spaces become &nbsp; only at start
+    const indent = raw.match(/^(\s*)/)[1];
+    const rest = hl.slice(indent.length); // hl includes spaces, but they're already preserved in pre
+    return `<div class="code-line" id="cl-${i}" data-line="${i}">` +
+      `<span class="line-num">${i+1}</span>` +
+      `<span class="line-code">${hl || ' '}</span>` +
+      `</div>`;
+  }).join('');
+}
+
+function highlightLine(lineIdx) {
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active-line'));
+  const el = document.getElementById('cl-' + lineIdx);
+  if (el) {
+    el.classList.add('active-line');
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  TREE DATA STRUCTURES
+// ═══════════════════════════════════════════════
 let nodeIdCounter = 0;
-let root = new TrieNode(nodeIdCounter++);
+function makeNode(val) { return { val, left: null, right: null, id: nodeIdCounter++ }; }
 
-/* ═══════════════════════════════════════════
-   OPERATION QUEUE
-═══════════════════════════════════════════ */
-// Each item: { op: 'addWord'|'search', arg: string }
-let opQueue = [];
-
-function updateOpInput() {
-  const op = document.getElementById('op-select').value;
-  document.getElementById('op-arg').placeholder = op === 'addWord' ? 'word to add' : 'pattern to search';
-}
-
-function queueOperation() {
-  const op = document.getElementById('op-select').value;
-  const arg = document.getElementById('op-arg').value.trim().toLowerCase();
-  if (!arg) { flashInput(); return; }
-  opQueue.push({ op, arg });
-  document.getElementById('op-arg').value = '';
-  document.getElementById('op-arg').focus();
-  renderQueue();
-}
-
-function flashInput() {
-  const inp = document.getElementById('op-arg');
-  inp.style.border = '1.5px solid var(--danger)';
-  setTimeout(() => inp.style.border = '', 800);
-}
-
-function removeFromQueue(idx) {
-  opQueue.splice(idx, 1);
-  renderQueue();
-}
-
-function clearQueue() {
-  opQueue = [];
-  renderQueue();
-}
-
-function renderQueue() {
-  const wrap = document.getElementById('op-queue-wrap');
-  const runBtn = document.getElementById('btn-run-all');
-  if (opQueue.length === 0) {
-    wrap.innerHTML = '<span id="op-queue-label" style="font-size:11px;color:var(--text-secondary)">Queue: (empty — add operations above)</span>';
-    runBtn.style.display = 'none';
-    return;
+function arrayToTree(arr) {
+  if (!arr || !arr.length || arr[0] === null) return null;
+  nodeIdCounter = 0;
+  const root = makeNode(arr[0]);
+  const q = [root];
+  let i = 1;
+  while (i < arr.length && q.length) {
+    const node = q.shift();
+    if (i < arr.length && arr[i] !== null) { node.left = makeNode(arr[i]); q.push(node.left); }
+    i++;
+    if (i < arr.length && arr[i] !== null) { node.right = makeNode(arr[i]); q.push(node.right); }
+    i++;
   }
-  let html = '<span id="op-queue-label" style="font-size:11px;color:var(--text-secondary);white-space:nowrap">Queue:</span>';
-  opQueue.forEach((item, i) => {
-    const cls = item.op === 'addWord' ? 'add' : 'search';
-    const label = item.op === 'addWord' ? `add("${item.arg}")` : `search("${item.arg}")`;
-    html += `<span class="op-chip ${cls}" title="Click × to remove">
-      ${label}
-      <span class="chip-x" onclick="removeFromQueue(${i})">✕</span>
-    </span>`;
-  });
-  wrap.innerHTML = html;
-  runBtn.style.display = 'inline-block';
+  return root;
 }
 
-/* ═══════════════════════════════════════════
-   STEP GENERATION — runs ALL queued ops
-═══════════════════════════════════════════ */
-let allSteps = [];   // flat list of all steps across ops
-let currentStep = 0;
-let playInterval = null;
-let speedMs = 1000;
-
-function snapshotTrie() {
-  function cloneNode(n) {
-    const c = { id: n.id, is_end: n.is_end, children: {} };
-    for (const [k, v] of Object.entries(n.children)) c.children[k] = cloneNode(v);
-    return c;
-  }
-  return cloneNode(root);
+function parseArr(str) {
+  try {
+    const s = str.trim().replace(/^\[/, '').replace(/\]$/, '');
+    if (!s) return [];
+    return s.split(',').map(x => x.trim() === 'null' ? null : parseInt(x.trim()));
+  } catch(e) { return []; }
 }
 
-function generateAddSteps(word) {
-  const steps = [];
-  let node = root;
-  steps.push({ line: 12, desc: `addWord("${word}"): start at root`, vars: { word, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
-  for (let i = 0; i < word.length; i++) {
-    const ch = word[i];
-    steps.push({ line: 13, desc: `Loop: ch = '${ch}' (index ${i})`, vars: { ch, idx: i, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
-    steps.push({ line: 14, desc: `Is '${ch}' in node.children? ${ch in node.children ? '✓ Yes, skip' : '✗ No → create'}`, vars: { ch, exists: ch in node.children }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
-    if (!(ch in node.children)) {
-      node.children[ch] = new TrieNode(nodeIdCounter++);
-      steps.push({ line: 15, desc: `Created new TrieNode for '${ch}' (id=${node.children[ch].id})`, vars: { ch, new_node_id: node.children[ch].id }, trie: snapshotTrie(), highlight: [node.children[ch].id], result: null, op: 'addWord', opWord: word });
+let rootTree = arrayToTree(parseArr("[3,4,5,1,2]"));
+let subTree  = arrayToTree(parseArr("[4,1,2]"));
+
+// ═══════════════════════════════════════════════
+//  TREE LAYOUT (Reingold-Tilford simplified)
+// ═══════════════════════════════════════════════
+function layoutTree(root) {
+  if (!root) return { nodes: [], edges: [] };
+  const nodes = [];
+  const edges = [];
+
+  // BFS to get node depths and assign x positions
+  const levels = [];
+  const bfs = (node, depth) => {
+    if (!node) return;
+    if (!levels[depth]) levels[depth] = [];
+    levels[depth].push(node);
+    bfs(node.left, depth + 1);
+    bfs(node.right, depth + 1);
+  };
+  bfs(root, 0);
+
+  const nodePos = new Map();
+  const yStep = 72;
+  const baseY = 44;
+
+  // Assign x via DFS in-order counter
+  let counter = 0;
+  const assignX = (node) => {
+    if (!node) return;
+    assignX(node.left);
+    nodePos.set(node.id, counter++);
+    assignX(node.right);
+  };
+  assignX(root);
+
+  const xScale = 64;
+  const xOffset = 40;
+
+  const getXY = (node) => {
+    let d = 0;
+    const find = (n, depth) => {
+      if (!n) return;
+      if (n.id === node.id) { d = depth; return; }
+      find(n.left, depth + 1);
+      find(n.right, depth + 1);
+    };
+    find(root, 0);
+    return {
+      x: nodePos.get(node.id) * xScale + xOffset,
+      y: d * yStep + baseY
+    };
+  };
+
+  const collectEdges = (node) => {
+    if (!node) return;
+    if (node.left) {
+      const p = getXY(node);
+      const c = getXY(node.left);
+      edges.push({ x1: p.x, y1: p.y, x2: c.x, y2: c.y, id: node.id + '-' + node.left.id });
+      collectEdges(node.left);
     }
-    node = node.children[ch];
-    steps.push({ line: 16, desc: `Advance node → '${ch}' node (id=${node.id})`, vars: { ch, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'addWord', opWord: word });
-  }
-  node.is_end = true;
-  steps.push({ line: 17, desc: `Mark node id=${node.id} as end-of-word ✓ "${word}" added!`, vars: { node_id: node.id, is_end: true }, trie: snapshotTrie(), highlight: [node.id], result: `"${word}" added to trie`, op: 'addWord', opWord: word });
-  return steps;
+    if (node.right) {
+      const p = getXY(node);
+      const c = getXY(node.right);
+      edges.push({ x1: p.x, y1: p.y, x2: c.x, y2: c.y, id: node.id + '-' + node.right.id });
+      collectEdges(node.right);
+    }
+  };
+  collectEdges(root);
+
+  const collectNodes = (node) => {
+    if (!node) return;
+    const pos = getXY(node);
+    nodes.push({ ...pos, val: node.val, id: node.id });
+    collectNodes(node.left);
+    collectNodes(node.right);
+  };
+  collectNodes(root);
+
+  // compute bounding box
+  const maxX = Math.max(...nodes.map(n => n.x)) + 40;
+  const maxY = Math.max(...nodes.map(n => n.y)) + 44;
+
+  return { nodes, edges, w: maxX, h: maxY };
 }
 
-function generateSearchSteps(word) {
+function renderTreeSVG(root, currentNodeId, matchNodeIds, failNodeIds, label) {
+  if (!root) return `<div style="color:var(--text-muted);font-size:13px">Empty tree</div>`;
+  const { nodes, edges, w, h } = layoutTree(root);
+  const mSet = new Set(matchNodeIds || []);
+  const fSet = new Set(failNodeIds || []);
+
+  const edgesSVG = edges.map(e =>
+    `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="var(--border)" stroke-width="2"/>`
+  ).join('');
+
+  const nodesSVG = nodes.map(n => {
+    let fill = 'var(--bg-tertiary)';
+    let stroke = 'var(--border)';
+    let sw = 1.5;
+    if (n.id === currentNodeId) { fill = 'var(--accent)'; stroke = 'var(--accent)'; sw = 2.5; }
+    else if (mSet.has(n.id))  { fill = '#a6e3a1'; stroke = '#a6e3a1'; sw = 2; }
+    else if (fSet.has(n.id))  { fill = '#f38ba8'; stroke = '#f38ba8'; sw = 2; }
+
+    const textColor = (fill !== 'var(--bg-tertiary)') ? '#000' : 'var(--text-primary)';
+    return `<g>
+      <circle cx="${n.x}" cy="${n.y}" r="22" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+      <text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle"
+            fill="${textColor}" font-size="14" font-weight="600">${n.val}</text>
+    </g>`;
+  }).join('');
+
+  const labelSVG = label ? `<text x="6" y="16" fill="var(--text-muted)" font-size="11" font-weight="700">${label}</text>` : '';
+
+  return `<svg class="tree-svg" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    ${labelSVG}${edgesSVG}${nodesSVG}
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════
+//  STEP GENERATION (isSubtree DFS trace)
+// ═══════════════════════════════════════════════
+function generateSteps(root, sub) {
   const steps = [];
-  steps.push({ line: 20, desc: `search("${word}"): call _dfs(word, 0, root)`, vars: { word, idx: 0 }, trie: snapshotTrie(), highlight: [root.id], result: null, op: 'search', opWord: word });
-  const dfsSteps = [];
-  let finalResult = false;
-  function dfs(node, idx) {
-    dfsSteps.push({ line: 23, desc: `_dfs idx=${idx}: ${idx === word.length ? 'reached end → check is_end' : `word[${idx}]='${word[idx]}'`}`, vars: { idx, node_id: node.id, is_end: node.is_end }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
-    if (idx === word.length) {
-      dfsSteps.push({ line: 24, desc: `idx == len(word). Return node.is_end = ${node.is_end}`, vars: { is_end: node.is_end, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
-      return node.is_end;
+  let stepNum = 0;
+
+  function isSameTree(p, q, pOrigId, depth) {
+    if (!p && !q) {
+      steps.push({ line: 33, desc: `isSameTree: both null → true`, vars: { p: 'null', q: 'null', depth }, currentNode: pOrigId, sameResult: true });
+      return true;
     }
-    const ch = word[idx];
-    dfsSteps.push({ line: 25, desc: `ch = word[${idx}] = '${ch}'`, vars: { idx, ch, node_id: node.id }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
-    if (ch !== '.') {
-      dfsSteps.push({ line: 26, desc: `'${ch}' ≠ '.' → exact match. Check children.get('${ch}')`, vars: { ch, has_child: ch in node.children }, trie: snapshotTrie(), highlight: [node.id], result: null, op: 'search', opWord: word });
-      const child = node.children[ch];
-      dfsSteps.push({ line: 27, desc: child ? `Found child for '${ch}' (id=${child.id}) → recurse` : `No child '${ch}' → return False`, vars: { ch, found: !!child, child_id: child ? child.id : null }, trie: snapshotTrie(), highlight: child ? [child.id] : [node.id], result: null, op: 'search', opWord: word });
-      if (!child) return false;
-      return dfs(child, idx + 1);
-    } else {
-      const childKeys = Object.keys(node.children);
-      dfsSteps.push({ line: 29, desc: `'.' wildcard! Branch into ${childKeys.length} children: [${childKeys.join(', ')}]`, vars: { wildcard: true, children: childKeys }, trie: snapshotTrie(), highlight: Object.values(node.children).map(c => c.id), result: null, op: 'search', opWord: word });
-      for (const [k, child] of Object.entries(node.children)) {
-        dfsSteps.push({ line: 30, desc: `Trying branch '${k}' (id=${child.id}) for wildcard...`, vars: { branch: k, child_id: child.id }, trie: snapshotTrie(), highlight: [child.id], result: null, op: 'search', opWord: word });
-        if (dfs(child, idx + 1)) return true;
-      }
+    if (!p || !q) {
+      steps.push({ line: 34, desc: `isSameTree: one null, one not → false`, vars: { p: p ? p.val : 'null', q: q ? q.val : 'null', depth }, currentNode: pOrigId, sameResult: false });
       return false;
     }
+    steps.push({ line: 35, desc: `isSameTree: compare values ${p.val} == ${q.val} ? ${p.val === q.val}`, vars: { 'p.val': p.val, 'q.val': q.val, equal: p.val === q.val, depth }, currentNode: p.id, sameResult: null });
+    if (p.val !== q.val) { return false; }
+    const l = isSameTree(p.left, q.left, p.id, depth + 1);
+    const r = isSameTree(p.right, q.right, p.id, depth + 1);
+    return l && r;
   }
-  finalResult = dfs(root, 0);
-  steps.push(...dfsSteps);
-  steps.push({ line: 20, desc: `search("${word}") complete → ${finalResult}`, vars: { word, result: finalResult }, trie: snapshotTrie(), highlight: [], result: finalResult, op: 'search', opWord: word });
+
+  function isSubtree(node, depth) {
+    if (!node) {
+      steps.push({ line: 19, desc: `isSubtree: node is null → return False`, vars: { node: 'null', depth }, currentNode: null });
+      return false;
+    }
+    steps.push({ line: 21, desc: `isSubtree: checking isSameTree at node ${node.val}`, vars: { 'node.val': node.val, depth }, currentNode: node.id });
+    const same = isSameTree(node, sub, node.id, depth);
+    steps.push({ line: 21, desc: `isSameTree(node ${node.val}, subRoot) = ${same}`, vars: { result: same, 'node.val': node.val, depth }, currentNode: node.id, sameResult: same });
+    if (same) {
+      steps.push({ line: 22, desc: `Match found at node ${node.val}! Return True`, vars: { result: true }, currentNode: node.id, sameResult: true });
+      return true;
+    }
+    steps.push({ line: 24, desc: `No match at ${node.val}. Recurse left subtree`, vars: { 'node.val': node.val, depth }, currentNode: node.id });
+    const l = isSubtree(node.left, depth + 1);
+    steps.push({ line: 25, desc: `Recurse right subtree of ${node.val}`, vars: { 'node.val': node.val, depth, leftResult: l }, currentNode: node.id });
+    const r = isSubtree(node.right, depth + 1);
+    return l || r;
+  }
+
+  steps.push({ line: 9, desc: 'Start: call isSubtree(root, subRoot)', vars: { 'root.val': root ? root.val : 'null', 'sub.val': sub ? sub.val : 'null' }, currentNode: null });
+  const ans = isSubtree(root, 0);
+  steps.push({ line: 23, desc: `Final answer: ${ans}`, vars: { answer: ans }, currentNode: null, finalResult: ans });
   return steps;
 }
 
-function runAll() {
-  if (opQueue.length === 0) return;
-  pausePlay();
+// ═══════════════════════════════════════════════
+//  EXECUTION ENGINE
+// ═══════════════════════════════════════════════
+const exec = (() => {
+  let steps = [];
+  let cur = 0;
+  let playing = false;
+  let timer = null;
+  let speed = 1000;
 
-  // Reset trie
-  nodeIdCounter = 0;
-  root = new TrieNode(nodeIdCounter++);
-
-  allSteps = [];
-  const ops = [...opQueue];
-  ops.forEach(item => {
-    if (item.op === 'addWord') allSteps.push(...generateAddSteps(item.arg));
-    else allSteps.push(...generateSearchSteps(item.arg));
-  });
-
-  currentStep = 0;
-  renderStep(currentStep);
-
-  // Highlight active chip
-  highlightChip(0);
-}
-
-function highlightChip(stepIdx) {
-  if (!allSteps.length) return;
-  const s = allSteps[stepIdx];
-  document.querySelectorAll('.op-chip').forEach((el, i) => {
-    el.classList.toggle('active', opQueue[i] && opQueue[i].op === s.op && opQueue[i].arg === s.opWord);
-  });
-}
-
-function resetAll() {
-  pausePlay();
-  nodeIdCounter = 0;
-  root = new TrieNode(nodeIdCounter++);
-  allSteps = [];
-  opQueue = [];
-  renderQueue();
-  document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
-  document.getElementById('log-desc').textContent = 'Trie reset. Add operations above and click Run All.';
-  document.getElementById('result-banner-wrap').innerHTML = '';
-  document.getElementById('vars-section').innerHTML = '';
-  document.getElementById('history-list').innerHTML = '';
-  document.getElementById('step-counter').textContent = 'Step 0 / 0';
-  document.getElementById('viz-panel-title').textContent = 'Trie Visualization';
-  renderCode(-1);
-}
-
-/* ═══════════════════════════════════════════
-   TRIE SVG RENDERING
-═══════════════════════════════════════════ */
-function layoutTrie(trieRoot) {
-  const nodeMap = {};
-  const edges = [];
-  const depthGroups = {};
-
-  function bfs(node, depth, label, parentId) {
-    if (!depthGroups[depth]) depthGroups[depth] = [];
-    depthGroups[depth].push({ node, label, parentId });
-    for (const [k, child] of Object.entries(node.children)) bfs(child, depth + 1, k, node.id);
+  function init(r, s) {
+    steps = generateSteps(r, s);
+    cur = 0;
+    clearInterval(timer);
+    playing = false;
+    updatePlayBtn();
+    render();
   }
-  bfs(trieRoot, 0, 'ROOT', null);
 
-  const W = 700;
-  const levelH = 74;
-  for (const [depth, group] of Object.entries(depthGroups)) {
-    const d = parseInt(depth);
-    const count = group.length;
-    const spread = Math.min(60, Math.floor(600 / Math.max(count, 1)));
-    const startX = W / 2 - ((count - 1) * spread) / 2;
-    group.forEach((item, i) => {
-      const x = count === 1 ? W / 2 : startX + i * spread;
-      const y = 40 + d * levelH;
-      nodeMap[item.node.id] = { x, y, ...item };
-    });
+  function render() {
+    if (!steps.length) return;
+    const s = steps[Math.min(cur, steps.length - 1)];
+    // code highlight
+    highlightLine(s.line);
+    // badge
+    document.getElementById('step-badge').textContent = `Step ${cur + 1} / ${steps.length}`;
+    // viz
+    renderExecViz(s);
+    // log
+    renderLog(s);
   }
-  for (const [id, info] of Object.entries(nodeMap)) {
-    if (info.parentId !== null) {
-      const par = nodeMap[info.parentId];
-      if (par) edges.push({ x1: par.x, y1: par.y, x2: info.x, y2: info.y, label: info.label, childId: info.node.id });
+
+  function renderExecViz(s) {
+    const vb = document.getElementById('viz-body');
+    // result indicator
+    const vr = document.getElementById('viz-result');
+    if (s.finalResult !== undefined) {
+      vr.innerHTML = s.finalResult
+        ? `<span class="result-pill result-true">✓ true</span>`
+        : `<span class="result-pill result-false">✗ false</span>`;
+    } else {
+      vr.innerHTML = '';
     }
+
+    let matchIds = [];
+    let failIds = [];
+    if (s.sameResult === true && s.currentNode !== null && s.currentNode !== undefined) matchIds = [s.currentNode];
+    if (s.sameResult === false && s.currentNode !== null && s.currentNode !== undefined) failIds = [s.currentNode];
+
+    vb.innerHTML = `
+      <div style="text-align:center;width:100%;max-width:460px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px">root</div>
+        ${renderTreeSVG(rootTree, s.currentNode, matchIds, failIds, '')}
+      </div>
+      <div style="text-align:center;width:100%;max-width:320px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px">subRoot</div>
+        ${renderTreeSVG(subTree, null, [], [], '')}
+      </div>
+    `;
   }
-  const maxDepth = Math.max(...Object.keys(depthGroups).map(Number));
-  return { nodeMap, edges, svgH: 60 + maxDepth * levelH + 50 };
-}
 
-function renderTrie(trieSnap, highlightIds) {
-  const { nodeMap, edges, svgH } = layoutTrie(trieSnap);
-  const hl = new Set(highlightIds || []);
-  const isDark = document.body.dataset.theme === 'dark';
-  const nodeColor = isDark ? '#252840' : '#e2e8f0';
-  const hlColor = isDark ? '#3b82f6' : '#3b82f6';
-  const endColor = isDark ? '#10b981' : '#059669';
-  const textColor = isDark ? '#f8f8f2' : '#111';
-  const edgeColor = isDark ? '#4b5563' : '#9ca3af';
-  const hlEdgeColor = isDark ? '#8be9fd' : '#3b82f6';
+  function renderLog(s) {
+    const lb = document.getElementById('log-body');
+    const varsHtml = Object.entries(s.vars || {}).map(([k, v]) =>
+      `<div class="log-var"><span class="vname">${escapeHtml(String(k))}</span> = <span class="vval">${escapeHtml(JSON.stringify(v))}</span></div>`
+    ).join('');
 
-  let svg = `<svg viewBox="0 0 700 ${svgH}" style="width:100%;max-height:${svgH}px">`;
-  svg += `<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
-    <polygon points="0 0,8 3,0 6" fill="${edgeColor}"/></marker></defs>`;
+    const histHtml = steps.slice(0, cur + 1).map((st, i) =>
+      `<div class="log-history-item ${i === cur ? 'current' : ''}" onclick="exec.goto(${i})">${i+1}. ${escapeHtml(st.desc)}</div>`
+    ).join('');
 
-  for (const e of edges) {
-    const hlEdge = hl.has(e.childId);
-    svg += `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"
-      stroke="${hlEdge ? hlEdgeColor : edgeColor}" stroke-width="${hlEdge ? 2.5 : 1.5}"
-      marker-end="url(#arr)"/>`;
-    const mx = (e.x1 + e.x2) / 2, my = (e.y1 + e.y2) / 2 - 4;
-    svg += `<text x="${mx}" y="${my}" text-anchor="middle" font-size="12" font-family="monospace"
-      font-weight="600" fill="${hlEdge ? hlEdgeColor : (isDark ? '#94a3b8' : '#6b7280')}">${e.label}</text>`;
+    lb.innerHTML = `
+      <div class="log-desc">${escapeHtml(s.desc)}</div>
+      <div class="log-vars-title">Variables</div>
+      ${varsHtml}
+      <div class="log-history">
+        <div class="log-vars-title">History</div>
+        ${histHtml}
+      </div>
+    `;
+    // auto-scroll history
+    const current = lb.querySelector('.log-history-item.current');
+    if (current) current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
-  for (const [id, info] of Object.entries(nodeMap)) {
-    const n = info.node;
-    const isHL = hl.has(n.id);
-    const fill = isHL ? hlColor : (n.is_end ? endColor : nodeColor);
-    const stroke = isHL ? hlEdgeColor : (n.is_end ? endColor : (isDark ? '#4b5563' : '#cbd5e1'));
-    const displayLabel = info.label === 'ROOT' ? '∅' : info.label;
-    svg += `<g>
-      <circle cx="${info.x}" cy="${info.y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${isHL ? 3 : 1.5}"/>
-      <text x="${info.x}" y="${info.y + 1}" text-anchor="middle" dominant-baseline="middle"
-        font-size="13" font-weight="700" fill="${isHL || n.is_end ? '#fff' : textColor}">${displayLabel}</text>
-      ${n.is_end ? `<text x="${info.x}" y="${info.y + 34}" text-anchor="middle" font-size="9" fill="${endColor}">END</text>` : ''}
-    </g>`;
+
+  function step(dir) {
+    cur = Math.max(0, Math.min(steps.length - 1, cur + dir));
+    render();
   }
-  svg += '</svg>';
-  return svg;
-}
 
-/* ═══════════════════════════════════════════
-   STEP RENDERING
-═══════════════════════════════════════════ */
-function renderCode(activeLine) {
-  const wrap = document.getElementById('code-wrap');
-  let html = '<pre class="code-pre">';
-  CODE_LINES.forEach((l, i) => {
-    const active = activeLine === i ? ' active' : '';
-    html += `<div class="code-line${active}"><span class="ln">${i + 1}</span><code class="lc">${l.t || '\u00a0'}</code></div>`;
-  });
-  html += '</pre>';
-  wrap.innerHTML = html;
-  const lines = wrap.querySelectorAll('.code-line');
-  if (activeLine >= 0 && lines[activeLine]) lines[activeLine].scrollIntoView({ block: 'nearest' });
-}
+  function goto(idx) {
+    cur = Math.max(0, Math.min(steps.length - 1, idx));
+    render();
+  }
 
-function renderStep(idx) {
-  if (!allSteps.length) return;
-  const s = allSteps[idx];
-  renderCode(s.line);
+  function reset() {
+    clearInterval(timer);
+    playing = false;
+    cur = 0;
+    updatePlayBtn();
+    render();
+  }
 
-  // Update panel title
-  const opLabel = s.op === 'addWord' ? `addWord("${s.opWord}")` : `search("${s.opWord}")`;
-  document.getElementById('viz-panel-title').textContent = `Trie — ${opLabel}`;
-
-  // Trie
-  document.getElementById('viz-canvas').innerHTML = renderTrie(s.trie, s.highlight);
-
-  // Step desc
-  document.getElementById('log-desc').textContent = s.desc;
-
-  // Result banner (only on final step of each op, or last step)
-  const rWrap = document.getElementById('result-banner-wrap');
-  if (s.result !== null && s.result !== undefined) {
-    let cls = 'result-add', text = `✓ ${s.result}`;
-    if (s.op === 'search') {
-      cls = s.result === true ? 'result-true' : 'result-false';
-      text = s.result === true ? `✓ search("${s.opWord}") → True` : `✗ search("${s.opWord}") → False`;
+  function playPause() {
+    if (playing) {
+      clearInterval(timer);
+      playing = false;
+    } else {
+      playing = true;
+      timer = setInterval(() => {
+        if (cur >= steps.length - 1) { clearInterval(timer); playing = false; updatePlayBtn(); return; }
+        cur++;
+        render();
+      }, speed);
     }
-    rWrap.innerHTML = `<div class="result-banner ${cls}">${text}</div>`;
-  } else {
-    rWrap.innerHTML = '';
+    updatePlayBtn();
   }
 
-  // Vars
-  let vhtml = '<div class="vars-title">Variables</div>';
-  for (const [k, v] of Object.entries(s.vars)) {
-    const vStr = Array.isArray(v) ? JSON.stringify(v) : String(v);
-    vhtml += `<div class="var-row"><span class="var-name">${k}</span><span style="color:var(--text-secondary)"> = </span><span class="var-val">${vStr}</span></div>`;
+  function setSpeed(v) { speed = parseInt(v); if (playing) { clearInterval(timer); playPause(); } }
+
+  function updatePlayBtn() {
+    const b = document.getElementById('play-btn');
+    if (b) b.textContent = playing ? '⏸' : '▶';
   }
-  document.getElementById('vars-section').innerHTML = vhtml;
 
-  // History
-  let hhtml = '<div class="vars-title" style="margin-top:10px">History</div>';
-  allSteps.slice(0, idx + 1).forEach((st, i) => {
-    hhtml += `<div class="hist-item ${i === idx ? 'current' : ''}" onclick="jumpStep(${i})">${i + 1}. ${st.desc}</div>`;
-  });
-  document.getElementById('history-list').innerHTML = hhtml;
-  const curItem = document.querySelector('.hist-item.current');
-  if (curItem) curItem.scrollIntoView({ block: 'nearest' });
+  return { init, step, goto, reset, playPause, setSpeed };
+})();
 
-  document.getElementById('step-counter').textContent = `Step ${idx + 1} / ${allSteps.length}`;
-  highlightChip(idx);
-}
-
-function jumpStep(i) { currentStep = i; renderStep(currentStep); }
-function stepForward() { if (currentStep < allSteps.length - 1) { currentStep++; renderStep(currentStep); } }
-function stepBack() { if (currentStep > 0) { currentStep--; renderStep(currentStep); } }
-function resetSteps() { pausePlay(); currentStep = 0; if (allSteps.length) renderStep(0); }
-
-function togglePlay() {
-  if (playInterval) { pausePlay(); return; }
-  document.getElementById('play-btn').textContent = '⏸';
-  playInterval = setInterval(() => {
-    if (currentStep < allSteps.length - 1) { currentStep++; renderStep(currentStep); }
-    else pausePlay();
-  }, speedMs);
-}
-function pausePlay() {
-  clearInterval(playInterval); playInterval = null;
-  const btn = document.getElementById('play-btn');
-  if (btn) btn.textContent = '▶';
-}
-function changeSpeed() {
-  speedMs = parseInt(document.getElementById('speed-sel').value);
-  if (playInterval) { pausePlay(); togglePlay(); }
-}
-
-/* ═══════════════════════════════════════════
-   INTUITION MODE
-═══════════════════════════════════════════ */
+// ═══════════════════════════════════════════════
+//  INTUITION STAGES
+// ═══════════════════════════════════════════════
 const INTUITION_STAGES = [
   {
     title: "Understanding the Problem",
-    thought: "So I need a dictionary that supports wildcard search. '.' can match anything — that's the twist.",
-    content: `The problem has two operations:
-• addWord(word): insert a word into the dictionary
-• search(word): return True if any word matches (where '.' is a wildcard)
+    thought: "Okay, two trees. I need to check if subRoot appears somewhere inside root... not as a path, but as a complete subtree.",
+    content: `Input: root tree (larger), subRoot tree (smaller).
+Output: true if subRoot is identical to some subtree of root.
 
-Key constraints:
-• Words consist of lowercase letters and '.'
-• '.' can appear multiple times in search
-• The dictionary can grow dynamically
-
-The wildcard '.' is what makes this non-trivial.`,
-    insight: "A regular hash set handles exact lookup, but we need structural pattern matching — that's a hint toward a Trie.",
-    viz: 'problem',
+Key observation: "subtree" means rooted at some node — values AND structure must match exactly. A node with children [1,2] is NOT a subtree of a node with children [1,2,3].`,
+    insight: "This is a structural identity check, not just value containment. I need to match every node, including null leaves.",
+    viz: 'problem'
   },
   {
-    title: "Why Not a Hash Set?",
-    thought: "Could I just store all words in a set and match with regex? Let me think...",
-    content: `Approach 1: Hash Set + regex
-• addWord: O(1) amortized, search: O(W × L) — scan every word
-• Problem: could be 10⁴ words × 25 chars = slow at scale
+    title: "Exploring Approaches",
+    thought: "Option A: For every node in root, check if the tree rooted there equals subRoot. Option B: Serialize both trees and use string matching. Which is cleaner?",
+    content: `Approach A — DFS + isSameTree:
+  • Visit every node in root (O(m) nodes)
+  • At each node, run full tree equality check (O(n))
+  • Total: O(m × n), Space: O(h)
 
-Approach 2: Trie (prefix tree)
-• addWord: O(L) — one node per character
-• search: O(26^d × L) in worst case, but bounded in practice
-• Natural fit: the trie STRUCTURALLY encodes prefixes`,
-    insight: "Trie wins because its branching structure lets us prune dead-ends early during wildcard search.",
-    viz: 'comparison',
+Approach B — Serialization (KMP):
+  • Serialize both trees to strings
+  • Use KMP substring search
+  • O(m + n) time — faster but tricky to implement
+
+For an interview, Approach A is clear and elegant. Approach B is a bonus optimization.`,
+    insight: "O(m×n) is totally fine for typical constraints. DFS + isSameTree is the answer interviewers love.",
+    viz: 'approaches'
   },
   {
-    title: "What is a Trie?",
-    thought: "A trie stores words character by character, sharing prefixes. Perfect for prefix-based lookups.",
-    content: `Adding "bad", "dad", "mad":
+    title: "The Key Insight: Recursive Decomposition",
+    thought: "Wait — both isSubtree and isSameTree are recursive! isSubtree recurses over root's nodes, isSameTree recurses to compare two trees. It's turtles all the way down.",
+    content: `isSubtree(root, sub):
+  1. If root is null → False (nowhere to look)
+  2. If isSameTree(root, sub) → True! Found it.
+  3. Else: recurse on root.left OR root.right
 
-          ROOT
-        / | \\
-       b  d  m
-       |  |  |
-       a  a  a
-       |  |  |
-       d* d* d*      (* = end-of-word)
-
-Each path from root to a marked node = a word.
-Shared prefixes share nodes — efficient storage!`,
-    insight: "is_end flag marks where a word terminates — a node mid-path is just a prefix, not a complete word.",
-    viz: 'trie_example',
-  },
-  {
-    title: "The DFS Wildcard Trick",
-    thought: "Normal character? Follow one edge. Dot? Branch into ALL children. That's it!",
-    content: `_dfs(word, idx, node):
-  • Base case: idx == len(word) → return node.is_end
-  • ch = word[idx]
-  • If ch != '.':
-      follow ONE child edge for ch
-  • If ch == '.':
-      try EVERY child — return True if any succeeds
-
-This is depth-first search through the trie,
-branching only when '.' forces us to explore all options.`,
-    insight: "The wildcard dot turns a simple path traversal into a DFS with bounded branching — up to 26 branches per dot.",
-    viz: 'dfs_wildcard',
+isSameTree(p, q):
+  1. Both null → True (perfect match at leaves)
+  2. One null, one not → False (structural mismatch)
+  3. Values differ → False
+  4. Recurse: check left AND right subtrees`,
+    insight: "The OR in isSubtree means 'it's somewhere in this tree'. The AND in isSameTree means 'everything must match'. Beautiful symmetry.",
+    viz: 'traversal'
   },
   {
     title: "Writing the Solution",
-    thought: "TrieNode needs children dict and is_end flag. addWord walks and creates. _dfs recurses with an index.",
-    content: `TrieNode design:
-  • children: dict[str, TrieNode] — only allocate what's needed
-  • is_end: bool — marks word boundary
-  • __slots__ — memory optimization
+    thought: "Base cases first — the recursion only terminates at nulls. Then the heart: try isSameTree here, then recurse left/right.",
+    content: `def isSubtree(self, root, subRoot):
+    if not root: return False
+    if self.isSameTree(root, subRoot): return True
+    return (self.isSubtree(root.left, subRoot) or
+            self.isSubtree(root.right, subRoot))
 
-addWord(word):
-  Walk from root, creating nodes as needed,
-  mark final node.is_end = True
+def isSameTree(self, p, q):
+    if not p and not q: return True
+    if not p or not q:  return False
+    if p.val != q.val:  return False
+    return (self.isSameTree(p.left, q.left) and
+            self.isSameTree(p.right, q.right))
 
-search(word):
-  Delegates to _dfs(word, 0, root)
-
-_dfs(word, idx, node):
-  The recursive DFS with wildcard branching`,
-    insight: "Using __slots__ cuts per-instance overhead since TrieNode instances can number in the thousands.",
-    viz: 'code_structure',
+Notice: each function is only 4-5 lines. Recursion does all the heavy lifting.`,
+    insight: "Short, readable, and self-documenting. The code almost reads like the English description of the algorithm.",
+    viz: 'code_flow'
   },
   {
     title: "Complexity Analysis",
-    thought: "addWord is clean O(L). search is trickier — how many paths can '.' open?",
-    content: `addWord(word):
-  Time:  O(L) — visit each character once
-  Space: O(L) — new nodes in worst case
+    thought: "m = nodes in root, n = nodes in subRoot. Worst case: I call isSameTree at every node of root. Each call traverses all n nodes of subRoot...",
+    content: `Time Complexity:
+  • isSubtree visits m nodes in root
+  • At each, isSameTree traverses up to n nodes
+  • Worst case: O(m × n)
+  • Example: root=[1,1,1,...,2] sub=[1,1,1,...,1] → always traverse full sub
 
-search(word):
-  Time:  O(26^d × L) where d = number of dots
-  • But d ≤ 25, and real tries are sparse
-  • In practice, much faster due to pruning
+Space Complexity:
+  • O(h_root) recursion stack, where h = height of root
+  • Balanced tree: O(log m)
+  • Skewed tree: O(m)
 
-Space per search: O(L) recursion stack depth`,
-    insight: "Wildcard search is exponential in theory but practical because tries are sparse and is_end pruning cuts many branches short.",
-    viz: 'complexity',
+Can we do better? Yes — serialize to string + KMP = O(m+n). But O(m×n) is accepted.`,
+    insight: "For m,n ≤ 2000 (LeetCode constraint), O(m×n) = 4M ops — trivially fast. Pick clarity over micro-optimization in interviews.",
+    viz: 'complexity'
   },
   {
-    title: "Edge Cases & Synthesis",
-    thought: "Empty string? All dots? Searching before adding? Let me trace through each.",
-    content: `Edge cases handled:
-• search("") → checks root.is_end (False unless "" was added)
-• search("...") → explores all paths of length 3 — works!
-• search("b..") → one exact + two wildcards — works!
-• Searching a word not yet added → returns False naturally
+    title: "Edge Cases & Testing",
+    thought: "What breaks this? Empty trees? Single-node trees? subRoot larger than root?",
+    content: `Edge case walkthrough:
+  • root=null → immediately return False ✓ (line 1)
+  • subRoot=null → isSameTree(x, null) returns false unless x also null ✓
+  • root == subRoot (identical trees) → isSameTree(root, sub) on first call ✓
+  • sub has more nodes than root → isSameTree hits null on root side, returns False ✓
+  • All same values → need structural match too ✓
 
-The solution is interview-ready:
-✓ Correct for all inputs
-✓ O(L) add, practical search performance
-✓ Clean separation of concerns (node vs dictionary)
-✓ Pythonic use of __slots__ and dict.get()`,
-    insight: "This is the canonical Trie + DFS pattern. Mastering it unlocks Word Search II, Auto-Complete, and Boggle variants.",
-    viz: 'final',
+Test with: root=[3,4,5,1,2], sub=[4,1,2] → True
+Test with: root=[3,4,5,1,2,null,null,null,null,0], sub=[4,1,2] → False (extra child!)`,
+    insight: "The null-check guards in isSameTree handle all structural mismatches gracefully. The algorithm is naturally robust.",
+    viz: 'edge_cases'
   },
+  {
+    title: "Final Synthesis",
+    thought: "Beautiful. Two recursive functions, each tiny and focused. isSubtree finds WHERE, isSameTree checks WHETHER. Together they solve the problem elegantly.",
+    content: `The complete picture:
+  • isSubtree = DFS traversal across root's nodes
+  • isSameTree = complete structural equality check
+  • They compose perfectly: outer finds candidates, inner validates
+
+This pattern appears everywhere:
+  • "Does X contain Y?" → traverse X, check Y at each position
+  • Binary trees, strings, arrays — same concept
+
+Interview pro tips:
+  • Mention the O(m+n) serialization approach as a follow-up
+  • Note that you're using the same helper you'd write for LC #100
+  • The code is short because recursion mirrors the problem structure`,
+    insight: "Mastery of recursion = writing code that matches the shape of the problem. This solution demonstrates exactly that.",
+    viz: 'final'
+  }
 ];
 
-let currentStage = 0;
-let intPlayInterval = null;
+let intCur = 0;
+let intPlaying = false;
+let intTimer = null;
 
 function renderIntuition() {
-  let html = '';
-  INTUITION_STAGES.forEach((s, i) => {
-    const cls = i === currentStage ? 'active' : i < currentStage ? 'past' : 'future';
-    html += `<div class="stage-card ${cls}">
-      <div class="stage-title"><span class="stage-num">${i + 1}</span>${s.title}</div>
-      <div class="thought-bubble">💭 "${s.thought}"</div>
-      <div class="stage-content">${s.content}</div>
-      <div class="insight-box"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+  const body = document.getElementById('int-body');
+  body.innerHTML = INTUITION_STAGES.map((s, i) => {
+    let cls = i < intCur ? 'past' : i === intCur ? 'active' : 'future';
+    return `<div class="stage-block ${cls}" id="is-${i}">
+      <div class="stage-header">
+        <div class="stage-num">${i+1}</div>
+        <div class="stage-title">${s.title}</div>
+      </div>
+      <div class="thought-bubble">💭 "${escapeHtml(s.thought)}"</div>
+      <div class="stage-content">${escapeHtml(s.content)}</div>
+      <div class="key-insight">💡 ${escapeHtml(s.insight)}</div>
     </div>`;
-  });
-  document.getElementById('int-stages').innerHTML = html;
-  const card = document.querySelector('.stage-card.active');
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  document.getElementById('int-counter').textContent = `Stage ${currentStage + 1} / ${INTUITION_STAGES.length}`;
-  document.getElementById('int-viz').innerHTML = buildIntViz(INTUITION_STAGES[currentStage].viz);
+  }).join('');
+
+  // scroll active into view
+  const active = document.getElementById('is-' + intCur);
+  if (active) setTimeout(() => active.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+
+  document.getElementById('int-stage-info').textContent = `Stage ${intCur+1} / ${INTUITION_STAGES.length}`;
+  document.getElementById('int-badge').textContent = `${intCur+1} / ${INTUITION_STAGES.length}`;
+  document.getElementById('int-play-btn').textContent = intPlaying ? '⏸' : '▶';
+
+  renderIntViz();
 }
 
-function buildIntViz(type) {
-  const isDark = document.body.dataset.theme === 'dark';
-  const accent = isDark ? '#8be9fd' : '#3b82f6';
-  const g = isDark ? '#50fa7b' : '#059669';
-  const r = '#ef4444';
-  switch(type) {
-    case 'problem': return `
-      <div class="int-viz-title">🔍 Problem: Two Operations</div>
-      <table class="op-table">
-        <tr><th>Operation</th><th>Input</th><th>Output</th><th>Example</th></tr>
-        <tr><td>addWord</td><td>word: str</td><td>None</td><td>addWord("bad")</td></tr>
-        <tr><td>search</td><td>word: str</td><td>bool</td><td>search("b.d") → True</td></tr>
-        <tr><td>search</td><td>word: str</td><td>bool</td><td>search("..d") → True</td></tr>
-        <tr><td>search</td><td>word: str</td><td>bool</td><td>search("xyz") → False</td></tr>
-      </table>
-      <div style="margin-top:14px;padding:12px;background:rgba(241,250,140,0.1);border-radius:8px;font-size:12.5px;line-height:1.6">
-        <strong style="color:${accent}">The twist:</strong> '.' matches any single character — a wildcard that can appear multiple times per query.
-      </div>`;
-    case 'comparison': return `
-      <div class="int-viz-title">⚖️ Approaches Compared</div>
-      <div class="approach-card approach-bad"><h4 style="color:${r}">❌ Hash Set + Linear Scan</h4>addWord: O(1)<br>search: O(W × L) — scan every word with regex<br><strong>Problem:</strong> 10⁴ words × 25 chars = 250k ops per query</div>
-      <div class="approach-card approach-good"><h4 style="color:${g}">✅ Trie + DFS</h4>addWord: O(L) — follow/create one node per char<br>search: O(26^d × L) — prunes dead branches early<br><strong>Win:</strong> Structure-aware — wildcards branch only into actual children</div>`;
-    case 'trie_example': return `
-      <div class="int-viz-title">🌲 Trie after adding: "bad", "dad", "mad", "ba"</div>
-      <svg viewBox="0 0 400 220" style="width:100%;max-height:220px">
-        <circle cx="200" cy="30" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
-        <text x="200" y="31" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">∅</text>
-        <line x1="200" y1="48" x2="80" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <text x="132" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">b</text>
-        <circle cx="80" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-        <text x="80" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">b</text>
-        <line x1="200" y1="48" x2="200" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <text x="207" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">d</text>
-        <circle cx="200" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-        <text x="200" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">d</text>
-        <line x1="200" y1="48" x2="320" y2="88" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <text x="268" y="72" font-size="11" font-family="monospace" fill="${isDark?'#94a3b8':'#6b7280'}" font-weight="600">m</text>
-        <circle cx="320" cy="100" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-        <text x="320" y="101" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">m</text>
-        <line x1="80" y1="118" x2="80" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="80" cy="160" r="18" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-        <text x="80" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#fff">a</text>
-        <text x="80" y="185" text-anchor="middle" font-size="9" fill="${g}">END</text>
-        <line x1="200" y1="118" x2="200" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="200" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-        <text x="200" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
-        <line x1="320" y1="118" x2="320" y2="148" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="320" cy="160" r="18" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#4b5563':'#cbd5e1'}" stroke-width="1.5"/>
-        <text x="320" y="161" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${isDark?'#f8f8f2':'#111'}">a</text>
-        <line x1="80" y1="178" x2="80" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="80" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-        <text x="80" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-        <line x1="200" y1="178" x2="200" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="200" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-        <text x="200" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-        <line x1="320" y1="178" x2="320" y2="198" stroke="${isDark?'#4b5563':'#9ca3af'}" stroke-width="1.5"/>
-        <circle cx="320" cy="210" r="12" fill="${g}" stroke="${g}" stroke-width="1.5"/>
-        <text x="320" y="211" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-      </svg>
-      <div style="margin-top:8px;font-size:11.5px;color:var(--text-secondary)">🟢 Green = end-of-word (is_end=True)</div>`;
-    case 'dfs_wildcard': return `
-      <div class="int-viz-title">🔀 Wildcard DFS: search("b.d")</div>
-      <svg viewBox="0 0 380 180" style="width:100%;max-height:180px">
-        <circle cx="60" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
-        <text x="60" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${accent}">∅</text>
-        <line x1="76" y1="30" x2="114" y2="30" stroke="${accent}" stroke-width="2"/>
-        <text x="95" y="22" font-size="10" font-family="monospace" fill="${accent}" font-weight="700">b</text>
-        <circle cx="130" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${accent}" stroke-width="2"/>
-        <text x="130" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${isDark?'#f8f8f2':'#111'}">b</text>
-        <line x1="146" y1="30" x2="184" y2="30" stroke="${isDark?'#ff79c6':'#d73a49'}" stroke-width="2" stroke-dasharray="4,3"/>
-        <text x="165" y="22" font-size="10" fill="${isDark?'#ff79c6':'#d73a49'}" font-weight="700">.</text>
-        <circle cx="200" cy="30" r="16" fill="${isDark?'#252840':'#e2e8f0'}" stroke="${isDark?'#ff79c6':'#d73a49'}" stroke-width="2" stroke-dasharray="4,3"/>
-        <text x="200" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${isDark?'#ff79c6':'#d73a49'}">?</text>
-        <line x1="216" y1="30" x2="254" y2="30" stroke="${accent}" stroke-width="2"/>
-        <text x="235" y="22" font-size="10" font-family="monospace" fill="${accent}" font-weight="700">d</text>
-        <circle cx="270" cy="30" r="16" fill="${g}" stroke="${g}" stroke-width="2"/>
-        <text x="270" y="31" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff">d</text>
-        <text x="270" y="55" text-anchor="middle" font-size="9" fill="${g}">END ✓</text>
-        <rect x="20" y="90" width="340" height="70" rx="8" fill="${isDark?'#252840':'#f1f5f9'}" stroke="${isDark?'#2d3154':'#e2e8f0'}"/>
-        <text x="36" y="112" font-size="11" fill="${isDark?'#f8f8f2':'#111'}">Steps:</text>
-        <text x="36" y="128" font-size="11" fill="${accent}">1. 'b' → follow exact edge to b-node</text>
-        <text x="36" y="144" font-size="11" fill="${isDark?'#ff79c6':'#d73a49'}">2. '.' → branch ALL children (only 'a' exists)</text>
-        <text x="36" y="160" font-size="11" fill="${g}">3. 'd' → follow exact edge → is_end=True → True!</text>
-      </svg>`;
-    case 'code_structure': return `
-      <div class="int-viz-title">🏗️ Code Architecture</div>
-      <div style="font-size:12.5px;line-height:1.8;font-family:var(--font-mono)">
-        <div style="color:var(--syn-keyword)">class <span style="color:var(--syn-type)">TrieNode</span>:</div>
-        <div style="padding-left:16px;color:var(--text-secondary)">  children: dict[str, TrieNode]  <span style="color:var(--syn-comment)"># edges</span></div>
-        <div style="padding-left:16px;color:var(--text-secondary)">  is_end: bool                   <span style="color:var(--syn-comment)"># word boundary</span></div>
-        <br>
-        <div style="color:var(--syn-keyword)">class <span style="color:var(--syn-type)">WordDictionary</span>:</div>
-        <div style="padding-left:16px;color:var(--text-secondary)">  root: TrieNode</div>
-        <div style="padding-left:16px;color:var(--syn-func)">  addWord(word)  →  walk + create → mark is_end</div>
-        <div style="padding-left:16px;color:var(--syn-func)">  search(word)   →  _dfs(word, 0, root)</div>
-        <div style="padding-left:16px;color:var(--syn-func)">  _dfs(word, idx, node)</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">  base: idx==len → is_end</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">  letter: follow one child</div>
-        <div style="padding-left:32px;color:var(--text-secondary)">  dot: try ALL children</div>
-      </div>`;
-    case 'complexity': return `
-      <div class="int-viz-title">📊 Complexity Breakdown</div>
-      <div class="complexity-grid">
-        <div class="complexity-card"><h4>addWord(word)</h4>Time: <strong>O(L)</strong><br>Space: <strong>O(L)</strong><br><span style="color:var(--text-secondary);font-size:11px">One node per new character</span></div>
-        <div class="complexity-card"><h4>search(word)</h4>Time: <strong>O(26^d × L)</strong><br>Space: <strong>O(L)</strong> stack<br><span style="color:var(--text-secondary);font-size:11px">d = number of '.' wildcards</span></div>
-        <div class="complexity-card" style="grid-column:1/-1"><h4>Total Space</h4><strong>O(Σ word lengths)</strong> for all insertions<br>Shared prefixes save memory vs hash set of strings</div>
-      </div>`;
-    case 'final': return `
-      <div class="int-viz-title">✅ Edge Cases</div>
-      <table class="op-table">
-        <tr><th>Query</th><th>Result</th><th>Why</th></tr>
-        <tr><td>search("")</td><td>False</td><td>root.is_end = False</td></tr>
-        <tr><td>search("...")</td><td>True/False</td><td>Explores all 3-char paths</td></tr>
-        <tr><td>search("b.d")</td><td>True</td><td>b→a→d matches "bad"</td></tr>
-        <tr><td>search("xyz")</td><td>False</td><td>No child 'x' from root</td></tr>
-        <tr><td>search("b.")</td><td>True</td><td>b→a is_end=True ("ba" added)</td></tr>
-      </table>
-      <div style="margin-top:14px;padding:12px;background:rgba(16,185,129,0.08);border-radius:8px;font-size:12.5px;line-height:1.6;border-left:3px solid #10b981">
-        <strong style="color:#10b981">Pattern to remember:</strong><br>
-        Trie = prefix-aware storage<br>DFS on Trie = wildcard/pattern matching<br>
-        This combo appears in: Word Search II, Auto-Complete, Boggle
-      </div>`;
-    default: return '<div style="color:var(--text-secondary);padding:20px">Select a stage to see visualization.</div>';
+function renderIntViz() {
+  const viz = document.getElementById('int-viz');
+  const stage = INTUITION_STAGES[intCur];
+
+  switch (stage.viz) {
+    case 'problem':
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Input Trees</h4>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center">
+            <div style="text-align:center">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700">ROOT</div>
+              ${renderTreeSVG(rootTree, null, [], [], '')}
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700">subROOT</div>
+              ${renderTreeSVG(subTree, null, [], [], '')}
+            </div>
+          </div>
+        </div>
+        <div class="viz-card">
+          <h4>Expected Output</h4>
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">
+            Node <strong style="color:var(--accent)">4</strong> in root has children [1, 2] — exactly matching subRoot.<br>
+            <span class="result-pill result-true">true</span>
+          </div>
+        </div>`;
+      break;
+
+    case 'approaches':
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Approach Comparison</h4>
+          <div class="approach-box approach-bad">
+            <strong>❌ Brute Force Only</strong>
+            Check all O(m²) pairs — wasteful and complex to implement correctly.
+          </div>
+          <div class="approach-box approach-good">
+            <strong>✅ DFS + isSameTree — O(m × n)</strong>
+            Elegant decomposition. isSubtree walks root, isSameTree validates. Clean, interview-ready.
+          </div>
+          <div class="approach-box" style="background:rgba(203,166,247,.08);border-left:3px solid var(--accent2)">
+            <strong>🚀 Bonus: Serialization + KMP — O(m + n)</strong>
+            Serialize both trees, use KMP substring match. Faster but complex to code under pressure.
+          </div>
+        </div>`;
+      break;
+
+    case 'traversal':
+      const pre = getPreorder(rootTree);
+      const ino = getInorder(rootTree);
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>DFS Traversal on root</h4>
+          ${renderTreeSVG(rootTree, null, [], [], '')}
+        </div>
+        <div class="viz-card">
+          <h4>isSubtree visits nodes in preorder</h4>
+          <div class="traversal-compare">
+            <div class="trav-row">
+              <span class="badge" style="color:var(--syn-funcname)">Preorder</span>
+              <span class="seq">[${pre.join(', ')}]</span>
+              <span class="reason">✅ Used by isSubtree</span>
+            </div>
+            <div class="trav-row">
+              <span class="badge">Inorder</span>
+              <span class="seq">[${ino.join(', ')}]</span>
+              <span class="reason">visits root mid</span>
+            </div>
+          </div>
+        </div>`;
+      break;
+
+    case 'code_flow':
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Call Flow Diagram</h4>
+          <svg viewBox="0 0 380 240" style="width:100%" xmlns="http://www.w3.org/2000/svg">
+            <!-- isSubtree box -->
+            <rect x="10" y="10" width="170" height="80" rx="8" fill="rgba(137,180,250,.12)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="95" y="35" text-anchor="middle" fill="var(--accent)" font-size="13" font-weight="700">isSubtree</text>
+            <text x="95" y="55" text-anchor="middle" fill="var(--text-secondary)" font-size="11">1. root null? → False</text>
+            <text x="95" y="70" text-anchor="middle" fill="var(--text-secondary)" font-size="11">2. isSameTree? → True</text>
+            <text x="95" y="85" text-anchor="middle" fill="var(--text-secondary)" font-size="11">3. recurse left | right</text>
+
+            <!-- isSameTree box -->
+            <rect x="200" y="10" width="170" height="80" rx="8" fill="rgba(166,227,161,.10)" stroke="#a6e3a1" stroke-width="1.5"/>
+            <text x="285" y="35" text-anchor="middle" fill="#a6e3a1" font-size="13" font-weight="700">isSameTree</text>
+            <text x="285" y="55" text-anchor="middle" fill="var(--text-secondary)" font-size="11">1. both null → True</text>
+            <text x="285" y="70" text-anchor="middle" fill="var(--text-secondary)" font-size="11">2. one null → False</text>
+            <text x="285" y="85" text-anchor="middle" fill="var(--text-secondary)" font-size="11">3. val mismatch → False</text>
+
+            <!-- arrow -->
+            <path d="M 180 50 L 198 50" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arr)"/>
+            <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0 0, 6 3, 0 6" fill="var(--text-muted)"/>
+            </marker></defs>
+
+            <!-- OR / AND labels -->
+            <text x="95" y="130" text-anchor="middle" fill="var(--syn-keyword)" font-size="12" font-weight="700">OR</text>
+            <text x="95" y="148" text-anchor="middle" fill="var(--text-muted)" font-size="11">(find in either subtree)</text>
+            <text x="285" y="130" text-anchor="middle" fill="var(--syn-keyword)" font-size="12" font-weight="700">AND</text>
+            <text x="285" y="148" text-anchor="middle" fill="var(--text-muted)" font-size="11">(both halves must match)</text>
+          </svg>
+        </div>`;
+      break;
+
+    case 'complexity':
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Complexity Analysis</h4>
+          <div class="complexity-row">
+            <div class="complexity-cell">
+              <div class="c-label">Time</div>
+              <div class="c-val">O(m·n)</div>
+              <div class="c-why">m nodes in root × n nodes in subRoot per isSameTree call</div>
+            </div>
+            <div class="complexity-cell">
+              <div class="c-label">Space</div>
+              <div class="c-val">O(h)</div>
+              <div class="c-why">h = height of root tree, recursion stack depth</div>
+            </div>
+          </div>
+        </div>
+        <div class="viz-card">
+          <h4>For this example</h4>
+          <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.7">
+            m = 5 nodes in root, n = 3 in subRoot<br>
+            Worst case: 5 × 3 = <strong style="color:var(--accent)">15 comparisons</strong><br>
+            Actual: much fewer due to early termination ✓
+          </div>
+        </div>`;
+      break;
+
+    case 'edge_cases':
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Edge Cases Handled</h4>
+          <div class="edge-cases-list">
+            <div class="ec-item"><span class="ec-icon">✅</span><div class="ec-text"><strong>root = null</strong><span>Line 1: immediately return False. Nothing to search in.</span></div></div>
+            <div class="ec-item"><span class="ec-icon">✅</span><div class="ec-text"><strong>subRoot = null</strong><span>isSameTree(x, null) → False unless x also null. Consistent.</span></div></div>
+            <div class="ec-item"><span class="ec-icon">✅</span><div class="ec-text"><strong>root == subRoot</strong><span>First isSameTree call at root returns True immediately.</span></div></div>
+            <div class="ec-item"><span class="ec-icon">✅</span><div class="ec-text"><strong>subRoot larger than root</strong><span>isSameTree hits null on root side → False. Correct.</span></div></div>
+            <div class="ec-item"><span class="ec-icon">✅</span><div class="ec-text"><strong>Same values, different structure</strong><span>e.g. root=[4,1,2,3], sub=[4,1,2] → False because isSameTree checks nulls too.</span></div></div>
+          </div>
+        </div>`;
+      break;
+
+    case 'final':
+    default:
+      viz.innerHTML = `
+        <div class="viz-card">
+          <h4>Full Example Trace</h4>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+            <div style="text-align:center">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700">root</div>
+              ${renderTreeSVG(rootTree, null, [rootTree ? findNode(rootTree, 4) : null].filter(Boolean).map(n=>n&&n.id), [], '')}
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700">subRoot</div>
+              ${renderTreeSVG(subTree, null, [], [], '')}
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:12.5px;color:var(--text-secondary);text-align:center">
+            Node <strong style="color:#a6e3a1">4</strong> (green) in root is an exact match for subRoot.<br>
+            <span class="result-pill result-true" style="margin-top:8px">isSubtree → true</span>
+          </div>
+        </div>
+        <div class="viz-card">
+          <h4>Pattern Reuse</h4>
+          <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.7">
+            isSameTree = <strong style="color:var(--accent)">LeetCode #100</strong><br>
+            isSubtree = DFS traversal + isSameTree<br><br>
+            This "outer traverse + inner validate" pattern applies to many tree problems. 
+            Recognize it, and you'll solve dozens of similar questions instantly.
+          </div>
+        </div>`;
+      break;
   }
 }
 
-function nextStage() { if (currentStage < INTUITION_STAGES.length - 1) { currentStage++; renderIntuition(); } }
-function prevStage() { if (currentStage > 0) { currentStage--; renderIntuition(); } }
-function toggleIntPlay() {
-  if (intPlayInterval) {
-    clearInterval(intPlayInterval); intPlayInterval = null;
-    document.getElementById('int-play-btn').textContent = '▶ Auto';
+function findNode(root, val) {
+  if (!root) return null;
+  if (root.val === val) return root;
+  return findNode(root.left, val) || findNode(root.right, val);
+}
+
+function getPreorder(root) {
+  if (!root) return [];
+  return [root.val, ...getPreorder(root.left), ...getPreorder(root.right)];
+}
+function getInorder(root) {
+  if (!root) return [];
+  return [...getInorder(root.left), root.val, ...getInorder(root.right)];
+}
+
+function intStep(dir) {
+  intCur = Math.max(0, Math.min(INTUITION_STAGES.length - 1, intCur + dir));
+  renderIntuition();
+}
+
+function intPlayPause() {
+  if (intPlaying) {
+    clearInterval(intTimer);
+    intPlaying = false;
   } else {
-    document.getElementById('int-play-btn').textContent = '⏸ Pause';
-    intPlayInterval = setInterval(() => {
-      if (currentStage < INTUITION_STAGES.length - 1) { currentStage++; renderIntuition(); }
-      else { clearInterval(intPlayInterval); intPlayInterval = null; document.getElementById('int-play-btn').textContent = '▶ Auto'; }
+    intPlaying = true;
+    intTimer = setInterval(() => {
+      if (intCur >= INTUITION_STAGES.length - 1) { clearInterval(intTimer); intPlaying = false; renderIntuition(); return; }
+      intCur++;
+      renderIntuition();
     }, 4000);
   }
+  renderIntuition();
 }
 
-/* ═══════════════════════════════════════════
-   MODE / THEME
-═══════════════════════════════════════════ */
+// ═══════════════════════════════════════════════
+//  MODE SWITCHING
+// ═══════════════════════════════════════════════
 let currentMode = 'intuition';
 
 function setMode(mode) {
   currentMode = mode;
-  pausePlay();
-  if (intPlayInterval) { clearInterval(intPlayInterval); intPlayInterval = null; document.getElementById('int-play-btn').textContent = '▶ Auto'; }
-  document.getElementById('btn-intuition').classList.toggle('active', mode === 'intuition');
-  document.getElementById('btn-execution').classList.toggle('active', mode === 'execution');
-  document.getElementById('intuition-container').style.display = mode === 'intuition' ? 'flex' : 'none';
-  const execEl = document.getElementById('execution-container');
-  execEl.style.display = mode === 'execution' ? 'flex' : 'none';
-  document.getElementById('op-bar').style.display = mode === 'execution' ? 'flex' : 'none';
+  clearInterval(intTimer); intPlaying = false;
 
-  if (mode === 'execution') {
-    renderCode(-1);
-    document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
-    // Pre-populate queue with a default example if empty
-    if (opQueue.length === 0 && allSteps.length === 0) {
-      opQueue = [
-        { op: 'addWord', arg: 'bad' },
-        { op: 'addWord', arg: 'dad' },
-        { op: 'addWord', arg: 'mad' },
-        { op: 'search', arg: 'pad' },
-        { op: 'search', arg: 'bad' },
-        { op: 'search', arg: '.ad' },
-        { op: 'search', arg: 'b..' },
-      ];
-      renderQueue();
-    }
+  document.getElementById('mode-intuition').classList.toggle('active', mode === 'intuition');
+  document.getElementById('mode-execution').classList.toggle('active', mode === 'execution');
+
+  const iw = document.getElementById('intuition-wrap');
+  const ew = document.getElementById('execution-wrap');
+  const ir = document.getElementById('input-row');
+
+  if (mode === 'intuition') {
+    iw.style.display = 'flex';
+    ew.style.display = 'none';
+    ir.style.display = 'none';
+    renderIntuition();
+  } else {
+    iw.style.display = 'none';
+    ew.style.display = 'flex';
+    ir.style.display = 'flex';
+    buildCodePanel();
+    exec.init(rootTree, subTree);
   }
 }
 
-function toggleTheme() {
-  const isDark = document.body.dataset.theme === 'dark';
-  document.body.dataset.theme = isDark ? 'light' : 'dark';
-  document.querySelector('.btn-theme').textContent = isDark ? '🌙 Dark' : '☀️ Light';
-  if (currentMode === 'intuition') renderIntuition();
-  else if (allSteps.length) renderStep(currentStep);
-  else document.getElementById('viz-canvas').innerHTML = renderTrie(snapshotTrie(), []);
+function reparse() {
+  const ra = parseArr(document.getElementById('input-root').value);
+  const sa = parseArr(document.getElementById('input-sub').value);
+  rootTree = arrayToTree(ra);
+  subTree  = arrayToTree(sa);
+  exec.init(rootTree, subTree);
 }
 
-/* ═══════════════════════════════════════════
-   KEYBOARD SHORTCUTS
-═══════════════════════════════════════════ */
+function toggleTheme() {
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
+}
+
+// ═══════════════════════════════════════════════
+//  RESIZABLE PANELS
+// ═══════════════════════════════════════════════
+function initResizable() {
+  const setupDivider = (dividerId, leftId, rightId) => {
+    const div = document.getElementById(dividerId);
+    const left = document.getElementById(leftId);
+    const right = document.getElementById(rightId);
+    if (!div || !left || !right) return;
+
+    let dragging = false;
+    let startX, startLeftW, startRightW;
+
+    div.addEventListener('mousedown', e => {
+      dragging = true;
+      startX = e.clientX;
+      startLeftW = left.offsetWidth;
+      startRightW = right.offsetWidth;
+      div.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const newLeft = Math.max(120, startLeftW + dx);
+      const newRight = Math.max(120, startRightW - dx);
+      left.style.width = newLeft + 'px';
+      left.style.flex = 'none';
+      right.style.width = newRight + 'px';
+      right.style.flex = 'none';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      div.classList.remove('dragging');
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    });
+  };
+
+  setupDivider('div1', 'code-panel', 'viz-panel');
+  setupDivider('div2', 'viz-panel', 'log-panel');
+}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-  if (e.code === 'Space') { e.preventDefault(); currentMode === 'execution' ? togglePlay() : toggleIntPlay(); }
-  else if (e.code === 'ArrowRight') { e.preventDefault(); currentMode === 'execution' ? stepForward() : nextStage(); }
-  else if (e.code === 'ArrowLeft') { e.preventDefault(); currentMode === 'execution' ? stepBack() : prevStage(); }
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intPlayPause() : exec.playPause();
+  } else if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intStep(1) : exec.step(1);
+  } else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intStep(-1) : exec.step(-1);
+  }
 });
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-window.onload = () => {
-  renderIntuition();
-  renderCode(-1);
-};
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+initResizable();
+setMode('intuition');
 </script>
 </body>
 </html>
