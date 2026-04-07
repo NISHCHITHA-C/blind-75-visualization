@@ -45,8 +45,21 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
 .btn-parse{background:var(--accent);color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px}
 
 .panels{display:flex;flex:1;overflow:hidden}
-.panel{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
-.panel:last-child{border-right:none}
+.panel{display:flex;flex-direction:column;overflow:hidden;min-width:160px}
+
+/* Draggable dividers */
+.resizer{
+  width:5px;flex-shrink:0;background:var(--border);cursor:col-resize;
+  position:relative;transition:background 0.15s;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+}
+.resizer::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:1px;height:32px;background:var(--text-muted);border-radius:1px;opacity:0.5;
+}
+.resizer:hover,.resizer.dragging{background:var(--accent);opacity:0.8;}
+.resizer:hover::after,.resizer.dragging::after{background:var(--accent);opacity:1;}
+body.resizing{cursor:col-resize;user-select:none;}
 .panel-header{padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);background:var(--bg-primary);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}
 .panel-body{flex:1;overflow:auto;position:relative}
 
@@ -119,8 +132,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
 
 /* INTUITION */
 .intuition-panels{display:flex;width:100%;height:100%}
-.intuition-left{width:50%;border-right:1px solid var(--border);overflow:auto}
-.intuition-right{width:50%;overflow:auto;padding:16px}
+.intuition-left{overflow:auto;min-width:160px}
+.intuition-right{overflow:auto;padding:16px;min-width:160px}
 .stage-card{padding:16px 20px;border-bottom:1px solid var(--border);transition:all 0.3s}
 .stage-card.active{background:var(--bg-primary)}
 .stage-card.past{opacity:0.6}
@@ -578,9 +591,71 @@ class App {
     this.intuitionStage=0;
     this.intuitionTimer=null;
     this.intuitionPlaying=false;
+    this.panelWidths=[32,46]; // code%, viz% — log gets the rest
+    this.intuitionWidths=50;  // left % in intuition mode
     this.steps=generateSteps(this.board,this.words);
     this.render();
     this.attachKeys();
+  }
+
+  // ── RESIZE ────────────────────────────────────────────────
+  startResize(e, which){
+    e.preventDefault();
+    const isInt = which==='int';
+    const container = isInt
+      ? document.getElementById('intuition-panels')
+      : document.getElementById('exec-panels');
+    if(!container) return;
+
+    const startX = e.clientX;
+    const totalW = container.getBoundingClientRect().width;
+
+    // Snapshot current flex-basis px values
+    const panels = isInt
+      ? [document.getElementById('intuition-left')]
+      : [document.getElementById('panel-code'), document.getElementById('panel-viz')];
+    const startWidths = panels.map(p => p.getBoundingClientRect().width);
+
+    const resizerEl = e.currentTarget;
+    resizerEl.classList.add('dragging');
+    document.body.classList.add('resizing');
+
+    const onMove = mv => {
+      const dx = mv.clientX - startX;
+      if(isInt){
+        const newW = Math.max(120, Math.min(totalW-120, startWidths[0]+dx));
+        const pct = (newW/totalW*100).toFixed(2);
+        this.intuitionWidths = parseFloat(pct);
+        const left = document.getElementById('intuition-left');
+        if(left) left.style.flex = `0 0 ${pct}%`;
+      } else {
+        if(which===0){
+          // Moving divider between code and viz
+          const newW = Math.max(120, Math.min(totalW-300, startWidths[0]+dx));
+          const pct = (newW/totalW*100).toFixed(2);
+          this.panelWidths[0] = parseFloat(pct);
+          const p = document.getElementById('panel-code');
+          if(p) p.style.flex = `0 0 ${pct}%`;
+        } else {
+          // Moving divider between viz and log
+          const newW = Math.max(120, Math.min(totalW-300, startWidths[1]+dx));
+          const pct = (newW/totalW*100).toFixed(2);
+          this.panelWidths[1] = parseFloat(pct);
+          const p = document.getElementById('panel-viz');
+          if(p) p.style.flex = `0 0 ${pct}%`;
+        }
+      }
+    };
+
+    const onUp = () => {
+      resizerEl.classList.remove('dragging');
+      document.body.classList.remove('resizing');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   }
 
   attachKeys() {
@@ -692,20 +767,23 @@ class App {
   // ── EXECUTION ─────────────────────────────────────────────
   renderExecution(){
     const step=this.steps[this.currentStep]||this.steps[0];
-    return `<div class="panels" style="flex:1;overflow:hidden">
-      ${this.renderCodePanel(step)}
-      ${this.renderVizPanel(step)}
-      ${this.renderLogPanel(step)}
+    const [w0,w1]=this.panelWidths||[32,46];
+    return `<div class="panels" id="exec-panels" style="flex:1;overflow:hidden">
+      <div class="panel" id="panel-code" style="flex:0 0 ${w0}%">${this.renderCodePanelInner(step)}</div>
+      <div class="resizer" id="resizer-0" onmousedown="app.startResize(event,0)"></div>
+      <div class="panel" id="panel-viz" style="flex:0 0 ${w1}%">${this.renderVizPanelInner(step)}</div>
+      <div class="resizer" id="resizer-1" onmousedown="app.startResize(event,1)"></div>
+      <div class="panel" id="panel-log" style="flex:1 1 0%">${this.renderLogPanelInner(step)}</div>
     </div>`;
   }
 
-  renderCodePanel(step){
+  renderCodePanelInner(step){
     const lines=PYTHON_CODE.map((raw,i)=>{
       const active=step&&step.line===i+1;
       return `<div class="code-line${active?' active':''}"><span class="line-num">${i+1}</span><span class="line-code">${highlightLine(raw)}</span></div>`;
     }).join('');
     const pct=((this.currentStep/(this.steps.length-1))*100).toFixed(1);
-    return `<div class="panel" style="width:32%;min-width:260px">
+    return `
       <div class="panel-header">Code <span style="font-weight:400;text-transform:none;font-size:10px">Python 3</span></div>
       <div class="panel-body"><div class="code-wrap" id="code-panel"><pre>${lines}</pre></div></div>
       <div class="controls">
@@ -721,11 +799,10 @@ class App {
           <option value="2" ${this.speed==2?'selected':''}>2x</option>
           <option value="4" ${this.speed==4?'selected':''}>4x</option>
         </select>
-      </div>
-    </div>`;
+      </div>`;
   }
 
-  renderVizPanel(step){
+  renderVizPanelInner(step){
     const board=step?step.board:this.board;
     const current=step?step.current:null;
     const path=step?step.path:[];
@@ -763,7 +840,7 @@ class App {
       <div class="leg-item"><div class="leg-dot" style="background:rgba(96,165,250,.2);border-color:#60a5fa"></div><span>Visited '#'</span></div>
     </div>`;
 
-    return `<div class="panel" style="flex:1">
+    return `
       <div class="panel-header">Visualization <span style="font-size:10px;font-weight:400">Grid + Trie DFS</span></div>
       <div class="panel-body">
         <div class="viz-canvas">
@@ -773,11 +850,10 @@ class App {
           ${legend}
           ${step?`<div style="max-width:420px;text-align:center;font-size:12px;color:var(--text-secondary);line-height:1.5;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:8px">${step.desc}</div>`:''}
         </div>
-      </div>
-    </div>`;
+      </div>`;
   }
 
-  renderLogPanel(step){
+  renderLogPanelInner(step){
     const vars=step?step.vars:{};
     const varRows=Object.entries(vars).map(([k,v])=>
       `<div class="var-row"><span class="var-name">${k}</span><span class="var-val">${String(v)}</span></div>`
@@ -785,7 +861,7 @@ class App {
     const history=this.steps.slice(0,Math.min(this.currentStep+1,this.steps.length))
       .map((s,i)=>`<div class="history-item${i===this.currentStep?' cur':''}" onclick="app.currentStep=${i};app.render()">${i+1}. ${s.desc.slice(0,38)}${s.desc.length>38?'…':''}</div>`)
       .reverse().slice(0,30).join('');
-    return `<div class="panel" style="width:22%;min-width:180px">
+    return `
       <div class="panel-header">Step Log</div>
       <div class="panel-body">
         <div class="step-log">
@@ -793,8 +869,7 @@ class App {
           <div class="vars-section"><h4>Variables</h4>${varRows||'<div style="color:var(--text-muted);font-size:11px">—</div>'}</div>
           <div class="history-section"><h4>History</h4>${history}</div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
   }
 
   // ── INTUITION ─────────────────────────────────────────────
@@ -821,9 +896,10 @@ class App {
         <div class="progress" style="max-width:160px"><div class="progress-fill" style="width:${(this.intuitionStage/(stages.length-1)*100).toFixed(0)}%"></div></div>
         <span style="font-size:11px;color:var(--text-muted);margin-left:auto">← → Arrow keys · Space to auto-play</span>
       </div>
-      <div class="intuition-panels" style="flex:1">
-        <div class="intuition-left">${stageList}</div>
-        <div class="intuition-right">${this.renderIntuitionViz(stages[this.intuitionStage])}</div>
+      <div class="intuition-panels" id="intuition-panels" style="flex:1">
+        <div class="intuition-left" id="intuition-left" style="flex:0 0 ${this.intuitionWidths||50}%">${stageList}</div>
+        <div class="resizer" id="resizer-int" onmousedown="app.startResize(event,'int')"></div>
+        <div class="intuition-right" id="intuition-right" style="flex:1 1 0%">${this.renderIntuitionViz(stages[this.intuitionStage])}</div>
       </div>
     </div>`;
   }
