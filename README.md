@@ -77,22 +77,22 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | # | Problem | Difficulty | Live Demo | Status |
 |---|---------|------------|-----------|--------|
 | 1 | Implement Trie (Prefix Tree) | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/08-Tries/01-implement-trie.html) | ✅ Available |
-| 2 | Design Add and Search Words Data Structure | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/08-Tries/02-add-search-words.html) | 🔜 Coming Soon |
-| 3 | Word Search II | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/08-Tries/03-word-search-ii.html) | 🔜 Coming Soon |
+| 2 | Design Add and Search Words Data Structure | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/08-Tries/02-add-search-words.html) | ✅ Available |
+| 3 | Word Search II | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/08-Tries/03-word-search-ii.html) | ✅ Available |
 
 ## 09 - Heap / Priority Queue
 
 | # | Problem | Difficulty | Live Demo | Status |
 |---|---------|------------|-----------|--------|
 | 1 | Kth Frequent Element in an Array | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/01-kth-frequent-element.html) | ✅ Available |
-| 2 | Find Median from Data Stream | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/02-median-data-stream.html) | 🔜 Coming Soon |
+| 2 | Find Median from Data Stream | 🔴 Hard | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/09-Heap-Priority-Queue/02-median-data-stream.html) | ✅ Available |
 
 ## 10 - Backtracking
 
 | # | Problem | Difficulty | Live Demo | Status |
 |---|---------|------------|-----------|--------|
 | 1 | Combination Sum | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/10-Backtracking/01-combination-sum.html) | ✅ Available |
-| 2 | Word Search | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/10-Backtracking/02-word-search.html) | 🔜 Coming Soon |
+| 2 | Word Search | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/10-Backtracking/02-word-search.html) | ✅ Available |
 
 ## 11 - Graphs
 
