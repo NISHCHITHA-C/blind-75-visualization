@@ -1,342 +1,1393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>200. Number of Islands</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>200. Number of Islands - Visualizer</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
-  --land:#10b981;--water:#1e40af;--curr:#3b82f6;--visited:#a78bfa;
-  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
-}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+  :root {
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-panel: #1a2332;
+    --bg-header: #0f172a;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: #374151;
+    --accent: #60a5fa;
+    --accent2: #a78bfa;
+    --highlight-line: rgba(251,191,36,0.13);
+    --font-mono: 'Consolas','Monaco','Courier New',monospace;
 
-header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
-.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
-.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
-.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+    --syn-keyword: #ff79c6;
+    --syn-builtin: #8be9fd;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-type: #8be9fd;
+    --syn-number: #bd93f9;
+    --syn-operator: #ff79c6;
+    --syn-self: #ffb86c;
+    --syn-decorator: #50fa7b;
+  }
+  [data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-panel: #f8fafc;
+    --bg-header: #e2e8f0;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border: #d1d5db;
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --highlight-line: #fef3c7;
 
-main{display:grid;grid-template-columns:330px 1fr 240px;flex:1;overflow:hidden;}
+    --syn-keyword: #d63384;
+    --syn-builtin: #0550ae;
+    --syn-function: #116329;
+    --syn-string: #953800;
+    --syn-comment: #6a737d;
+    --syn-type: #0550ae;
+    --syn-number: #8250df;
+    --syn-operator: #d63384;
+    --syn-self: #953800;
+    --syn-decorator: #116329;
+  }
 
-.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
-.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.75;position:relative;transition:background .15s;}
-.cl.active{background:rgba(59,130,246,.1);}
-.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
-.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.75;}
-.cl.active .ln{color:#3b82f6;}
-.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
-.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    transition: background 0.2s, color 0.2s;
+  }
 
-.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.stats{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;gap:20px;}
-.stat{display:flex;flex-direction:column;}
-.stat-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--land);}
+  /* ── HEADER ── */
+  #header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px 8px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  #header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  #problem-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    flex: 1;
+    min-width: 200px;
+  }
+  .mode-toggle { display: flex; gap: 6px; }
+  .mode-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.18s;
+  }
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  #theme-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+  }
+  #input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  #input-row label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  #grid-input {
+    flex: 1; min-width: 260px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 8px;
+  }
+  .parse-btn {
+    padding: 5px 12px;
+    border-radius: 5px;
+    border: none;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+  }
 
-.grid-section{flex:1;overflow:auto;padding:20px;display:flex;align-items:center;justify-content:center;}
-.grid-container{display:inline-block;}
-.grid-row{display:flex;}
-.grid-cell{width:50px;height:50px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;transition:all .3s;}
-.grid-cell.water{background:var(--water);color:#60a5fa;}
-.grid-cell.land{background:var(--land);color:#fff;}
-.grid-cell.curr{background:var(--curr);color:#fff;box-shadow:inset 0 0 0 3px rgba(59,130,246,.5);}
-.grid-cell.visited{background:var(--visited);color:#fff;}
+  /* ── MAIN ── */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
 
-.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);flex-shrink:0;}
-.decision.dfs{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
-.decision.found{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07);color:var(--land);}
+  /* ── PANELS ── */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    min-width: 0;
+  }
+  .panel:last-child { border-right: none; }
+  .panel-header {
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .panel-body { flex: 1; overflow: auto; min-height: 0; }
 
-.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
-.btn:disabled{opacity:.3;cursor:not-allowed;}
-.step-info{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
-.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.spd-wrap label{font-size:.7rem;color:var(--muted);}
-input[type=range]{accent-color:#3b82f6;width:80px;}
+  /* ── RESIZER ── */
+  .resizer {
+    width: 5px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    z-index: 5;
+  }
+  .resizer:hover, .resizer.dragging { background: var(--accent); }
 
-.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
-.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
-.lc:hover{color:var(--text);}
-.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
-.le{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
-.le.dfs{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
-.le.island{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);color:var(--land);}
-.ls{color:var(--muted);margin-right:6px;}
+  /* ── CODE PANEL ── */
+  #code-panel { background: var(--bg-panel); }
+  #code-content {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.0;
+    background: #0d1117;
+    color: #d4d4d4;
+    overflow: auto;
+    height: 100%;
+    padding: 0;
+  }
+  [data-theme="light"] #code-content { background: #f9fafb; color: #1e1e1e; }
+  #code-content pre { margin: 0; padding: 14px 0; }
+  .code-line {
+    display: flex;
+    align-items: stretch;
+    min-height: 20px;
+    transition: background 0.15s;
+    padding: 1px 0;
+  }
+  .code-line.active-line { background: var(--highlight-line) !important; }
+  .line-num {
+    display: inline-block;
+    min-width: 38px;
+    text-align: right;
+    padding-right: 14px;
+    color: #4b5563;
+    user-select: none;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .line-code { flex: 1; white-space: pre; color: inherit; }
+
+  /* ── VIZ PANEL ── */
+  #viz-panel { background: var(--bg-primary); }
+  #viz-content { padding: 14px; height: 100%; overflow: auto; }
+  #grid-svg-wrap { display: flex; justify-content: center; align-items: flex-start; }
+
+  /* grid cell */
+  .cell { transition: fill 0.22s, stroke 0.22s; }
+
+  /* ── CONTROLS (bottom of viz panel) ── */
+  #controls {
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-header);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.15s;
+  }
+  .ctrl-btn:hover { background: var(--accent); color: #fff; }
+  .ctrl-btn:disabled { opacity: 0.35; cursor: default; }
+  #speed-sel {
+    padding: 4px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #step-counter { font-size: 12px; color: var(--text-secondary); margin-left: auto; white-space: nowrap; }
+
+  /* ── STEP LOG ── */
+  #log-panel { background: var(--bg-panel); }
+  #log-body { padding: 12px; }
+  .log-step-desc {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    line-height: 1.5;
+    padding: 8px 10px;
+    background: var(--bg-secondary);
+    border-radius: 5px;
+    border-left: 3px solid var(--accent);
+  }
+  .vars-section { margin-bottom: 10px; }
+  .vars-title { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
+  .var-row { font-family: var(--font-mono); font-size: 12px; margin: 3px 0; color: var(--text-secondary); }
+  .var-name { color: var(--accent); }
+  .history-title { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; margin-top: 10px; }
+  .hist-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin: 2px 0;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .hist-item.current { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+  .hist-item:hover { background: var(--bg-secondary); }
+
+  /* ── INTUITION MODE ── */
+  #intuition-wrap { display: flex; width: 100%; height: 100%; overflow: hidden; }
+  .int-panel { flex: 1; overflow: auto; border-right: 1px solid var(--border); padding: 20px; }
+  .int-panel:last-child { border-right: none; }
+  .int-stage {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: opacity 0.3s, border-color 0.3s, background 0.3s;
+  }
+  .int-stage.active { border-color: var(--accent); background: rgba(96,165,250,0.06); }
+  .int-stage h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .stage-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .thought-bubble {
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    border-radius: 0 5px 5px 0;
+  }
+  .stage-content { font-size: 13px; line-height: 1.65; color: var(--text-secondary); white-space: pre-line; margin-bottom: 8px; }
+  .key-insight {
+    background: rgba(16,185,129,0.08);
+    border-left: 3px solid #10b981;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 0 5px 5px 0;
+  }
+  .key-insight strong { color: #10b981; }
+  .int-controls {
+    display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap;
+  }
+  .int-viz-panel { padding: 20px; overflow: auto; }
+  .int-viz-panel h3 { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 12px; }
+  .approach-card {
+    border-radius: 7px; padding: 14px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .approach-card.bad { background: rgba(239,68,68,.08); border-left: 4px solid #ef4444; }
+  .approach-card.good { background: rgba(16,185,129,.08); border-left: 4px solid #10b981; }
+  .approach-card h4 { margin-bottom: 6px; }
+  .complexity-box {
+    background: var(--bg-secondary); border-radius: 7px;
+    padding: 14px; margin-bottom: 12px; font-size: 13px; line-height: 1.7;
+  }
+  .complexity-box h4 { color: var(--accent); margin-bottom: 6px; }
+
+  /* progress bar */
+  #int-progress {
+    height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 12px;
+  }
+  #int-progress-fill {
+    height: 3px; background: var(--accent); border-radius: 2px; transition: width 0.3s;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; margin: 3px 0; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
 </style>
 </head>
-<body>
-<header>
-  <div class="h-num">200</div>
-  <div class="h-title">Number of Islands</div>
-  <div class="h-badge">MEDIUM</div>
-  <div class="h-right">
-    <button class="btn btn-p" onclick="init()">Reset</button>
+<body data-theme="dark">
+<div id="header">
+  <div id="header-top">
+    <div id="problem-title">200. Number of Islands</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-intuition" onclick="app.setMode('intuition')">💡 Intuition</button>
+      <button class="mode-btn" id="btn-execution" onclick="app.setMode('execution')">▶️ Execution</button>
+    </div>
+    <button id="theme-btn" onclick="app.toggleTheme()">☀️ Light</button>
   </div>
-</header>
+  <div id="input-row" style="display:none">
+    <label>Grid (JSON 2-D array of "0"/"1"):</label>
+    <input id="grid-input" type="text"
+      value='[["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]'>
+    <button class="parse-btn" onclick="app.parseInput()">▶ Run</button>
+  </div>
+</div>
 
-<main>
-  <div class="code-panel">
-    <div class="plabel">DFS Approach</div>
-    <div class="code-scroll" id="codePanel"></div>
-  </div>
-
-  <div class="viz-panel">
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Islands Found</div>
-        <div class="stat-val" id="islandCount">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Cells Visited</div>
-        <div class="stat-val" id="visitedCount" style="color:var(--visited);">0</div>
-      </div>
-    </div>
-    
-    <div class="grid-section">
-      <div class="grid-container" id="gridContainer"></div>
-    </div>
-    
-    <div id="decision" class="decision">Scanning grid for islands...</div>
-    
-    <div class="bot">
-      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
-      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
-      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
-      <span class="step-info" id="stepInfo">0 / 0</span>
-      <div class="spd-wrap">
-        <label>Speed:</label>
-        <input type="range" id="speedSlider" min="200" max="1400" value="600"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="log-panel">
-    <div class="plabel">
-      Search Log
-      <button class="lc" onclick="clearLog()">Clear</button>
-    </div>
-    <div class="log-scroll" id="logScroll"></div>
-  </div>
-</main>
+<div id="main"></div>
 
 <script>
-const code=[
-  {t:'def numIslands(grid):',cm:true},
-  {t:'    if not grid:',ln:1},
-  {t:'        return 0',ln:2},
-  {t:'    ',ln:3},
-  {t:'    islands = 0',ln:4},
-  {t:'    rows, cols = len(grid), len(grid[0])',ln:5},
-  {t:'    ',ln:6},
-  {t:'    def dfs(r, c):',ln:7},
-  {t:'        if (r < 0 or r >= rows or',ln:8},
-  {t:'            c < 0 or c >= cols or',ln:9},
-  {t:'            grid[r][c] == "0"):',ln:10},
-  {t:'            return',ln:11},
-  {t:'        ',ln:12},
-  {t:'        grid[r][c] = "0"  # Mark as visited',ln:13},
-  {t:'        dfs(r+1, c)  # Down',ln:14},
-  {t:'        dfs(r-1, c)  # Up',ln:15},
-  {t:'        dfs(r, c+1)  # Right',ln:16},
-  {t:'        dfs(r, c-1)  # Left',ln:17},
-  {t:'    ',ln:18},
-  {t:'    for r in range(rows):',ln:19},
-  {t:'        for c in range(cols):',ln:20},
-  {t:'            if grid[r][c] == "1":',ln:21},
-  {t:'                islands += 1',ln:22},
-  {t:'                dfs(r, c)',ln:23},
-  {t:'    ',ln:24},
-  {t:'    return islands',ln:25}
+/* ════════════════════════════════════════════════════
+   PYTHON SOURCE (displayed verbatim)
+════════════════════════════════════════════════════ */
+const PYTHON_CODE = `from collections import deque
+from typing import List
+
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        if not grid:
+            return 0
+        rows, cols = len(grid), len(grid[0])
+        islands = 0
+
+        def bfs(r, c):
+            queue = deque([(r, c)])
+            grid[r][c] = '0'  # Mark visited in-place
+            while queue:
+                row, col = queue.popleft()
+                for dr, dc in ((-1,0),(1,0),(0,-1),(0,1)):
+                    nr, nc = row + dr, col + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == '1':
+                        grid[nr][nc] = '0'
+                        queue.append((nr, nc))
+
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r][c] == '1':
+                    bfs(r, c)
+                    islands += 1
+        return islands`;
+
+/* ════════════════════════════════════════════════════
+   SYNTAX HIGHLIGHTER
+════════════════════════════════════════════════════ */
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* Token-safe highlighter: tokenise the raw line first, then emit HTML.
+   Never runs regexes on already-emitted span tags. */
+function highlightPython(rawLine) {
+  const KEYWORDS = new Set(['def','class','if','elif','else','while','for','return',
+    'import','from','in','and','or','not','True','False','None','pass','break',
+    'continue','raise','try','except','finally','with','as','lambda','yield',
+    'del','global','nonlocal','assert']);
+  const BUILTINS = new Set(['len','range','print','append','extend','pop','deque',
+    'popleft','enumerate','zip','map','filter','sorted','reversed','min','max',
+    'sum','abs','isinstance','type','int','str','float','bool','list','dict',
+    'set','tuple','input']);
+  const TYPES = new Set(['List','Dict','Tuple','Set','Optional','Union','Any']);
+
+  // Tokeniser — walks the raw string once, produces [{type, val}]
+  const tokens = [];
+  let i = 0, line = rawLine;
+
+  while (i < line.length) {
+    // 1. Comment — rest of line
+    if (line[i] === '#') {
+      tokens.push({ t: 'comment', v: line.slice(i) });
+      break;
+    }
+    // 2. String literal (single or double, handles escaped chars)
+    if (line[i] === '"' || line[i] === "'") {
+      const q = line[i];
+      let j = i + 1;
+      while (j < line.length) {
+        if (line[j] === '\\') { j += 2; continue; }
+        if (line[j] === q) { j++; break; }
+        j++;
+      }
+      tokens.push({ t: 'string', v: line.slice(i, j) });
+      i = j; continue;
+    }
+    // 3. Word (identifier / keyword)
+    if (/[a-zA-Z_]/.test(line[i])) {
+      let j = i;
+      while (j < line.length && /\w/.test(line[j])) j++;
+      const word = line.slice(i, j);
+      // peek ahead for '(' to detect call
+      const nextNonSpace = line.slice(j).trimStart()[0];
+      if (word === 'self')                   tokens.push({ t: 'self',    v: word });
+      else if (KEYWORDS.has(word))           tokens.push({ t: 'keyword', v: word });
+      else if (TYPES.has(word))              tokens.push({ t: 'type',    v: word });
+      else if (BUILTINS.has(word) && nextNonSpace === '(')
+                                             tokens.push({ t: 'builtin', v: word });
+      else                                   tokens.push({ t: 'plain',   v: word });
+      i = j; continue;
+    }
+    // 4. Number
+    if (/[0-9]/.test(line[i]) && (i === 0 || !/\w/.test(line[i-1]))) {
+      let j = i;
+      while (j < line.length && /[0-9.]/.test(line[j])) j++;
+      tokens.push({ t: 'number', v: line.slice(i, j) });
+      i = j; continue;
+    }
+    // 5. Everything else — plain char
+    // Accumulate consecutive plain chars
+    let j = i + 1;
+    while (j < line.length && line[j] !== '#' && line[j] !== '"' && line[j] !== "'"
+           && !/[a-zA-Z_0-9]/.test(line[j])) j++;
+    tokens.push({ t: 'plain', v: line.slice(i, j) });
+    i = j;
+  }
+
+  // Mark function name after 'def'
+  for (let k = 0; k < tokens.length - 1; k++) {
+    if (tokens[k].t === 'keyword' && tokens[k].v === 'def') {
+      // find next non-plain-space token
+      for (let m = k+1; m < tokens.length; m++) {
+        if (tokens[m].t === 'plain') continue; // skip whitespace tokens
+        if (tokens[m].t === 'plain' && tokens[m].v.trim() === '') continue;
+        if (/^[a-zA-Z_]/.test(tokens[m].v) && tokens[m].t !== 'keyword') {
+          tokens[m].t = 'function'; break;
+        }
+        break;
+      }
+    }
+  }
+
+  // Emit HTML — escape each token value individually
+  const COLOR = {
+    keyword:  'syn-keyword',
+    builtin:  'syn-builtin',
+    function: 'syn-function',
+    string:   'syn-string',
+    comment:  'syn-comment',
+    type:     'syn-type',
+    number:   'syn-number',
+    self:     'syn-self',
+    plain:    null
+  };
+
+  return tokens.map(tok => {
+    const cls = COLOR[tok.t];
+    const escaped = escapeHtml(tok.v);
+    return cls ? `<span class="${cls}">${escaped}</span>` : escaped;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   BFS SIMULATION — produce steps
+════════════════════════════════════════════════════ */
+function simulate(inputGrid) {
+  // deep clone
+  const grid = inputGrid.map(r => [...r]);
+  const rows = grid.length, cols = grid[0].length;
+  const steps = [];
+  let islands = 0;
+
+  // track which cells belong to which island (for coloring)
+  const islandOf = Array.from({length: rows}, () => Array(cols).fill(null));
+  let islandIdx = 0;
+
+  const snap = (line, desc, extras = {}) => {
+    steps.push({
+      line,
+      description: desc,
+      gridSnap: grid.map(r => [...r]),
+      islandSnap: islandOf.map(r => [...r]),
+      islands,
+      ...extras
+    });
+  };
+
+  snap(4, 'Start: check if grid is empty. Grid is valid — proceed.', {highlight: []});
+
+  snap(5, `rows = ${rows}, cols = ${cols}, islands = 0`, {highlight: []});
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      snap(20, `Outer loop: checking cell (${r},${c}) = '${grid[r][c]}'`, {cursor: [r,c]});
+
+      if (grid[r][c] === '1') {
+        // start BFS
+        snap(21, `Cell (${r},${c}) is '1' — start BFS from here`, {cursor: [r, c]});
+        islandIdx++;
+        const queue = [[r, c]];
+        grid[r][c] = '0';
+        islandOf[r][c] = islandIdx;
+
+        snap(11, `Initialize BFS queue = [(${r},${c})]. Mark (${r},${c}) as visited ('0')`, {
+          cursor: [r,c], queue: [...queue]
+        });
+
+        while (queue.length) {
+          const [row, col] = queue.shift();
+          snap(13, `Dequeue (${row},${col}). Exploring 4 neighbors...`, {
+            cursor: [row, col], dequeued: [row, col], queue: queue.map(x => [...x])
+          });
+
+          const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+          const dirNames = ['up','down','left','right'];
+          for (let d = 0; d < 4; d++) {
+            const [dr, dc] = dirs[d];
+            const nr = row + dr, nc = col + dc;
+            const inBounds = nr >= 0 && nr < rows && nc >= 0 && nc < cols;
+
+            if (!inBounds) {
+              snap(14, `Neighbor ${dirNames[d]} (${nr},${nc}) is out of bounds — skip`, {
+                cursor: [row, col], queue: queue.map(x => [...x])
+              });
+              continue;
+            }
+
+            if (grid[nr][nc] !== '1') {
+              snap(14, `Neighbor ${dirNames[d]} (${nr},${nc}) = '${grid[nr][nc]}' — already visited or water, skip`, {
+                cursor: [row, col], probe: [nr, nc], queue: queue.map(x => [...x])
+              });
+              continue;
+            }
+
+            grid[nr][nc] = '0';
+            islandOf[nr][nc] = islandIdx;
+            queue.push([nr, nc]);
+            snap(15, `Neighbor ${dirNames[d]} (${nr},${nc}) = '1' — mark visited, enqueue!`, {
+              cursor: [row, col], probe: [nr, nc], queue: queue.map(x => [...x])
+            });
+          }
+        }
+
+        islands++;
+        snap(22, `BFS complete! Island #${islands} fully explored. islands = ${islands}`, {cursor: [r,c]});
+      }
+    }
+  }
+
+  snap(23, `All cells processed. Total islands = ${islands}. ✅ Return ${islands}`, {done: true});
+  return steps;
+}
+
+/* ════════════════════════════════════════════════════
+   INTUITION STAGES
+════════════════════════════════════════════════════ */
+const INTUITION_STAGES = [
+  {
+    title: "Understanding the Problem",
+    thought: "Let me see what we're really being asked here. A 2D grid of '1's and '0's — I need to count 'islands'...",
+    content: `The grid is a map where:
+• '1' = land cell
+• '0' = water cell
+
+Two land cells are connected if adjacent horizontally or vertically (not diagonal).
+An "island" is a connected group of '1's surrounded by water.
+
+Key insight: I need to count the number of connected components in this grid.`,
+    insight: "This is a classic connected-components problem on a 2D grid. Once I see that, the algorithm becomes obvious.",
+    viz: 'example'
+  },
+  {
+    title: "Exploring Approaches",
+    thought: "How do I find connected components? I know DFS and BFS both work. What about Union-Find?",
+    content: `Three valid approaches:
+
+1. DFS (recursive) — visit each cell, recurse on neighbors
+2. BFS (queue-based) — visit each cell, expand via queue
+3. Union-Find — union adjacent '1's, count distinct roots
+
+All three are O(m×n) time. BFS is iterative so no recursion stack overflow risk on very large grids.`,
+    insight: "BFS is the safest iterative choice here. The 'mark visited in-place' trick avoids allocating a separate visited set.",
+    viz: 'approaches'
+  },
+  {
+    title: "The Key Trick: Mark In-Place",
+    thought: "Wait — instead of a separate `visited` set, I can just overwrite grid[r][c] = '0' when I visit it. Genius!",
+    content: `The classic trick: mutate the grid to track visited cells.
+
+When we visit a '1':
+  → Set it to '0' immediately (mark visited)
+  → This prevents visiting it again
+
+This avoids allocating an O(m×n) extra array.
+
+Trade-off: the grid is modified (if that's not allowed, copy it first).`,
+    insight: "Mark-in-place reduces space complexity from O(m×n) extra to O(1) extra (beyond the BFS queue).",
+    viz: 'trick'
+  },
+  {
+    title: "BFS Implementation",
+    thought: "Outer loop finds unvisited '1's. Each one is a new island. BFS floods the entire island.",
+    content: `Algorithm structure:
+
+for each cell (r, c):
+  if grid[r][c] == '1':
+    islands += 1
+    bfs(r, c)  ← floods entire island
+
+bfs(r, c):
+  queue = [(r, c)]
+  mark (r, c) as visited
+  while queue not empty:
+    dequeue (row, col)
+    for each 4-neighbor (nr, nc):
+      if in bounds and grid[nr][nc] == '1':
+        mark visited + enqueue
+
+The outer loop ensures we find EVERY island.`,
+    insight: "The outer loop is O(m×n). Each cell is enqueued at most once, so total BFS work is also O(m×n). No cell is processed twice.",
+    viz: 'bfs-flow'
+  },
+  {
+    title: "Complexity Analysis",
+    thought: "Is this optimal? Every cell must be checked at least once, so O(m×n) is unavoidable.",
+    content: `Time Complexity: O(m × n)
+  • Outer double loop: O(m × n)
+  • Each cell enters the BFS queue at most once
+  • Total: O(m × n)
+
+Space Complexity: O(min(m, n))
+  • BFS queue holds at most min(m,n) cells at once
+    (the diagonal wavefront of the BFS)
+  • We reuse the input grid for visited tracking`,
+    insight: "This is asymptotically optimal — we cannot solve the problem without examining every cell at least once.",
+    viz: 'complexity'
+  },
+  {
+    title: "Edge Cases",
+    thought: "What could break this? Empty grid, all water, all land, single cell...",
+    content: `Edge cases handled:
+
+• Empty grid → early return 0 (line 6-7)
+• All water → outer loop finds no '1's → return 0
+• All land → one big BFS → return 1
+• Single cell '1' → BFS immediately empties → return 1
+• Single cell '0' → never triggers BFS → return 0
+• Non-rectangular grid → rows/cols computed per row (safe)`,
+    insight: "The guard clause 'if not grid: return 0' is essential. All other cases fall out naturally from the algorithm.",
+    viz: 'edge-cases'
+  },
+  {
+    title: "Synthesis",
+    thought: "Beautiful — the grid itself becomes the visited set. O(m×n) time, O(min(m,n)) space. Clean and elegant.",
+    content: `The complete picture:
+
+1. Scan grid cell by cell
+2. When we hit a '1', we've found a new island
+3. BFS floods the entire island, marking cells as water
+4. After BFS, no cell in that island can trigger another count
+5. The outer loop moves on to find the next island
+
+The algorithm is self-contained — grid serves triple duty as input, visited marker, and implicit flood-fill state.`,
+    insight: "This approach demonstrates mastery of: BFS/DFS, in-place mutation, connected-components, and clean code structure.",
+    viz: 'final'
+  }
 ];
 
-let grid,steps=[],cursor=0,playing=false,playTimer;
+/* ════════════════════════════════════════════════════
+   GRID SVG RENDERER
+════════════════════════════════════════════════════ */
+const ISLAND_COLORS = [
+  '#3b82f6','#f59e0b','#10b981','#f43f5e','#8b5cf6',
+  '#06b6d4','#ec4899','#84cc16','#fb923c','#a78bfa'
+];
 
-function buildCode(){
-  const panel=document.getElementById('codePanel');
-  code.forEach((c,i)=>{
-    const line=document.createElement('div');
-    line.className='cl';
-    line.id=`line${c.ln||i}`;
-    const ln=document.createElement('div');ln.className='ln';
-    ln.textContent=c.ln!==undefined?c.ln:'';
-    const ct=document.createElement('div');ct.className='ct';
-    if(c.cm){
-      ct.innerHTML=`<span class="cm">${c.t}</span>`;
-    }else{
-      ct.innerHTML=c.t
-        .replace(/(def|if|not|or|for|in|return|range)/g,'<span class="kw">$1</span>')
-        .replace(/(numIslands|dfs|len)/g,'<span class="fn">$1</span>')
-        .replace(/(grid|islands|rows|cols|r|c)/g,'<span class="nm">$1</span>');
+function renderGridSVG(gridSnap, islandSnap, cursor, probe, queueCells, done) {
+  const rows = gridSnap.length, cols = gridSnap[0].length;
+  const CS = Math.min(44, Math.floor(400 / Math.max(rows, cols)));
+  const PAD = 4;
+  const W = cols * (CS + PAD) + PAD;
+  const H = rows * (CS + PAD) + PAD;
+
+  let cells = '';
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = PAD + c * (CS + PAD);
+      const y = PAD + r * (CS + PAD);
+      const orig = gridSnap[r][c];
+      const isl = islandSnap[r][c];
+      const isCursor = cursor && cursor[0] === r && cursor[1] === c;
+      const isProbe = probe && probe[0] === r && probe[1] === c;
+      const inQueue = queueCells && queueCells.some(q => q[0] === r && q[1] === c);
+
+      let fill, stroke, strokeW = 1.5;
+      if (done && isl) {
+        fill = ISLAND_COLORS[(isl - 1) % ISLAND_COLORS.length] + 'cc';
+        stroke = ISLAND_COLORS[(isl - 1) % ISLAND_COLORS.length];
+      } else if (isCursor) {
+        fill = '#facc15'; stroke = '#fbbf24'; strokeW = 2.5;
+      } else if (isProbe) {
+        fill = '#f87171'; stroke = '#ef4444'; strokeW = 2;
+      } else if (inQueue) {
+        fill = '#a78bfa'; stroke = '#8b5cf6'; strokeW = 2;
+      } else if (isl) {
+        fill = ISLAND_COLORS[(isl - 1) % ISLAND_COLORS.length] + '88';
+        stroke = ISLAND_COLORS[(isl - 1) % ISLAND_COLORS.length];
+      } else if (orig === '1') {
+        fill = '#374151'; stroke = '#6b7280';
+      } else {
+        fill = '#0f172a'; stroke = '#1e293b';
+      }
+
+      cells += `<rect class="cell" x="${x}" y="${y}" width="${CS}" height="${CS}" rx="4"
+        fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}"/>`;
+      cells += `<text x="${x + CS/2}" y="${y + CS/2 + 5}" text-anchor="middle"
+        font-size="${CS * 0.38}px" font-family="monospace"
+        fill="${orig === '0' ? '#374151' : '#f9fafb'}" font-weight="600">${orig}</text>`;
+
+      // row/col labels on first row/col
+      if (r === 0) cells += `<text x="${x+CS/2}" y="${y-3}" text-anchor="middle" font-size="10" fill="#4b5563">${c}</text>`;
+      if (c === 0) cells += `<text x="${x-4}" y="${y+CS/2+4}" text-anchor="end" font-size="10" fill="#4b5563">${r}</text>`;
     }
-    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+  }
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"
+    style="display:block;margin:0 auto">${cells}</svg>`;
+}
+
+
+/* ════════════════════════════════════════════════════
+   DEQUE VISUALIZER
+════════════════════════════════════════════════════ */
+function renderDequeViz(queue, dequeued, theme) {
+  const isDark = theme !== 'light';
+  const BG     = isDark ? '#0f172a' : '#f8fafc';
+  const BORDER = isDark ? '#374151' : '#d1d5db';
+  const TEXT   = isDark ? '#f9fafb' : '#111827';
+  const MUTED  = isDark ? '#6b7280' : '#9ca3af';
+  const LABEL  = isDark ? '#9ca3af' : '#6b7280';
+
+  const BOX_W = 62, BOX_H = 42, ARROW = 18, PAD = 14, RADIUS = 6;
+
+  const items = [];
+  if (dequeued) items.push({ cell: dequeued, ghost: true });
+  if (queue) queue.forEach(c => items.push({ cell: c, ghost: false }));
+
+  const n = items.length;
+  const innerW = n * BOX_W + Math.max(0, n - 1) * ARROW;
+  const W = Math.max(PAD * 2 + innerW, 220);
+  const H = BOX_H + 52;
+
+  let svgItems = '';
+  let xCursor = PAD;
+
+  items.forEach((item, idx) => {
+    const { cell, ghost } = item;
+    const x = xCursor;
+    const y = 22;
+
+    const liveIdx = items.slice(0, idx+1).filter(i => !i.ghost).length - 1;
+    const liveCount = items.filter(i => !i.ghost).length;
+    const isFirst = !ghost && liveIdx === 0;
+    const isLast  = !ghost && liveIdx === liveCount - 1;
+
+    const fillColor   = ghost ? 'none'
+      : isFirst       ? (isDark ? '#facc1522' : '#fef9c3')
+      :                  (isDark ? '#a78bfa22' : '#ede9fe');
+    const strokeColor = ghost ? MUTED : isFirst ? '#facc15' : '#a78bfa';
+    const textColor   = ghost ? MUTED : TEXT;
+    const dash        = ghost ? '4,3' : 'none';
+
+    svgItems += `<rect x="${x}" y="${y}" width="${BOX_W}" height="${BOX_H}"
+      rx="${RADIUS}" fill="${fillColor}" stroke="${strokeColor}"
+      stroke-width="${ghost?1.5:2}" stroke-dasharray="${dash}"/>`;
+
+    svgItems += `<text x="${x+BOX_W/2}" y="${y+BOX_H/2+5}" text-anchor="middle"
+      font-family="monospace" font-size="13" font-weight="600" fill="${textColor}">(${cell[0]},${cell[1]})</text>`;
+
+    if (ghost) {
+      svgItems += `<text x="${x+BOX_W/2}" y="${y-6}" text-anchor="middle"
+        font-size="10" fill="${MUTED}" font-style="italic">dequeued</text>`;
+    }
+    if (isFirst) {
+      svgItems += `<text x="${x+BOX_W/2}" y="${y-6}" text-anchor="middle"
+        font-size="10" fill="#facc15" font-weight="700">FRONT</text>`;
+    }
+    if (isLast && liveCount > 1) {
+      svgItems += `<text x="${x+BOX_W/2}" y="${y+BOX_H+13}" text-anchor="middle"
+        font-size="10" fill="#a78bfa" font-weight="700">BACK</text>`;
+    }
+
+    if (idx < items.length - 1) {
+      const ax = x + BOX_W + 1, ay = y + BOX_H/2;
+      svgItems += `<line x1="${ax}" y1="${ay}" x2="${ax+ARROW-3}" y2="${ay}"
+        stroke="${MUTED}" stroke-width="1.5" marker-end="url(#dq-arr)"/>`;
+    }
+
+    xCursor += BOX_W + ARROW;
   });
+
+  const popArrow = dequeued ? (() => {
+    const ghostX = PAD, ay = 22 + BOX_H/2;
+    return `<line x1="${ghostX - 12}" y1="${ay}" x2="${ghostX - 2}" y2="${ay}"
+      stroke="#facc15" stroke-width="1.8" stroke-dasharray="4,3"/>
+    <polygon points="${ghostX-14},${ay-4} ${ghostX-14},${ay+4} ${ghostX-24},${ay}"
+      fill="#facc15"/>
+    <text x="${ghostX-28}" y="${ay+4}" text-anchor="end" font-size="10" fill="#facc15">pop</text>`;
+  })() : '';
+
+  const emptyMsg = n === 0
+    ? `<text x="${W/2}" y="${H/2+4}" text-anchor="middle" font-size="13"
+        fill="${MUTED}" font-style="italic">queue empty</text>` : '';
+
+  return `
+  <div style="margin-top:12px;padding:10px 14px;background:${BG};border:1px solid ${BORDER};border-radius:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:${LABEL};margin-bottom:8px">
+      BFS Deque
+      <span style="font-weight:400;margin-left:8px;color:${MUTED}">${queue?queue.length:0} item${(queue&&queue.length===1)?'':'s'}</span>
+    </div>
+    <div style="overflow-x:auto;padding-bottom:4px">
+      <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="dq-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <polygon points="0 0,7 3,0 6" fill="${MUTED}"/>
+          </marker>
+        </defs>
+        ${popArrow}${svgItems}${emptyMsg}
+      </svg>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:4px;font-size:11px;color:${MUTED}">
+      <span><span style="color:#facc15">■</span> front (next pop)</span>
+      <span><span style="color:#a78bfa">■</span> queued</span>
+      ${dequeued ? `<span>⬚ just dequeued</span>` : ''}
+    </div>
+  </div>`;
 }
 
-function highlight(ln){
-  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
-  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
-}
-
-function buildSteps(g){
-  const s=[];
-  const visited=Array(g.length).fill(0).map(()=>Array(g[0].length).fill(false));
-  let islands=0;
-  let visitedCount=0;
-  
-  s.push({line:-1,grid:JSON.parse(JSON.stringify(visited)),islands:0,visited:0,curr:null,msg:'Initializing search for islands...',log:{type:'dfs',text:'Starting DFS traversal'}});
-  
-  function dfs(r,c,islandNum){
-    if(r<0||r>=g.length||c<0||c>=g[0].length||g[r][c]==='0'||visited[r][c]){
-      return;
+/* ════════════════════════════════════════════════════
+   INTUITION VIZ RENDERER
+════════════════════════════════════════════════════ */
+function renderIntuitionViz(stageIdx, grid) {
+  const stage = INTUITION_STAGES[stageIdx];
+  switch (stage.viz) {
+    case 'example': {
+      const rows = grid.length, cols = grid[0].length;
+      const isnap = Array.from({length: rows}, () => Array(cols).fill(null));
+      return `<h3>Example Grid</h3>
+        ${renderGridSVG(grid, isnap, null, null, null, false)}
+        <div style="margin-top:12px">
+          <div class="legend-item"><div class="legend-dot" style="background:#374151;border:1.5px solid #6b7280"></div> Land ('1')</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#0f172a;border:1.5px solid #1e293b"></div> Water ('0')</div>
+        </div>`;
     }
-    
-    visited[r][c]=true;
-    visitedCount++;
-    s.push({line:13,grid:JSON.parse(JSON.stringify(visited)),islands:islands,visited:visitedCount,curr:[r,c],msg:`Visiting land at (${r},${c})`,log:{type:'dfs',text:`DFS at (${r},${c})`}});
-    
-    dfs(r+1,c,islandNum);
-    dfs(r-1,c,islandNum);
-    dfs(r,c+1,islandNum);
-    dfs(r,c-1,islandNum);
-  }
-  
-  for(let r=0;r<g.length;r++){
-    for(let c=0;c<g[0].length;c++){
-      s.push({line:21,grid:JSON.parse(JSON.stringify(visited)),islands:islands,visited:visitedCount,curr:[r,c],msg:`Checking cell (${r},${c})`,log:{type:'dfs',text:`Check (${r},${c}): ${g[r][c]==='1'?'land':'water'}`}});
-      
-      if(g[r][c]==='1'&&!visited[r][c]){
-        islands++;
-        s.push({line:22,grid:JSON.parse(JSON.stringify(visited)),islands:islands,visited:visitedCount,curr:[r,c],msg:`Found new island #${islands} at (${r},${c})`,log:{type:'island',text:`New island #${islands} found at (${r},${c})`}});
-        dfs(r,c,islands);
-      }
+    case 'approaches':
+      return `<h3>Approach Comparison</h3>
+        <div class="approach-card good">
+          <h4 style="color:#10b981">✅ BFS (chosen)</h4>
+          Iterative, queue-based.<br>
+          <strong>Time:</strong> O(m×n) &nbsp; <strong>Space:</strong> O(min(m,n))<br>
+          No recursion stack overflow risk.
+        </div>
+        <div class="approach-card" style="background:rgba(96,165,250,.08);border-left:4px solid var(--accent)">
+          <h4 style="color:var(--accent)">✅ DFS (also valid)</h4>
+          Recursive or iterative stack.<br>
+          <strong>Time:</strong> O(m×n) &nbsp; <strong>Space:</strong> O(m×n) worst case<br>
+          Elegant but risks stack overflow on huge grids.
+        </div>
+        <div class="approach-card bad">
+          <h4 style="color:#ef4444">❌ Brute Force</h4>
+          Check every pair of '1' cells for connectivity.<br>
+          <strong>Time:</strong> O((m×n)²) — too slow!
+        </div>`;
+    case 'trick': {
+      const sample = [['1','1','0'],['1','0','0'],['0','0','1']];
+      const isnap = [[1,1,null],[1,null,null],[null,null,2]];
+      return `<h3>Mark In-Place Trick</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">After BFS from (0,0), island '1' cells become '0':</p>
+        ${renderGridSVG(sample, isnap, null, null, null, true)}
+        <p style="font-size:12px;color:var(--text-secondary);margin-top:10px">
+          Colored = visited &amp; marked '0'. No extra visited array needed!
+        </p>`;
     }
+    case 'bfs-flow':
+      return `<h3>BFS Flow</h3>
+        <div style="font-family:var(--font-mono);font-size:12px;line-height:1.8;color:var(--text-secondary)">
+          <div style="color:var(--syn-keyword)">for</div> each cell (r,c):<br>
+          &nbsp;&nbsp;<div style="color:var(--syn-keyword);display:inline">if</div> grid[r][c] == <span style="color:var(--syn-string)">'1'</span>:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;islands += 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--syn-builtin)">bfs</span>(r, c)<br>
+          <br>
+          <div style="color:var(--syn-keyword)">def</div> <span style="color:var(--syn-function)">bfs</span>(r, c):<br>
+          &nbsp;&nbsp;queue = deque([(r,c)])<br>
+          &nbsp;&nbsp;mark visited<br>
+          &nbsp;&nbsp;<div style="color:var(--syn-keyword);display:inline">while</div> queue:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;row, col = queue.popleft()<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<div style="color:var(--syn-keyword);display:inline">for</div> 4 neighbors:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div style="color:var(--syn-keyword);display:inline">if</div> valid + is '1':<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mark + enqueue
+        </div>`;
+    case 'complexity':
+      return `<h3>Complexity</h3>
+        <div class="complexity-box">
+          <h4>⏱ Time: O(m × n)</h4>
+          Each cell is enqueued at most once.<br>
+          Total dequeues ≤ m×n. Each dequeue does O(1) work (4 neighbors).<br>
+          <strong>→ O(m×n) total</strong>
+        </div>
+        <div class="complexity-box">
+          <h4>💾 Space: O(min(m, n))</h4>
+          BFS queue at peak holds the "wavefront" — at most min(m,n) cells.<br>
+          In-place marking = no extra visited array.<br>
+          <strong>→ O(min(m,n)) queue space</strong>
+        </div>`;
+    case 'edge-cases': {
+      const allWater = [['0','0'],['0','0']];
+      const isnap2 = [[null,null],[null,null]];
+      return `<h3>Edge Cases</h3>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+          <div>✅ <strong>Empty grid</strong> → early return 0</div>
+          <div>✅ <strong>All water</strong> → outer loop finds no '1's</div>
+          <div>✅ <strong>All land</strong> → one big BFS → return 1</div>
+          <div>✅ <strong>Single cell '1'</strong> → BFS empties immediately → return 1</div>
+        </div>
+        <div style="margin-top:12px">
+          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:6px">All water grid → answer = 0:</p>
+          ${renderGridSVG(allWater, isnap2, null, null, null, false)}
+        </div>`;
+    }
+    case 'final': {
+      // show fully colored final result grid
+      const g = grid.map(r => r.map(() => '0'));
+      const rows2 = grid.length, cols2 = grid[0].length;
+      const isnap3 = Array.from({length: rows2}, () => Array(cols2).fill(null));
+      // re-run to get final island coloring
+      const gCopy = grid.map(r => [...r]);
+      let idx = 0;
+      const visited = Array.from({length: rows2}, () => Array(cols2).fill(false));
+      for (let r = 0; r < rows2; r++) {
+        for (let c = 0; c < cols2; c++) {
+          if (gCopy[r][c] === '1' && !visited[r][c]) {
+            idx++;
+            const q = [[r,c]]; visited[r][c] = true; isnap3[r][c] = idx; gCopy[r][c] = '0';
+            while (q.length) {
+              const [rr,cc] = q.shift();
+              for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                const nr = rr+dr, nc = cc+dc;
+                if (nr>=0 && nr<rows2 && nc>=0 && nc<cols2 && gCopy[nr][nc]==='1') {
+                  gCopy[nr][nc]='0'; visited[nr][nc]=true; isnap3[nr][nc]=idx; q.push([nr,nc]);
+                }
+              }
+            }
+          }
+        }
+      }
+      return `<h3>Final Result: ${idx} Island${idx!==1?'s':''}</h3>
+        ${renderGridSVG(g.map((_,r) => grid[r].map((_,c) => isnap3[r][c] ? '1' : '0')), isnap3, null, null, null, true)}
+        <div style="margin-top:12px">
+          ${ISLAND_COLORS.slice(0,idx).map((c,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${c}88;border:1.5px solid ${c}"></div>Island ${i+1}</div>`).join('')}
+        </div>`;
+    }
+    default: return '';
   }
-  
-  s.push({line:25,grid:JSON.parse(JSON.stringify(visited)),islands:islands,visited:visitedCount,curr:null,msg:`Total islands found: ${islands}`,done:true,log:{type:'island',text:`Result: ${islands} islands`}});
-  
-  return s;
 }
 
-function renderGrid(st){
-  const container=document.getElementById('gridContainer');
-  container.innerHTML='';
-  
-  grid.forEach((row,r)=>{
-    const rowDiv=document.createElement('div');
-    rowDiv.className='grid-row';
-    
-    row.forEach((cell,c)=>{
-      const cellDiv=document.createElement('div');
-      cellDiv.className='grid-cell';
-      
-      if(cell==='0'){
-        cellDiv.classList.add('water');
-        cellDiv.textContent='~';
-      }else{
-        cellDiv.classList.add('land');
-        cellDiv.textContent='■';
-        if(st.grid[r][c])cellDiv.classList.add('visited');
-      }
-      
-      if(st.curr&&st.curr[0]===r&&st.curr[1]===c){
-        cellDiv.classList.add('curr');
-      }
-      
-      rowDiv.appendChild(cellDiv);
+/* ════════════════════════════════════════════════════
+   APP
+════════════════════════════════════════════════════ */
+const DEFAULT_GRID = [
+  ["1","1","0","0","0"],
+  ["1","1","0","0","0"],
+  ["0","0","1","0","0"],
+  ["0","0","0","1","1"]
+];
+
+const app = new class {
+  constructor() {
+    this.theme = 'dark';
+    this.mode = 'intuition';
+    this.grid = DEFAULT_GRID.map(r=>[...r]);
+    this.steps = simulate(DEFAULT_GRID);
+    this.currentStep = 0;
+    this.isPlaying = false;
+    this.speed = 1;
+    this.intStage = 0;
+    this.isIntPlaying = false;
+    this._timer = null;
+    this._intTimer = null;
+    this._panelWidths = [30, 50, 20]; // %
+    this._dragging = null;
+    this.render();
+    this._attachKeys();
+  }
+
+  toggleTheme() {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = this.theme;
+    document.getElementById('theme-btn').textContent = this.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+  }
+
+  setMode(m) {
+    this.pause(); this.pauseInt();
+    this.mode = m;
+    document.getElementById('btn-intuition').classList.toggle('active', m==='intuition');
+    document.getElementById('btn-execution').classList.toggle('active', m==='execution');
+    document.getElementById('input-row').style.display = m==='execution' ? 'flex' : 'none';
+    this.render();
+  }
+
+  parseInput() {
+    try {
+      const raw = document.getElementById('grid-input').value;
+      const g = JSON.parse(raw);
+      if (!Array.isArray(g) || !g.length || !Array.isArray(g[0])) throw new Error();
+      this.grid = g;
+      this.steps = simulate(g);
+      this.currentStep = 0;
+      this.isPlaying = false;
+      clearInterval(this._timer);
+      this.render();
+    } catch { alert('Invalid grid JSON. Expected: [["1","0",...],...]'); }
+  }
+
+  render() {
+    const main = document.getElementById('main');
+    if (this.mode === 'intuition') {
+      main.innerHTML = this._renderIntuition();
+    } else {
+      main.innerHTML = this._renderExecution();
+      this._attachResizers();
+    }
+    this._syncLog();
+    this._syncCode();
+    this._syncViz();
+  }
+
+  /* ── INTUITION ── */
+  _renderIntuition() {
+    const stages = INTUITION_STAGES;
+    const cur = this.intStage;
+    const stagesHTML = stages.map((s, i) => {
+      const op = i === cur ? '1' : (i < cur ? '0.55' : '0.28');
+      return `<div class="int-stage ${i===cur?'active':''}" style="opacity:${op}" id="int-stage-${i}">
+        <h3><span class="stage-num">${i+1}</span>${s.title}</h3>
+        ${s.thought ? `<div class="thought-bubble">💭 "${s.thought}"</div>` : ''}
+        <div class="stage-content">${s.content}</div>
+        ${s.insight ? `<div class="key-insight"><strong>💡 Key Insight:</strong> ${s.insight}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    const pct = Math.round(((cur+1)/stages.length)*100);
+    return `<div id="intuition-wrap">
+      <div class="int-panel" style="flex:1;min-width:0">
+        <div style="padding:16px 16px 0">
+          <div id="int-progress"><div id="int-progress-fill" style="width:${pct}%"></div></div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Stage ${cur+1} of ${stages.length}</div>
+        </div>
+        <div style="padding:0 16px 16px;overflow:auto;height:calc(100% - 80px)">${stagesHTML}</div>
+        <div class="int-controls" style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg-header)">
+          <button class="ctrl-btn" onclick="app.prevInt()" ${cur===0?'disabled':''}>◀ Prev</button>
+          <button class="ctrl-btn" onclick="app.toggleIntPlay()" id="int-play-btn">
+            ${this.isIntPlaying ? '⏸ Pause' : '▶ Play'}
+          </button>
+          <button class="ctrl-btn" onclick="app.nextInt()" ${cur===stages.length-1?'disabled':''}>Next ▶</button>
+          <span style="font-size:12px;color:var(--text-secondary);margin-left:8px">${cur+1}/${stages.length}</span>
+        </div>
+      </div>
+      <div class="int-viz-panel" style="flex:1;min-width:0;border-left:1px solid var(--border)">
+        <div id="int-viz-content">${renderIntuitionViz(cur, DEFAULT_GRID)}</div>
+      </div>
+    </div>`;
+  }
+
+  prevInt() {
+    if (this.intStage > 0) { this.intStage--; this.render(); this._scrollIntStage(); }
+  }
+  nextInt() {
+    if (this.intStage < INTUITION_STAGES.length-1) { this.intStage++; this.render(); this._scrollIntStage(); }
+  }
+  toggleIntPlay() {
+    this.isIntPlaying = !this.isIntPlaying;
+    if (this.isIntPlaying) {
+      this._intTimer = setInterval(() => {
+        if (this.intStage >= INTUITION_STAGES.length-1) { this.pauseInt(); return; }
+        this.nextInt();
+      }, 3500);
+    } else { this.pauseInt(); }
+    const btn = document.getElementById('int-play-btn');
+    if (btn) btn.textContent = this.isIntPlaying ? '⏸ Pause' : '▶ Play';
+  }
+  pauseInt() {
+    this.isIntPlaying = false;
+    clearInterval(this._intTimer);
+  }
+  _scrollIntStage() {
+    const el = document.getElementById(`int-stage-${this.intStage}`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /* ── EXECUTION ── */
+  _renderExecution() {
+    const [w0, w1, w2] = this._panelWidths;
+    return `
+      <div class="panel" id="code-panel" style="width:${w0}%">
+        <div class="panel-header">Python Code</div>
+        <div class="panel-body" id="code-body">
+          <div id="code-content"><pre>${this._buildCodeHTML()}</pre></div>
+        </div>
+      </div>
+      <div class="resizer" id="res-0"></div>
+      <div class="panel" id="viz-panel" style="width:${w1}%;flex-direction:column">
+        <div class="panel-header">Grid Visualization</div>
+        <div class="panel-body" id="viz-body">
+          <div id="viz-content"><div id="grid-svg-wrap"></div>${this._buildLegend()}<div id="deque-wrap"></div></div>
+        </div>
+        <div id="controls">
+          <button class="ctrl-btn" onclick="app.reset()" title="Reset">⏮</button>
+          <button class="ctrl-btn" onclick="app.stepBack()" id="btn-back" title="Step Back">◀</button>
+          <button class="ctrl-btn" onclick="app.togglePlay()" id="btn-play" title="Play/Pause">▶</button>
+          <button class="ctrl-btn" onclick="app.stepFwd()" id="btn-fwd" title="Step Forward">▶▶</button>
+          <select id="speed-sel" onchange="app.setSpeed(this.value)">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+          <span id="step-counter">Step 1 / ${this.steps.length}</span>
+        </div>
+      </div>
+      <div class="resizer" id="res-1"></div>
+      <div class="panel" id="log-panel" style="width:${w2}%">
+        <div class="panel-header">Step Log</div>
+        <div class="panel-body" id="log-body-wrap">
+          <div id="log-body"></div>
+        </div>
+      </div>`;
+  }
+
+  _buildLegend() {
+    return `<div style="padding:10px 14px 4px;font-size:12px;color:var(--text-secondary)">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <div class="legend-item"><div class="legend-dot" style="background:#facc15"></div> Current cell</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> In queue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div> Probing</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f688;border:1.5px solid #3b82f6"></div> Visited island</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#374151;border:1.5px solid #6b7280"></div> Unvisited land</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0f172a;border:1.5px solid #1e293b"></div> Water</div>
+      </div>
+    </div>`;
+  }
+
+  _buildCodeHTML() {
+    const lines = PYTHON_CODE.split('\n');
+    return lines.map((l, i) => {
+      const hl = highlightPython(l);
+      return `<div class="code-line" id="cl-${i}">
+        <span class="line-num">${i+1}</span><code class="line-code">${hl || '&nbsp;'}</code>
+      </div>`;
+    }).join('');
+  }
+
+  _syncCode() {
+    if (this.mode !== 'execution') return;
+    const step = this.steps[this.currentStep];
+    if (!step) return;
+    // remove old active
+    document.querySelectorAll('.code-line.active-line').forEach(el => el.classList.remove('active-line'));
+    const el = document.getElementById(`cl-${step.line}`);
+    if (el) {
+      el.classList.add('active-line');
+      el.scrollIntoView({block:'nearest', behavior:'smooth'});
+    }
+  }
+
+  _syncViz() {
+    if (this.mode !== 'execution') return;
+    const wrap = document.getElementById('grid-svg-wrap');
+    if (!wrap) return;
+    const step = this.steps[this.currentStep];
+    if (!step) return;
+    wrap.innerHTML = renderGridSVG(
+      step.gridSnap, step.islandSnap,
+      step.cursor || null,
+      step.probe || null,
+      step.queue || null,
+      step.done || false
+    );
+    // render deque visualizer
+    const dequeWrap = document.getElementById('deque-wrap');
+    if (dequeWrap) {
+      dequeWrap.innerHTML = renderDequeViz(step.queue || [], step.dequeued || null, this.theme);
+    }
+    const ctr = document.getElementById('step-counter');
+    if (ctr) ctr.textContent = `Step ${this.currentStep+1} / ${this.steps.length}`;
+  }
+
+  _syncLog() {
+    if (this.mode !== 'execution') return;
+    const body = document.getElementById('log-body');
+    if (!body) return;
+    const step = this.steps[this.currentStep];
+    if (!step) return;
+
+    const vars = {
+      'current cell': step.cursor ? `(${step.cursor[0]}, ${step.cursor[1]})` : 'none',
+      'islands': step.islands,
+      'grid[r][c]': step.cursor ? step.gridSnap[step.cursor[0]][step.cursor[1]] : '-',
+    };
+    if (step.queue) vars['queue size'] = step.queue.length;
+    if (step.probe) vars['probe'] = `(${step.probe[0]}, ${step.probe[1]})`;
+
+    const history = this.steps.slice(0, this.currentStep+1);
+    body.innerHTML = `
+      <div class="log-step-desc">${step.description}</div>
+      <div class="vars-section">
+        <div class="vars-title">Variables</div>
+        ${Object.entries(vars).map(([k,v]) =>
+          `<div class="var-row"><span class="var-name">${k}</span>: ${JSON.stringify(v)}</div>`
+        ).join('')}
+      </div>
+      <div class="history-title">History</div>
+      ${history.map((s, i) =>
+        `<div class="hist-item ${i===this.currentStep?'current':''}" onclick="app.goToStep(${i})">${i+1}. ${s.description}</div>`
+      ).join('')}`;
+    // scroll current into view
+    const curEl = body.querySelector('.hist-item.current');
+    if (curEl) curEl.scrollIntoView({block:'nearest'});
+  }
+
+  goToStep(i) { this.currentStep = i; this._syncAll(); }
+
+  _syncAll() { this._syncCode(); this._syncViz(); this._syncLog(); }
+
+  /* playback */
+  togglePlay() {
+    this.isPlaying = !this.isPlaying;
+    const btn = document.getElementById('btn-play');
+    if (btn) btn.textContent = this.isPlaying ? '⏸' : '▶';
+    if (this.isPlaying) {
+      this._timer = setInterval(() => {
+        if (this.currentStep >= this.steps.length-1) { this.pause(); return; }
+        this.currentStep++;
+        this._syncAll();
+      }, 700 / this.speed);
+    } else { this.pause(); }
+  }
+  pause() {
+    this.isPlaying = false;
+    clearInterval(this._timer);
+    const btn = document.getElementById('btn-play');
+    if (btn) btn.textContent = '▶';
+  }
+  stepFwd() {
+    if (this.currentStep < this.steps.length-1) { this.currentStep++; this._syncAll(); }
+  }
+  stepBack() {
+    if (this.currentStep > 0) { this.currentStep--; this._syncAll(); }
+  }
+  reset() {
+    this.pause();
+    this.currentStep = 0;
+    this._syncAll();
+  }
+  setSpeed(v) { this.speed = parseFloat(v); if (this.isPlaying) { this.pause(); this.togglePlay(); } }
+
+  /* ── RESIZERS ── */
+  _attachResizers() {
+    ['res-0','res-1'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('mousedown', e => {
+        this._dragging = { idx, startX: e.clientX, widths: [...this._panelWidths] };
+        el.classList.add('dragging');
+        e.preventDefault();
+      });
     });
-    
-    container.appendChild(rowDiv);
-  });
-}
+    document.addEventListener('mousemove', e => {
+      if (!this._dragging) return;
+      const main = document.getElementById('main');
+      if (!main) return;
+      const totalW = main.offsetWidth;
+      const dx = ((e.clientX - this._dragging.startX) / totalW) * 100;
+      const w = [...this._dragging.widths];
+      if (this._dragging.idx === 0) {
+        w[0] = Math.max(15, Math.min(50, w[0] + dx));
+        w[1] = Math.max(20, w[1] - dx);
+      } else {
+        w[1] = Math.max(20, Math.min(65, w[1] + dx));
+        w[2] = Math.max(12, w[2] - dx);
+      }
+      // normalise
+      const tot = w[0]+w[1]+w[2];
+      this._panelWidths = w.map(x => (x/tot)*100);
+      const panels = ['code-panel','viz-panel','log-panel'];
+      panels.forEach((pid, i) => {
+        const p = document.getElementById(pid);
+        if (p) p.style.width = this._panelWidths[i] + '%';
+      });
+    });
+    document.addEventListener('mouseup', () => {
+      if (this._dragging) {
+        document.getElementById(this._dragging.idx===0?'res-0':'res-1')?.classList.remove('dragging');
+        this._dragging = null;
+      }
+    });
+  }
 
-function renderStats(st){
-  document.getElementById('islandCount').textContent=st.islands;
-  document.getElementById('visitedCount').textContent=st.visited;
-}
+  _attachKeys() {
+    document.addEventListener('keydown', e => {
+      if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (this.mode==='execution') this.togglePlay();
+        else this.toggleIntPlay();
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        if (this.mode==='execution') this.stepFwd(); else this.nextInt();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        if (this.mode==='execution') this.stepBack(); else this.prevInt();
+      }
+    });
+  }
+}();
 
-function renderDecision(st){
-  const d=document.getElementById('decision');
-  d.className='decision';
-  d.textContent=st.msg;
-  if(st.curr)d.classList.add('dfs');
-  if(st.islands>0)d.classList.add('found');
-}
-
-function addLog(idx,log){
-  const el=document.getElementById('logScroll');
-  const d=document.createElement('div');d.className=`le ${log.type}`;
-  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-
-function clearLog(){document.getElementById('logScroll').innerHTML='';}
-
-function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
-
-function renderStep(idx){
-  const st=steps[idx];
-  highlight(st.line);
-  renderGrid(st);
-  renderStats(st);
-  renderDecision(st);
-  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
-  document.getElementById('btnPrev').disabled=idx===0;
-  document.getElementById('btnNext').disabled=idx===steps.length-1;
-}
-
-function stepFwd(){
-  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
-}
-
-function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
-
-function togglePlay(){
-  playing=!playing;
-  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
-  if(playing)runPlay();else clearTimeout(playTimer);
-}
-
-function runPlay(){
-  if(!playing)return;
-  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
-  stepFwd();
-  const spd=1600-parseInt(document.getElementById('speedSlider').value);
-  playTimer=setTimeout(runPlay,spd);
-}
-
-function init(){
-  clearTimeout(playTimer);playing=false;
-  document.getElementById('btnPlay').textContent='▶ Play';
-  clearLog();
-  
-  // Sample grid
-  grid=[
-    ['1','1','0','0','0'],
-    ['1','1','0','0','0'],
-    ['0','0','1','0','0'],
-    ['0','0','0','1','1']
-  ];
-  
-  steps=buildSteps(grid);
-  
-  cursor=0;
-  highlight(-1);
-  if(steps[0]?.log)addLog(0,steps[0].log);
-  renderStep(0);
-}
-
-buildCode();
-init();
+/* inject syntax CSS */
+const styleEl = document.createElement('style');
+styleEl.textContent = `
+  .syn-keyword  { color: var(--syn-keyword);  font-weight: 600; }
+  .syn-builtin  { color: var(--syn-builtin);  }
+  .syn-function { color: var(--syn-function); font-weight: 600; }
+  .syn-string   { color: var(--syn-string);   }
+  .syn-comment  { color: var(--syn-comment);  font-style: italic; }
+  .syn-type     { color: var(--syn-type);     }
+  .syn-number   { color: var(--syn-number);   }
+  .syn-operator { color: var(--syn-operator); }
+  .syn-self     { color: var(--syn-self);     }
+`;
+document.head.appendChild(styleEl);
 </script>
 </body>
 </html>
