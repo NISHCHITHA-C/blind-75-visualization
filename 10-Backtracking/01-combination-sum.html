@@ -73,6 +73,8 @@
     padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
   .btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn:disabled:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border); }
 
   .mode-toggle { display: flex; gap: 6px; margin-bottom: 8px; }
   .mode-btn { flex: 1; padding: 7px; border-radius: 6px; border: 1px solid var(--border);
@@ -101,18 +103,17 @@
   /* Divider */
   .divider { width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0;
     transition: background 0.15s; position: relative; z-index: 5; }
-  .divider:hover { background: var(--accent); }
+  .divider:hover, .divider.dragging { background: var(--accent); }
 
   /* ── CODE PANEL ── */
   #code-panel .panel-body { background: #0d1117; }
-  .code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.0; }
-  .code-line { display: flex; align-items: stretch; min-height: 20px; transition: background 0.15s; padding: 1px 0; }
+  .code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.6; }
+  .code-line { display: flex; align-items: stretch; min-height: 22px; transition: background 0.15s; padding: 1px 0; }
   .code-line.active-line { background: var(--highlight-line); border-left: 3px solid var(--highlight-border); }
   .code-line:not(.active-line) { border-left: 3px solid transparent; }
   .line-num { display: inline-block; min-width: 36px; text-align: right; padding-right: 14px;
     color: #4b5563; user-select: none; font-size: 12px; padding-top: 1px; flex-shrink: 0; }
   .line-code { white-space: pre; color: #d4d4d4; flex: 1; padding-right: 16px; }
-  /* Syntax tokens */
   .tok-kw { color: var(--syn-keyword); font-weight: 600; }
   .tok-fn { color: var(--syn-function); }
   .tok-str { color: var(--syn-string); }
@@ -124,7 +125,13 @@
 
   /* ── VIZ PANEL ── */
   #viz-panel { background: var(--bg-primary); }
-  #viz-panel .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+  #viz-panel .panel-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden; /* parent does NOT scroll — children handle it */
+  }
   .viz-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px;
     background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
   .ctrl-btn { border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary);
@@ -134,20 +141,40 @@
   .ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .speed-select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border);
     padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-  .step-counter { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .step-counter { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 60px; text-align: center; }
 
-  /* Tree SVG */
-  .tree-svg { width: 100%; flex: 1; min-height: 280px; }
-
-  /* Result box */
-  .result-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-  .result-box h4 { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
-  .result-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* Result box — fixed height, no flex-grow */
+  .result-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; flex-shrink: 0; }
+  .result-box h4 { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .result-chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
   .chip { background: var(--node-found); color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-family: var(--font-mono); }
   .chip-current { background: var(--accent); color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-family: var(--font-mono); }
 
+  /* Tree container — this is where scrolling happens */
+  .tree-scroll-container {
+    flex: 1;
+    overflow: auto;        /* both axes */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    position: relative;
+    min-height: 0;         /* crucial for flex children */
+  }
+  .tree-scroll-container svg {
+    display: block;
+    /* width/height set dynamically from JS */
+  }
+
+  /* Legend */
+  .tree-legend {
+    display: flex; gap: 14px; flex-shrink: 0;
+    font-size: 11px; color: var(--text-secondary); align-items: center; padding: 0 4px;
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
   /* Progress bar */
-  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.2s; }
 
   /* ── STEP LOG PANEL ── */
@@ -156,7 +183,7 @@
     font-size: 12.5px; line-height: 1.5; border-left: 3px solid var(--accent); }
   .vars-section { margin-bottom: 10px; }
   .vars-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-secondary); margin-bottom: 6px; }
-  .var-row { font-family: var(--font-mono); font-size: 12px; margin: 3px 0; }
+  .var-row { font-family: var(--font-mono); font-size: 12px; margin: 3px 0; word-break: break-all; }
   .var-name { color: var(--accent); }
   .var-val { color: var(--text-primary); }
   .history-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text-secondary); margin-bottom: 6px; }
@@ -170,7 +197,7 @@
   .int-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
   .int-panel:last-child { border-right: none; }
   .int-panel .panel-header { padding: 10px 16px; font-size: 12px; font-weight: 700; color: var(--text-secondary);
-    text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
+    text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; }
   .int-panel-body { flex: 1; overflow-y: auto; padding: 16px; }
 
   .int-stage { margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;
@@ -191,7 +218,7 @@
   .int-content { color: var(--text-secondary); font-size: 12.5px; line-height: 1.7; white-space: pre-line; }
 
   .int-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px 16px;
-    border-top: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; }
+    border-top: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; flex-wrap: wrap; }
 
   /* Intuition Viz */
   .int-viz-body { flex: 1; overflow-y: auto; padding: 16px; }
@@ -208,7 +235,7 @@
     padding: 10px; text-align: center; }
   .complexity-pill .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; }
   .complexity-pill .value { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent2); }
-  .tree-demo svg { width: 100%; }
+  .tree-demo-scroll { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-primary); }
   .candidates-strip { display: flex; gap: 6px; flex-wrap: wrap; }
   .cand-pill { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px;
     padding: 4px 12px; font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
@@ -217,14 +244,12 @@
   .pruning-demo .prune { color: var(--node-pruned); text-decoration: line-through; }
   .pruning-demo .keep { color: var(--node-found); font-weight: 600; }
 
-  /* Step progress indicator */
   .step-dots { display: flex; gap: 5px; justify-content: center; padding: 6px 0; flex-wrap: wrap; }
   .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.2s; }
   .step-dot.done { background: var(--accent); }
   .step-dot.current { background: var(--highlight-border); width: 12px; border-radius: 4px; }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
@@ -259,52 +284,54 @@
    SYNTAX HIGHLIGHTER
 ═══════════════════════════════════════════════════ */
 function highlightPython(line) {
-  // Use DOM for safe escaping
   const tmp = document.createElement('div');
   tmp.textContent = line;
   let safe = tmp.innerHTML;
 
-  // Comments (process first)
   if (safe.trim().startsWith('#')) {
     return `<span class="tok-cmt">${safe}</span>`;
   }
 
-  // Strings (triple then single/double)
-  safe = safe.replace(/&quot;&quot;&quot;([\s\S]*?)&quot;&quot;&quot;/g, m => `<span class="tok-str">${m}</span>`);
-  safe = safe.replace(/&#39;&#39;&#39;([\s\S]*?)&#39;&#39;&#39;/g, m => `<span class="tok-str">${m}</span>`);
-  safe = safe.replace(/((?:&quot;|&#39;)(?:(?!(?:&quot;|&#39;)).)*(?:&quot;|&#39;))/g, m => `<span class="tok-str">${m}</span>`);
+  // Strings (triple then single/double) — must run before keyword scan
+  safe = safe.replace(/(&quot;&quot;&quot;)([\s\S]*?)(&quot;&quot;&quot;)/g, (m) => `<span class="tok-str">${m}</span>`);
+  safe = safe.replace(/(&#39;&#39;&#39;)([\s\S]*?)(&#39;&#39;&#39;)/g, (m) => `<span class="tok-str">${m}</span>`);
+  // Single/double quoted strings (non-greedy, no newline)
+  safe = safe.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;)/g, (m) => `<span class="tok-str">${m}</span>`);
 
-  // Inline comments
-  safe = safe.replace(/(#[^<]*)$/, m => `<span class="tok-cmt">${m}</span>`);
+  // Inline comments (after string scan)
+  safe = safe.replace(/(#(?:[^<]*)$)/gm, (m) => `<span class="tok-cmt">${m}</span>`);
 
-  // Type annotations
-  safe = safe.replace(/\b(List|Optional|Dict|Tuple|Set|int|str|bool|float|None)\b/g, '<span class="tok-type">$1</span>');
+  // Bracket/type annotations — before keyword scan to avoid re-wrapping
+  safe = safe.replace(/\b(List|Optional|Dict|Tuple|Set|int|str|bool|float)\b(?![^<]*<\/span>)/g,
+    '<span class="tok-type">$1</span>');
 
   // Keywords
   const kws = ['class','def','return','if','elif','else','for','while','in','and','or','not',
                 'True','False','None','import','from','as','break','continue','pass','lambda','yield','with'];
   kws.forEach(k => {
-    safe = safe.replace(new RegExp(`(?<![\\w\\-])${k}(?![\\w\\-])`, 'g'), `<span class="tok-kw">${k}</span>`);
+    const re = new RegExp(`(?<![\\w\\-<"/])${k}(?![\\w\\-])(?![^<]*<\\/span>)`, 'g');
+    safe = safe.replace(re, `<span class="tok-kw">${k}</span>`);
   });
 
   // Function names after def
-  safe = safe.replace(/(<span class="tok-kw">def<\/span>\s+)(\w+)/g, (_, d, fn) => `${d}<span class="tok-fn">${fn}</span>`);
+  safe = safe.replace(/(<span class="tok-kw">def<\/span>\s+)(\w+)/g,
+    (_, d, fn) => `${d}<span class="tok-fn">${fn}</span>`);
 
   // Built-in calls
   safe = safe.replace(/\b(range|len|append|pop|copy|sort|sorted|print|enumerate|zip|map|filter|sum|min|max)\b(?=\s*\()/g,
     '<span class="tok-fn">$1</span>');
 
-  // Numbers
-  safe = safe.replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
+  // Numbers (not inside existing spans)
+  safe = safe.replace(/(?<!["\w<])(\b\d+\b)(?![^<]*<\/span>)/g, '<span class="tok-num">$1</span>');
 
-  // Operators
+  // self
   safe = safe.replace(/\b(self)\b/g, '<span class="tok-type">self</span>');
 
   return safe;
 }
 
 /* ═══════════════════════════════════════════════════
-   THE SOLUTION CODE (for display)
+   SOLUTION CODE
 ═══════════════════════════════════════════════════ */
 const CODE = `class Solution:
     def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
@@ -332,8 +359,6 @@ const CODE_LINES = CODE.split('\n');
 /* ═══════════════════════════════════════════════════
    STEP SIMULATOR
 ═══════════════════════════════════════════════════ */
-let STEPS = [];
-
 function simulate(candidates, target) {
   const steps = [];
   const results = [];
@@ -341,13 +366,7 @@ function simulate(candidates, target) {
   let stepId = 0;
 
   function snap(line, desc, extra={}) {
-    steps.push({
-      id: stepId++,
-      line,
-      description: desc,
-      results: results.map(r=>[...r]),
-      ...extra
-    });
+    steps.push({ id: stepId++, line, description: desc, results: results.map(r=>[...r]), ...extra });
   }
 
   snap(3, `Initialize results=[], sort candidates → [${sorted.join(', ')}]`, {
@@ -378,7 +397,7 @@ function simulate(candidates, target) {
       });
 
       if (candidate > remaining) {
-        snap(12, `🔴 Prune! ${candidate} > ${remaining} → break (all further candidates also too large)`, {
+        snap(12, `🔴 Prune! ${candidate} > ${remaining} → break (all further too large)`, {
           current: [...current], remaining, start, depth, pruned: true, loopI: i,
           vars: { candidate, remaining, action: 'BREAK - prune branch' }
         });
@@ -419,7 +438,7 @@ function simulate(candidates, target) {
 }
 
 /* ═══════════════════════════════════════════════════
-   BACKTRACK TREE for visualization
+   TREE BUILDER
 ═══════════════════════════════════════════════════ */
 function buildTree(candidates, target) {
   const sorted = [...candidates].sort((a,b)=>a-b);
@@ -427,104 +446,135 @@ function buildTree(candidates, target) {
 
   function build(start, current, remaining, depth) {
     const id = nodeId++;
-    const node = { id, current: [...current], remaining, depth, children: [], pruned: false, found: remaining===0 };
-    if (remaining === 0) return node;
-    if (depth > 5) return node; // limit visual depth
+    const node = {
+      id, current: [...current], remaining, depth,
+      children: [], pruned: false, found: remaining === 0,
+      _width: 1
+    };
+    if (remaining === 0 || depth >= 6) return node;
 
+    let childrenAdded = 0;
     for (let i = start; i < sorted.length; i++) {
       const c = sorted[i];
       if (c > remaining) { node.pruned = true; break; }
       current.push(c);
-      node.children.push(build(i, current, remaining - c, depth + 1));
+      const child = build(i, current, remaining - c, depth + 1);
+      node.children.push(child);
       current.pop();
+      childrenAdded++;
     }
     return node;
   }
 
-  return build(0, [], target, 0);
+  const tree = build(0, [], target, 0);
+  computeWidths(tree);
+  return tree;
+}
+
+function computeWidths(node) {
+  if (!node.children.length) { node._width = 1; return 1; }
+  let w = 0;
+  node.children.forEach(c => { w += computeWidths(c); });
+  node._width = Math.max(1, w);
+  return node._width;
 }
 
 /* ═══════════════════════════════════════════════════
-   SVG TREE RENDERER
+   SVG TREE RENDERER — now returns {svg, width, height}
 ═══════════════════════════════════════════════════ */
 function renderTreeSVG(tree, activeStep) {
-  const NODE_R = 22;
-  const H_GAP = 48;
-  const V_GAP = 62;
+  const H_GAP = 72;   // horizontal gap per unit width
+  const V_GAP = 72;   // vertical gap between levels
+  const NODE_RX = 30; // ellipse rx
+  const NODE_RY = 16; // ellipse ry
+  const PAD = 20;     // padding around tree
 
-  // Calculate subtree widths
-  function calcWidth(node) {
-    if (!node.children.length) return 1;
-    const sum = node.children.reduce((a, c) => a + calcWidth(c), 0);
-    node._width = Math.max(1, sum);
-    return node._width;
-  }
-  calcWidth(tree);
-
-  const nodes = [];
-  const edges = [];
+  const allNodes = [];
+  const allEdges = [];
 
   function layout(node, cx, cy) {
     node._x = cx;
     node._y = cy;
-    nodes.push(node);
+    allNodes.push(node);
 
-    const totalW = (node.children.reduce((a,c)=>a+(c._width||1),0)-1) * H_GAP;
-    let ox = cx - totalW / 2;
-
+    let ox = cx - ((node._width - 1) * H_GAP) / 2;
     node.children.forEach(child => {
-      const childCX = ox + ((child._width||1)-1)*H_GAP/2;
-      edges.push({ x1: cx, y1: cy, x2: childCX, y2: cy + V_GAP, found: child.found, pruned: child.pruned });
+      const childCX = ox + ((child._width - 1) * H_GAP) / 2;
+      allEdges.push({
+        x1: cx, y1: cy + NODE_RY,
+        x2: childCX, y2: cy + V_GAP - NODE_RY,
+        found: child.found, pruned: child.pruned
+      });
       layout(child, childCX, cy + V_GAP);
-      ox += (child._width||1) * H_GAP;
+      ox += child._width * H_GAP;
     });
   }
 
-  const treeWidth = (tree._width || 1) * H_GAP;
-  const W = Math.max(500, treeWidth + 60);
-  const depths = new Set(nodes.map(n=>n.depth));
-  const H = Math.max(200, (Math.max(...[...depths])+1) * V_GAP + 60);
+  layout(tree, (tree._width * H_GAP) / 2, PAD + NODE_RY);
 
-  // Layout pass
-  layout(tree, W/2, 36);
+  // Compute bounding box
+  let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
+  allNodes.forEach(n => {
+    minX = Math.min(minX, n._x - NODE_RX - PAD);
+    maxX = Math.max(maxX, n._x + NODE_RX + PAD);
+    maxY = Math.max(maxY, n._y + NODE_RY + PAD);
+  });
 
-  // Find active node from step
-  let activeCurrentStr = null;
-  if (activeStep) {
-    activeCurrentStr = JSON.stringify(activeStep.current);
-  }
+  const W = Math.max(400, maxX - minX);
+  const H = Math.max(200, maxY);
+  const offsetX = -minX;
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:340px">`;
-  svg += `<defs>
-    <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-      <polygon points="0 0,6 3,0 6" fill="#4b5563"/>
-    </marker>
-  </defs>`;
+  // Active node matching
+  let activeCurrentStr = activeStep ? JSON.stringify(activeStep.current) : null;
+
+  let svgParts = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" style="display:block">`,
+    `<defs>
+      <marker id="arr" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+        <polygon points="0 0,6 2.5,0 5" fill="#4b5563"/>
+      </marker>
+    </defs>`
+  ];
 
   // Edges
-  edges.forEach(e => {
+  allEdges.forEach(e => {
     const color = e.found ? '#10b981' : e.pruned ? '#ef4444' : '#4b5563';
-    svg += `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="${color}" stroke-width="1.5" stroke-dasharray="${e.pruned?'4,3':'none'}" opacity="0.6"/>`;
+    const dash = e.pruned ? '5,4' : 'none';
+    svgParts.push(
+      `<line x1="${e.x1+offsetX}" y1="${e.y1}" x2="${e.x2+offsetX}" y2="${e.y2}"
+        stroke="${color}" stroke-width="1.5" stroke-dasharray="${dash}" opacity="0.7"/>`
+    );
   });
 
   // Nodes
-  nodes.forEach(n => {
+  allNodes.forEach(n => {
     const isActive = activeCurrentStr && JSON.stringify(n.current) === activeCurrentStr;
-    const fill = n.found ? '#10b981' : n.pruned ? '#991b1b' : isActive ? '#3b82f6' : '#374151';
-    const stroke = isActive ? '#fbbf24' : n.found ? '#34d399' : '#4b5563';
-    const sw = isActive ? 3 : 1.5;
+    const fill = n.found ? '#064e3b' : n.pruned ? '#450a0a' : isActive ? '#1e3a5f' : '#1f2937';
+    const stroke = isActive ? '#fbbf24' : n.found ? '#10b981' : n.pruned ? '#ef4444' : '#4b5563';
+    const sw = isActive ? 2.5 : 1.5;
+    const cx = n._x + offsetX;
+
     const label = n.current.length ? `[${n.current.join(',')}]` : '[]';
     const rem = `r=${n.remaining}`;
+    const labelColor = n.found ? '#6ee7b7' : n.pruned ? '#fca5a5' : '#e5e7eb';
 
-    svg += `<g>
-      <ellipse cx="${n._x}" cy="${n._y}" rx="${NODE_R+4}" ry="${NODE_R-4}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
-      <text x="${n._x}" y="${n._y-3}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-family="monospace">${label}</text>
-      <text x="${n._x}" y="${n._y+7}" text-anchor="middle" dominant-baseline="middle" fill="${n.found?'#d1fae5':'#9ca3af'}" font-size="8" font-family="monospace">${rem}</text>
-    </g>`;
+    svgParts.push(`
+      <ellipse cx="${cx}" cy="${n._y}" rx="${NODE_RX}" ry="${NODE_RY}"
+        fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+      <text x="${cx}" y="${n._y - 4}" text-anchor="middle" dominant-baseline="middle"
+        fill="${labelColor}" font-size="9.5" font-family="monospace" font-weight="600">${label}</text>
+      <text x="${cx}" y="${n._y + 8}" text-anchor="middle" dominant-baseline="middle"
+        fill="${n.found ? '#34d399' : '#9ca3af'}" font-size="8.5" font-family="monospace">${rem}</text>
+    `);
+
+    if (n.found) {
+      svgParts.push(`<text x="${cx + NODE_RX + 4}" y="${n._y}" dominant-baseline="middle"
+        fill="#10b981" font-size="11">✓</text>`);
+    }
   });
 
-  svg += `</svg>`;
-  return svg;
+  svgParts.push('</svg>');
+  return { svg: svgParts.join(''), width: W, height: H };
 }
 
 /* ═══════════════════════════════════════════════════
@@ -533,7 +583,6 @@ function renderTreeSVG(tree, activeStep) {
 let state = {
   mode: 'intuition',
   theme: 'dark',
-  // execution
   steps: [],
   currentStep: 0,
   isPlaying: false,
@@ -542,10 +591,10 @@ let state = {
   candidates: [2,3,6,7],
   target: 7,
   tree: null,
-  // intuition
   intuitionStage: 0,
   intuitionPlaying: false,
-  intuitionTimer: null
+  intuitionTimer: null,
+  pw: [30, 50, 20]
 };
 
 /* ═══════════════════════════════════════════════════
@@ -568,7 +617,7 @@ Key observations:
   {
     title: "Exploring Approaches",
     thought: "Could I use DP? Maybe greedy? Or should I enumerate all subsets?",
-    content: `Approach A — Brute Force (enumerate all subsets):
+    content: `Approach A — Brute Force (enumerate all multisets):
   Try every possible multiset of candidates. This explodes in complexity and is hard to avoid duplicates.
 
 Approach B — Dynamic Programming:
@@ -690,41 +739,63 @@ function render() {
 function renderExecution() {
   const step = state.steps[state.currentStep] || {};
   const progress = state.steps.length > 1 ? (state.currentStep / (state.steps.length - 1)) * 100 : 0;
-  const treeSVG = state.tree ? renderTreeSVG(state.tree, step) : '';
+
+  // Build SVG tree
+  let treeHTML = '<div style="padding:20px;color:var(--text-secondary);text-align:center;font-size:12px">Loading tree...</div>';
+  if (state.tree) {
+    const { svg, width, height } = renderTreeSVG(state.tree, step);
+    treeHTML = svg;
+    // We'll inject width/height after render via the container
+    state._treeW = width;
+    state._treeH = height;
+  }
 
   return `
   <div class="panel" id="code-panel" style="width:${state.pw[0]}%">
     <div class="panel-header">Code<span style="color:var(--accent);margin-left:6px">Python</span></div>
     <div class="panel-body">
-      <pre class="code-pre">${CODE_LINES.map((line,i)=>`<div class="code-line${step.line===i?'':''}" id="cl${i}" style="display:flex;align-items:stretch;min-height:20px;padding:1px 0;background:${step.line===i?'var(--highlight-line)':'transparent'};border-left:${step.line===i?'3px solid var(--highlight-border)':'3px solid transparent'}"><span class="line-num">${i+1}</span><span class="line-code">${highlightPython(line)||'&nbsp;'}</span></div>`).join('')}</pre>
+      <pre class="code-pre">${CODE_LINES.map((line, i) => {
+        const active = step.line === i;
+        return `<div class="code-line${active?' active-line':''}">` +
+          `<span class="line-num">${i+1}</span>` +
+          `<span class="line-code">${highlightPython(line)||'&nbsp;'}</span>` +
+          `</div>`;
+      }).join('')}</pre>
     </div>
   </div>
   <div class="divider" id="div1"></div>
   <div class="panel" id="viz-panel" style="width:${state.pw[1]}%">
     <div class="panel-header">
-      <span>Decision Tree Visualization</span>
-      <span style="font-size:11px;color:var(--text-secondary)">
-        🟢 found &nbsp; 🔴 pruned &nbsp; 🔵 active
-      </span>
+      <span>Decision Tree</span>
+      <div class="tree-legend">
+        <span><span class="legend-dot" style="background:#10b981"></span>Found</span>
+        <span><span class="legend-dot" style="background:#ef4444"></span>Pruned</span>
+        <span><span class="legend-dot" style="background:#3b82f6"></span>Active</span>
+        <span style="font-size:10px;color:var(--text-secondary)">← scroll →</span>
+      </div>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="padding:10px;display:flex;flex-direction:column;gap:8px;overflow:hidden;">
       <div class="result-box">
         <h4>Results found so far</h4>
-        <div class="result-chips" id="result-chips">
+        <div class="result-chips">
           ${(step.results||[]).map(r=>`<span class="chip">[${r.join(',')}]</span>`).join('')}
-          ${step.current && step.current.length && !step.found ? `<span class="chip-current">→ [${step.current.join(',')}] (r=${step.remaining??'?'})</span>` : ''}
-          ${!(step.results||[]).length && !(step.current&&step.current.length) ? '<span style="color:var(--text-secondary);font-size:12px">None yet...</span>' : ''}
+          ${step.current&&step.current.length&&!step.found
+            ? `<span class="chip-current">→ [${step.current.join(',')}] (r=${step.remaining??'?'})</span>`
+            : ''}
+          ${!(step.results||[]).length&&!(step.current&&step.current.length)
+            ? '<span style="color:var(--text-secondary);font-size:12px">None yet…</span>'
+            : ''}
         </div>
       </div>
-      <div class="tree-demo" style="overflow-x:auto">
-        ${treeSVG}
+      <div class="tree-scroll-container" id="tree-container">
+        ${treeHTML}
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
     </div>
     <div class="viz-controls">
       <button class="ctrl-btn" title="Reset" onclick="resetStep()">⏮</button>
       <button class="ctrl-btn" title="Step Back" onclick="stepBack()" ${state.currentStep<=0?'disabled':''}>◀</button>
-      <button class="ctrl-btn" title="${state.isPlaying?'Pause':'Play'}" onclick="togglePlay()" id="play-btn">${state.isPlaying?'⏸':'▶'}</button>
+      <button class="ctrl-btn" title="${state.isPlaying?'Pause':'Play'}" onclick="togglePlay()">${state.isPlaying?'⏸':'▶'}</button>
       <button class="ctrl-btn" title="Step Forward" onclick="stepFwd()" ${state.currentStep>=state.steps.length-1?'disabled':''}>▶</button>
       <button class="ctrl-btn" title="Skip to End" onclick="skipEnd()">⏭</button>
       <select class="speed-select" onchange="setSpeed(this.value)">
@@ -743,11 +814,15 @@ function renderExecution() {
       <div class="log-step-desc">${step.description||'—'}</div>
       <div class="vars-section">
         <h4>Variables</h4>
-        ${Object.entries(step.vars||{}).map(([k,v])=>`<div class="var-row"><span class="var-name">${k}</span><span class="var-val">: ${v}</span></div>`).join('')}
+        ${Object.entries(step.vars||{}).map(([k,v])=>
+          `<div class="var-row"><span class="var-name">${k}</span><span class="var-val">: ${v}</span></div>`
+        ).join('')}
       </div>
       <div class="history-section">
         <h4>History</h4>
-        ${state.steps.slice(0, state.currentStep+1).map((s,i)=>`<div class="history-item ${i===state.currentStep?'current':''}" onclick="gotoStep(${i})">${i+1}. ${s.description}</div>`).join('')}
+        ${state.steps.slice(0, state.currentStep+1).map((s,i)=>
+          `<div class="history-item ${i===state.currentStep?'current':''}" onclick="gotoStep(${i})">${i+1}. ${s.description}</div>`
+        ).join('')}
       </div>
     </div>
   </div>`;
@@ -774,7 +849,10 @@ function renderIntuition() {
 
   return `<div id="intuition-container">
     <div class="int-panel" style="flex:1">
-      <div class="panel-header">Senior Engineer's Thought Process <span style="float:right">Stage ${state.intuitionStage+1} / ${INTUITION_STAGES.length}</span></div>
+      <div class="panel-header">
+        Senior Engineer's Thought Process
+        <span>Stage ${state.intuitionStage+1} / ${INTUITION_STAGES.length}</span>
+      </div>
       <div class="int-panel-body" id="int-stages-body">${stagesHTML}</div>
       <div class="int-controls">
         <button class="btn" onclick="prevStage()" ${state.intuitionStage<=0?'disabled':''}>← Prev</button>
@@ -795,7 +873,7 @@ function renderIntuitionViz(stage) {
     case 'problem': return `
       <div class="viz-card">
         <h3>Example Input</h3>
-        <div style="margin-bottom:10px;font-size:12.5px;color:var(--text-secondary)">candidates =</div>
+        <div style="margin-bottom:8px;font-size:12.5px;color:var(--text-secondary)">candidates =</div>
         <div class="candidates-strip" style="margin-bottom:14px">
           ${[2,3,6,7].map(c=>`<div class="cand-pill">${c}</div>`).join('')}
         </div>
@@ -839,32 +917,29 @@ function renderIntuitionViz(stage) {
       </div>
       <div class="viz-card">
         <h3>Decision Tree (abbreviated)</h3>
-        <svg viewBox="0 0 320 160" style="width:100%" xmlns="http://www.w3.org/2000/svg">
-          <!-- Root -->
-          <ellipse cx="160" cy="20" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="160" y="21" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[] r=7</text>
-          <!-- Level 1 -->
-          <line x1="160" y1="34" x2="80" y2="70" stroke="#4b5563" stroke-width="1.2"/>
-          <line x1="160" y1="34" x2="160" y2="70" stroke="#4b5563" stroke-width="1.2"/>
-          <line x1="160" y1="34" x2="240" y2="70" stroke="#4b5563" stroke-width="1.2"/>
-          <ellipse cx="80" cy="80" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="80" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[2] r=5</text>
-          <ellipse cx="160" cy="80" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="160" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[3] r=4</text>
-          <ellipse cx="240" cy="80" rx="28" ry="14" fill="#374151" stroke="#a78bfa" stroke-width="1.5"/>
-          <text x="240" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[7] r=0</text>
-          <!-- [7] found -->
-          <text x="240" y="104" text-anchor="middle" fill="#10b981" font-size="9">✅</text>
-          <!-- Level 2 from [2] -->
-          <line x1="80" y1="94" x2="50" y2="126" stroke="#4b5563" stroke-width="1.2"/>
-          <line x1="80" y1="94" x2="90" y2="126" stroke="#4b5563" stroke-width="1.2"/>
-          <ellipse cx="50" cy="136" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="50" y="137" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace">[2,2]r=3</text>
-          <ellipse cx="110" cy="136" rx="28" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="110" y="137" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace">[2,3]r=2</text>
-          <line x1="80" y1="94" x2="110" y2="126" stroke="#4b5563" stroke-width="1.2"/>
-          <text x="280" y="140" text-anchor="middle" fill="#6272a4" font-size="9" font-style="italic">... and so on</text>
-        </svg>
+        <div class="tree-demo-scroll">
+          <svg viewBox="0 0 320 170" width="320" height="170" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="160" cy="22" rx="30" ry="15" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="160" y="23" text-anchor="middle" fill="#e5e7eb" font-size="9" font-family="monospace">[] r=7</text>
+            <line x1="160" y1="37" x2="60" y2="72" stroke="#4b5563" stroke-width="1.2"/>
+            <line x1="160" y1="37" x2="160" y2="72" stroke="#4b5563" stroke-width="1.2"/>
+            <line x1="160" y1="37" x2="260" y2="72" stroke="#4b5563" stroke-width="1.2"/>
+            <ellipse cx="60" cy="84" rx="30" ry="15" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="60" y="85" text-anchor="middle" fill="#e5e7eb" font-size="9" font-family="monospace">[2] r=5</text>
+            <ellipse cx="160" cy="84" rx="30" ry="15" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="160" y="85" text-anchor="middle" fill="#e5e7eb" font-size="9" font-family="monospace">[3] r=4</text>
+            <ellipse cx="260" cy="84" rx="30" ry="15" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+            <text x="260" y="85" text-anchor="middle" fill="#6ee7b7" font-size="9" font-family="monospace">[7] r=0</text>
+            <text x="260" y="108" text-anchor="middle" fill="#10b981" font-size="11">✓ Found!</text>
+            <line x1="60" y1="99" x2="30" y2="132" stroke="#4b5563" stroke-width="1.2"/>
+            <line x1="60" y1="99" x2="90" y2="132" stroke="#4b5563" stroke-width="1.2"/>
+            <ellipse cx="30" cy="145" rx="28" ry="14" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="30" y="146" text-anchor="middle" fill="#e5e7eb" font-size="8" font-family="monospace">[2,2]r=3</text>
+            <ellipse cx="100" cy="145" rx="28" ry="14" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+            <text x="100" y="146" text-anchor="middle" fill="#e5e7eb" font-size="8" font-family="monospace">[2,3]r=2</text>
+            <text x="185" y="150" fill="#6272a4" font-size="9" font-style="italic" font-family="monospace">...continues</text>
+          </svg>
+        </div>
       </div>`;
 
     case 'dedup': return `
@@ -878,21 +953,21 @@ function renderIntuitionViz(stage) {
       </div>
       <div class="viz-card">
         <h3>With Start Index — No Duplicates</h3>
-        <div style="font-size:12.5px;color:var(--text-secondary);line-height:2">
+        <div style="font-size:12.5px;color:var(--text-secondary);line-height:2;font-family:var(--font-mono)">
           backtrack(start=<span style="color:#60a5fa">0</span>, ...)<br>
-          &nbsp;&nbsp;pick 2 (i=0) → backtrack(start=<span style="color:#10b981">0</span>, ...) ← reuse allowed<br>
-          &nbsp;&nbsp;pick 3 (i=1) → backtrack(start=<span style="color:#10b981">1</span>, ...) ← can't go back to 2<br>
+          &nbsp;&nbsp;pick 2 (i=0) → backtrack(start=<span style="color:#10b981">0</span>, ...) ← reuse ok<br>
+          &nbsp;&nbsp;pick 3 (i=1) → backtrack(start=<span style="color:#10b981">1</span>, ...) ← no 2 again<br>
           &nbsp;&nbsp;pick 6 (i=2) → backtrack(start=<span style="color:#10b981">2</span>, ...)<br>
-          <span style="color:#10b981">→ [3,2] is impossible: once we start at i=1, i=0 is gone</span>
+          <span style="color:#10b981">→ [3,2] impossible: once start=1, index 0 is gone</span>
         </div>
       </div>
       <div class="viz-card">
         <h3>The i vs i+1 Choice</h3>
         <div class="approach-box approach-good">
-          <strong>backtrack(i, ...)</strong> — use i (allow reuse of current element)
+          <strong>backtrack(i, ...)</strong> — allows reuse of current element ✓
         </div>
         <div class="approach-box approach-bad">
-          <strong>backtrack(i+1, ...)</strong> — would prevent reuse (wrong for this problem)
+          <strong>backtrack(i+1, ...)</strong> — would prevent reuse (wrong here)
         </div>
       </div>`;
 
@@ -902,10 +977,10 @@ function renderIntuitionViz(stage) {
         <div class="pruning-demo">
           candidates = [3, 7, 2, 6], target = 5<br>
           i=0: 3 ≤ 5 ✓ recurse<br>
-          i=1: 7 > 5 → <span class="keep">continue</span> (check next!)<br>
+          i=1: 7 > 5 → <span style="color:#ef4444">continue</span> (must check i=2!)<br>
           i=2: 2 ≤ 5 ✓ recurse<br>
           i=3: 6 > 5 → continue<br>
-          <span style="color:#ef4444">Must check every element even if too large</span>
+          <span style="color:#ef4444">No early exit possible</span>
         </div>
       </div>
       <div class="viz-card">
@@ -914,53 +989,53 @@ function renderIntuitionViz(stage) {
           candidates = [2, 3, 6, 7], target = 5<br>
           i=0: 2 ≤ 5 ✓ recurse<br>
           i=1: 3 ≤ 5 ✓ recurse<br>
-          i=2: 6 > 5 → <span class="keep">BREAK</span> (7 is also > 5, skip!)<br>
-          <span style="color:#10b981">Entire right portion pruned in one step</span>
+          i=2: 6 > 5 → <span class="keep">BREAK</span> (7 also > 5, skip all!)<br>
+          <span style="color:#10b981">Entire right portion pruned instantly</span>
         </div>
       </div>
       <div class="viz-card">
-        <h3>Impact: Pruned Subtrees</h3>
-        <svg viewBox="0 0 300 100" style="width:100%" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="150" cy="20" rx="32" ry="14" fill="#374151" stroke="#60a5fa" stroke-width="1.5"/>
-          <text x="150" y="21" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">[] r=5</text>
-          <line x1="150" y1="34" x2="60" y2="70" stroke="#10b981" stroke-width="1.5"/>
-          <line x1="150" y1="34" x2="140" y2="70" stroke="#10b981" stroke-width="1.5"/>
-          <line x1="150" y1="34" x2="230" y2="70" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <line x1="150" y1="34" x2="280" y2="70" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <ellipse cx="60" cy="80" rx="22" ry="12" fill="#374151" stroke="#10b981" stroke-width="1.5"/>
-          <text x="60" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">2✓</text>
-          <ellipse cx="140" cy="80" rx="22" ry="12" fill="#374151" stroke="#10b981" stroke-width="1.5"/>
-          <text x="140" y="81" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace">3✓</text>
-          <ellipse cx="230" cy="80" rx="22" ry="12" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5"/>
-          <text x="230" y="81" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">6✗</text>
-          <ellipse cx="280" cy="80" rx="22" ry="12" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5"/>
-          <text x="280" y="81" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">7✗</text>
-          <text x="255" y="100" text-anchor="middle" fill="#ef4444" font-size="8">PRUNED by sort+break</text>
+        <h3>Pruned vs Explored</h3>
+        <svg viewBox="0 0 300 110" width="300" height="110" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="150" cy="22" rx="34" ry="15" fill="#1f2937" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="150" y="23" text-anchor="middle" fill="#e5e7eb" font-size="9" font-family="monospace">[] r=5</text>
+          <line x1="150" y1="37" x2="50" y2="72" stroke="#10b981" stroke-width="1.5"/>
+          <line x1="150" y1="37" x2="130" y2="72" stroke="#10b981" stroke-width="1.5"/>
+          <line x1="150" y1="37" x2="210" y2="72" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <line x1="150" y1="37" x2="270" y2="72" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <ellipse cx="50" cy="84" rx="28" ry="14" fill="#1f2937" stroke="#10b981" stroke-width="1.5"/>
+          <text x="50" y="85" text-anchor="middle" fill="#6ee7b7" font-size="9" font-family="monospace">2 ✓</text>
+          <ellipse cx="130" cy="84" rx="28" ry="14" fill="#1f2937" stroke="#10b981" stroke-width="1.5"/>
+          <text x="130" y="85" text-anchor="middle" fill="#6ee7b7" font-size="9" font-family="monospace">3 ✓</text>
+          <ellipse cx="210" cy="84" rx="28" ry="14" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="210" y="85" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">6 ✗</text>
+          <ellipse cx="270" cy="84" rx="28" ry="14" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="270" y="85" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">7 ✗</text>
+          <text x="240" y="106" text-anchor="middle" fill="#ef4444" font-size="8.5">PRUNED by sort+break</text>
         </svg>
       </div>`;
 
     case 'code_flow': return `
       <div class="viz-card">
         <h3>Choose → Recurse → Unchoose</h3>
-        <div style="font-family:var(--font-mono);font-size:12.5px;line-height:2;color:var(--text-secondary)">
-          <span style="color:#ff79c6">for</span> i <span style="color:#ff79c6">in</span> <span style="color:#50fa7b">range</span>(start, <span style="color:#50fa7b">len</span>(candidates)):<br>
-          &nbsp;&nbsp;<span style="color:#8be9fd">candidate</span> = candidates[i]<br>
-          &nbsp;&nbsp;<span style="color:#ff79c6">if</span> candidate &gt; remaining: <span style="color:#ff79c6">break</span><br>
-          &nbsp;&nbsp;current.<span style="color:#50fa7b">append</span>(candidate) <span style="color:#6272a4"># ← CHOOSE</span><br>
-          &nbsp;&nbsp;<span style="color:#50fa7b">backtrack</span>(i, current, remaining-candidate) <span style="color:#6272a4"># ← EXPLORE</span><br>
-          &nbsp;&nbsp;current.<span style="color:#50fa7b">pop</span>() <span style="color:#6272a4"># ← UNCHOOSE (backtrack)</span>
+        <div style="font-family:var(--font-mono);font-size:12.5px;line-height:2.1;color:var(--text-secondary)">
+          <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-fn">range</span>(start, <span class="tok-fn">len</span>(candidates)):<br>
+          &nbsp;&nbsp;candidate = candidates[i]<br>
+          &nbsp;&nbsp;<span class="tok-kw">if</span> candidate &gt; remaining: <span class="tok-kw">break</span><br>
+          &nbsp;&nbsp;current.<span class="tok-fn">append</span>(candidate) <span class="tok-cmt"># CHOOSE</span><br>
+          &nbsp;&nbsp;<span class="tok-fn">backtrack</span>(i, current, remaining-candidate) <span class="tok-cmt"># EXPLORE</span><br>
+          &nbsp;&nbsp;current.<span class="tok-fn">pop</span>() <span class="tok-cmt"># UNCHOOSE ← backtrack!</span>
         </div>
       </div>
       <div class="viz-card">
-        <h3>Call Stack Example</h3>
+        <h3>Call Stack Example (target=7)</h3>
         <div style="font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);line-height:2">
           backtrack(0, [], 7)<br>
           &nbsp;→ backtrack(0, [2], 5)<br>
           &nbsp;&nbsp;→ backtrack(0, [2,2], 3)<br>
-          &nbsp;&nbsp;&nbsp;→ backtrack(0, [2,2,2], 1) ← prune 3>1, break<br>
-          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,2,3], 0) ← <span style="color:#10b981">FOUND! [2,2,3]</span><br>
-          &nbsp;&nbsp;pop 2 → try 3...<br>
-          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,3], 2) ← prune 3>2... wait 6>2, break
+          &nbsp;&nbsp;&nbsp;→ backtrack(0, [2,2,2], 1) ← 3&gt;1 break<br>
+          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,2,3], 0) ← <span style="color:#10b981">FOUND!</span><br>
+          &nbsp;&nbsp;← pop 2 → try 3...<br>
+          &nbsp;&nbsp;&nbsp;→ backtrack(1, [2,3], 2) ← 6&gt;2 break
         </div>
       </div>`;
 
@@ -975,46 +1050,52 @@ function renderIntuitionViz(stage) {
           N = number of candidates<br>
           T = target value<br>
           M = minimum candidate value<br><br>
-          The recursion tree has depth ≤ T/M and branching factor ≤ N.
+          Recursion tree depth ≤ T/M, branching factor ≤ N.
         </div>
       </div>
       <div class="viz-card">
         <h3>Example: [2,3,6,7], target=7</h3>
         <div style="font-size:12px;color:var(--text-secondary);line-height:2">
-          Max depth = 7/2 = 3-4 levels<br>
-          Branching = up to 4 (candidates)<br>
-          But pruning cuts most branches!<br>
-          <span style="color:#10b981">In practice: much fewer than 4^4 = 256 nodes</span>
+          Max depth = 7/2 = 3–4 levels<br>
+          Branching = up to 4 candidates<br>
+          Pruning eliminates most branches early<br>
+          <span style="color:#10b981">In practice: far fewer than 4⁴ = 256 nodes</span>
         </div>
       </div>`;
 
-    case 'final': return `
-      <div class="viz-card">
-        <h3>Complete Decision Tree for [2,3,6,7], target=7</h3>
-        ${renderTreeSVG(buildTree([2,3,6,7], 7), null)}
-        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:8px">
-          🟢 Green nodes = found solutions &nbsp; 🔴 Red dashes = pruned branches
+    case 'final': {
+      const { svg, width, height } = renderTreeSVG(buildTree([2,3,6,7], 7), null);
+      return `
+        <div class="viz-card">
+          <h3>Complete Decision Tree for [2,3,6,7], target=7</h3>
+          <div class="tree-demo-scroll" style="max-height:280px;overflow:auto">
+            ${svg}
+          </div>
+          <div style="font-size:11.5px;color:var(--text-secondary);margin-top:8px">
+            🟢 Green = found &nbsp;|&nbsp; 🔴 Red dashed = pruned &nbsp;|&nbsp; Scroll to see full tree
+          </div>
         </div>
-      </div>
-      <div class="viz-card">
-        <h3>Solutions</h3>
-        <div class="result-chips">
-          <span class="chip">[2,2,3]</span>
-          <span class="chip">[7]</span>
+        <div class="viz-card">
+          <h3>Solutions Found</h3>
+          <div class="result-chips">
+            <span class="chip">[2,2,3]</span>
+            <span class="chip">[7]</span>
+          </div>
         </div>
-      </div>
-      <div class="viz-card">
-        <h3>Concepts Demonstrated</h3>
-        <div style="font-size:12.5px;line-height:2;color:var(--text-secondary)">
-          🔁 Backtracking (choose/recurse/unchoose)<br>
-          ✂️ Pruning (sort + break)<br>
-          🚫 Duplicate avoidance (start index)<br>
-          ♻️ Unlimited reuse (i not i+1)<br>
-          📋 Collecting all solutions (results array)
-        </div>
-      </div>`;
+        <div class="viz-card">
+          <h3>Concepts Demonstrated</h3>
+          <div style="font-size:12.5px;line-height:2;color:var(--text-secondary)">
+            🔁 Backtracking (choose/recurse/unchoose)<br>
+            ✂️ Pruning (sort + break)<br>
+            🚫 Duplicate avoidance (start index)<br>
+            ♻️ Unlimited reuse (i not i+1)<br>
+            📋 Collecting all solutions (results array)
+          </div>
+        </div>`;
+    }
 
-    default: return '<div class="viz-card"><h3>Visualization</h3><div style="color:var(--text-secondary)">See left panel</div></div>';
+    default:
+      return '<div class="viz-card"><h3>Visualization</h3><div style="color:var(--text-secondary)">See left panel</div></div>';
   }
 }
 
@@ -1026,41 +1107,56 @@ function setupDividers() {
     const el = document.getElementById(id);
     if (!el) return;
     let dragging = false;
-    el.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
-    document.addEventListener('mousemove', e => {
+
+    el.addEventListener('mousedown', e => {
+      dragging = true;
+      el.classList.add('dragging');
+      e.preventDefault();
+    });
+
+    const onMove = e => {
       if (!dragging) return;
       const main = document.getElementById('main');
       const rect = main.getBoundingClientRect();
       const total = rect.width;
       const panels = main.querySelectorAll('.panel');
+      if (!panels[0] || !panels[1] || !panels[2]) return;
+
       if (idx === 0) {
         let p0 = ((e.clientX - rect.left) / total) * 100;
-        p0 = Math.max(15, Math.min(50, p0));
-        const rest = 100 - p0 - state.pw[2];
+        p0 = Math.max(15, Math.min(55, p0));
         state.pw[0] = p0;
-        state.pw[1] = Math.max(20, rest);
+        state.pw[1] = Math.max(15, 100 - p0 - state.pw[2]);
       } else {
         let p2 = ((rect.right - e.clientX) / total) * 100;
-        p2 = Math.max(15, Math.min(40, p2));
-        const rest = 100 - state.pw[0] - p2;
+        p2 = Math.max(12, Math.min(40, p2));
         state.pw[2] = p2;
-        state.pw[1] = Math.max(20, rest);
+        state.pw[1] = Math.max(15, 100 - state.pw[0] - p2);
       }
-      panels[0].style.width = state.pw[0]+'%';
-      panels[1].style.width = state.pw[1]+'%';
-      panels[2].style.width = state.pw[2]+'%';
-    });
-    document.addEventListener('mouseup', () => { dragging = false; });
+      panels[0].style.width = state.pw[0] + '%';
+      panels[1].style.width = state.pw[1] + '%';
+      panels[2].style.width = state.pw[2] + '%';
+    };
+
+    const onUp = () => {
+      if (dragging) {
+        dragging = false;
+        el.classList.remove('dragging');
+      }
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   });
 }
 
 function scrollLogToStep() {
-  setTimeout(()=>{
+  setTimeout(() => {
     const lb = document.getElementById('log-body');
     if (!lb) return;
-    const items = lb.querySelectorAll('.history-item.current');
-    if (items.length) items[0].scrollIntoView({ block:'nearest', behavior:'smooth' });
-  }, 50);
+    const item = lb.querySelector('.history-item.current');
+    if (item) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, 60);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1069,11 +1165,9 @@ function scrollLogToStep() {
 function setMode(m) {
   clearTimers();
   state.mode = m;
-  document.getElementById('mode-intuition').classList.toggle('active', m==='intuition');
-  document.getElementById('mode-execution').classList.toggle('active', m==='execution');
-  if (m === 'execution' && !state.steps.length) {
-    runSim();
-  }
+  document.getElementById('mode-intuition').classList.toggle('active', m === 'intuition');
+  document.getElementById('mode-execution').classList.toggle('active', m === 'execution');
+  if (m === 'execution' && !state.steps.length) runSim();
   render();
 }
 
@@ -1087,7 +1181,8 @@ function runWithInput() {
   try {
     state.candidates = JSON.parse(document.getElementById('inp-candidates').value);
     state.target = parseInt(document.getElementById('inp-target').value);
-  } catch(e) { alert('Invalid input format'); return; }
+    if (!Array.isArray(state.candidates)) throw new Error();
+  } catch(e) { alert('Invalid input. Use format: [2,3,6,7]'); return; }
   runSim();
   render();
 }
@@ -1100,18 +1195,14 @@ function runSim() {
   state.isPlaying = false;
 }
 
-function togglePlay() {
-  state.isPlaying ? pause() : play();
-}
+function togglePlay() { state.isPlaying ? pause() : play(); }
 
 function play() {
-  if (state.currentStep >= state.steps.length - 1) { state.currentStep = 0; }
+  if (state.currentStep >= state.steps.length - 1) state.currentStep = 0;
   state.isPlaying = true;
   clearInterval(state.playTimer);
   state.playTimer = setInterval(() => {
-    if (state.currentStep >= state.steps.length - 1) {
-      pause(); return;
-    }
+    if (state.currentStep >= state.steps.length - 1) { pause(); return; }
     state.currentStep++;
     render();
     scrollLogToStep();
@@ -1126,48 +1217,25 @@ function pause() {
 }
 
 function stepFwd() {
-  if (state.currentStep < state.steps.length - 1) {
-    state.currentStep++;
-    render();
-    scrollLogToStep();
-  }
+  if (state.currentStep < state.steps.length - 1) { state.currentStep++; render(); scrollLogToStep(); }
 }
-
 function stepBack() {
-  if (state.currentStep > 0) {
-    state.currentStep--;
-    render();
-  }
+  if (state.currentStep > 0) { state.currentStep--; render(); }
 }
-
-function resetStep() {
-  pause();
-  state.currentStep = 0;
-  render();
-}
-
-function skipEnd() {
-  pause();
-  state.currentStep = state.steps.length - 1;
-  render();
-}
-
-function gotoStep(i) {
-  state.currentStep = i;
-  render();
-}
-
-function setSpeed(v) {
-  state.speed = parseFloat(v);
-  if (state.isPlaying) { pause(); play(); }
-}
+function resetStep() { pause(); state.currentStep = 0; render(); }
+function skipEnd() { pause(); state.currentStep = state.steps.length - 1; render(); }
+function gotoStep(i) { state.currentStep = i; render(); }
+function setSpeed(v) { state.speed = parseFloat(v); if (state.isPlaying) { pause(); play(); } }
 
 /* Intuition controls */
 function nextStage() {
   if (state.intuitionStage < INTUITION_STAGES.length - 1) {
     state.intuitionStage++;
     render();
-    scrollToActiveStage();
+    setTimeout(() => {
+      const el = document.getElementById(`istage${state.intuitionStage}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 }
 
@@ -1175,24 +1243,26 @@ function prevStage() {
   if (state.intuitionStage > 0) {
     state.intuitionStage--;
     render();
-    scrollToActiveStage();
+    setTimeout(() => {
+      const el = document.getElementById(`istage${state.intuitionStage}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 }
 
-function toggleIntuitionPlay() {
-  state.intuitionPlaying ? stopIntuitionPlay() : startIntuitionPlay();
-}
+function toggleIntuitionPlay() { state.intuitionPlaying ? stopIntuitionPlay() : startIntuitionPlay(); }
 
 function startIntuitionPlay() {
   state.intuitionPlaying = true;
   clearInterval(state.intuitionTimer);
   state.intuitionTimer = setInterval(() => {
-    if (state.intuitionStage >= INTUITION_STAGES.length - 1) {
-      stopIntuitionPlay(); return;
-    }
+    if (state.intuitionStage >= INTUITION_STAGES.length - 1) { stopIntuitionPlay(); return; }
     state.intuitionStage++;
     render();
-    scrollToActiveStage();
+    setTimeout(() => {
+      const el = document.getElementById(`istage${state.intuitionStage}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }, 4000);
   render();
 }
@@ -1201,13 +1271,6 @@ function stopIntuitionPlay() {
   state.intuitionPlaying = false;
   clearInterval(state.intuitionTimer);
   render();
-}
-
-function scrollToActiveStage() {
-  setTimeout(()=>{
-    const el = document.getElementById(`istage${state.intuitionStage}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 50);
 }
 
 function clearTimers() {
@@ -1221,13 +1284,10 @@ function clearTimers() {
    KEYBOARD
 ═══════════════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (e.code === 'Space') { e.preventDefault();
-    state.mode === 'execution' ? togglePlay() : toggleIntuitionPlay(); }
-  else if (e.code === 'ArrowRight') { e.preventDefault();
-    state.mode === 'execution' ? stepFwd() : nextStage(); }
-  else if (e.code === 'ArrowLeft') { e.preventDefault();
-    state.mode === 'execution' ? stepBack() : prevStage(); }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space') { e.preventDefault(); state.mode === 'execution' ? togglePlay() : toggleIntuitionPlay(); }
+  else if (e.code === 'ArrowRight') { e.preventDefault(); state.mode === 'execution' ? stepFwd() : nextStage(); }
+  else if (e.code === 'ArrowLeft') { e.preventDefault(); state.mode === 'execution' ? stepBack() : prevStage(); }
   else if (e.code === 'Home') { e.preventDefault(); resetStep(); }
   else if (e.code === 'End') { e.preventDefault(); skipEnd(); }
 });
@@ -1235,7 +1295,6 @@ document.addEventListener('keydown', e => {
 /* ═══════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════ */
-state.pw = [30, 50, 20]; // panel widths %
 runSim();
 render();
 </script>
