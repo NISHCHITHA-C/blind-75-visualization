@@ -16,8 +16,6 @@
     --accent2: #7c3aed;
     --highlight-line: rgba(100,255,218,0.08);
     --font-mono: 'Consolas','Monaco','Courier New',monospace;
-
-    /* Syntax - Dark Dracula */
     --syn-keyword: #ff79c6;
     --syn-function: #50fa7b;
     --syn-string: #f1fa8c;
@@ -51,7 +49,6 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
 
-  /* ---- HEADER ---- */
   #header {
     display: flex; flex-direction: column; gap: 8px;
     padding: 10px 16px; background: var(--bg-secondary);
@@ -65,78 +62,167 @@
   .btn:hover { border-color: var(--accent); color: var(--accent); }
   .btn.active { background: var(--accent); color: #0d0d1a; border-color: var(--accent); font-weight: 600; }
 
-  /* Mode toggle */
   #mode-toggle { display: flex; gap: 6px; }
   .mode-btn { flex: 1; padding: 7px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; }
 
-  /* Input row */
   #input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   #input-row label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
   #board-input, #word-input { background: var(--bg-code); border: 1px solid var(--border); border-radius: 5px; padding: 4px 8px; color: var(--text-primary); font-family: var(--font-mono); font-size: 12px; }
   #board-input { width: 320px; }
   #word-input { width: 120px; }
 
-  /* ---- MAIN ---- */
-  #main { display: flex; height: calc(100vh - var(--header-h, 120px)); overflow: hidden; }
+  #app-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-  /* ---- PANELS ---- */
-  .panel { display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+  #main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+  .panel { display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; flex-grow: 0; }
+  #viz-panel { flex-shrink: 1; flex-grow: 1; min-width: 120px; }
+  #code-panel, #log-panel { min-width: 80px; }
+
   .panel-header { padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); background: var(--bg-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
-  .panel-body { flex: 1; overflow: auto; }
+  .panel-body { flex: 1; overflow: auto; min-height: 0; }
 
-  .divider { width: 4px; background: var(--border); cursor: col-resize; flex-shrink: 0; transition: background .15s; }
-  .divider:hover { background: var(--accent); }
+  .divider { width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0; flex-grow: 0; z-index: 10; transition: background .1s; user-select: none; }
+  .divider:hover, .divider.dragging { background: var(--accent); }
 
-  /* ---- CODE PANEL ---- */
   #code-panel { background: var(--bg-code); }
   .code-pre { margin: 0; padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.65; }
-  .code-line { display: flex; align-items: flex-start; padding: 0 0; min-height: 23px; transition: background .15s; }
+  .code-line { display: flex; align-items: flex-start; padding: 0; min-height: 23px; transition: background .15s; }
   .code-line.active-line { background: var(--highlight-line); border-left: 2px solid var(--accent); }
   .line-num { display: inline-block; min-width: 38px; text-align: right; padding-right: 14px; color: var(--text-secondary); user-select: none; font-size: 12px; padding-top: 1px; flex-shrink: 0; }
   .line-code { flex: 1; white-space: pre; color: var(--text-primary); }
 
-  /* Syntax tokens */
-  .kw { color: var(--syn-keyword); font-weight: 600; }
-  .fn { color: var(--syn-function); }
-  .st { color: var(--syn-string); }
-  .cm { color: var(--syn-comment); font-style: italic; }
-  .tp { color: var(--syn-type); }
-  .nm { color: var(--syn-number); }
-  .dc { color: var(--syn-decorator); }
-  .bi { color: var(--syn-builtin); }
-  .op { color: var(--text-secondary); }
+  .kw  { color: var(--syn-keyword);   font-weight: 600; }
+  .fn  { color: var(--syn-function);  }
+  .st  { color: var(--syn-string);    }
+  .cm  { color: var(--syn-comment);   font-style: italic; }
+  .tp  { color: var(--syn-type);      }
+  .nm  { color: var(--syn-number);    }
+  .dc  { color: var(--syn-decorator); }
+  .bi  { color: var(--syn-builtin);   }
 
   /* ---- VIZ PANEL ---- */
   #viz-panel { background: var(--bg-primary); position: relative; }
-  #viz-panel .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
 
-  .board-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .board-grid { display: inline-grid; gap: 4px; }
+  .board-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px; }
+
+  /* Main board cells */
   .cell {
-    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-    border: 2px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 18px; font-weight: 700;
-    background: var(--bg-secondary); color: var(--text-primary); transition: all .2s; position: relative;
+    width: 50px; height: 50px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border: 2px solid var(--border); border-radius: 8px;
+    font-family: var(--font-mono); font-weight: 700;
+    background: var(--bg-secondary); color: var(--text-primary);
+    transition: all .25s; position: relative; gap: 1px;
   }
-  .cell.visited { background: rgba(100,255,218,0.15); border-color: var(--accent); color: var(--accent); }
-  .cell.current { background: rgba(100,255,218,0.35); border-color: var(--accent); box-shadow: 0 0 12px rgba(100,255,218,0.4); color: #0d0d1a; }
-  .cell.mismatch { background: rgba(255,85,85,0.18); border-color: #ff5555; color: #ff5555; }
-  .cell.matched { background: rgba(80,250,123,0.22); border-color: #50fa7b; color: #50fa7b; }
-  .cell.start { background: rgba(189,147,249,0.2); border-color: #bd93f9; color: #bd93f9; }
-  .cell.idx-label { position: absolute; top: 2px; right: 4px; font-size: 9px; color: var(--text-secondary); font-family: var(--font-mono); }
+  .cell-char      { font-size: 20px; line-height: 1; }
+  .cell-coord     { font-size: 9px; color: var(--text-secondary); font-weight: 400; }
+  .cell-orig      { font-size: 9px; font-weight: 700; }
 
-  .word-display { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  /* Cell states */
+  .cell.state-path {
+    background: rgba(100,255,218,0.18);
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .cell.state-current {
+    background: rgba(100,255,218,0.38);
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(100,255,218,0.45);
+    transform: scale(1.08);
+  }
+  .cell.state-mismatch {
+    background: rgba(255,85,85,0.22);
+    border-color: #ff5555;
+    box-shadow: 0 0 8px rgba(255,85,85,0.3);
+  }
+  .cell.state-matched {
+    background: rgba(80,250,123,0.25);
+    border-color: #50fa7b;
+  }
+  /* '#' marked cells — show the lock icon + faint original */
+  .cell.state-marked {
+    background: rgba(189,147,249,0.18);
+    border-color: #bd93f9;
+    border-style: dashed;
+  }
+  .cell.state-marked .cell-char { color: #bd93f9; }
+  .cell.state-marked .cell-orig { color: #ffb86c; }
+
+  .cell-hash-badge {
+    position: absolute; top: 3px; right: 4px;
+    font-size: 9px; font-weight: 800;
+    color: #bd93f9;
+    background: rgba(189,147,249,0.15);
+    border-radius: 3px;
+    padding: 0 3px;
+    line-height: 14px;
+  }
+
+  /* word chars */
+  .word-display { display: flex; gap: 5px; align-items: center; justify-content: center; flex-wrap: wrap; }
   .word-char {
     width: 34px; height: 34px; border: 2px solid var(--border); border-radius: 6px;
     display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 16px; font-weight: 700;
-    background: var(--bg-secondary); color: var(--text-secondary); transition: all .2s;
+    background: var(--bg-secondary); color: var(--text-secondary); transition: all .2s; position: relative;
   }
-  .word-char.matched { background: rgba(80,250,123,0.22); border-color: #50fa7b; color: #50fa7b; }
-  .word-char.current { background: rgba(100,255,218,0.3); border-color: var(--accent); color: var(--accent); }
+  .word-char.wc-matched  { background: rgba(80,250,123,0.22); border-color: #50fa7b; color: #50fa7b; }
+  .word-char.wc-current  { background: rgba(100,255,218,0.3); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px rgba(100,255,218,0.3); }
+  .word-char.wc-pending  { opacity: 0.45; }
+  .word-char-idx { position:absolute; bottom:1px; right:3px; font-size:8px; color:var(--text-secondary); font-weight:400; }
 
   .result-badge { padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; text-align: center; }
-  .result-badge.found { background: rgba(80,250,123,0.2); border: 2px solid #50fa7b; color: #50fa7b; }
+  .result-badge.found     { background: rgba(80,250,123,0.2); border: 2px solid #50fa7b; color: #50fa7b; }
   .result-badge.not-found { background: rgba(255,85,85,0.2); border: 2px solid #ff5555; color: #ff5555; }
   .result-badge.searching { background: rgba(100,255,218,0.1); border: 2px solid var(--accent); color: var(--accent); }
+
+  /* ── Marked-cells inspector ── */
+  #marked-inspector {
+    background: var(--bg-secondary);
+    border: 1px solid #bd93f9;
+    border-radius: 10px;
+    padding: 12px 14px;
+    width: 100%;
+    max-width: 520px;
+  }
+  #marked-inspector h4 {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: #bd93f9; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .marked-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 10px; background: var(--bg-primary); border-radius: 7px;
+    margin-bottom: 5px; font-family: var(--font-mono); font-size: 12px;
+  }
+  .marked-coord { color: var(--text-secondary); min-width: 44px; }
+  .marked-arrow { color: var(--text-secondary); }
+  .marked-hash  { color: #bd93f9; font-size: 15px; font-weight: 800; min-width: 18px; }
+  .marked-orig-val { color: #ffb86c; font-weight: 700; font-size: 15px; min-width: 18px; }
+  .marked-label { color: var(--text-secondary); font-size: 11px; }
+  .marked-depth-badge {
+    margin-left: auto; background: rgba(189,147,249,0.15);
+    color: #bd93f9; border-radius: 10px; padding: 1px 7px;
+    font-size: 10px; font-weight: 700;
+  }
+  .no-marks { color: var(--text-secondary); font-size: 12px; font-style: italic; }
+
+  /* stack trace */
+  #stack-trace {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; width: 100%; max-width: 520px;
+  }
+  #stack-trace h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-secondary); margin-bottom: 8px; }
+  .stack-row {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 12px;
+    padding: 4px 8px; border-radius: 5px; margin-bottom: 3px;
+  }
+  .stack-row.stack-top { background: rgba(100,255,218,0.1); }
+  .stack-depth  { color: var(--text-secondary); min-width: 20px; font-size: 10px; }
+  .stack-cell   { color: var(--accent); font-weight: 700; }
+  .stack-char   { color: #ffb86c; }
+  .stack-wi     { color: var(--text-secondary); font-size: 11px; }
 
   /* Controls */
   #controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
@@ -150,17 +236,17 @@
   #log-panel { background: var(--bg-secondary); }
   .step-desc { font-size: 13px; line-height: 1.5; color: var(--text-primary); padding: 12px; background: var(--bg-panel); border-radius: 8px; margin-bottom: 10px; }
   .vars-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); margin-bottom: 6px; }
-  .var-row { display: flex; gap: 6px; font-family: var(--font-mono); font-size: 12px; margin: 3px 0; }
+  .var-row { display: flex; gap: 6px; font-family: var(--font-mono); font-size: 12px; margin: 3px 0; flex-wrap: wrap; }
   .var-name { color: var(--accent); }
   .var-val { color: var(--text-primary); word-break: break-all; }
   .history-list { margin-top: 12px; }
-  .history-item { padding: 5px 8px; border-radius: 5px; font-size: 11px; margin: 2px 0; color: var(--text-secondary); cursor: default; transition: background .1s; }
+  .history-item { padding: 5px 8px; border-radius: 5px; font-size: 11px; margin: 2px 0; color: var(--text-secondary); cursor: pointer; transition: background .1s; }
   .history-item.current { background: var(--bg-panel); color: var(--text-primary); font-weight: 600; }
   .history-item:hover { background: var(--bg-panel); }
 
   /* ---- INTUITION MODE ---- */
   #intuition-container { display: flex; width: 100%; height: 100%; overflow: hidden; }
-  .intuition-left { flex: 1; overflow: auto; padding: 20px; border-right: 1px solid var(--border); }
+  .intuition-left { flex: 1; overflow: auto; padding: 16px; border-right: 1px solid var(--border); }
   .intuition-right { flex: 1; overflow: auto; padding: 20px; }
 
   .stage-card { padding: 16px; margin-bottom: 14px; border-radius: 10px; border-left: 4px solid var(--border); background: var(--bg-secondary); transition: all .3s; }
@@ -176,14 +262,13 @@
 
   .intuition-viz-card { background: var(--bg-secondary); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
   .intuition-viz-card h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
-
   .intuition-controls { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 10px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
 
   .approach-card { padding: 14px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
-  .approach-card.bad { border-color: #ff5555; background: rgba(255,85,85,0.07); }
+  .approach-card.bad  { border-color: #ff5555; background: rgba(255,85,85,0.07); }
   .approach-card.good { border-color: #50fa7b; background: rgba(80,250,123,0.07); }
   .approach-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-  .approach-card.bad h4 { color: #ff5555; }
+  .approach-card.bad  h4 { color: #ff5555; }
   .approach-card.good h4 { color: #50fa7b; }
   .approach-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
 
@@ -198,37 +283,55 @@
   .mini-cell.hi-backtrack { background: rgba(255,85,85,0.15); border-color: #ff5555; color: #ff5555; }
 
   .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
-  .tag-blue { background: rgba(100,255,218,0.15); color: var(--accent); }
-  .tag-purple { background: rgba(124,58,237,0.2); color: #bd93f9; }
-  .tag-green { background: rgba(80,250,123,0.15); color: #50fa7b; }
-  .tag-red { background: rgba(255,85,85,0.15); color: #ff5555; }
+  .tag-blue   { background: rgba(100,255,218,0.15); color: var(--accent); }
+  .tag-purple { background: rgba(124,58,237,0.2);   color: #bd93f9; }
+  .tag-green  { background: rgba(80,250,123,0.15);  color: #50fa7b; }
+  .tag-red    { background: rgba(255,85,85,0.15);   color: #ff5555; }
+  .tag-orange { background: rgba(255,184,108,0.15); color: #ffb86c; }
 
   svg text { font-family: var(--font-mono); }
+
+  /* Legend strip */
+  .legend-strip {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    justify-content: center; font-size: 11px;
+  }
+  .legend-dot {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 10px; font-weight: 600;
+  }
+  .ld-current { background:rgba(100,255,218,0.18); color:var(--accent); border:1px solid var(--accent); }
+  .ld-path    { background:rgba(100,255,218,0.1);  color:var(--accent); border:1px dashed var(--accent); }
+  .ld-marked  { background:rgba(189,147,249,0.15); color:#bd93f9;       border:1px dashed #bd93f9; }
+  .ld-mismatch{ background:rgba(255,85,85,0.15);   color:#ff5555;       border:1px solid #ff5555; }
+  .ld-matched { background:rgba(80,250,123,0.18);  color:#50fa7b;       border:1px solid #50fa7b; }
+  .ld-plain   { background:var(--bg-secondary);    color:var(--text-secondary); border:1px solid var(--border); }
 </style>
 </head>
 <body data-theme="dark">
 
-<div id="header">
-  <div id="header-top">
-    <h1>79. Word Search</h1>
-    <div id="header-top-right">
-      <div id="mode-toggle">
-        <button class="btn mode-btn active" id="btn-intuition" onclick="app.setMode('intuition')">💡 Intuition</button>
-        <button class="btn mode-btn" id="btn-execution" onclick="app.setMode('execution')">▶️ Execution</button>
+<div id="app-wrap">
+  <div id="header">
+    <div id="header-top">
+      <h1>79. Word Search</h1>
+      <div id="header-top-right">
+        <div id="mode-toggle">
+          <button class="btn mode-btn active" id="btn-intuition" onclick="app.setMode('intuition')">💡 Intuition</button>
+          <button class="btn mode-btn"         id="btn-execution" onclick="app.setMode('execution')">▶️ Execution</button>
+        </div>
+        <button class="btn" id="theme-btn" onclick="app.toggleTheme()">☀️ Light</button>
       </div>
-      <button class="btn" onclick="app.toggleTheme()">☀️ Light</button>
+    </div>
+    <div id="input-row" style="display:none">
+      <label>Board (JSON):</label>
+      <input id="board-input" type="text" value='[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]'>
+      <label>Word:</label>
+      <input id="word-input" type="text" value="ABCCED">
+      <button class="btn" onclick="app.parseAndRun()">▶ Run</button>
     </div>
   </div>
-  <div id="input-row" style="display:none">
-    <label>Board (JSON):</label>
-    <input id="board-input" type="text" value='[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]'>
-    <label>Word:</label>
-    <input id="word-input" type="text" value="ABCCED">
-    <button class="btn" onclick="app.parseAndRun()">▶ Run</button>
-  </div>
+  <div id="main"></div>
 </div>
-
-<div id="main"></div>
 
 <script>
 const PYTHON_CODE = `from typing import List
@@ -274,207 +377,220 @@ class Solution:
             if board[r][c] == word[0]
         )`;
 
-// Token-based syntax highlighter
+// ── Syntax highlighter ──────────────────────────────────────────────────────
 function highlightPython(line) {
-  if (!line.trim()) return '&nbsp;';
+  if (!line.trim()) return '\u00a0';
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  const keywords = new Set(['from','import','class','def','if','elif','else','while',
+    'for','return','in','and','or','not','True','False','None','is','with','as',
+    'pass','break','continue','lambda','yield','raise','try','except','finally',
+    'global','nonlocal']);
+  const builtins = new Set(['len','range','print','any','all','sum','min','max',
+    'list','dict','set','int','str','bool','type','Counter','enumerate','zip',
+    'map','filter']);
+  const types = new Set(['List','Dict','Set','Optional','Tuple','Union','Any']);
 
-  // Helper: escape HTML
-  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-  // Check if comment
-  const commentIdx = line.indexOf('#');
-  // String detection
-  const reStr = /(['"])(.*?)\1/g;
-
-  let result = '';
-  let i = 0;
-  const chars = [...line];
-  const len = chars.length;
-  let inStr = false, strChar = '', strStart = -1;
-  let commentStart = -1;
-
-  // Tokenize: pass 1 - find string and comment positions
-  const tokens = []; // {start, end, type, text}
-  let j = 0;
+  const tokens = [];
+  let j = 0, len = line.length, inStr = false, strChar = '', strStart = -1;
   while (j < len) {
-    const ch = chars[j];
+    const ch = line[j];
     if (!inStr) {
       if (ch === "'" || ch === '"') {
-        // Triple quote check
-        if (chars[j+1] === ch && chars[j+2] === ch) {
+        if (line[j+1] === ch && line[j+2] === ch) {
           const end3 = line.indexOf(ch+ch+ch, j+3);
-          if (end3 !== -1) {
-            tokens.push({start:j, end:end3+3, type:'st', text: line.slice(j, end3+3)});
-            j = end3+3; continue;
-          }
+          if (end3 !== -1) { tokens.push({start:j,end:end3+3,type:'st',text:line.slice(j,end3+3)}); j=end3+3; continue; }
         }
-        inStr = true; strChar = ch; strStart = j;
-      } else if (ch === '#') {
-        tokens.push({start:j, end:len, type:'cm', text: line.slice(j)});
-        j = len; continue;
-      }
+        inStr=true; strChar=ch; strStart=j;
+      } else if (ch === '#') { tokens.push({start:j,end:len,type:'cm',text:line.slice(j)}); break; }
     } else {
-      if (ch === strChar && chars[j-1] !== '\\') {
-        tokens.push({start:strStart, end:j+1, type:'st', text: line.slice(strStart, j+1)});
-        inStr = false;
+      if (ch === strChar && (j===0||line[j-1]!=='\\')) {
+        tokens.push({start:strStart,end:j+1,type:'st',text:line.slice(strStart,j+1)}); inStr=false;
       }
     }
     j++;
   }
 
-  // Build coverage map
-  const covered = new Array(len).fill(false);
-  for (const t of tokens) for (let k=t.start;k<t.end;k++) covered[k]=true;
-
-  // For uncovered segments: tokenize keywords/identifiers/etc.
-  const keywords = new Set(['from','import','class','def','if','elif','else','while','for','return','in','and','or','not','True','False','None','is','with','as','pass','break','continue','lambda','yield','raise','try','except','finally','global','nonlocal']);
-  const builtins = new Set(['len','range','print','any','all','sum','min','max','list','dict','set','int','str','bool','type','Counter','enumerate','zip','map','filter']);
-  const types = new Set(['List','Dict','Set','Optional','Tuple','Union','int','str','bool','float','Any']);
-
   function tokenizePlain(seg) {
-    // Tokenize identifiers, numbers, operators
-    let out = '';
-    let k = 0;
+    let out='', k=0;
     while (k < seg.length) {
       const c = seg[k];
       if (/[a-zA-Z_]/.test(c)) {
-        let word = '';
-        while (k < seg.length && /[a-zA-Z0-9_]/.test(seg[k])) { word += seg[k++]; }
-        if (keywords.has(word)) out += `<span class="kw">${esc(word)}</span>`;
-        else if (builtins.has(word)) out += `<span class="bi">${esc(word)}</span>`;
-        else if (types.has(word)) out += `<span class="tp">${esc(word)}</span>`;
-        else if (k < seg.length && seg[k] === '(') out += `<span class="fn">${esc(word)}</span>`;
-        else out += esc(word);
+        let word='';
+        while (k < seg.length && /[a-zA-Z0-9_]/.test(seg[k])) { word+=seg[k++]; }
+        if (keywords.has(word))      out+=`<span class="kw">${esc(word)}</span>`;
+        else if (builtins.has(word)) out+=`<span class="bi">${esc(word)}</span>`;
+        else if (types.has(word))    out+=`<span class="tp">${esc(word)}</span>`;
+        else if (k < seg.length && seg[k]==='(') out+=`<span class="fn">${esc(word)}</span>`;
+        else out+=esc(word);
       } else if (/[0-9]/.test(c)) {
-        let num = '';
-        while (k < seg.length && /[0-9.]/.test(seg[k])) { num += seg[k++]; }
-        out += `<span class="nm">${esc(num)}</span>`;
-      } else {
-        out += esc(c); k++;
-      }
+        let num='';
+        while (k < seg.length && /[0-9.]/.test(seg[k])) { num+=seg[k++]; }
+        out+=`<span class="nm">${esc(num)}</span>`;
+      } else { out+=esc(c); k++; }
     }
     return out;
   }
 
-  // Merge: output tokens in order with gaps
-  let allTokens = [...tokens].sort((a,b)=>a.start-b.start);
-  let pos = 0;
-  let html = '';
-  for (const t of allTokens) {
-    if (t.start > pos) {
-      html += tokenizePlain(line.slice(pos, t.start));
-    }
-    html += `<span class="${t.type}">${esc(t.text)}</span>`;
-    pos = t.end;
+  const sorted = [...tokens].sort((a,b) => a.start-b.start);
+  let pos=0, html='';
+  for (const t of sorted) {
+    if (t.start > pos) html+=tokenizePlain(line.slice(pos, t.start));
+    html+=`<span class="${t.type}">${esc(t.text)}</span>`;
+    pos=t.end;
   }
-  if (pos < len) html += tokenizePlain(line.slice(pos));
-  return html || '&nbsp;';
+  if (pos < len) html+=tokenizePlain(line.slice(pos));
+  return html || '\u00a0';
 }
 
-// ========================= SIMULATION =========================
+// ── Simulation ──────────────────────────────────────────────────────────────
+// markedCells: Map of "r,c" -> { origVal, depth }  (cells currently marked '#')
 function simulateWordSearch(board, word) {
   const steps = [];
   const m = board.length, n = board[0].length;
-  const word_len = word.length;
   let stepNum = 0;
 
-  // Deep clone board
-  function cloneBoard(b) { return b.map(r=>[...r]); }
+  function cloneBoard(b) { return b.map(r => [...r]); }
+  function cloneMarked(m) {
+    const out = {};
+    for (const [k,v] of Object.entries(m)) out[k] = {...v};
+    return out;
+  }
 
-  // Snapshot type: {line, desc, vars, boardSnap, path, currentCell, wordIdx, result}
+  // markedCells tracks { origVal, depth } for each '#' cell currently on board
+  const markedCells = {};
+
   function snap(line, desc, vars, boardSnap, path, currentCell, wordIdx, result) {
-    steps.push({line, desc, vars: {...vars}, boardSnap: cloneBoard(boardSnap), path:[...path], currentCell, wordIdx, result, stepNum: stepNum++});
+    steps.push({
+      line, desc, vars:{...vars},
+      boardSnap: cloneBoard(boardSnap),
+      markedSnapshot: cloneMarked(markedCells),
+      path:[...path], currentCell, wordIdx, result, stepNum: stepNum++
+    });
   }
 
-  // Freq pruning
   const boardCount = {};
-  for (let i=0;i<m;i++) for (let j=0;j<n;j++) {
-    boardCount[board[i][j]] = (boardCount[board[i][j]]||0)+1;
-  }
+  for (let i=0;i<m;i++) for (let j=0;j<n;j++) boardCount[board[i][j]] = (boardCount[board[i][j]]||0)+1;
   const wordCount = {};
   for (const ch of word) wordCount[ch] = (wordCount[ch]||0)+1;
 
-  snap(11, 'Count character frequencies on board', {board_count: JSON.stringify(boardCount), word_count: JSON.stringify(wordCount)}, board, [], null, -1, null);
+  snap(11,'Count character frequencies on board',
+    {board_count:JSON.stringify(boardCount), word_count:JSON.stringify(wordCount)},
+    board,[],null,-1,null);
 
-  // Pruning check
-  let pruned = false;
-  for (const [ch, cnt] of Object.entries(wordCount)) {
+  let pruned=false;
+  for (const [ch,cnt] of Object.entries(wordCount)) {
     if ((boardCount[ch]||0) < cnt) {
-      snap(14, `Pruning: '${ch}' needed ${cnt} times but board only has ${boardCount[ch]||0}. Return False.`, {ch, needed:cnt, available:boardCount[ch]||0}, board, [], null, -1, false);
-      pruned = true; break;
+      snap(14,`Pruning: '${ch}' needed ${cnt}× but board has ${boardCount[ch]||0}. Return False.`,
+        {ch,needed:cnt,available:boardCount[ch]||0},board,[],null,-1,false);
+      pruned=true; break;
     }
   }
   if (pruned) return steps;
 
-  // Reversal optimization
   let actualWord = word;
   if ((boardCount[word[0]]||0) > (boardCount[word[word.length-1]]||0)) {
     actualWord = word.split('').reverse().join('');
-    snap(17, `Reverse word: first char '${word[0]}' (freq ${boardCount[word[0]]}) > last char '${word[word.length-1]}' (freq ${boardCount[word[word.length-1]]}). Search for '${actualWord}' instead.`, {original_word: word, reversed_word: actualWord}, board, [], null, -1, null);
+    snap(17,`Reverse word: '${word[0]}'(${boardCount[word[0]]}) > '${word[word.length-1]}'(${boardCount[word[word.length-1]]}). Searching '${actualWord}'.`,
+      {original_word:word, reversed_word:actualWord}, board,[],null,-1,null);
   } else {
-    snap(17, `No reversal: first char '${word[0]}' frequency is OK. Searching for '${actualWord}'.`, {word: actualWord}, board, [], null, -1, null);
+    snap(17,`No reversal needed. Searching for '${actualWord}'.`,{word:actualWord},board,[],null,-1,null);
   }
 
   const wl = actualWord.length;
   let found = false;
   const workBoard = cloneBoard(board);
 
-  function dfs(r, c, idx, path) {
+  function dfs(r, c, idx, path, depth) {
     if (found) return false;
+
     if (idx === wl) {
-      snap(20, `idx == word_len (${wl}): Found complete word! Return True ✓`, {r,c,idx,word_matched: actualWord}, workBoard, path, null, idx, true);
-      found = true; return true;
+      snap(20,`idx == word_len (${wl}): Found complete word! ✓`,
+        {r,c,idx,'word_matched':actualWord}, workBoard, path, null, true);
+      found=true; return true;
     }
-    if (r < 0 || r >= m || c < 0 || c >= n) {
-      snap(22, `Out of bounds at (${r},${c}). Return False.`, {r,c,idx}, workBoard, path, [r,c], idx, null);
+    if (r<0||r>=m||c<0||c>=n) {
+      snap(22,`Out of bounds (${r},${c}). Return False.`,
+        {r,c,idx},workBoard,path,[r,c],idx,null);
       return false;
     }
-    if (workBoard[r][c] !== actualWord[idx]) {
-      snap(24, `Cell (${r},${c})='${workBoard[r][c]}' ≠ word[${idx}]='${actualWord[idx]}'. Mismatch. Return False.`, {r,c,cell_val: workBoard[r][c], expected: actualWord[idx], idx}, workBoard, path, [r,c], idx, null);
+    const cellVal = workBoard[r][c];
+    if (cellVal !== actualWord[idx]) {
+      const isMark = cellVal === '#';
+      snap(24,
+        isMark
+          ? `Cell (${r},${c}) is '#' (already in current path — can't reuse). Return False.`
+          : `Cell (${r},${c})='${cellVal}' ≠ word[${idx}]='${actualWord[idx]}'. Mismatch.`,
+        {r,c, 'board[r][c]': cellVal, expected: actualWord[idx], idx,
+         note: isMark ? `Originally '${markedCells[r+','+c]?.origVal||'?'}' — blocked by '#' guard` : ''},
+        workBoard, path, [r,c], idx, null);
       return false;
     }
-    // Mark visited
+
     const temp = workBoard[r][c];
     workBoard[r][c] = '#';
-    const newPath = [...path, [r,c]];
-    snap(27, `Match! Cell (${r},${c})='${temp}' == word[${idx}]. Mark as visited '#'.`, {r,c,matched_char:temp,idx,path_len:newPath.length}, workBoard, newPath, [r,c], idx, null);
+    markedCells[`${r},${c}`] = { origVal: temp, depth };
+    const newPath = [...path,[r,c]];
 
-    const dirs = [[1,0,'down'],[-1,0,'up'],[0,1,'right'],[0,-1,'left']];
+    snap(27,
+      `✓ Match (${r},${c})='${temp}' == word[${idx}].\n→ Save temp='${temp}', set board[${r}][${c}]='#'`,
+      {r, c, 'temp (saved original)': temp, 'board[r][c] now': '#', idx,
+       'path so far': newPath.map(([pr,pc])=>`(${pr},${pc})`).join('→'),
+       'cells marked #': Object.keys(markedCells).length},
+      workBoard, newPath, [r,c], idx, null);
+
+    const dirs = [[1,0,'↓ down'],[-1,0,'↑ up'],[0,1,'→ right'],[0,-1,'← left']];
     let res = false;
     for (const [dr,dc,dir] of dirs) {
       if (found) break;
-      snap(28, `DFS ${dir} from (${r},${c}) → (${r+dr},${c+dc}) for word[${idx+1}]='${actualWord[idx+1]||'(end)'}' `, {r,c,next_r:r+dr, next_c:c+dc, idx, next_idx:idx+1}, workBoard, newPath, [r,c], idx+1, null);
-      res = dfs(r+dr, c+dc, idx+1, newPath) || res;
+      snap(28,
+        `DFS ${dir}: (${r},${c}) → (${r+dr},${c+dc}) looking for word[${idx+1}]='${actualWord[idx+1]||'(end)'}'`,
+        {from:`(${r},${c})`, to:`(${r+dr},${c+dc})`, 'next_char': actualWord[idx+1]||'—',
+         idx, next_idx: idx+1,
+         '#_marked_cells': Object.entries(markedCells).map(([k,v])=>`${k}='${v.origVal}'`).join(', ')||'none'},
+        workBoard, newPath, [r,c], idx+1, null);
+      res = dfs(r+dr, c+dc, idx+1, newPath, depth+1) || res;
     }
 
     // Restore
     workBoard[r][c] = temp;
+    delete markedCells[`${r},${c}`];
+
     if (!res) {
-      snap(34, `Backtrack: restore (${r},${c}) = '${temp}'. No path found from here.`, {r,c,restored:temp,idx}, workBoard, path, [r,c], idx, null);
+      snap(33,
+        `Backtrack: board[${r}][${c}] = temp = '${temp}'  (restore '#' → '${temp}')`,
+        {r, c, '#_restored_to': temp, idx,
+         'remaining_#_cells': Object.entries(markedCells).map(([k,v])=>`${k}='${v.origVal}'`).join(', ')||'none'},
+        workBoard, path, [r,c], idx, null);
     }
     return res;
   }
 
-  snap(37, `Start searching for '${actualWord}'. Try each cell matching first char '${actualWord[0]}'.`, {word: actualWord, first_char: actualWord[0]}, workBoard, [], null, 0, null);
+  snap(37, `Start outer loop: try each cell matching '${actualWord[0]}'.`,
+    {word:actualWord, first_char:actualWord[0]}, workBoard, [], null, 0, null);
 
-  outer: for (let r=0; r<m; r++) {
-    for (let c=0; c<n; c++) {
+  outer: for (let r=0;r<m;r++) {
+    for (let c=0;c<n;c++) {
       if (workBoard[r][c] === actualWord[0]) {
-        snap(39, `Trying start at (${r},${c}) = '${workBoard[r][c]}'`, {r,c,char:workBoard[r][c]}, workBoard, [], [r,c], 0, null);
-        const res = dfs(r, c, 0, []);
+        snap(39, `Trying start at (${r},${c})='${workBoard[r][c]}'`,
+          {r,c,char:workBoard[r][c]}, workBoard, [], [r,c], 0, null);
+        const res = dfs(r,c,0,[],0);
         if (res) break outer;
       }
     }
   }
 
   if (!found) {
-    snap(37, `All cells tried. Word '${actualWord}' not found. Return False.`, {word:actualWord}, workBoard, [], null, -1, false);
+    snap(37, `All cells tried. '${actualWord}' not found. Return False.`,
+      {word:actualWord}, workBoard, [], null, -1, false);
   }
-
   return steps;
 }
 
-// ========================= APP =========================
+// ── APP ──────────────────────────────────────────────────────────────────────
 const app = {
   mode: 'intuition',
   theme: 'dark',
@@ -485,95 +601,99 @@ const app = {
   speed: 1,
   board: [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],
   word: "ABCCED",
-  actualWord: "ABCCED",
   intuitionStage: 0,
   intuitionPlaying: false,
   intuitionInterval: null,
+  panelWidths: { code: 0, log: 0 },
 
   intuitionStages: [
     {
-      title: "Understanding the Problem",
-      thought: "We have a 2D grid of characters. We need to find if a word exists by traversing adjacent cells (up/down/left/right) without reusing the same cell.",
-      content: `Key constraints to note:\n• Each cell can be used only once per path\n• Adjacency is 4-directional (no diagonals)\n• The grid can have duplicate characters\n• We need to return True/False — just existence, not the path itself`,
-      insight: "This is a classic backtracking/DFS problem. We explore all 4 directions recursively, marking cells as visited to prevent reuse.",
-      vizType: 'problem'
+      title:"Understanding the Problem",
+      thought:"We have a 2D grid of characters. Find if a word exists by traversing adjacent cells (4-directional) without reusing any cell.",
+      content:`Key constraints:\n• Each cell used at most once per path\n• 4-directional adjacency (no diagonals)\n• Grid may have duplicate characters\n• Return True/False — existence only`,
+      insight:"Classic backtracking/DFS — explore all 4 directions recursively, mark cells visited to prevent reuse.",
+      vizType:'problem'
     },
     {
-      title: "Why Brute Force DFS Alone is Costly",
-      thought: "A naive DFS from every cell can be O(m·n·4^L) where L=word length. For large boards + long words, that's brutal. Can we prune early?",
-      content: `Brute force explores exponentially many paths:\n• Start at each of m×n cells: O(m·n)\n• Each step has 4 choices, for word_len steps: O(4^L)\n• Total: O(m·n·4^L) — can be millions of calls\n\nTwo key optimizations before we even DFS:\n1. Frequency pruning — if the board doesn't have enough of any character the word needs, return False immediately\n2. Reversal optimization — start from whichever end of the word has the rarer first character`,
-      insight: "Pruning before backtracking can eliminate the search entirely for impossible cases. The reversal trick reduces the branching factor from the start.",
-      vizType: 'brute_force'
+      title:"Why Brute Force DFS Alone is Costly",
+      thought:"Naive DFS from every cell is O(m·n·4^L). For a 4×4 board and 10-char word that's ~4 million recursive calls. Can we prune early?",
+      content:`Two key optimizations before DFS:\n1. Frequency pruning — if board lacks enough of any required character, return False instantly\n2. Reversal trick — start from whichever end of the word has the rarer character`,
+      insight:"Pruning before backtracking eliminates impossible cases in O(m·n + L). The reversal reduces the branching factor from the very first step.",
+      vizType:'brute_force'
     },
     {
-      title: "The Backtracking Pattern",
-      thought: "Backtracking means: try something → explore → undo if it fails. Here, we mark a cell as '#' (visited), recurse, then restore it.",
-      content: `The core DFS loop:\n1. Base case: idx == word_len → return True (found it!)\n2. Bounds check: out of grid → False\n3. Char check: cell != word[idx] → False (mismatch)\n4. Mark cell as '#' to prevent revisiting\n5. Recurse in all 4 directions\n6. Restore cell (backtrack)\n\nIn-place marking (board[r][c] = '#') avoids a separate visited set — saves O(m·n) space!`,
-      insight: "In-place marking is an elegant trick: we use '#' as a sentinel (it never appears in valid words) so we need zero extra memory for visited tracking.",
-      vizType: 'backtrack'
+      title:"The '#' In-Place Marking Trick",
+      thought:"I need to track visited cells. I could use a Set... but there's a cleverer way: overwrite the cell itself with '#'!",
+      content:`The '#' sentinel trick:\n1. Save: temp = board[r][c]\n2. Mark: board[r][c] = '#'\n3. Recurse through 4 neighbors\n4. Restore: board[r][c] = temp  ← CRITICAL\n\n'#' never appears in valid words, so any attempt\nto match '#' against a word character fails instantly.\nThis replaces an O(m·n) visited[] array with O(1)!`,
+      insight:"In-place '#' marking is both the visited guard AND the backtrack signal — one trick does two jobs with zero extra memory.",
+      vizType:'backtrack'
     },
     {
-      title: "The Frequency Pruning Trick",
-      thought: "Before even starting DFS, I can count characters. If the board has fewer 'E's than the word needs, it's impossible — quit immediately!",
-      content: `Algorithm:\n• board_count = Counter(all board chars)\n• word_count = Counter(word chars)\n• For each char in word: if board_count[char] < word_count[char] → return False\n\nFor word "ABCCED" on our board:\n• A: need 1, have 2 ✓\n• B: need 1, have 1 ✓\n• C: need 2, have 2 ✓\n• E: need 1, have 2 ✓\n→ No early exit, proceed to DFS`,
-      insight: "This O(m·n + L) check eliminates entire search trees before they start. For impossible inputs, it's an instant O(1) effective answer.",
-      vizType: 'frequency'
+      title:"Frequency Pruning",
+      thought:"Before DFS, count characters. If the board has fewer 'E's than the word needs, it's impossible — quit immediately!",
+      content:`Algorithm:\n• board_count = Counter(all board chars)\n• word_count = Counter(word chars)\n• For each char: if board_count < word_count → False\n\nFor "ABCCED" on our board:\n• A: need 1, have 2 ✓  B: need 1, have 1 ✓\n• C: need 2, have 2 ✓  E: need 1, have 2 ✓\n→ All OK, proceed to DFS`,
+      insight:"O(m·n + L) check can eliminate entire search trees before they start. For impossible inputs it's an instant answer.",
+      vizType:'frequency'
     },
     {
-      title: "The Reversal Optimization",
-      thought: "Which end should I start searching from? If word[0] appears 10 times but word[-1] appears only once, starting from word[-1] is way faster!",
-      content: `Logic:\n• if board_count[word[0]] > board_count[word[-1]]:\n     word = word[::-1]\n\nExample:\n• word = "ABCCED" — A(×2), D(×1)\n• Starting from A: 2 starting points → more branches\n• Starting from D: 1 starting point → fewer branches\n• Reverse to "DECCBA" → start from D (rarer) → prune faster\n\nThis optimization is subtle but powerful in practice.`,
-      insight: "Always attack from the rarer end. It's like binary search vs linear — you want to reduce the search space as fast as possible from the very first step.",
-      vizType: 'reversal'
+      title:"The Reversal Optimization",
+      thought:"Which end should I start from? If word[0] appears 10× but word[-1] only once, starting from word[-1] is way faster!",
+      content:`Logic:\nif board_count[word[0]] > board_count[word[-1]]:\n    word = word[::-1]\n\nExample — word "ABCCED":\n• A appears 2×, D appears 1×\n• Reverse → "DECCBA", start from D (rarer)\n• Fewer starting positions = less branching`,
+      insight:"Always attack from the rarer end. Reducing starting positions from 2 to 1 can halve the entire search tree.",
+      vizType:'reversal'
     },
     {
-      title: "Complexity Analysis",
-      thought: "Let me verify we're not doing anything asymptotically worse with these optimizations…",
-      content: `Time Complexity:\n• Pruning step: O(m·n + L)\n• DFS backtracking: O(m·n·4^L) worst case\n• But in practice, pruning + reversal cut this dramatically\n\nSpace Complexity:\n• O(L) for recursion call stack (max depth = word length)\n• O(1) extra memory (in-place marking — no visited set!)\n• Compare to O(m·n) for a naive visited array\n\nThis is as space-optimal as backtracking can get.`,
-      insight: "O(L) space is the theoretical minimum for any correct solution — you need at least the recursion stack. In-place marking achieves this bound.",
-      vizType: 'complexity'
+      title:"Complexity Analysis",
+      thought:"Let me verify the optimizations don't change the asymptotic bounds...",
+      content:`Time:\n• Pruning: O(m·n + L)\n• DFS worst case: O(m·n·4^L)\n• Practical: dramatically better with pruning + reversal\n\nSpace:\n• Recursion stack: O(L) — one frame per char\n• In-place marking: O(1) extra (no visited array!)\n• Naïve visited set would cost O(m·n)`,
+      insight:"O(L) space is the theoretical minimum for any backtracking solution. In-place marking achieves this bound.",
+      vizType:'complexity'
     },
     {
-      title: "Edge Cases & Final Picture",
-      thought: "What could break this? Empty board? Word longer than board? All same characters?",
-      content: `Handled cases:\n• Word impossible by frequency → pruned instantly\n• Single cell: works (idx=0 matches, idx=1 == word_len → True)\n• All same characters: DFS explores all, in-place '#' prevents cycles\n• Word not on board: DFS exhausts all paths → False\n\nThe in-place marking also handles a subtle bug:\nwithout it, we could visit the same cell twice in a path (A→B→A), giving false positives.`,
-      insight: "The solution is complete, optimal in space, and handles all edge cases. The three optimizations (frequency, reversal, in-place) make it production-ready.",
-      vizType: 'edge_cases'
+      title:"Edge Cases & Final Picture",
+      thought:"What could break this? Impossible words, same cell twice, single cell board...",
+      content:`All covered:\n• Impossible frequency → pruned in O(m·n)\n• Same cell twice in path → '#' sentinel prevents it\n• Word longer than board → freq check catches it\n• Single cell board → works (idx 0 → 1 == word_len)\n• Multiple valid paths → any() short-circuits on first True`,
+      insight:"The three-layer defense (frequency, reversal, in-place marking) makes this solution both correct and practically fast.",
+      vizType:'edge_cases'
     }
   ],
 
   init() {
     this.parseAndRun();
+    this.panelWidths.code = Math.round(window.innerWidth * 0.32);
+    this.panelWidths.log  = Math.round(window.innerWidth * 0.22);
     this.render();
     this.attachKeys();
-    this.updateHeaderHeight();
+    this.updateMainHeight();
+    window.addEventListener('resize', () => this.updateMainHeight());
   },
 
-  updateHeaderHeight() {
-    const h = document.getElementById('header');
-    document.getElementById('main').style.height = `calc(100vh - ${h.offsetHeight}px)`;
+  updateMainHeight() {
+    const hdr = document.getElementById('header');
+    const main = document.getElementById('main');
+    if (hdr && main) main.style.height = (window.innerHeight - hdr.offsetHeight) + 'px';
   },
 
   toggleTheme() {
     this.theme = this.theme === 'dark' ? 'light' : 'dark';
     document.body.setAttribute('data-theme', this.theme);
-    document.querySelector('[onclick="app.toggleTheme()"]').textContent = this.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    document.getElementById('theme-btn').textContent = this.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
   },
 
   setMode(m) {
     this.mode = m;
-    document.getElementById('btn-intuition').classList.toggle('active', m === 'intuition');
-    document.getElementById('btn-execution').classList.toggle('active', m === 'execution');
-    document.getElementById('input-row').style.display = m === 'execution' ? 'flex' : 'none';
+    document.getElementById('btn-intuition').classList.toggle('active', m==='intuition');
+    document.getElementById('btn-execution').classList.toggle('active', m==='execution');
+    document.getElementById('input-row').style.display = m==='execution' ? 'flex' : 'none';
     this.stopPlay();
     this.render();
-    this.updateHeaderHeight();
+    this.updateMainHeight();
   },
 
   parseAndRun() {
     try {
       this.board = JSON.parse(document.getElementById('board-input').value);
-      this.word = document.getElementById('word-input').value.trim();
+      this.word  = document.getElementById('word-input').value.trim();
     } catch(e) { return; }
     this.steps = simulateWordSearch(this.board.map(r=>[...r]), this.word);
     this.currentStep = 0;
@@ -584,206 +704,470 @@ const app = {
   stopPlay() {
     clearInterval(this.playInterval);
     clearInterval(this.intuitionInterval);
-    this.isPlaying = false; this.intuitionPlaying = false;
+    this.isPlaying = false;
+    this.intuitionPlaying = false;
   },
 
-  // ---- RENDER ----
   render() {
     const main = document.getElementById('main');
     if (this.mode === 'intuition') {
       main.innerHTML = this.renderIntuitionHTML();
       this.scrollActiveStage();
     } else {
-      main.innerHTML = this.renderExecutionHTML();
-      this.renderCodeLines();
-      this.renderViz();
-      this.renderLog();
+      this.renderExecution();
     }
   },
 
-  // ======================== INTUITION MODE ========================
-  renderIntuitionHTML() {
-    const stages = this.intuitionStages;
-    const cur = this.intuitionStage;
+  renderExecution() {
+    const main = document.getElementById('main');
+    const cw = this.panelWidths.code;
+    const lw = this.panelWidths.log;
 
-    const leftHTML = stages.map((s,i) => {
-      let cls = i === cur ? 'active' : (i < cur ? 'past' : 'future');
-      return `<div class="stage-card ${cls}" id="stage-${i}">
-        <div class="stage-title">
-          <span class="stage-num">${i+1}</span>
-          ${s.title}
+    main.innerHTML = `
+      <div class="panel" id="code-panel" style="width:${cw}px;">
+        <div class="panel-header">Code <span style="color:var(--accent);font-size:10px;">Python</span></div>
+        <div class="panel-body" id="code-body"><pre class="code-pre" id="code-pre"></pre></div>
+      </div>
+      <div class="divider" id="div1"></div>
+      <div class="panel" id="viz-panel" style="background:var(--bg-primary);">
+        <div class="panel-header">Visualization</div>
+        <div class="panel-body" id="viz-body"></div>
+        <div id="controls">
+          <button class="ctrl-btn" onclick="app.reset()" title="Reset">⏮</button>
+          <button class="ctrl-btn" onclick="app.stepBack()">◀</button>
+          <button class="ctrl-btn play-btn" id="play-btn" onclick="app.togglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="app.stepForward()">▶▶</button>
+          <button class="ctrl-btn" onclick="app.skipEnd()" title="End">⏭</button>
+          <select id="speed-select" onchange="app.setSpeed(this.value)">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+          <span id="step-counter">Step 1 / ${this.steps.length}</span>
         </div>
+      </div>
+      <div class="divider" id="div2"></div>
+      <div class="panel" id="log-panel" style="width:${lw}px;background:var(--bg-secondary);">
+        <div class="panel-header">Step Log</div>
+        <div class="panel-body" style="padding:12px;" id="log-body"></div>
+      </div>`;
+
+    this.renderCodeLines();
+    this.renderViz();
+    this.renderLog();
+    this.setupDividers();
+  },
+
+  setupDividers() {
+    const attachDivider = (divId, leftId, rightId) => {
+      const divider = document.getElementById(divId);
+      if (!divider) return;
+      let dragging=false, startX=0, startLeftW=0, startRightW=0;
+      divider.addEventListener('mousedown', e => {
+        dragging=true; startX=e.clientX;
+        const left=document.getElementById(leftId);
+        const right=document.getElementById(rightId);
+        startLeftW=left?left.offsetWidth:0; startRightW=right?right.offsetWidth:0;
+        divider.classList.add('dragging');
+        document.body.style.cursor='col-resize'; document.body.style.userSelect='none';
+        e.preventDefault();
+      });
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const dx=e.clientX-startX;
+        const nl=startLeftW+dx, nr=startRightW-dx;
+        if (nl<80||nr<80) return;
+        const left=document.getElementById(leftId); const right=document.getElementById(rightId);
+        if (!left||!right) return;
+        left.style.width=nl+'px'; right.style.width=nr+'px';
+        if (leftId==='code-panel') this.panelWidths.code=nl;
+        if (rightId==='log-panel') this.panelWidths.log=nr;
+      });
+      document.addEventListener('mouseup', () => {
+        if (!dragging) return; dragging=false;
+        divider.classList.remove('dragging');
+        document.body.style.cursor=''; document.body.style.userSelect='';
+      });
+    };
+    attachDivider('div1','code-panel','viz-panel');
+    attachDivider('div2','viz-panel','log-panel');
+  },
+
+  renderCodeLines() {
+    const pre = document.getElementById('code-pre');
+    if (!pre) return;
+    const step = this.steps[this.currentStep];
+    const activeLine = step ? step.line - 1 : -1;
+    const lines = PYTHON_CODE.split('\n');
+    pre.innerHTML='';
+    lines.forEach((line, i) => {
+      const div = document.createElement('div');
+      div.className = 'code-line' + (i===activeLine ? ' active-line' : '');
+      const num = document.createElement('span');
+      num.className='line-num'; num.textContent=i+1;
+      const code = document.createElement('code');
+      code.className='line-code'; code.innerHTML=highlightPython(line);
+      div.appendChild(num); div.appendChild(code);
+      pre.appendChild(div);
+    });
+    if (activeLine>=0 && pre.children[activeLine]) {
+      pre.children[activeLine].scrollIntoView({block:'nearest', behavior:'smooth'});
+    }
+  },
+
+  // ── Enhanced Viz ──
+  renderViz() {
+    const body = document.getElementById('viz-body');
+    if (!body) return;
+    const step = this.steps[this.currentStep] || {};
+    const board = step.boardSnap || this.board;
+    const marked = step.markedSnapshot || {};   // { "r,c": { origVal, depth } }
+    const path   = step.path || [];
+    const currentCell = step.currentCell;
+    const wordIdx = step.wordIdx ?? -1;
+    const result  = step.result;
+    const m = board.length, n = board[0].length;
+
+    const pathSet = new Set(path.map(([r,c]) => `${r},${c}`));
+
+    // Build board grid
+    let cellHTML = `<div class="board-grid" style="display:inline-grid;grid-template-columns:repeat(${n},54px);gap:5px;">`;
+    for (let r=0;r<m;r++) {
+      for (let c=0;c<n;c++) {
+        const key = `${r},${c}`;
+        const isCurrent  = currentCell && currentCell[0]===r && currentCell[1]===c;
+        const isInPath   = pathSet.has(key) && !isCurrent;
+        const isMarked   = marked[key] !== undefined;
+        const markedInfo = marked[key];
+
+        let stateClass='';
+        if      (result===true && isInPath)  stateClass='state-matched';
+        else if (isCurrent && result===false) stateClass='state-mismatch';
+        else if (isCurrent)                  stateClass='state-current';
+        else if (isMarked)                   stateClass='state-marked';
+        else if (isInPath)                   stateClass='state-path';
+
+        const dispChar = board[r][c];  // what's actually on the board now
+        const origChar = isMarked ? markedInfo.origVal : null;
+
+        // Small badge showing '#' for marked cells
+        const hashBadge = isMarked ? `<span class="cell-hash-badge">#</span>` : '';
+
+        // The main character display
+        let mainCharHTML;
+        if (isMarked) {
+          // Show both: '#' big, original underneath
+          mainCharHTML = `<span class="cell-char" style="font-size:18px;">#</span><span class="cell-orig" style="color:#ffb86c;">was '${origChar}'</span>`;
+        } else {
+          mainCharHTML = `<span class="cell-char">${dispChar}</span>`;
+        }
+
+        cellHTML += `<div class="cell ${stateClass}">
+          ${hashBadge}
+          ${mainCharHTML}
+          <span class="cell-coord">${r},${c}</span>
+        </div>`;
+      }
+    }
+    cellHTML += '</div>';
+
+    // Legend
+    const legendHTML = `<div class="legend-strip">
+      <span class="legend-dot ld-current">● Current</span>
+      <span class="legend-dot ld-path">● In Path</span>
+      <span class="legend-dot ld-marked">⊘ Marked '#'</span>
+      <span class="legend-dot ld-mismatch">✕ Mismatch</span>
+      <span class="legend-dot ld-matched">✓ Found</span>
+      <span class="legend-dot ld-plain">□ Unvisited</span>
+    </div>`;
+
+    // Word progress
+    const displayWord = (step.vars && step.vars.reversed_word)
+      ? step.vars.reversed_word : (step.vars && step.vars.word ? step.vars.word : this.word);
+    let wordHTML = '<div class="word-display">';
+    for (let i=0;i<displayWord.length;i++) {
+      let wcls = 'wc-pending';
+      if (result===true)     wcls='wc-matched';
+      else if (i < wordIdx)  wcls='wc-matched';
+      else if (i === wordIdx) wcls='wc-current';
+      wordHTML += `<div class="word-char ${wcls}">${displayWord[i]}<span class="word-char-idx">${i}</span></div>`;
+    }
+    wordHTML += '</div>';
+
+    // Result badge
+    let badgeCls='searching', badgeTxt=`Searching… step ${this.currentStep+1}/${this.steps.length}`;
+    if (result===true)  { badgeCls='found';     badgeTxt='✓ Word Found!'; }
+    if (result===false) { badgeCls='not-found'; badgeTxt='✗ Not Found'; }
+
+    // ── '#' Inspector ──
+    const markedEntries = Object.entries(marked);
+    let inspectorHTML;
+    if (markedEntries.length === 0) {
+      inspectorHTML = `<div id="marked-inspector">
+        <h4>🔒 Cells Marked '#' (in-place visited)</h4>
+        <div class="no-marks">No cells currently marked — board is unmodified</div>
+      </div>`;
+    } else {
+      const rows = markedEntries.map(([key, info]) => {
+        const [kr, kc] = key.split(',').map(Number);
+        return `<div class="marked-row">
+          <span class="marked-coord">(${kr},${kc})</span>
+          <span class="marked-arrow">→</span>
+          <span style="color:var(--text-secondary);font-size:11px;">board[${kr}][${kc}] =</span>
+          <span class="marked-hash">'#'</span>
+          <span class="marked-arrow">|</span>
+          <span style="color:var(--text-secondary);font-size:11px;">saved in temp:</span>
+          <span class="marked-orig-val">'${info.origVal}'</span>
+          <span class="marked-depth-badge">depth ${info.depth}</span>
+        </div>`;
+      }).join('');
+      inspectorHTML = `<div id="marked-inspector">
+        <h4>🔒 Cells Marked '#' &nbsp;·&nbsp; <span style="font-weight:400;text-transform:none;font-size:11px;color:#bd93f9;">${markedEntries.length} cell${markedEntries.length>1?'s':''} blocked</span></h4>
+        ${rows}
+        <div style="margin-top:8px;font-size:11px;color:var(--text-secondary);line-height:1.6;">
+          These cells have their <span style="color:#ffb86c;">original value</span> saved in <code style="color:#50fa7b;">temp</code>.<br>
+          They show <span style="color:#bd93f9;">'#'</span> on the board so any future DFS call that lands here will see '<span style="color:#bd93f9;">#</span>' ≠ target char and return False — preventing cell reuse.
+        </div>
+      </div>`;
+    }
+
+    // ── Call stack trace ──
+    const stackRows = path.map(([pr,pc], i) => {
+      const origVal = marked[`${pr},${pc}`]?.origVal || this.board[pr][pc];
+      const isTop = i === path.length-1;
+      return `<div class="stack-row ${isTop?'stack-top':''}">
+        <span class="stack-depth">${i}</span>
+        <span class="stack-cell">(${pr},${pc})</span>
+        <span class="stack-char">'${origVal}'</span>
+        <span class="stack-wi">word[${i}]='${displayWord[i]||'?'}'</span>
+        ${isTop ? '<span style="color:var(--accent);font-size:10px;margin-left:auto;">← top</span>' : ''}
+      </div>`;
+    }).join('');
+    const stackHTML = `<div id="stack-trace">
+      <h4>Call Stack (DFS depth ${path.length})</h4>
+      ${stackRows || '<div class="no-marks">Empty stack</div>'}
+    </div>`;
+
+    body.innerHTML = `<div class="board-wrap">
+      ${cellHTML}
+      ${legendHTML}
+      <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);">Matching word:</div>
+      ${wordHTML}
+      <div class="result-badge ${badgeCls}" style="margin-top:6px;">${badgeTxt}</div>
+      ${inspectorHTML}
+      ${stackHTML}
+    </div>`;
+
+    const sc = document.getElementById('step-counter');
+    if (sc) sc.textContent = `Step ${this.currentStep+1} / ${this.steps.length}`;
+  },
+
+  renderLog() {
+    const body = document.getElementById('log-body');
+    if (!body) return;
+    const step = this.steps[this.currentStep] || {};
+    const vars = step.vars || {};
+
+    const varsHTML = Object.entries(vars).map(([k,v]) =>
+      `<div class="var-row">
+        <span class="var-name">${k}</span>
+        <span style="color:var(--text-secondary)">: </span>
+        <span class="var-val">${typeof v==='object' ? JSON.stringify(v) : v}</span>
+      </div>`
+    ).join('');
+
+    const histHTML = this.steps.slice(0, this.currentStep+1).map((s,i) =>
+      `<div class="history-item ${i===this.currentStep?'current':''}" onclick="app.goToStep(${i})">${i+1}. ${s.desc.split('\n')[0]}</div>`
+    ).join('');
+
+    body.innerHTML = `
+      <div class="step-desc">${step.desc ? step.desc.replace(/\n/g,'<br>') : '—'}</div>
+      <div class="vars-section"><h4>Variables</h4>${varsHTML||'<div style="color:var(--text-secondary);font-size:12px;">—</div>'}</div>
+      <div class="history-list">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;">History</div>
+        ${histHTML}
+      </div>`;
+    setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
+  },
+
+  goToStep(i) { this.currentStep=i; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
+  stepForward() { if (this.currentStep<this.steps.length-1){this.currentStep++;this.renderCodeLines();this.renderViz();this.renderLog();} },
+  stepBack()    { if (this.currentStep>0){this.currentStep--;this.renderCodeLines();this.renderViz();this.renderLog();} },
+  reset()    { this.currentStep=0; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
+  skipEnd()  { this.currentStep=this.steps.length-1; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
+  setSpeed(v) { this.speed=parseFloat(v); },
+  togglePlay() {
+    this.isPlaying=!this.isPlaying;
+    const btn=document.getElementById('play-btn');
+    if (btn) btn.textContent=this.isPlaying?'⏸':'▶';
+    if (this.isPlaying) {
+      this.playInterval=setInterval(()=>{
+        if (this.currentStep<this.steps.length-1){this.stepForward();}
+        else{this.isPlaying=false;clearInterval(this.playInterval);if(btn)btn.textContent='▶';}
+      }, 700/this.speed);
+    } else { clearInterval(this.playInterval); }
+  },
+
+  // ── Intuition mode ──
+  renderIntuitionHTML() {
+    const stages=this.intuitionStages, cur=this.intuitionStage;
+    const leftHTML=stages.map((s,i)=>{
+      const cls=i===cur?'active':(i<cur?'past':'future');
+      return `<div class="stage-card ${cls}" id="stage-${i}">
+        <div class="stage-title"><span class="stage-num">${i+1}</span>${s.title}</div>
         <div class="thought-bubble">💭 "${s.thought}"</div>
         <div class="stage-content">${s.content.replace(/\n/g,'<br>')}</div>
         <div class="insight-box"><strong>💡 Key Insight:</strong> ${s.insight}</div>
       </div>`;
     }).join('');
-
-    const ctrlHTML = `
-      <div class="intuition-controls">
-        <button class="ctrl-btn" onclick="app.prevStage()">◀</button>
-        <button class="ctrl-btn play-btn" id="i-play-btn" onclick="app.toggleIntuitionPlay()">▶</button>
-        <button class="ctrl-btn" onclick="app.nextStage()">▶▶</button>
-        <span id="stage-counter" style="font-size:12px;color:var(--text-secondary);margin-left:8px;">Stage ${cur+1} / ${stages.length}</span>
-      </div>`;
-
     return `<div id="intuition-container">
       <div style="display:flex;flex-direction:column;flex:1;border-right:1px solid var(--border);overflow:hidden;">
         <div class="panel-header">Senior Engineer's Thought Process <span>Stage ${cur+1}/${stages.length}</span></div>
-        <div class="intuition-left panel-body" style="padding:16px;">${leftHTML}</div>
-        ${ctrlHTML}
+        <div class="intuition-left" style="flex:1;overflow:auto;padding:16px;">${leftHTML}</div>
+        <div class="intuition-controls">
+          <button class="ctrl-btn" onclick="app.prevStage()">◀</button>
+          <button class="ctrl-btn play-btn" onclick="app.toggleIntuitionPlay()">${this.intuitionPlaying?'⏸':'▶'}</button>
+          <button class="ctrl-btn" onclick="app.nextStage()">▶▶</button>
+          <span style="font-size:12px;color:var(--text-secondary);margin-left:8px;">Stage ${cur+1} / ${stages.length}</span>
+        </div>
       </div>
       <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
         <div class="panel-header">Visual Explanation</div>
-        <div class="intuition-right panel-body">${this.renderIntuitionViz(stages[cur].vizType)}</div>
+        <div style="flex:1;overflow:auto;padding:20px;">${this.renderIntuitionViz(stages[cur].vizType)}</div>
       </div>
     </div>`;
   },
 
   scrollActiveStage() {
-    setTimeout(()=>{
-      const el = document.getElementById(`stage-${this.intuitionStage}`);
-      if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
-    }, 50);
+    setTimeout(()=>{ const el=document.getElementById(`stage-${this.intuitionStage}`); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); },50);
   },
 
-  prevStage() {
-    if (this.intuitionStage > 0) { this.intuitionStage--; this.render(); this.scrollActiveStage(); }
-  },
-  nextStage() {
-    if (this.intuitionStage < this.intuitionStages.length-1) { this.intuitionStage++; this.render(); this.scrollActiveStage(); }
-  },
+  prevStage() { if(this.intuitionStage>0){this.intuitionStage--;this.render();this.scrollActiveStage();} },
+  nextStage() { if(this.intuitionStage<this.intuitionStages.length-1){this.intuitionStage++;this.render();this.scrollActiveStage();} },
   toggleIntuitionPlay() {
-    this.intuitionPlaying = !this.intuitionPlaying;
+    this.intuitionPlaying=!this.intuitionPlaying;
     if (this.intuitionPlaying) {
-      this.intuitionInterval = setInterval(()=>{
-        if (this.intuitionStage < this.intuitionStages.length-1) {
-          this.intuitionStage++; this.render(); this.scrollActiveStage();
-        } else { this.intuitionPlaying=false; clearInterval(this.intuitionInterval); }
-      }, 3000);
+      this.intuitionInterval=setInterval(()=>{
+        if(this.intuitionStage<this.intuitionStages.length-1){this.intuitionStage++;this.render();this.scrollActiveStage();}
+        else{this.intuitionPlaying=false;clearInterval(this.intuitionInterval);}
+      },3500);
     } else { clearInterval(this.intuitionInterval); }
   },
 
   renderIntuitionViz(type) {
     switch(type) {
-      case 'problem': return this.vizProblem();
+      case 'problem':     return this.vizProblem();
       case 'brute_force': return this.vizBruteForce();
-      case 'backtrack': return this.vizBacktrack();
-      case 'frequency': return this.vizFrequency();
-      case 'reversal': return this.vizReversal();
-      case 'complexity': return this.vizComplexity();
-      case 'edge_cases': return this.vizEdgeCases();
-      default: return this.vizProblem();
+      case 'backtrack':   return this.vizBacktrack();
+      case 'frequency':   return this.vizFrequency();
+      case 'reversal':    return this.vizReversal();
+      case 'complexity':  return this.vizComplexity();
+      case 'edge_cases':  return this.vizEdgeCases();
+      default:            return this.vizProblem();
     }
   },
 
   vizProblem() {
-    const board = this.board;
-    const word = this.word;
-    // Show board + word
-    let gridHTML = `<div class="mini-board" style="grid-template-columns:repeat(${board[0].length},36px)">`;
-    for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) {
-      gridHTML += `<div class="mini-cell">${board[r][c]}</div>`;
-    }
-    gridHTML += '</div>';
-
-    let wordHTML = `<div style="display:flex;gap:4px;margin-top:10px;">`;
-    for (const ch of word) wordHTML += `<div class="mini-cell" style="width:30px;height:30px;font-size:14px;">${ch}</div>`;
-    wordHTML += '</div>';
-
-    return `<div class="intuition-viz-card">
-      <h3>The Board & Word</h3>
+    const board=this.board,word=this.word;
+    let g=`<div class="mini-board" style="display:inline-grid;grid-template-columns:repeat(${board[0].length},36px);gap:3px;">`;
+    for(let r=0;r<board.length;r++)for(let c=0;c<board[r].length;c++) g+=`<div class="mini-cell">${board[r][c]}</div>`;
+    g+='</div>';
+    let ww='<div style="display:flex;gap:4px;margin-top:10px;">';
+    for(const ch of word) ww+=`<div class="mini-cell" style="width:30px;height:30px;font-size:14px;">${ch}</div>`;
+    ww+='</div>';
+    return `<div class="intuition-viz-card"><h3>The Board &amp; Word</h3>
       <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
-        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Board (${board.length}×${board[0].length})</div>${gridHTML}</div>
-        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Word to find</div>${wordHTML}</div>
+        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Board (${board.length}×${board[0].length})</div>${g}</div>
+        <div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Word to find</div>${ww}</div>
       </div>
       <div style="margin-top:16px;background:var(--bg-primary);padding:12px;border-radius:8px;">
         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Movement rules:</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="tag tag-blue">↑ Up</span>
-          <span class="tag tag-blue">↓ Down</span>
-          <span class="tag tag-blue">← Left</span>
-          <span class="tag tag-blue">→ Right</span>
-          <span class="tag tag-red">✕ No diagonals</span>
-          <span class="tag tag-red">✕ No reuse</span>
+          <span class="tag tag-blue">↑ Up</span><span class="tag tag-blue">↓ Down</span>
+          <span class="tag tag-blue">← Left</span><span class="tag tag-blue">→ Right</span>
+          <span class="tag tag-red">✕ No diagonals</span><span class="tag tag-red">✕ No reuse</span>
         </div>
-      </div>
-    </div>`;
+      </div></div>`;
   },
 
   vizBruteForce() {
-    return `<div class="intuition-viz-card">
-      <h3>Brute Force vs Optimized</h3>
+    return `<div class="intuition-viz-card"><h3>Brute Force vs Optimized</h3>
       <div class="approach-card bad">
         <h4>❌ Naive DFS (no pruning)</h4>
-        <p>Try every cell as start. At each step, branch 4 ways.<br>
-        <strong>O(m·n·4^L)</strong> — e.g. 4×4 board, 10-char word = 4,194,304 paths!</p>
+        <p>Try every cell as start. At each step, branch 4 ways.<br><strong>O(m·n·4^L)</strong> — 4×4 board, 10-char word ≈ 4.2M paths!</p>
       </div>
       <div class="approach-card good" style="margin-top:10px;">
-        <h4>✅ DFS + Frequency Pruning + Reversal</h4>
-        <p>1. Check frequencies first — O(m·n + L) instant kill<br>
-        2. Reverse word if rarer end is at end<br>
-        3. DFS only from cells matching first char<br>
-        <strong>Practical: orders of magnitude faster</strong></p>
+        <h4>✅ DFS + Freq Pruning + Reversal + '#' marking</h4>
+        <p>1. Check frequencies — O(m·n+L) instant kill<br>2. Reverse word if rarer end is at back<br>3. In-place '#' instead of visited set: O(1) space<br><strong>Practical: orders of magnitude faster</strong></p>
       </div>
       <svg viewBox="0 0 340 120" width="100%" style="margin-top:14px;">
-        <rect x="10" y="20" width="120" height="80" rx="8" fill="rgba(255,85,85,0.15)" stroke="#ff5555" stroke-width="1.5"/>
-        <text x="70" y="42" text-anchor="middle" fill="#ff5555" font-size="12" font-weight="700">Naive DFS</text>
-        <text x="70" y="62" text-anchor="middle" fill="#ff5555" font-size="11">O(m·n·4^L)</text>
-        <text x="70" y="82" text-anchor="middle" fill="#ff5555" font-size="10">~4M calls</text>
-        <text x="70" y="96" text-anchor="middle" fill="#ff5555" font-size="10">(4×4 board, L=10)</text>
-
-        <text x="170" y="65" text-anchor="middle" fill="var(--text-secondary)" font-size="20">→</text>
-
-        <rect x="210" y="20" width="120" height="80" rx="8" fill="rgba(80,250,123,0.12)" stroke="#50fa7b" stroke-width="1.5"/>
-        <text x="270" y="42" text-anchor="middle" fill="#50fa7b" font-size="12" font-weight="700">Optimized</text>
-        <text x="270" y="62" text-anchor="middle" fill="#50fa7b" font-size="11">Prune early</text>
-        <text x="270" y="80" text-anchor="middle" fill="#50fa7b" font-size="10">Rare-end start</text>
-        <text x="270" y="96" text-anchor="middle" fill="#50fa7b" font-size="10">In-place marking</text>
+        <rect x="10" y="10" width="130" height="80" rx="8" fill="rgba(255,85,85,0.15)" stroke="#ff5555" stroke-width="1.5"/>
+        <text x="75" y="38" text-anchor="middle" fill="#ff5555" font-size="12" font-weight="700">Naive DFS</text>
+        <text x="75" y="56" text-anchor="middle" fill="#ff5555" font-size="11">O(m·n·4^L)</text>
+        <text x="75" y="74" text-anchor="middle" fill="#ff5555" font-size="10">visited[] = O(m·n)</text>
+        <text x="175" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="22">→</text>
+        <rect x="200" y="10" width="130" height="80" rx="8" fill="rgba(80,250,123,0.12)" stroke="#50fa7b" stroke-width="1.5"/>
+        <text x="265" y="38" text-anchor="middle" fill="#50fa7b" font-size="12" font-weight="700">Optimized</text>
+        <text x="265" y="56" text-anchor="middle" fill="#50fa7b" font-size="11">Prune + '#' mark</text>
+        <text x="265" y="74" text-anchor="middle" fill="#50fa7b" font-size="10">space = O(L) only</text>
       </svg>
     </div>`;
   },
 
   vizBacktrack() {
-    // Show a mini path with backtracking
-    const board = [["A","B","C"],["S","F","C"],["A","D","E"]];
-    let gridHTML = `<div class="mini-board" style="grid-template-columns:repeat(3,36px)">`;
-    const path = [[0,0],[0,1],[0,2],[1,2]]; // ABCC
-    for (let r=0;r<3;r++) for (let c=0;c<3;c++) {
-      const inPath = path.some(([pr,pc])=>pr===r&&pc===c);
-      const cls = inPath ? 'hi-path' : '';
-      gridHTML += `<div class="mini-cell ${cls}">${board[r][c]}</div>`;
+    // Show a mini animated board illustrating '#' marking and restore
+    const mini=[["A","B","C"],["S","F","C"],["A","D","E"]];
+    const path=[[0,0],[0,1],[0,2]]; // A→B→C
+    let g=`<div class="mini-board" style="display:inline-grid;grid-template-columns:repeat(3,38px);gap:3px;">`;
+    for(let r=0;r<3;r++) for(let c=0;c<3;c++) {
+      const inP=path.some(([pr,pc])=>pr===r&&pc===c);
+      g+=`<div class="mini-cell ${inP?'hi-path':''}">${inP?'#':mini[r][c]}</div>`;
     }
-    gridHTML += '</div>';
-    return `<div class="intuition-viz-card">
-      <h3>Backtracking Pattern</h3>
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Current path highlighted (A→B→C→C)</div>
-      ${gridHTML}
-      <div style="margin-top:14px;background:var(--bg-primary);padding:12px;border-radius:8px;font-family:var(--font-mono);font-size:12px;">
-        <div style="color:var(--syn-keyword);">def <span style="color:var(--syn-function);">dfs</span>(r, c, idx):</div>
-        <div style="padding-left:16px;color:var(--text-primary);">temp, board[r][c] = board[r][c], <span style="color:var(--syn-string);">'#'</span>  <span style="color:var(--syn-comment);"># mark</span></div>
-        <div style="padding-left:16px;color:var(--text-primary);">found = dfs(r+1,c,...) <span style="color:var(--syn-keyword);">or</span> ...</div>
-        <div style="padding-left:16px;color:var(--text-primary);">board[r][c] = temp  <span style="color:var(--syn-comment);"># restore ← KEY</span></div>
+    g+='</div>';
+    // show restored
+    let g2=`<div class="mini-board" style="display:inline-grid;grid-template-columns:repeat(3,38px);gap:3px;">`;
+    for(let r=0;r<3;r++) for(let c=0;c<3;c++) g2+=`<div class="mini-cell">${mini[r][c]}</div>`;
+    g2+='</div>';
+    return `<div class="intuition-viz-card"><h3>The '#' In-Place Marking Trick</h3>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;color:#bd93f9;margin-bottom:5px;">During DFS (A→B→C marked)</div>${g}
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.7;">
+            Cells on current path show <span style="color:#bd93f9;font-weight:700;">'#'</span><br>
+            Original values saved in <span style="color:#ffb86c;font-weight:700;">temp</span> on call stack
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#50fa7b;margin-bottom:5px;">After backtrack (restored)</div>${g2}
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.7;">
+            <code style="color:#50fa7b;">board[r][c] = temp</code><br>
+            Board is clean again for next path
+          </div>
+        </div>
       </div>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-        <span class="tag tag-blue">Mark '#'</span>
-        <span class="tag tag-green">Explore 4 dirs</span>
-        <span class="tag tag-purple">Restore on backtrack</span>
-        <span class="tag tag-red">No visited[] needed</span>
+      <div style="background:var(--bg-primary);padding:12px;border-radius:8px;font-family:var(--font-mono);font-size:12px;line-height:1.8;">
+        <span class="kw" style="color:var(--syn-keyword);">temp</span>, board[r][c] = board[r][c], <span style="color:#bd93f9;">'#'</span>&nbsp;&nbsp;<span style="color:var(--syn-comment);font-style:italic;"># ← mark</span><br>
+        found = dfs(...)<br>
+        board[r][c] = <span class="kw" style="color:var(--syn-keyword);">temp</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--syn-comment);font-style:italic;"># ← restore</span>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="tag tag-purple">temp stores original</span>
+        <span class="tag tag-purple">'#' blocks revisit</span>
+        <span class="tag tag-green">restore on exit</span>
+        <span class="tag tag-red">no visited[] needed</span>
       </div>
     </div>`;
   },
 
   vizFrequency() {
-    const board = this.board;
-    const word = this.word;
-    // Count
-    const bc = {}; for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
-    const wc = {}; for (const ch of word) wc[ch]=(wc[ch]||0)+1;
-
-    const rows = Object.entries(wc).map(([ch,need]) => {
-      const have = bc[ch]||0;
-      const ok = have >= need;
+    const board=this.board, word=this.word;
+    const bc={};
+    for(let r=0;r<board.length;r++)for(let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
+    const wc={};
+    for(const ch of word) wc[ch]=(wc[ch]||0)+1;
+    const rows=Object.entries(wc).map(([ch,need])=>{
+      const have=bc[ch]||0, ok=have>=need;
       return `<tr>
         <td style="font-family:var(--font-mono);font-size:14px;font-weight:700;padding:6px 10px;color:var(--accent);">'${ch}'</td>
         <td style="padding:6px 10px;color:var(--text-secondary);">need ${need}</td>
@@ -791,14 +1175,12 @@ const app = {
         <td style="padding:6px 10px;font-weight:700;color:${ok?'#50fa7b':'#ff5555'}">${ok?'✓ OK':'✗ FAIL'}</td>
       </tr>`;
     }).join('');
-
-    return `<div class="intuition-viz-card">
-      <h3>Frequency Pruning Check</h3>
+    return `<div class="intuition-viz-card"><h3>Frequency Pruning Check</h3>
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Word: "${word}"</div>
       <table style="border-collapse:collapse;width:100%;background:var(--bg-primary);border-radius:8px;overflow:hidden;">
         <thead><tr style="background:var(--bg-secondary);">
           <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Char</th>
-          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Word Needs</th>
+          <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Needs</th>
           <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Board Has</th>
           <th style="padding:6px 10px;text-align:left;color:var(--text-secondary);font-size:11px;">Status</th>
         </tr></thead>
@@ -811,40 +1193,34 @@ const app = {
   },
 
   vizReversal() {
-    const board = this.board;
-    const word = this.word;
-    const bc = {}; for (let r=0;r<board.length;r++) for (let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
-    const firstFreq = bc[word[0]]||0, lastFreq = bc[word[word.length-1]]||0;
-    const reversed = firstFreq > lastFreq;
-    const actualWord = reversed ? word.split('').reverse().join('') : word;
-
-    return `<div class="intuition-viz-card">
-      <h3>Reversal Optimization</h3>
+    const board=this.board,word=this.word;
+    const bc={};
+    for(let r=0;r<board.length;r++)for(let c=0;c<board[r].length;c++) bc[board[r][c]]=(bc[board[r][c]]||0)+1;
+    const ff=bc[word[0]]||0, lf=bc[word[word.length-1]]||0;
+    const rev=ff>lf, aw=rev?word.split('').reverse().join(''):word;
+    return `<div class="intuition-viz-card"><h3>Reversal Optimization</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
         <div style="background:var(--bg-primary);padding:12px;border-radius:8px;text-align:center;">
           <div style="font-size:11px;color:var(--text-secondary);">First char '${word[0]}'</div>
-          <div style="font-size:28px;font-weight:700;color:${reversed?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${firstFreq}</div>
-          <div style="font-size:11px;color:var(--text-secondary);">occurrences on board</div>
+          <div style="font-size:28px;font-weight:700;color:${rev?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${ff}</div>
+          <div style="font-size:11px;color:var(--text-secondary);">occurrences</div>
         </div>
         <div style="background:var(--bg-primary);padding:12px;border-radius:8px;text-align:center;">
           <div style="font-size:11px;color:var(--text-secondary);">Last char '${word[word.length-1]}'</div>
-          <div style="font-size:28px;font-weight:700;color:${!reversed?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${lastFreq}</div>
-          <div style="font-size:11px;color:var(--text-secondary);">occurrences on board</div>
+          <div style="font-size:28px;font-weight:700;color:${!rev?'#ff5555':'#50fa7b'};font-family:var(--font-mono);">${lf}</div>
+          <div style="font-size:11px;color:var(--text-secondary);">occurrences</div>
         </div>
       </div>
-      <div style="padding:12px;border-radius:8px;background:${reversed?'rgba(80,250,123,0.1)':'rgba(100,255,218,0.1)'};border:1px solid ${reversed?'#50fa7b':'var(--accent)'};">
-        <div style="font-size:12px;color:var(--text-secondary);">Decision: ${reversed ? `Reverse! '${word[0]}' (${firstFreq}×) > '${word[word.length-1]}' (${lastFreq}×)` : `No reversal. '${word[0]}' ≤ '${word[word.length-1]}'`}</div>
-        <div style="margin-top:6px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:${reversed?'#50fa7b':'var(--accent)'};">Search for: "${actualWord}"</div>
+      <div style="padding:12px;border-radius:8px;background:${rev?'rgba(80,250,123,0.1)':'rgba(100,255,218,0.1)'};border:1px solid ${rev?'#50fa7b':'var(--accent)'};">
+        <div style="font-size:12px;color:var(--text-secondary);">Decision: ${rev?`Reverse! '${word[0]}'(${ff}×) > '${word[word.length-1]}'(${lf}×)`:`No reversal needed`}</div>
+        <div style="margin-top:6px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:${rev?'#50fa7b':'var(--accent)'};">Search for: "${aw}"</div>
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">
-        ${reversed ? `Starting from '${actualWord[0]}' (${bc[actualWord[0]]||0} starting points) instead of '${word[0]}' (${firstFreq} starting points)` : `Starting from '${word[0]}' — already the rarer end`}
-      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">Starting from '${aw[0]}' — ${bc[aw[0]]||0} starting point(s) on the board</div>
     </div>`;
   },
 
   vizComplexity() {
-    return `<div class="intuition-viz-card">
-      <h3>Complexity Analysis</h3>
+    return `<div class="intuition-viz-card"><h3>Complexity Analysis</h3>
       <div style="margin-bottom:12px;">
         <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">⏱ Time Complexity</div>
         <div class="complexity-row"><span class="complexity-label">Frequency pruning</span><span class="complexity-val">O(m·n + L)</span></div>
@@ -854,254 +1230,46 @@ const app = {
       <div>
         <div style="font-size:12px;font-weight:700;color:#50fa7b;margin-bottom:8px;">💾 Space Complexity</div>
         <div class="complexity-row"><span class="complexity-label">Recursion stack</span><span class="complexity-val">O(L)</span></div>
-        <div class="complexity-row"><span class="complexity-label">In-place marking (no visited[])</span><span class="complexity-val">O(1) extra</span></div>
-        <div class="complexity-row"><span class="complexity-label">Naive approach (visited set)</span><span class="complexity-val">O(m·n)</span></div>
+        <div class="complexity-row"><span class="complexity-label">In-place '#' marking</span><span class="complexity-val">O(1) extra</span></div>
+        <div class="complexity-row"><span class="complexity-label">Naïve visited set</span><span class="complexity-val">O(m·n) — avoided!</span></div>
       </div>
       <svg viewBox="0 0 320 80" width="100%" style="margin-top:14px;">
         <rect x="10" y="10" width="90" height="60" rx="6" fill="rgba(255,85,85,0.12)" stroke="#ff5555" stroke-width="1.5"/>
-        <text x="55" y="35" text-anchor="middle" fill="#ff5555" font-size="11" font-weight="700">Naive</text>
-        <text x="55" y="52" text-anchor="middle" fill="#ff5555" font-size="10">O(m·n) space</text>
-        <text x="55" y="65" text-anchor="middle" fill="#ff5555" font-size="10">visited array</text>
-        <text x="165" y="48" text-anchor="middle" fill="var(--text-secondary)" font-size="20">→</text>
+        <text x="55" y="34" text-anchor="middle" fill="#ff5555" font-size="11" font-weight="700">Naive</text>
+        <text x="55" y="50" text-anchor="middle" fill="#ff5555" font-size="10">O(m·n) space</text>
+        <text x="55" y="64" text-anchor="middle" fill="#ff5555" font-size="10">visited array</text>
+        <text x="165" y="48" text-anchor="middle" fill="var(--text-secondary)" font-size="22">→</text>
         <rect x="215" y="10" width="95" height="60" rx="6" fill="rgba(80,250,123,0.12)" stroke="#50fa7b" stroke-width="1.5"/>
-        <text x="262" y="35" text-anchor="middle" fill="#50fa7b" font-size="11" font-weight="700">This Solution</text>
-        <text x="262" y="52" text-anchor="middle" fill="#50fa7b" font-size="10">O(L) space</text>
-        <text x="262" y="65" text-anchor="middle" fill="#50fa7b" font-size="10">in-place '#'</text>
+        <text x="262" y="34" text-anchor="middle" fill="#50fa7b" font-size="11" font-weight="700">This Solution</text>
+        <text x="262" y="50" text-anchor="middle" fill="#50fa7b" font-size="10">O(L) space</text>
+        <text x="262" y="64" text-anchor="middle" fill="#50fa7b" font-size="10">in-place '#'</text>
       </svg>
     </div>`;
   },
 
   vizEdgeCases() {
-    return `<div class="intuition-viz-card">
-      <h3>Edge Cases Handled</h3>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
-          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Impossible word (bad frequency)</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Caught instantly by freq check — O(m·n) not O(m·n·4^L)</div>
-        </div>
-        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
-          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Same cell visited twice</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">In-place '#' sentinel prevents A→B→A false paths</div>
-        </div>
-        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
-          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Word longer than board</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Freq check eliminates immediately (can't have enough distinct cells)</div>
-        </div>
-        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
-          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Single cell board</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">DFS: idx==0 match, idx==1==word_len → True (or False)</div>
-        </div>
-        <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;">
-          <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ Multiple valid paths</div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">any() short-circuits on first True — no wasted work</div>
-        </div>
-      </div>
-    </div>`;
-  },
-
-  // ======================== EXECUTION MODE ========================
-  renderExecutionHTML() {
-    return `
-      <div class="panel" id="code-panel" style="width:32%;background:var(--bg-code);">
-        <div class="panel-header">Code <span style="color:var(--accent);font-size:10px;">Python</span></div>
-        <div class="panel-body" id="code-body"><pre class="code-pre" id="code-pre"></pre></div>
-      </div>
-      <div class="divider" id="div1"></div>
-      <div class="panel" id="viz-panel" style="flex:1;background:var(--bg-primary);">
-        <div class="panel-header">Visualization</div>
-        <div class="panel-body" id="viz-body"></div>
-        <div id="controls">
-          <button class="ctrl-btn" onclick="app.reset()" title="Reset">⏮</button>
-          <button class="ctrl-btn" onclick="app.stepBack()" title="Back">◀</button>
-          <button class="ctrl-btn play-btn" id="play-btn" onclick="app.togglePlay()">▶</button>
-          <button class="ctrl-btn" onclick="app.stepForward()" title="Forward">▶</button>
-          <button class="ctrl-btn" onclick="app.skipEnd()" title="End">⏭</button>
-          <select id="speed-select" onchange="app.setSpeed(this.value)">
-            <option value="0.5">0.5×</option>
-            <option value="1" selected>1×</option>
-            <option value="2">2×</option>
-            <option value="4">4×</option>
-          </select>
-          <span id="step-counter">Step 1 / ${this.steps.length}</span>
-        </div>
-      </div>
-      <div class="divider" id="div2"></div>
-      <div class="panel" id="log-panel" style="width:22%;background:var(--bg-secondary);">
-        <div class="panel-header">Step Log</div>
-        <div class="panel-body" style="padding:12px;" id="log-body"></div>
-      </div>`;
-  },
-
-  renderCodeLines() {
-    const pre = document.getElementById('code-pre');
-    if (!pre) return;
-    const step = this.steps[this.currentStep];
-    const activeLine = step ? step.line - 1 : -1;
-    const lines = PYTHON_CODE.split('\n');
-    pre.innerHTML = '';
-    lines.forEach((line, i) => {
-      const div = document.createElement('div');
-      div.className = 'code-line' + (i === activeLine ? ' active-line' : '');
-      const num = document.createElement('span');
-      num.className = 'line-num'; num.textContent = i+1;
-      const code = document.createElement('code');
-      code.className = 'line-code';
-      code.innerHTML = highlightPython(line);
-      div.appendChild(num); div.appendChild(code);
-      pre.appendChild(div);
-    });
-    // Scroll active line into view
-    if (activeLine >= 0) {
-      const activeEl = pre.children[activeLine];
-      if (activeEl) activeEl.scrollIntoView({block:'nearest', behavior:'smooth'});
-    }
-  },
-
-  renderViz() {
-    const body = document.getElementById('viz-body');
-    if (!body) return;
-    const step = this.steps[this.currentStep] || {};
-    const board = step.boardSnap || this.board;
-    const path = step.path || [];
-    const currentCell = step.currentCell;
-    const wordIdx = step.wordIdx ?? -1;
-    const result = step.result;
-    const m = board.length, n = board[0].length;
-
-    // Determine cell states
-    const pathSet = new Set(path.map(([r,c])=>`${r},${c}`));
-    let cellHTML = `<div class="board-grid" style="grid-template-columns:repeat(${n},48px);gap:5px;">`;
-    for (let r=0;r<m;r++) for (let c=0;c<n;c++) {
-      const key = `${r},${c}`;
-      const isCurrent = currentCell && currentCell[0]===r && currentCell[1]===c;
-      const isPath = pathSet.has(key) && !isCurrent;
-      const isVisited = board[r][c] === '#';
-      let cls = '';
-      if (result === true && isPath) cls = 'matched';
-      else if (isCurrent && result === false) cls = 'mismatch';
-      else if (isCurrent) cls = 'current';
-      else if (isPath) cls = 'visited';
-      else if (isVisited) cls = 'visited';
-      cellHTML += `<div class="cell ${cls}">${this.board[r][c]}<span class="idx-label">${r},${c}</span></div>`;
-    }
-    cellHTML += '</div>';
-
-    // Word display
-    const displayWord = step.vars && step.vars.reversed_word ? step.vars.reversed_word : (step.vars && step.vars.word ? step.vars.word : this.word);
-    let wordHTML = `<div class="word-display">`;
-    for (let i=0;i<displayWord.length;i++) {
-      const cls = (result === true) ? 'matched' : (i < wordIdx ? 'matched' : (i === wordIdx ? 'current' : ''));
-      wordHTML += `<div class="word-char ${cls}">${displayWord[i]}</div>`;
-    }
-    wordHTML += '</div>';
-
-    let badgeCls = 'searching', badgeTxt = `Searching... (step ${this.currentStep+1}/${this.steps.length})`;
-    if (result === true) { badgeCls = 'found'; badgeTxt = '✓ Word Found!'; }
-    else if (result === false) { badgeCls = 'not-found'; badgeTxt = '✗ Not Found'; }
-
-    body.innerHTML = `<div class="board-wrap">
-      ${cellHTML}
-      <div style="margin-top:8px;font-size:11px;color:var(--text-secondary);">
-        <span class="tag tag-blue">■ Current</span>
-        <span class="tag tag-green">■ Path</span>
-        <span class="tag tag-red">■ Mismatch</span>
-      </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">Word characters matched:</div>
-      ${wordHTML}
-      <div class="result-badge ${badgeCls}" style="margin-top:10px;">${badgeTxt}</div>
-      <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">Stack depth: ${path.length} | Path: [${path.map(([r,c])=>`(${r},${c})`).join('→')||'—'}]</div>
-    </div>`;
-
-    document.getElementById('step-counter').textContent = `Step ${this.currentStep+1} / ${this.steps.length}`;
-  },
-
-  renderLog() {
-    const body = document.getElementById('log-body');
-    if (!body) return;
-    const step = this.steps[this.currentStep] || {};
-    const vars = step.vars || {};
-
-    const varsHTML = Object.entries(vars).map(([k,v]) =>
-      `<div class="var-row"><span class="var-name">${k}</span><span style="color:var(--text-secondary)">: </span><span class="var-val">${typeof v === 'object' ? JSON.stringify(v) : v}</span></div>`
-    ).join('');
-
-    const historyHTML = this.steps.slice(0, this.currentStep+1).map((s,i) =>
-      `<div class="history-item ${i===this.currentStep?'current':''}" onclick="app.goToStep(${i})">${i+1}. ${s.desc}</div>`
-    ).join('');
-
-    body.innerHTML = `
-      <div class="step-desc">${step.desc||'—'}</div>
-      <div class="vars-section"><h4>Variables</h4>${varsHTML||'<div style="color:var(--text-secondary);font-size:12px;">No vars</div>'}</div>
-      <div class="history-list"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);margin-bottom:6px;">History</div>${historyHTML}</div>`;
-
-    // Auto-scroll history to bottom
-    setTimeout(()=>{ body.scrollTop = body.scrollHeight; }, 50);
-  },
-
-  goToStep(i) {
-    this.currentStep = i;
-    this.renderCodeLines(); this.renderViz(); this.renderLog();
-  },
-
-  stepForward() {
-    if (this.currentStep < this.steps.length-1) {
-      this.currentStep++;
-      this.renderCodeLines(); this.renderViz(); this.renderLog();
-    }
-  },
-  stepBack() {
-    if (this.currentStep > 0) {
-      this.currentStep--;
-      this.renderCodeLines(); this.renderViz(); this.renderLog();
-    }
-  },
-  reset() { this.currentStep=0; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
-  skipEnd() { this.currentStep=this.steps.length-1; this.renderCodeLines(); this.renderViz(); this.renderLog(); },
-  setSpeed(v) { this.speed = parseFloat(v); },
-  togglePlay() {
-    this.isPlaying = !this.isPlaying;
-    const btn = document.getElementById('play-btn');
-    if (btn) btn.textContent = this.isPlaying ? '⏸' : '▶';
-    if (this.isPlaying) {
-      this.playInterval = setInterval(()=>{
-        if (this.currentStep < this.steps.length-1) { this.stepForward(); }
-        else { this.isPlaying=false; clearInterval(this.playInterval); if(btn)btn.textContent='▶'; }
-      }, 700 / this.speed);
-    } else { clearInterval(this.playInterval); }
+    const cases=[
+      ['Impossible word (bad frequency)','Caught instantly by freq check — O(m·n) not O(m·n·4^L)'],
+      ['Same cell visited twice in path',"'#' sentinel makes board[r][c]≠word[idx] → False immediately"],
+      ['Word longer than board','Freq check eliminates immediately (pigeonhole)'],
+      ['Single cell board','idx 0 match → idx 1 == word_len → True or False'],
+      ['Multiple valid paths','any() short-circuits on first True — no wasted work']
+    ];
+    const html=cases.map(([t,d])=>`
+      <div style="padding:10px 14px;background:var(--bg-primary);border-radius:8px;border-left:3px solid #50fa7b;margin-bottom:8px;">
+        <div style="font-weight:700;color:#50fa7b;font-size:13px;">✓ ${t}</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${d}</div>
+      </div>`).join('');
+    return `<div class="intuition-viz-card"><h3>Edge Cases Handled</h3>${html}</div>`;
   },
 
   attachKeys() {
     document.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT') return;
-      if (e.code === 'Space') { e.preventDefault(); this.mode==='execution'?this.togglePlay():this.toggleIntuitionPlay(); }
-      else if (e.code === 'ArrowRight') { e.preventDefault(); this.mode==='execution'?this.stepForward():this.nextStage(); }
-      else if (e.code === 'ArrowLeft') { e.preventDefault(); this.mode==='execution'?this.stepBack():this.prevStage(); }
+      if (e.target.tagName==='INPUT') return;
+      if (e.code==='Space') { e.preventDefault(); this.mode==='execution'?this.togglePlay():this.toggleIntuitionPlay(); }
+      else if (e.code==='ArrowRight') { e.preventDefault(); this.mode==='execution'?this.stepForward():this.nextStage(); }
+      else if (e.code==='ArrowLeft')  { e.preventDefault(); this.mode==='execution'?this.stepBack():this.prevStage(); }
     });
-
-    // Divider drag
-    setTimeout(()=>this.setupDividers(), 100);
-  },
-
-  setupDividers() {
-    const makeResizer = (divId, leftId, rightId, isRight) => {
-      const div = document.getElementById(divId);
-      if (!div) return;
-      let dragging = false, startX = 0;
-      div.addEventListener('mousedown', e => { dragging=true; startX=e.clientX; e.preventDefault(); });
-      document.addEventListener('mousemove', e => {
-        if (!dragging) return;
-        const dx = e.clientX - startX; startX = e.clientX;
-        const left = document.getElementById(leftId);
-        const right = document.getElementById(rightId);
-        if (!left||!right) return;
-        const lw = left.offsetWidth + dx;
-        const rw = right.offsetWidth - dx;
-        if (lw > 80 && rw > 80) { left.style.width = lw + 'px'; right.style.width = rw + 'px'; right.style.flex = 'none'; }
-      });
-      document.addEventListener('mouseup', ()=>{ dragging=false; });
-    };
-    makeResizer('div1','code-panel','viz-panel',false);
-    makeResizer('div2','viz-panel','log-panel',true);
   }
 };
 
