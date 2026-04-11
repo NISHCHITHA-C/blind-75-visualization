@@ -463,12 +463,19 @@ function simulateWordSearch(board, word) {
   // markedCells tracks { origVal, depth } for each '#' cell currently on board
   const markedCells = {};
 
+  // actualWord is set after the reversal decision; default to original word until then
+  let searchWord = word;
+  let isReversed = false;
+
   function snap(line, desc, vars, boardSnap, path, currentCell, wordIdx, result) {
     steps.push({
       line, desc, vars:{...vars},
       boardSnap: cloneBoard(boardSnap),
       markedSnapshot: cloneMarked(markedCells),
-      path:[...path], currentCell, wordIdx, result, stepNum: stepNum++
+      path:[...path], currentCell, wordIdx, result, stepNum: stepNum++,
+      searchWord,   // the word actually being searched at this step
+      isReversed,   // whether it was reversed
+      originalWord: word
     });
   }
 
@@ -494,9 +501,11 @@ function simulateWordSearch(board, word) {
   let actualWord = word;
   if ((boardCount[word[0]]||0) > (boardCount[word[word.length-1]]||0)) {
     actualWord = word.split('').reverse().join('');
+    isReversed = true; searchWord = actualWord;
     snap(17,`Reverse word: '${word[0]}'(${boardCount[word[0]]}) > '${word[word.length-1]}'(${boardCount[word[word.length-1]]}). Searching '${actualWord}'.`,
       {original_word:word, reversed_word:actualWord}, board,[],null,-1,null);
   } else {
+    searchWord = actualWord;
     snap(17,`No reversal needed. Searching for '${actualWord}'.`,{word:actualWord},board,[],null,-1,null);
   }
 
@@ -882,16 +891,29 @@ const app = {
       <span class="legend-dot ld-plain">□ Unvisited</span>
     </div>`;
 
-    // Word progress
-    const displayWord = (step.vars && step.vars.reversed_word)
-      ? step.vars.reversed_word : (step.vars && step.vars.word ? step.vars.word : this.word);
-    let wordHTML = '<div class="word-display">';
-    for (let i=0;i<displayWord.length;i++) {
+    // Word progress — always use step.searchWord (the word actually being DFS'd)
+    const searchWord   = step.searchWord   || this.word;
+    const originalWord = step.originalWord || this.word;
+    const wasReversed  = step.isReversed   || false;
+
+    // Header: show search word, and if reversed, show original too
+    const wordLabel = wasReversed
+      ? `<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">
+           Searching <span style="color:#ffb86c;font-family:var(--font-mono);font-weight:700;">"${searchWord}"</span>
+           <span style="color:var(--text-secondary);">(reversed from</span>
+           <span style="color:var(--text-secondary);font-family:var(--font-mono);">"${originalWord}"</span><span style="color:var(--text-secondary);">)</span>
+         </div>`
+      : `<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">
+           Searching <span style="color:var(--accent);font-family:var(--font-mono);font-weight:700;">"${searchWord}"</span>
+         </div>`;
+
+    let wordHTML = wordLabel + '<div class="word-display">';
+    for (let i=0;i<searchWord.length;i++) {
       let wcls = 'wc-pending';
-      if (result===true)     wcls='wc-matched';
-      else if (i < wordIdx)  wcls='wc-matched';
+      if (result===true)      wcls='wc-matched';
+      else if (i < wordIdx)   wcls='wc-matched';
       else if (i === wordIdx) wcls='wc-current';
-      wordHTML += `<div class="word-char ${wcls}">${displayWord[i]}<span class="word-char-idx">${i}</span></div>`;
+      wordHTML += `<div class="word-char ${wcls}">${searchWord[i]}<span class="word-char-idx">${i}</span></div>`;
     }
     wordHTML += '</div>';
 
@@ -940,7 +962,7 @@ const app = {
         <span class="stack-depth">${i}</span>
         <span class="stack-cell">(${pr},${pc})</span>
         <span class="stack-char">'${origVal}'</span>
-        <span class="stack-wi">word[${i}]='${displayWord[i]||'?'}'</span>
+        <span class="stack-wi">word[${i}]='${searchWord[i]||'?'}'</span>
         ${isTop ? '<span style="color:var(--accent);font-size:10px;margin-left:auto;">← top</span>' : ''}
       </div>`;
     }).join('');
