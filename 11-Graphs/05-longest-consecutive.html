@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>128. Longest Consecutive Sequence – Visualizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg0: #0d1117;
+  --bg1: #161b22;
+  --bg2: #1c2230;
+  --bg3: #21262d;
+  --bg4: #30363d;
+  --border: #30363d;
+  --text0: #e6edf3;
+  --text1: #8b949e;
+  --text2: #6e7681;
+  --accent: #58a6ff;
+  --accent2: #79c0ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --orange: #f0883e;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --cyan: #76e3ea;
+  --pink: #ff7b72;
+  --font-ui: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* syntax – dark (Dracula-ish) */
+  --syn-kw:   #ff79c6;
+  --syn-fn:   #50fa7b;
+  --syn-str:  #f1fa8c;
+  --syn-num:  #bd93f9;
+  --syn-cmt:  #6272a4;
+  --syn-type: #8be9fd;
+  --syn-op:   #ff79c6;
+  --syn-self: #ffb86c;
+  --syn-deco: #ff79c6;
+}
+/* syntax span classes */
+.syn-kw   { color: var(--syn-kw);   }
+.syn-fn   { color: var(--syn-fn);   }
+.syn-str  { color: var(--syn-str);  }
+.syn-num  { color: var(--syn-num);  }
+.syn-cmt  { color: var(--syn-cmt); font-style: italic; }
+.syn-type { color: var(--syn-type); }
+.syn-op   { color: var(--syn-op);   }
+.syn-self { color: var(--syn-self); }
+.syn-deco { color: var(--syn-deco); }
+[data-theme="light"] {
+  --bg0: #ffffff;
+  --bg1: #f6f8fa;
+  --bg2: #f0f3f7;
+  --bg3: #e8ecf0;
+  --bg4: #d0d7de;
+  --border: #d0d7de;
+  --text0: #1f2328;
+  --text1: #636c76;
+  --text2: #9198a1;
+  --accent: #0969da;
+  --accent2: #0a6ab5;
+  --green: #1a7f37;
+  --yellow: #9a6700;
+  --orange: #bc4c00;
+  --red: #cf222e;
+  --purple: #8250df;
+  --cyan: #1b7c83;
+  --pink: #cf222e;
+  --syn-kw:   #d73a49;
+  --syn-fn:   #6f42c1;
+  --syn-str:  #032f62;
+  --syn-num:  #005cc5;
+  --syn-cmt:  #6a737d;
+  --syn-type: #22863a;
+  --syn-op:   #d73a49;
+  --syn-self: #e36209;
+  --syn-deco: #6f42c1;
+}
+[data-theme="light"] .syn-kw   { color: var(--syn-kw);   }
+[data-theme="light"] .syn-fn   { color: var(--syn-fn);   }
+[data-theme="light"] .syn-str  { color: var(--syn-str);  }
+[data-theme="light"] .syn-num  { color: var(--syn-num);  }
+[data-theme="light"] .syn-cmt  { color: var(--syn-cmt);  }
+[data-theme="light"] .syn-type { color: var(--syn-type); }
+[data-theme="light"] .syn-op   { color: var(--syn-op);   }
+[data-theme="light"] .syn-self { color: var(--syn-self); }
+[data-theme="light"] .syn-deco { color: var(--syn-deco); }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg0);
+  color: var(--text0);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ─── HEADER ─────────────────────────────── */
+#header {
+  flex-shrink: 0;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hrow1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.problem-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text0);
+  letter-spacing: -0.01em;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(88,166,255,.15);
+  color: var(--accent);
+  border: 1px solid rgba(88,166,255,.25);
+}
+.hrow1 .right { margin-left: auto; display: flex; gap: 8px; }
+.btn-sm {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text0);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.btn-sm:hover { background: var(--bg4); border-color: var(--accent); }
+
+.mode-bar {
+  display: flex;
+  gap: 6px;
+}
+.mode-btn {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text1);
+  cursor: pointer;
+  transition: all .15s;
+}
+.mode-btn:hover { color: var(--text0); border-color: var(--accent); }
+.mode-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* input row */
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.input-label { font-size: 12px; color: var(--text1); white-space: nowrap; }
+.input-field {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 10px;
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text0);
+  flex: 1;
+  min-width: 200px;
+  outline: none;
+  transition: border-color .15s;
+}
+.input-field:focus { border-color: var(--accent); }
+
+/* ─── MAIN ────────────────────────────────── */
+#main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ─── PANELS ──────────────────────────────── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  min-width: 0;
+}
+.panel:last-child { border-right: none; }
+.panel-header {
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text1);
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-body {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* resizer */
+.resizer {
+  width: 5px;
+  cursor: col-resize;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background .15s;
+  z-index: 10;
+}
+.resizer:hover, .resizer.dragging { background: var(--accent); }
+
+/* ─── CODE PANEL ──────────────────────────── */
+#code-panel { background: var(--bg0); }
+.code-scroll {
+  height: 100%;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.code-scroll pre { margin: 0; padding: 12px 0; }
+.code-line {
+  display: flex;
+  align-items: stretch;
+  min-height: 21.45px;
+  padding: 0;
+  transition: background .12s;
+  position: relative;
+}
+.code-line.active {
+  background: rgba(251,191,36,.12) !important;
+}
+.code-line.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--yellow);
+}
+.ln {
+  min-width: 42px;
+  text-align: right;
+  padding: 0 14px 0 0;
+  color: var(--text2);
+  user-select: none;
+  flex-shrink: 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.code-line.active .ln { color: var(--yellow); }
+.lc {
+  flex: 1;
+  white-space: pre;
+  padding: 0 16px 0 0;
+  color: var(--text0);
+}
+
+/* ─── VIZ PANEL ───────────────────────────── */
+#viz-panel { background: var(--bg0); }
+#viz-panel .panel-body { padding: 0; position: relative; }
+#viz-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* controls bar */
+#controls-bar {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg1);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ctrl-btn {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text0);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  transition: all .15s;
+}
+.ctrl-btn:hover { background: var(--bg4); border-color: var(--accent); }
+.ctrl-btn.play-btn { background: var(--accent); border-color: var(--accent); color: #fff; width: 34px; height: 34px; font-size: 14px; }
+.ctrl-btn.play-btn:hover { background: var(--accent2); }
+.step-info { font-size: 12px; color: var(--text1); font-family: var(--font-mono); margin-left: 4px; white-space: nowrap; }
+.speed-sel {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  padding: 4px 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text0);
+  cursor: pointer;
+  outline: none;
+  margin-left: auto;
+}
+
+/* ─── STEP LOG ────────────────────────────── */
+#step-panel { background: var(--bg0); min-width: 220px; }
+.step-desc {
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text0);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg1);
+  min-height: 60px;
+}
+.vars-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.vars-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+.var-row {
+  display: flex;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  margin-bottom: 4px;
+  align-items: baseline;
+}
+.var-name { color: var(--accent); flex-shrink: 0; }
+.var-val { color: var(--text0); word-break: break-all; }
+.history-section { padding: 10px 14px; }
+.history-item {
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  margin-bottom: 3px;
+  color: var(--text1);
+  cursor: pointer;
+  transition: background .1s;
+  line-height: 1.45;
+}
+.history-item:hover { background: var(--bg3); }
+.history-item.current {
+  background: var(--bg3);
+  color: var(--text0);
+  border-left: 2px solid var(--accent);
+  padding-left: 6px;
+}
+.history-num {
+  display: inline-block;
+  min-width: 18px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  margin-right: 4px;
+}
+
+/* ─── INTUITION MODE ────────────────────────── */
+#intuition-main {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.int-left {
+  width: 48%;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.int-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.int-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+.int-panel-hdr {
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text1);
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stage-card {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  transition: opacity .3s, border-color .3s;
+}
+.stage-card.active { border-color: var(--accent); background: var(--bg2); }
+.stage-card.past { opacity: .55; }
+.stage-card.future { opacity: .25; }
+.stage-num-badge {
+  display: inline-flex;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--bg4);
+  color: var(--text1);
+  font-size: 11px;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.stage-card.active .stage-num-badge { background: var(--accent); color: #fff; }
+.stage-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text0);
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.thought-bubble {
+  background: rgba(88,166,255,.08);
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  color: var(--text1);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.55;
+}
+.stage-content {
+  font-size: 13px;
+  color: var(--text1);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.key-insight {
+  margin-top: 10px;
+  background: rgba(63,185,80,.08);
+  border-left: 3px solid var(--green);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  color: var(--text0);
+  line-height: 1.55;
+}
+.key-insight strong { color: var(--green); }
+
+/* int controls */
+#int-controls {
+  padding: 8px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--bg1);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.int-stage-info { font-size: 12px; color: var(--text1); font-family: var(--font-mono); }
+
+/* viz in intuition */
+.int-viz-body {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.int-viz-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.int-viz-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+.int-viz-svg { width: 100%; overflow: hidden; }
+
+/* approach comparison */
+.approach-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.approach-box {
+  flex: 1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.approach-box.bad { background: rgba(248,81,73,.07); border-color: rgba(248,81,73,.3); }
+.approach-box.good { background: rgba(63,185,80,.07); border-color: rgba(63,185,80,.3); }
+.approach-box h4 { font-size: 12.5px; font-weight: 600; margin-bottom: 6px; }
+.approach-box.bad h4 { color: var(--red); }
+.approach-box.good h4 { color: var(--green); }
+.approach-box p { font-size: 12px; color: var(--text1); line-height: 1.6; }
+
+.set-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+}
+.set-node {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text0);
+  transition: all .25s;
+}
+.set-node.root { border-color: var(--accent); background: rgba(88,166,255,.15); color: var(--accent); }
+.set-node.chain { border-color: var(--green); background: rgba(63,185,80,.15); color: var(--green); }
+.set-node.visited { border-color: var(--text2); background: transparent; color: var(--text2); opacity: .5; }
+
+.complexity-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.complexity-box h4 { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.complexity-box p { font-size: 12px; color: var(--text1); line-height: 1.7; }
+.complexity-box code { font-family: var(--font-mono); color: var(--yellow); font-size: 12px; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text2); }
+
+/* tag pill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 99px;
+  letter-spacing: .04em;
+}
+.pill-graph { background: rgba(188,140,255,.12); color: var(--purple); border: 1px solid rgba(188,140,255,.3); }
+.pill-medium { background: rgba(240,136,62,.12); color: var(--orange); border: 1px solid rgba(240,136,62,.3); }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="header">
+  <div class="hrow1">
+    <span class="problem-title">128. Longest Consecutive Sequence</span>
+    <span class="pill pill-medium">Medium</span>
+    <span class="pill pill-graph">Graph</span>
+    <div class="right">
+      <button class="btn-sm" id="theme-btn">☀ Light</button>
+    </div>
+  </div>
+  <div class="mode-bar">
+    <button class="mode-btn active" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition</button>
+    <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶ Step-by-Step</button>
+  </div>
+  <div class="input-row" id="input-row" style="display:none">
+    <span class="input-label">Input nums:</span>
+    <input class="input-field" id="input-field" value="[100, 4, 200, 1, 3, 2]" />
+    <button class="btn-sm" onclick="rerun()">Run</button>
+  </div>
+</div>
+
+<div id="main">
+  <!-- INTUITION MODE (default) -->
+  <div id="intuition-main">
+    <div class="int-left">
+      <div class="int-panel-hdr">
+        <span>Senior Engineer's Thought Process</span>
+        <span class="int-stage-info" id="int-stage-info">Stage 1 / 6</span>
+      </div>
+      <div class="int-scroll" id="int-scroll"></div>
+      <div id="int-controls">
+        <button class="ctrl-btn" onclick="intStep(-1)">◀</button>
+        <button class="ctrl-btn play-btn" id="int-play-btn" onclick="intTogglePlay()">▶</button>
+        <button class="ctrl-btn" onclick="intStep(1)">▶</button>
+        <button class="ctrl-btn" onclick="intReset()" title="Reset">↺</button>
+      </div>
+    </div>
+    <div class="int-right">
+      <div class="int-panel-hdr">Visual Explanation</div>
+      <div class="int-viz-body" id="int-viz-body"></div>
+    </div>
+  </div>
+
+  <!-- EXECUTION MODE (hidden) -->
+  <div id="execution-main" style="display:none; width:100%; height:100%; display:none; flex-direction:row; overflow:hidden;">
+    <div class="panel" id="code-panel" style="width:34%">
+      <div class="panel-header">Code</div>
+      <div class="panel-body code-scroll" id="code-body"><pre id="code-pre"></pre></div>
+    </div>
+    <div class="resizer" id="r1"></div>
+    <div class="panel" id="viz-panel" style="flex:1">
+      <div class="panel-header">Graph Visualization</div>
+      <div class="panel-body" style="position:relative">
+        <svg id="viz-canvas" viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div id="controls-bar">
+        <button class="ctrl-btn" onclick="reset()" title="Reset">↺</button>
+        <button class="ctrl-btn" onclick="stepBack()">◀</button>
+        <button class="ctrl-btn play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+        <button class="ctrl-btn" onclick="stepFwd()">▶</button>
+        <span class="step-info" id="step-info">Step 0 / 0</span>
+        <select class="speed-sel" id="speed-sel" onchange="setSpeed(this.value)">
+          <option value="2000">0.5×</option>
+          <option value="1000" selected>1×</option>
+          <option value="500">2×</option>
+          <option value="250">4×</option>
+        </select>
+      </div>
+    </div>
+    <div class="resizer" id="r2"></div>
+    <div class="panel" id="step-panel" style="width:240px; min-width:200px">
+      <div class="panel-header">Step Log</div>
+      <div class="panel-body" id="step-body">
+        <div class="step-desc" id="step-desc">–</div>
+        <div class="vars-section">
+          <div class="vars-title">Variables</div>
+          <div id="vars-content"></div>
+        </div>
+        <div class="history-section">
+          <div class="vars-title">History</div>
+          <div id="history-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   PYTHON CODE (clean, no extraneous comments)
+═══════════════════════════════════════════ */
+const CODE = `from typing import List
+
+
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        num_set: set[int] = set(nums)
+
+        best: int = 0
+
+        for num in num_set:
+
+            if (num - 1) in num_set:
+                continue
+
+            current: int = num
+            length:  int = 1
+
+            while (current + 1) in num_set:
+                current += 1
+                length  += 1
+
+            best = max(best, length)
+
+        return best`.trimEnd();
+
+/* ═══════════════════════════════════════════
+   SYNTAX HIGHLIGHTING  (token-based, no double-escape)
+═══════════════════════════════════════════ */
+
+// Escape only raw text fragments — never touch already-built HTML
+function escT(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function span(cls,txt){ return `<span class="${cls}">${escT(txt)}</span>`; }
+
+const KWS = new Set(['from','import','class','def','return','if','elif','else',
+  'while','for','in','and','or','not','True','False','None','continue','pass',
+  'break','as','with','yield','lambda','global','nonlocal','del','raise','try',
+  'except','finally','assert','is']);
+const BUILTINS = new Set(['set','max','min','len','range','print','enumerate',
+  'zip','map','filter','sorted','list','dict','tuple','type','isinstance',
+  'hasattr','getattr','setattr','super','object','property','staticmethod',
+  'classmethod','abs','sum','any','all','open','int','str','float','bool']);
+const TYPES = new Set(['List','Optional','Dict','Set','Tuple','Union','Any',
+  'Callable','Iterator','Generator','Sequence','Mapping','int','str','float',
+  'bool','None','bytes']);
+
+// Token regex — order matters, first match wins
+const TOKEN_RE = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\s+)|(->)|(\b\w+\b)|([+\-*\/%=<>!&|^~:,.\[\]{}()])/g;
+
+function highlightPy(raw){
+  // Special case: pure comment line
+  const trimmed = raw.trimStart();
+  if(trimmed.startsWith('#')){
+    const indent = raw.slice(0, raw.length - trimmed.length);
+    return escT(indent) + span('syn-cmt', trimmed);
+  }
+
+  // Split off inline comment (but not inside strings — handled by token loop)
+  let out = '';
+  let i = 0;
+  let inStr = false;
+
+  // Use token regex to walk the line
+  const tokens = [];
+  let m;
+  TOKEN_RE.lastIndex = 0;
+  while((m = TOKEN_RE.exec(raw)) !== null){
+    tokens.push({ text: m[0], isStr: !!m[1], isWS: !!m[2], isArrow: !!m[3], isWord: !!m[4] });
+  }
+
+  let result = '';
+  let prevWord = '';
+
+  for(let ti = 0; ti < tokens.length; ti++){
+    const tok = tokens[ti];
+    const t = tok.text;
+
+    if(tok.isStr){
+      result += span('syn-str', t);
+    } else if(tok.isWS){
+      result += escT(t);
+    } else if(tok.isArrow){
+      result += span('syn-op', t);
+    } else if(tok.isWord){
+      if(t === 'self'){
+        result += span('syn-self', t);
+      } else if(prevWord === 'def'){
+        result += span('syn-fn', t);
+      } else if(KWS.has(t)){
+        result += span('syn-kw', t);
+      } else if(TYPES.has(t)){
+        // look ahead: if followed by [ or used after : or -> treat as type
+        result += span('syn-type', t);
+      } else if(BUILTINS.has(t)){
+        result += span('syn-fn', t);
+      } else if(/^\d+$/.test(t)){
+        result += span('syn-num', t);
+      } else {
+        result += escT(t);
+      }
+      prevWord = t;
+      continue;
+    } else {
+      // punctuation / operators
+      if(t === '#'){
+        // rest of line is a comment
+        const rest = raw.slice(raw.indexOf('#', TOKEN_RE.lastIndex - t.length));
+        result += span('syn-cmt', rest);
+        break;
+      }
+      result += span('syn-op', t);
+    }
+    prevWord = '';
+  }
+  return result;
+}
+
+/* Build code panel */
+function buildCode(){
+  const pre = document.getElementById('code-pre');
+  pre.innerHTML = '';
+  CODE.split('\n').forEach((line,i)=>{
+    const div = document.createElement('div');
+    div.className='code-line';
+    div.id=`cl-${i}`;
+    const ln=document.createElement('span');
+    ln.className='ln';
+    ln.textContent=i+1;
+    const lc=document.createElement('code');
+    lc.className='lc';
+    lc.innerHTML = line==='' ? ' ' : highlightPy(line);
+    div.appendChild(ln);
+    div.appendChild(lc);
+    pre.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   STEP SIMULATION
+═══════════════════════════════════════════ */
+let STEPS = [];
+
+function simulate(numsArr){
+  const steps=[];
+  const numSet = new Set(numsArr);
+  let best=0;
+
+  const log=(line,desc,vars,extra={})=>{
+    steps.push({line,desc,vars:{...vars},extra:{...extra}});
+  };
+
+  log(4,'Build hash set from nums',{num_set:[...numSet],best:0},{phase:'init',set:[...numSet]});
+
+  for(const num of numSet){
+    const isRoot = !numSet.has(num-1);
+    log(9,`Iterating: num = ${num}`,{num,best,num_set:[...numSet]},{phase:'iter',num,numSet:[...numSet]});
+
+    if(!isRoot){
+      log(11,`num=${num} has predecessor ${num-1} → skip (not a sequence root)`,{num,best},{phase:'skip',num});
+      continue;
+    }
+
+    log(13,`num=${num} is a SEQUENCE ROOT (${num-1} not in set)`,{num,best},{phase:'root',num});
+
+    let current=num, length=1;
+    log(15,`Start chain at ${num}: current=${current}, length=${length}`,{num,current,length,best},{phase:'chain_start',current,length,chainStart:num});
+
+    while(numSet.has(current+1)){
+      current++;
+      length++;
+      log(17,`Follow edge ${current-1}→${current}: length=${length}`,{current,length,best},{phase:'walk',current,length,chainStart:num});
+    }
+
+    const prev=best;
+    best=Math.max(best,length);
+    log(20,`Chain [${num}..${current}] has length ${length} → best=${best}`,{current,length,best},{phase:'update',chainStart:num,chainEnd:current,length,best,prevBest:prev});
+  }
+
+  log(22,`Return best = ${best}`,{best},{phase:'done',best});
+  return steps;
+}
+
+function parseNums(s){
+  try{
+    const a=JSON.parse(s.trim());
+    if(Array.isArray(a)&&a.every(x=>typeof x==='number')) return a;
+  }catch(e){}
+  const m=s.match(/-?\d+/g);
+  return m?m.map(Number):[];
+}
+
+/* ═══════════════════════════════════════════
+   EXECUTION MODE STATE
+═══════════════════════════════════════════ */
+let curStep=0, playing=false, playTimer=null, speedMs=1000;
+
+function rerun(){
+  pause();
+  const nums=parseNums(document.getElementById('input-field').value);
+  STEPS=simulate(nums);
+  curStep=0;
+  renderStep();
+}
+function reset(){ pause(); curStep=0; renderStep(); }
+function stepFwd(){ pause(); if(curStep<STEPS.length-1){curStep++;renderStep();} }
+function stepBack(){ pause(); if(curStep>0){curStep--;renderStep();} }
+function togglePlay(){
+  if(playing) pause();
+  else play();
+}
+function play(){
+  if(playing) return;
+  playing=true;
+  document.getElementById('play-btn').textContent='⏸';
+  playTimer=setInterval(()=>{
+    if(curStep>=STEPS.length-1){pause();return;}
+    curStep++;renderStep();
+  },speedMs);
+}
+function pause(){
+  playing=false;
+  if(playTimer){clearInterval(playTimer);playTimer=null;}
+  document.getElementById('play-btn').textContent='▶';
+}
+function setSpeed(v){ speedMs=parseInt(v); if(playing){pause();play();} }
+
+function renderStep(){
+  if(!STEPS.length) return;
+  const s=STEPS[curStep];
+  document.getElementById('step-info').textContent=`Step ${curStep+1} / ${STEPS.length}`;
+
+  // highlight line
+  document.querySelectorAll('.code-line').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById(`cl-${s.line}`);
+  if(el){
+    el.classList.add('active');
+    el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+
+  // description
+  document.getElementById('step-desc').textContent=s.desc;
+
+  // vars
+  const vc=document.getElementById('vars-content');
+  vc.innerHTML='';
+  for(const [k,v] of Object.entries(s.vars)){
+    if(k==='num_set') continue;
+    const row=document.createElement('div');
+    row.className='var-row';
+    row.innerHTML=`<span class="var-name">${k}</span><span style="color:var(--text2)"> = </span><span class="var-val">${Array.isArray(v)?JSON.stringify(v):String(v)}</span>`;
+    vc.appendChild(row);
+  }
+
+  // history
+  const hc=document.getElementById('history-content');
+  hc.innerHTML='';
+  STEPS.slice(0,curStep+1).forEach((st,i)=>{
+    const d=document.createElement('div');
+    d.className='history-item'+(i===curStep?' current':'');
+    d.innerHTML=`<span class="history-num">${i+1}</span>${st.desc}`;
+    d.onclick=()=>{curStep=i;renderStep();};
+    hc.appendChild(d);
+  });
+  // auto-scroll history
+  const cur=hc.querySelector('.current');
+  if(cur) cur.scrollIntoView({block:'nearest'});
+
+  // svg viz
+  renderViz(s);
+}
+
+/* ═══════════════════════════════════════════
+   GRAPH SVG VISUALIZATION
+═══════════════════════════════════════════ */
+function renderViz(step){
+  const svg=document.getElementById('viz-canvas');
+  const isDark=document.body.dataset.theme==='dark';
+  const e=step.extra;
+
+  svg.innerHTML='';
+  const W=700,H=340;
+
+  // helper
+  const mk=(tag,attrs)=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(const[k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+    return el;
+  };
+  const txt=(x,y,s,attrs={})=>{
+    const t=mk('text',{x,y,'text-anchor':'middle','dominant-baseline':'central',
+      'font-family':'JetBrains Mono, monospace','font-size':'13',...attrs});
+    t.textContent=s; return t;
+  };
+
+  const colors={
+    nodeFill: isDark?'#21262d':'#f0f3f7',
+    nodeStroke: isDark?'#30363d':'#d0d7de',
+    text: isDark?'#e6edf3':'#1f2328',
+    dim: isDark?'#6e7681':'#9198a1',
+    edge: isDark?'#444c56':'#b1bac4',
+    root: '#58a6ff',
+    chain: '#3fb950',
+    current: '#d29922',
+    visited: isDark?'#30363d':'#d0d7de',
+    bg: isDark?'#0d1117':'#ffffff',
+  };
+
+  const nums=parseNums(document.getElementById('input-field').value);
+  const numSet=new Set(nums);
+  const unique=[...numSet].sort((a,b)=>a-b);
+
+  if(!unique.length){
+    svg.appendChild(txt(W/2,H/2,'No input',{fill:colors.dim}));
+    return;
+  }
+
+  // identify chains
+  const chains=[];
+  const seen=new Set();
+  for(const n of unique){
+    if(!numSet.has(n-1)){
+      let c=n,len=1;
+      while(numSet.has(c+1)){c++;len++;}
+      chains.push({start:n,end:c,len});
+    }
+  }
+
+  // layout: place all unique nodes in sorted order
+  // We arrange chains as groups
+  const nodeR=24;
+  const chainGap=50;
+  const nodeGap=70;
+
+  // compute positions
+  const nodePos={}; // num -> {x,y,chainIdx,posInChain}
+  let x=60;
+  chains.forEach((ch,ci)=>{
+    let nx=x;
+    for(let n=ch.start;n<=ch.end;n++){
+      nodePos[n]={x:nx,y:H/2-20,chainIdx:ci,posInChain:n-ch.start,chainLen:ch.len};
+      nx+=nodeGap;
+    }
+    x=nx+chainGap;
+  });
+
+  // scale to fit
+  const maxX=Math.max(...Object.values(nodePos).map(p=>p.x));
+  const scale=Math.min(1,(W-80)/(maxX+30));
+  const offX=(W-(maxX+30)*scale)/2;
+  Object.values(nodePos).forEach(p=>{p.x=p.x*scale+offX; p.y=p.y*0.9+50;});
+
+  const phase=e.phase||'init';
+
+  // determine node states
+  const nodeState={}; // num -> 'root'|'chain'|'visited'|'current'|'normal'
+  unique.forEach(n=>nodeState[n]='normal');
+
+  if(phase==='root'||phase==='chain_start'||phase==='walk'||phase==='update'){
+    const cs=e.chainStart;
+    // mark root
+    nodeState[cs]='root';
+    // mark chain members up to current
+    if(e.current!==undefined){
+      for(let n=cs;n<=e.current;n++){
+        nodeState[n]= n===e.current?'current':'chain';
+      }
+    }
+    // mark previously completed nodes (from earlier steps) as visited
+    STEPS.slice(0,curStep).forEach(st=>{
+      if(st.extra.phase==='update'){
+        for(let n=st.extra.chainStart;n<=st.extra.chainEnd;n++){
+          if(nodeState[n]==='normal') nodeState[n]='visited';
+        }
+      }
+    });
+  }
+  if(phase==='update'){
+    for(let n=e.chainStart;n<=e.chainEnd;n++){
+      nodeState[n]='chain';
+    }
+  }
+  if(phase==='skip'){
+    // mark current iter node
+    nodeState[e.num]='visited';
+  }
+
+  // defs: arrowhead
+  const defs=mk('defs',{});
+  const arrowDark=mk('marker',{id:'arr','markerWidth':'8','markerHeight':'8','refX':'7','refY':'3','orient':'auto'});
+  const poly=mk('polygon',{points:'0 0, 8 3, 0 6',fill:colors.edge});
+  arrowDark.appendChild(poly); defs.appendChild(arrowDark);
+  svg.appendChild(defs);
+
+  // background
+  svg.appendChild(mk('rect',{x:0,y:0,width:W,height:H,fill:colors.bg,rx:0}));
+
+  // draw edges
+  chains.forEach(ch=>{
+    for(let n=ch.start;n<ch.end;n++){
+      const p1=nodePos[n], p2=nodePos[n+1];
+      if(!p1||!p2) return;
+      const x1=p1.x+nodeR*0.8,x2=p2.x-nodeR*0.8;
+      const state=nodeState[n];
+      const ec=(state==='chain'||state==='current')?colors.chain:
+               (state==='visited')?colors.visited:colors.edge;
+      svg.appendChild(mk('line',{x1,y1:p1.y,x2,y2:p2.y,stroke:ec,'stroke-width':'2','marker-end':'url(#arr)'}));
+    }
+  });
+
+  // chain length labels
+  chains.forEach(ch=>{
+    // only if this chain has been walked (or is being walked)
+    const started=STEPS.slice(0,curStep+1).some(st=>st.extra.chainStart===ch.start && (st.extra.phase==='update'||st.extra.phase==='walk'||st.extra.phase==='chain_start'));
+    if(!started) return;
+    const p=nodePos[ch.end]||nodePos[ch.start];
+    if(!p) return;
+    const lenLabel=txt(p.x+32,p.y-38,`len=${ch.len}`,{fill:colors.chain,'font-size':'11','font-weight':'600'});
+    svg.appendChild(lenLabel);
+  });
+
+  // draw nodes
+  unique.forEach(n=>{
+    const p=nodePos[n];
+    if(!p) return;
+    const st=nodeState[n];
+    let fill=colors.nodeFill, stroke=colors.nodeStroke, textCol=colors.text, sw='1.5';
+    if(st==='root'){fill=`rgba(88,166,255,.18)`;stroke='#58a6ff';textCol='#58a6ff';sw='2';}
+    else if(st==='current'){fill=`rgba(210,153,34,.22)`;stroke='#d29922';textCol='#d29922';sw='2.5';}
+    else if(st==='chain'){fill=`rgba(63,185,80,.18)`;stroke='#3fb950';textCol='#3fb950';sw='2';}
+    else if(st==='visited'){fill='transparent';stroke=colors.visited;textCol=colors.dim;sw='1';}
+
+    svg.appendChild(mk('circle',{cx:p.x,cy:p.y,r:nodeR,fill,stroke,'stroke-width':sw}));
+    svg.appendChild(txt(p.x,p.y,String(n),{fill:textCol,'font-weight':'600','font-size':'14'}));
+  });
+
+  // current iteration indicator
+  if(phase==='iter'&&e.num!==undefined){
+    const p=nodePos[e.num];
+    if(p){
+      svg.appendChild(mk('circle',{cx:p.x,cy:p.y,r:nodeR+6,fill:'none',stroke:'#bc8cff','stroke-width':'2','stroke-dasharray':'4 3',opacity:'0.7'}));
+    }
+  }
+
+  // best label
+  const curBest=step.vars.best??0;
+  const bestLabel=txt(W-70,30,`best = ${curBest}`,{fill:curBest>0?colors.chain:colors.dim,'font-size':'15','font-weight':'700'});
+  svg.appendChild(bestLabel);
+
+  // legend
+  const leg=[
+    {c:'#58a6ff',l:'Root (in-degree 0)'},
+    {c:'#3fb950',l:'Active chain'},
+    {c:'#d29922',l:'Current node'},
+  ];
+  leg.forEach((item,i)=>{
+    const lx=22, ly=H-38+i*18;
+    svg.appendChild(mk('circle',{cx:lx,cy:ly,r:5,fill:item.c}));
+    svg.appendChild(txt(lx+10,ly,item.l,{'text-anchor':'start',fill:colors.dim,'font-size':'11'}));
+  });
+}
+
+/* ═══════════════════════════════════════════
+   INTUITION STAGES
+═══════════════════════════════════════════ */
+const STAGES=[
+  {
+    title:'Understanding the Problem',
+    thought:'What are we actually finding here? Not a search problem, not a sort problem… we want the longest run of integers.',
+    content:`Given an unsorted array of integers, find the length of the longest consecutive sequence — e.g., [1,2,3,4] has length 4.
+
+The key constraints:
+• We must achieve O(n) time — ruling out sorting (O(n log n))
+• Numbers can be in any order, with duplicates
+
+The hidden structure: if you squint, the numbers define an implicit graph where consecutive integers are connected.`,
+    insight:'The sequence [a, a+1, a+2, … a+k] is a directed path in an implicit graph. Finding the longest sequence = finding the longest path.',
+    viz:'graph_intro'
+  },
+  {
+    title:'Why Not Sort?',
+    thought:`Sorting feels natural here — then I could scan linearly. But that's O(n log n) and the problem demands O(n)…`,
+    content:`Approach A — Sort then scan:
+  Sort → O(n log n)
+  Single pass to find longest run → O(n)
+  Total: O(n log n) ✗
+
+Approach B — Hash set lookup:
+  Build set → O(n)
+  Constant-time membership tests → O(1) each
+  Total: O(n) ✓
+
+The hash set replaces sorting by giving us O(1) "does this value exist?" — which is all we need to trace a chain forward.`,
+    insight:'Hash set membership in O(1) lets us simulate traversal without sorting. We trade ordered data for instant lookup.',
+    viz:'approaches'
+  },
+  {
+    title:'The Graph Model',
+    thought:`Each number is a node. If n and n+1 both exist, draw an edge n → n+1. Consecutive sequences are just paths in this graph!`,
+    content:`Graph construction:
+  Nodes: every unique integer in nums
+  Edges: directed n → n+1 when both exist in the set
+
+The result is a collection of disjoint directed chains (DAG paths). No cycles possible — integers are totally ordered.
+
+Example with [100, 4, 200, 1, 3, 2]:
+  Chain 1: 1 → 2 → 3 → 4   (length 4)
+  Chain 2: 100              (length 1)
+  Chain 3: 200              (length 1)
+
+We never build this graph explicitly — the hash set is our O(1) adjacency lookup.`,
+    insight:'The hash set IS the graph. Checking "current+1 in set" is equivalent to following an edge.',
+    viz:'graph_model'
+  },
+  {
+    title:'The Root Trick — Why O(n)',
+    thought:`If I start traversal from every node, I'd walk each chain multiple times… I need to start only from the beginning of each chain.`,
+    content:`A sequence root is a number n where n−1 does NOT exist in the set.
+  → No incoming edge → nothing can extend it from the left.
+  → It's where the chain begins.
+
+By starting traversal ONLY from roots:
+  • Every node is visited exactly once — either as a root, or during one root's traversal
+  • No node is ever a traversal starting point twice
+
+Root check: if (n−1) in set → skip (not a root)
+
+This single condition is what collapses the algorithm from O(n²) to O(n).`,
+    insight:'The root check is the algorithm\'s "secret sauce". It converts potentially O(n) traversals each of O(n) into one O(n) total pass.',
+    viz:'root_trick'
+  },
+  {
+    title:'Walking the Chain',
+    thought:`Once I\'m at a root, I greedily follow edges — current → current+1 — until the chain ends. That's just a while loop.`,
+    content:`For each root, the chain walk:
+
+  current = root
+  length = 1
+  while (current + 1) in num_set:
+      current += 1
+      length += 1
+  best = max(best, length)
+
+This is an implicit BFS/DFS on a directed path — no queue or stack needed because a path has no branching.
+
+Each iteration of the while loop follows one edge in our implicit graph. The loop terminates when there's no next node (no outgoing edge).`,
+    insight:'The while loop IS the graph traversal. For a path graph (no branching), a greedy walk finds the full path in O(length) steps.',
+    viz:'chain_walk'
+  },
+  {
+    title:'Complexity & Final Picture',
+    thought:`Let me verify O(n). The outer for loop visits every node. The inner while loop looks like nested work — but each node is walked at most once total.`,
+    content:`Time Complexity — O(n):
+  • Set construction: O(n)
+  • Outer loop: visits each node once → O(n)
+  • Inner while: across ALL iterations, each node is "walked through" at most once
+  • Total inner iterations ≤ n → O(n) amortized
+  Combined: O(n) + O(n) = O(n)  ✓
+
+Space Complexity — O(n):
+  • Hash set stores at most n unique values
+
+The elegance: graph semantics (nodes, edges, paths, connected components) are fully realized with just a hash set and two loops.`,
+    insight:'Amortized analysis: even though there\'s a nested loop, the total work is O(n) because each element is processed exactly once across all chain walks.',
+    viz:'complexity'
+  }
+];
+
+let intStage=0, intPlaying=false, intTimer=null;
+
+function buildIntuition(){
+  const scroll=document.getElementById('int-scroll');
+  scroll.innerHTML='';
+  STAGES.forEach((st,i)=>{
+    const card=document.createElement('div');
+    const cls=i===intStage?'active':i<intStage?'past':'future';
+    card.className=`stage-card ${cls}`;
+    card.id=`int-card-${i}`;
+    card.innerHTML=`
+      <div class="stage-title">
+        <span class="stage-num-badge">${i+1}</span>${st.title}
+      </div>
+      <div class="thought-bubble">💭 "${st.thought}"</div>
+      <div class="stage-content">${st.content}</div>
+      <div class="key-insight"><strong>💡 Key Insight:</strong> ${st.insight}</div>
+    `;
+    card.onclick=()=>{ intStage=i; buildIntuition(); };
+    scroll.appendChild(card);
+  });
+  // scroll active into view
+  const active=document.getElementById(`int-card-${intStage}`);
+  if(active) setTimeout(()=>active.scrollIntoView({block:'nearest',behavior:'smooth'}),50);
+  document.getElementById('int-stage-info').textContent=`Stage ${intStage+1} / ${STAGES.length}`;
+  renderIntViz();
+}
+
+function intStep(d){
+  intPause();
+  intStage=Math.max(0,Math.min(STAGES.length-1,intStage+d));
+  buildIntuition();
+}
+function intReset(){ intPause(); intStage=0; buildIntuition(); }
+function intTogglePlay(){ if(intPlaying) intPause(); else intPlay(); }
+function intPlay(){
+  if(intPlaying) return;
+  intPlaying=true;
+  document.getElementById('int-play-btn').textContent='⏸';
+  intTimer=setInterval(()=>{
+    if(intStage>=STAGES.length-1){intPause();return;}
+    intStage++; buildIntuition();
+  },3500);
+}
+function intPause(){
+  intPlaying=false;
+  if(intTimer){clearInterval(intTimer);intTimer=null;}
+  document.getElementById('int-play-btn').textContent='▶';
+}
+
+/* ═══════════════════════════════════════════
+   INTUITION VISUALIZATIONS
+═══════════════════════════════════════════ */
+function renderIntViz(){
+  const body=document.getElementById('int-viz-body');
+  body.innerHTML='';
+  const st=STAGES[intStage];
+  const isDark=document.body.dataset.theme==='dark';
+
+  const card=(title,html)=>{
+    const c=document.createElement('div');
+    c.className='int-viz-card';
+    c.innerHTML=`<div class="int-viz-title">${title}</div>${html}`;
+    body.appendChild(c);
+  };
+
+  const numsCurrent=parseNums(document.getElementById('input-field').value||'[100,4,200,1,3,2]');
+  const numSet=new Set(numsCurrent);
+
+  switch(st.viz){
+    case 'graph_intro': {
+      card('Example: nums = [100, 4, 200, 1, 3, 2]',`
+        <div class="int-viz-title" style="margin-bottom:6px;color:var(--text1)">Numbers as nodes — consecutive pairs form edges</div>
+        <svg class="int-viz-svg" viewBox="0 0 560 120" style="height:120px">
+          ${chainSvg([1,2,3,4],60,60,isDark)}
+          ${isolatedNode(100,330,60,isDark)}
+          ${isolatedNode(200,430,60,isDark)}
+          <text x="175" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="${isDark?'#3fb950':'#1a7f37'}">length = 4  ✓</text>
+        </svg>
+      `);
+      card('Goal', `<p style="font-size:13px;color:var(--text1);line-height:1.7">Find the longest such path (chain) in the implicit graph. The answer is its length.</p>`);
+      break;
+    }
+    case 'approaches': {
+      card('Approach Comparison',`
+        <div class="approach-row">
+          <div class="approach-box bad">
+            <h4>❌ Sort + Scan</h4>
+            <p>Sort array → scan for runs<br>Time: <strong>O(n log n)</strong><br>Fails the constraint</p>
+          </div>
+          <div class="approach-box good">
+            <h4>✅ Hash Set</h4>
+            <p>Build set → trace chains<br>Time: <strong>O(n)</strong><br>Membership in O(1)</p>
+          </div>
+        </div>
+        <div class="int-viz-card" style="background:var(--bg2);border:none;padding:10px 12px;margin-top:4px">
+          <div style="font-size:12px;color:var(--text1);line-height:1.7">
+            <strong style="color:var(--accent)">Key:</strong> We don't need sorted order — we just need to know "is value X present?" A hash set answers that in O(1).
+          </div>
+        </div>
+      `);
+      break;
+    }
+    case 'graph_model': {
+      const unique=[...numSet].sort((a,b)=>a-b);
+      const chains=getChains(numSet);
+      card('Implicit Graph (hash set = adjacency)',`
+        <div style="font-size:12px;color:var(--text1);margin-bottom:10px">
+          Each unique number is a node. Edges exist where n and n+1 are both present.
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px">
+          ${unique.map(n=>{
+            const isRoot=!numSet.has(n-1);
+            const hasNext=numSet.has(n+1);
+            return `<div style="display:flex;align-items:center;gap:4px">
+              <div class="set-node ${isRoot?'root':hasNext?'chain':''}">${n}</div>
+              ${hasNext?`<span style="color:var(--text2);font-size:16px">→</span>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--text2)">Blue = root node (chain start) · Green = chain member</div>
+      `);
+      break;
+    }
+    case 'root_trick': {
+      const unique=[...numSet].sort((a,b)=>a-b);
+      const roots=unique.filter(n=>!numSet.has(n-1));
+      card('Root Detection',`
+        <div style="font-size:12px;color:var(--text1);margin-bottom:10px">
+          A root is a node with no incoming edge: <code style="color:var(--yellow);font-family:var(--font-mono)">(n−1) not in set</code>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          ${unique.map(n=>{
+            const isRoot=!numSet.has(n-1);
+            return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div class="set-node ${isRoot?'root':'visited'}">${n}</div>
+              <span style="font-size:10px;color:${isRoot?'var(--accent)':'var(--text2)'}">${isRoot?'ROOT':'skip'}</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="int-viz-card" style="background:rgba(88,166,255,.06);border-color:rgba(88,166,255,.2);padding:10px 12px;margin-top:4px">
+          <div style="font-size:12px;color:var(--text1)">Traversal starts <strong style="color:var(--accent)">only from roots</strong> → each node walked exactly once → O(n) total</div>
+        </div>
+      `);
+      break;
+    }
+    case 'chain_walk': {
+      const chains=getChains(numSet);
+      const longestChain=chains.reduce((a,b)=>b.len>a.len?b:a,{len:0,start:0,end:0});
+      const nodes=[];
+      for(let n=longestChain.start;n<=longestChain.end;n++) nodes.push(n);
+      card('Chain Walk (longest chain)',`
+        <div style="font-size:12px;color:var(--text1);margin-bottom:10px">
+          Starting from root <strong style="color:var(--accent)">${longestChain.start}</strong>, follow edges until no next node exists.
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${nodes.map((n,i)=>`
+            <div class="set-node chain">${n}</div>
+            ${i<nodes.length-1?`<span style="color:var(--green);font-size:18px">→</span>`:''}
+          `).join('')}
+        </div>
+        <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--text1)">
+          length = ${longestChain.len} &nbsp;→&nbsp; <span style="color:var(--green)">best = ${longestChain.len}</span>
+        </div>
+      `);
+      break;
+    }
+    case 'complexity': {
+      card('Time & Space Complexity',`
+        <div class="complexity-box">
+          <h4>Time: O(n)</h4>
+          <p>• Set build: <code>O(n)</code><br>
+          • Outer for loop: visits each node once → <code>O(n)</code><br>
+          • Inner while loop: across ALL runs, each node walked ≤ once → <code>O(n)</code> amortized<br>
+          • Total: <code>O(n) + O(n) = O(n)</code></p>
+        </div>
+        <div class="complexity-box">
+          <h4>Space: O(n)</h4>
+          <p>• Hash set: stores ≤ n unique values → <code>O(n)</code><br>
+          • No recursion stack — iterative only<br>
+          • No explicit graph adjacency list needed</p>
+        </div>
+      `);
+      break;
+    }
+  }
+}
+
+function getChains(numSet){
+  const chains=[];
+  for(const n of numSet){
+    if(!numSet.has(n-1)){
+      let c=n,len=1;
+      while(numSet.has(c+1)){c++;len++;}
+      chains.push({start:n,end:c,len});
+    }
+  }
+  return chains;
+}
+
+function chainSvg(nodes,startX,y,isDark){
+  const r=20,gap=70;
+  let html='';
+  nodes.forEach((n,i)=>{
+    const x=startX+i*gap;
+    const fill=isDark?'rgba(63,185,80,.2)':'rgba(26,127,55,.1)';
+    const stroke='#3fb950';
+    html+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    html+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono,monospace" font-size="14" fill="${stroke}" font-weight="600">${n}</text>`;
+    if(i<nodes.length-1){
+      const x2=startX+(i+1)*gap;
+      html+=`<line x1="${x+r+2}" y1="${y}" x2="${x2-r-6}" y2="${y}" stroke="#3fb950" stroke-width="2" marker-end="url(#arr2)"/>`;
+    }
+  });
+  html+=`<defs><marker id="arr2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><polygon points="0 0, 7 3, 0 6" fill="#3fb950"/></marker></defs>`;
+  return html;
+}
+function isolatedNode(n,x,y,isDark){
+  const fill=isDark?'rgba(88,166,255,.15)':'rgba(9,105,218,.08)';
+  return `<circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="#58a6ff" stroke-width="1.5"/>
+    <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono,monospace" font-size="13" fill="#58a6ff" font-weight="500">${n}</text>`;
+}
+
+/* ═══════════════════════════════════════════
+   MODE SWITCHING
+═══════════════════════════════════════════ */
+let currentMode='intuition';
+function setMode(m){
+  currentMode=m;
+  document.getElementById('btn-intuition').classList.toggle('active',m==='intuition');
+  document.getElementById('btn-execution').classList.toggle('active',m==='execution');
+  document.getElementById('input-row').style.display=m==='execution'?'flex':'none';
+  document.getElementById('intuition-main').style.display=m==='intuition'?'flex':'none';
+  const exMain=document.getElementById('execution-main');
+  exMain.style.display=m==='execution'?'flex':'none';
+  if(m==='execution'){
+    pause(); intPause();
+    rerun();
+  } else {
+    pause(); intPause();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESIZERS
+═══════════════════════════════════════════ */
+function initResizer(rid, leftId, rightId){
+  const r=document.getElementById(rid);
+  const left=document.getElementById(leftId);
+  const right=document.getElementById(rightId);
+  let dragging=false;
+  r.addEventListener('mousedown',e=>{
+    dragging=true; r.classList.add('dragging');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    const parent=r.parentElement;
+    const total=parent.getBoundingClientRect().width;
+    const leftRect=left.getBoundingClientRect();
+    const newLeft=e.clientX-parent.getBoundingClientRect().left;
+    const leftPct=Math.max(15,Math.min(60,newLeft/total*100));
+    left.style.width=leftPct+'%';
+  });
+  document.addEventListener('mouseup',()=>{ dragging=false; r.classList.remove('dragging'); });
+}
+
+/* ═══════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════ */
+function toggleTheme(){
+  const isDark=document.body.dataset.theme==='dark';
+  document.body.dataset.theme=isDark?'light':'dark';
+  document.getElementById('theme-btn').textContent=isDark?'🌙 Dark':'☀ Light';
+  if(currentMode==='execution') renderStep();
+  else renderIntViz();
+}
+document.getElementById('theme-btn').onclick=toggleTheme;
+
+/* ═══════════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.code==='Space'){ e.preventDefault(); currentMode==='execution'?togglePlay():intTogglePlay(); }
+  if(e.code==='ArrowRight'){ e.preventDefault(); currentMode==='execution'?stepFwd():intStep(1); }
+  if(e.code==='ArrowLeft'){ e.preventDefault(); currentMode==='execution'?stepBack():intStep(-1); }
+});
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+buildCode();
+STEPS=simulate(parseNums('[100, 4, 200, 1, 3, 2]'));
+buildIntuition();
+initResizer('r1','code-panel','viz-panel');
+initResizer('r2','viz-panel','step-panel');
+
+// ensure execution main is correctly hidden initially
+document.getElementById('execution-main').style.display='none';
+</script>
+</body>
+</html>
