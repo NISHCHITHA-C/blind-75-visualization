@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>261. Graph Valid Tree - Visualizer</title>
+<style>
+  :root {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #181825;
+    --bg-panel: #24273a;
+    --bg-header: #1e1e2e;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --text-muted: #585b70;
+    --border: #313244;
+    --accent: #89b4fa;
+    --accent2: #cba6f7;
+    --green: #a6e3a1;
+    --red: #f38ba8;
+    --yellow: #f9e2af;
+    --teal: #94e2d5;
+    --pink: #f5c2e7;
+    --orange: #fab387;
+    --font-mono: 'Consolas','Monaco','Courier New',monospace;
+    /* Dracula syntax */
+    --syn-keyword: #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-number: #bd93f9;
+    --syn-type: #8be9fd;
+    --syn-decorator: #ffb86c;
+    --syn-builtin: #ff79c6;
+    --highlight-line: rgba(249,226,175,0.10);
+    --node-default: #313244;
+    --node-visited: #89b4fa;
+    --node-current: #f9e2af;
+    --node-queued: #a6e3a1;
+    --node-cycle: #f38ba8;
+  }
+  [data-theme="light"] {
+    --bg-primary: #eff1f5;
+    --bg-secondary: #e6e9ef;
+    --bg-panel: #dce0e8;
+    --bg-header: #eff1f5;
+    --text-primary: #4c4f69;
+    --text-secondary: #5c5f77;
+    --text-muted: #9ca0b0;
+    --border: #bcc0cc;
+    --accent: #1e66f5;
+    --accent2: #8839ef;
+    --green: #40a02b;
+    --red: #d20f39;
+    --yellow: #df8e1d;
+    --teal: #179299;
+    --pink: #ea76cb;
+    --orange: #fe640b;
+    --syn-keyword: #d20f39;
+    --syn-function: #40a02b;
+    --syn-string: #40a02b;
+    --syn-comment: #9ca0b0;
+    --syn-number: #8839ef;
+    --syn-type: #179299;
+    --syn-decorator: #fe640b;
+    --syn-builtin: #d20f39;
+    --highlight-line: rgba(223,142,29,0.15);
+    --node-default: #bcc0cc;
+    --node-visited: #1e66f5;
+    --node-current: #df8e1d;
+    --node-queued: #40a02b;
+    --node-cycle: #d20f39;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background: var(--bg-primary); color: var(--text-primary); font-size: 13px; overflow: hidden; }
+
+  /* HEADER */
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--bg-header); border-bottom: 1px solid var(--border);
+    padding: 10px 18px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .header-row1 { display: flex; align-items: center; justify-content: space-between; }
+  .problem-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .problem-title span { color: var(--accent); }
+  .header-right { display: flex; gap: 8px; align-items: center; }
+  .btn { cursor: pointer; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; background: var(--bg-secondary); color: var(--text-secondary); transition: all .15s; border: 1px solid var(--border); }
+  .btn:hover { background: var(--border); color: var(--text-primary); }
+  .btn.active { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+  .btn.danger { background: var(--red); color: var(--bg-primary); border-color: var(--red); }
+
+  .mode-row { display: flex; gap: 6px; }
+  .mode-btn { flex: 1; max-width: 220px; padding: 6px 0; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); transition: all .15s; text-align: center; }
+  .mode-btn.active { background: var(--accent2); color: var(--bg-primary); border-color: var(--accent2); }
+  .mode-btn:hover:not(.active) { background: var(--border); color: var(--text-primary); }
+
+  .input-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .input-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .input-field { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 4px 8px; font-family: var(--font-mono); font-size: 12px; width: 100px; }
+  .input-field:focus { outline: none; border-color: var(--accent); }
+
+  /* MAIN */
+  #main {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+  }
+  #content {
+    display: flex; width: 100%; overflow: hidden;
+  }
+
+  /* PANELS */
+  .panel { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; height: 100%; background: var(--bg-panel); }
+  .panel:last-child { border-right: none; }
+  .panel-header { padding: 8px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
+  .panel-body { flex: 1; overflow: auto; }
+
+  /* RESIZER */
+  .resizer { width: 4px; cursor: col-resize; background: var(--border); flex-shrink: 0; transition: background .1s; z-index: 10; }
+  .resizer:hover, .resizer.active { background: var(--accent); }
+
+  /* CODE PANEL */
+  #code-panel { flex-shrink: 0; }
+  .code-inner { padding: 12px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.0; background: var(--bg-secondary); min-height: 100%; }
+  .code-line { display: flex; align-items: stretch; min-height: 20px; transition: background .15s; }
+  .code-line.highlighted { background: var(--highlight-line); }
+  .line-num { display: inline-block; min-width: 38px; text-align: right; padding-right: 12px; color: var(--text-muted); user-select: none; font-size: 12px; padding-top: 1px; flex-shrink: 0; }
+  .line-code { white-space: pre; color: var(--text-primary); flex: 1; padding-right: 16px; padding-top: 1px; }
+
+  /* Syntax colors */
+  .sk { color: var(--syn-keyword); font-weight: 600; }
+  .sf { color: var(--syn-function); }
+  .ss { color: var(--syn-string); }
+  .sc { color: var(--syn-comment); font-style: italic; }
+  .sn { color: var(--syn-number); }
+  .st { color: var(--syn-type); }
+  .sd { color: var(--syn-decorator); }
+
+  /* VIZ PANEL */
+  #viz-panel { flex: 1; min-width: 200px; }
+  .viz-inner { width: 100%; height: 100%; position: relative; }
+  svg.main-viz { width: 100%; height: 100%; }
+
+  /* Controls bar */
+  #controls { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+  #controls .ctrl-btn { cursor: pointer; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all .12s; }
+  #controls .ctrl-btn:hover { background: var(--border); color: var(--text-primary); }
+  #controls .ctrl-btn.active { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+  .speed-select { background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
+  .step-counter { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  /* STEP LOG */
+  #log-panel { flex-shrink: 0; }
+  .log-inner { padding: 10px; }
+  .log-current { background: var(--bg-secondary); border-left: 3px solid var(--accent); padding: 8px 10px; border-radius: 0 6px 6px 0; margin-bottom: 10px; font-size: 12px; line-height: 1.5; color: var(--text-primary); }
+  .log-vars { margin-bottom: 10px; }
+  .log-vars h4 { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); margin-bottom: 6px; }
+  .var-row { font-family: var(--font-mono); font-size: 11px; padding: 2px 0; color: var(--text-secondary); }
+  .var-name { color: var(--accent); }
+  .log-history h4 { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); margin-bottom: 6px; }
+  .hist-item { font-size: 11px; padding: 4px 6px; border-radius: 4px; margin-bottom: 2px; color: var(--text-muted); }
+  .hist-item.active { background: var(--border); color: var(--text-primary); }
+
+  /* INTUITION MODE */
+  #intuition-content { display: flex; width: 100%; height: 100%; }
+  .int-left { flex: 1; overflow: auto; border-right: 1px solid var(--border); }
+  .int-right { flex: 1; overflow: auto; }
+  .int-stage { padding: 18px 20px; border-bottom: 1px solid var(--border); transition: opacity .3s; }
+  .int-stage.active { opacity: 1; }
+  .int-stage.past { opacity: .55; }
+  .int-stage.future { opacity: .22; }
+  .stage-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .stage-num { width: 22px; height: 22px; border-radius: 50%; background: var(--accent2); color: var(--bg-primary); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stage-num.done { background: var(--green); color: var(--bg-primary); }
+  .thought-bubble { background: rgba(137,180,250,.08); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 0 6px 6px 0; font-style: italic; font-size: 12px; color: var(--text-secondary); margin: 8px 0; line-height: 1.5; }
+  .stage-body { font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+  .key-insight { background: rgba(166,227,161,.08); border-left: 3px solid var(--green); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: var(--text-primary); line-height: 1.5; }
+  .key-insight strong { color: var(--green); }
+
+  .int-right-inner { padding: 16px; }
+  .viz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .viz-card-title { padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-panel); }
+  .viz-card-body { padding: 12px; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .compare-table th { background: var(--bg-panel); padding: 6px 8px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); }
+  .compare-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 700; }
+  .badge-green { background: rgba(166,227,161,.15); color: var(--green); }
+  .badge-red { background: rgba(243,139,168,.15); color: var(--red); }
+  .badge-blue { background: rgba(137,180,250,.15); color: var(--accent); }
+  .badge-yellow { background: rgba(249,226,175,.15); color: var(--yellow); }
+
+  code.inline { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: var(--font-mono); font-size: 11px; color: var(--syn-type); }
+
+  /* Intuition nav */
+  .int-nav { display: flex; gap: 6px; padding: 8px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .stage-progress { font-size: 11px; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; }
+
+  /* Result badge */
+  .result-badge { font-size: 14px; font-weight: 800; padding: 4px 14px; border-radius: 20px; display: inline-block; }
+  .result-true { background: rgba(166,227,161,.18); color: var(--green); border: 1px solid var(--green); }
+  .result-false { background: rgba(243,139,168,.18); color: var(--red); border: 1px solid var(--red); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="header">
+  <div class="header-row1">
+    <div class="problem-title"><span>261.</span> Graph Valid Tree</div>
+    <div class="header-right">
+      <button class="btn" id="theme-btn" onclick="toggleTheme()">☀ Light</button>
+    </div>
+  </div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="mode-int" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
+    <button class="mode-btn" id="mode-exec" onclick="setMode('execution')">▶ Step-by-Step Execution</button>
+  </div>
+  <div class="input-row" id="exec-input-row" style="display:none">
+    <span class="input-label">n =</span>
+    <input class="input-field" id="inp-n" value="5" style="width:55px">
+    <span class="input-label">edges =</span>
+    <input class="input-field" id="inp-edges" value="[[0,1],[0,2],[0,3],[1,4]]" style="width:230px">
+    <button class="btn" onclick="rerun()">▶ Run</button>
+    <div id="result-display"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="content">
+    <!-- INTUITION MODE -->
+    <div id="intuition-wrapper" style="width:100%;height:100%;display:flex;flex-direction:column;">
+      <div id="intuition-content"></div>
+      <div class="int-nav" id="int-nav">
+        <button class="btn" onclick="intPrev()">◀ Prev</button>
+        <button class="btn active" id="int-play-btn" onclick="intPlayPause()">▶ Play</button>
+        <button class="btn" onclick="intNext()">Next ▶</button>
+        <div class="stage-progress" id="stage-progress">Stage 1 / 7</div>
+      </div>
+    </div>
+
+    <!-- EXECUTION MODE -->
+    <div id="execution-wrapper" style="display:none;width:100%;height:100%;flex-direction:row;">
+      <div class="panel" id="code-panel" style="width:32%">
+        <div class="panel-header">Code <span id="lang-badge" style="color:var(--syn-function);font-size:10px;">Python</span></div>
+        <div class="panel-body"><div class="code-inner" id="code-display"></div></div>
+      </div>
+      <div class="resizer" id="res1"></div>
+      <div class="panel" id="viz-panel" style="flex:1;">
+        <div class="panel-header">Graph Visualization</div>
+        <div class="panel-body viz-inner" id="viz-body">
+          <svg id="viz-svg" class="main-viz"></svg>
+        </div>
+        <div id="controls">
+          <button class="ctrl-btn" onclick="execReset()" title="Reset">⏮</button>
+          <button class="ctrl-btn" onclick="execBack()" title="Step back">◀</button>
+          <button class="ctrl-btn active" id="play-btn" onclick="execPlayPause()" title="Play/Pause">▶</button>
+          <button class="ctrl-btn" onclick="execForward()" title="Step forward">▶|</button>
+          <select class="speed-select" id="speed-sel" onchange="setSpeed(this.value)">
+            <option value="2000">0.5x</option>
+            <option value="1000" selected>1x</option>
+            <option value="500">2x</option>
+            <option value="250">4x</option>
+          </select>
+          <span class="step-counter" id="step-counter">Step 0 / 0</span>
+          <span id="exec-result" style="margin-left:8px;"></span>
+        </div>
+      </div>
+      <div class="resizer" id="res2"></div>
+      <div class="panel" id="log-panel" style="width:22%">
+        <div class="panel-header">Step Log</div>
+        <div class="panel-body"><div class="log-inner" id="log-inner"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// PROBLEM CODE (BFS approach, clean)
+// ═══════════════════════════════════════════════════════
+const CODE_LINES = [
+  "from typing import List",
+  "from collections import defaultdict, deque",
+  "",
+  "",
+  "class Solution:",
+  "    def validTree(self, n: int, edges: List[List[int]]) -> bool:",
+  '        """',
+  "        A graph is a valid tree iff:",
+  "          1. Exactly n-1 edges  (no cycle, no excess)",
+  "          2. Fully connected    (all n nodes reachable)",
+  '        """',
+  "        # Guard: tree on n nodes needs exactly n-1 edges",
+  "        if len(edges) != n - 1:",
+  "            return False",
+  "",
+  "        # Build undirected adjacency list",
+  "        adj = defaultdict(list)",
+  "        for u, v in edges:",
+  "            adj[u].append(v)",
+  "            adj[v].append(u)",
+  "",
+  "        # BFS from node 0: count reachable nodes",
+  "        visited = {0}",
+  "        queue   = deque([0])",
+  "",
+  "        while queue:",
+  "            node = queue.popleft()",
+  "            for neighbour in adj[node]:",
+  "                if neighbour not in visited:",
+  "                    visited.add(neighbour)",
+  "                    queue.append(neighbour)",
+  "",
+  "        # All n nodes reachable → fully connected",
+  "        return len(visited) == n",
+];
+
+// ═══════════════════════════════════════════════════════
+// SYNTAX HIGHLIGHTING
+// ═══════════════════════════════════════════════════════
+// Token-based highlighter — processes raw source left-to-right,
+// never re-scans already-emitted HTML, so class= attributes are safe.
+function highlightLine(raw) {
+  if (!raw.trim()) return '\u00a0'; // &nbsp; as real char
+
+  const KEYWORDS = new Set(['from','import','class','def','if','elif','else','while','for','return','in','and','or','not','True','False','None','pass','break','continue','lambda','with','as','raise','try','except','finally','yield','del','global','nonlocal','assert','is']);
+  const TYPES    = new Set(['List','Dict','Set','Tuple','Optional','Union','Any','deque','defaultdict','int','bool','str','float','bytes','type','object','None']);
+
+  function escChar(c) {
+    if (c === '&') return '&amp;';
+    if (c === '<') return '&lt;';
+    if (c === '>') return '&gt;';
+    if (c === '"') return '&quot;';
+    return c;
+  }
+  function escStr(s) { return s.split('').map(escChar).join(''); }
+
+  let out = '';
+  let i = 0;
+  const src = raw;
+  const len = src.length;
+
+  while (i < len) {
+    // 1. Comment — rest of line
+    if (src[i] === '#') {
+      out += `<span class="sc">${escStr(src.slice(i))}</span>`;
+      break;
+    }
+
+    // 2. Triple-quoted string (docstring) — simplified: treat whole line as string
+    if ((src[i] === '"' && src.slice(i,i+3) === '"""') ||
+        (src[i] === "'" && src.slice(i,i+3) === "'''")) {
+      const q = src.slice(i,i+3);
+      let j = i + 3;
+      while (j < len && src.slice(j,j+3) !== q) j++;
+      j = Math.min(j+3, len);
+      out += `<span class="ss">${escStr(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+
+    // 3. Single/double quoted string
+    if (src[i] === '"' || src[i] === "'") {
+      const q = src[i]; let j = i+1;
+      while (j < len && src[j] !== q) {
+        if (src[j] === '\\') j++; // skip escape
+        j++;
+      }
+      j = Math.min(j+1, len);
+      out += `<span class="ss">${escStr(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+
+    // 4. Identifier or keyword
+    if (/[a-zA-Z_]/.test(src[i])) {
+      let j = i+1;
+      while (j < len && /[a-zA-Z0-9_]/.test(src[j])) j++;
+      const word = src.slice(i,j);
+      const escaped = escStr(word);
+
+      // peek past whitespace for '('
+      let k = j;
+      while (k < len && src[k] === ' ') k++;
+      const isCall = src[k] === '(';
+
+      if (KEYWORDS.has(word)) {
+        out += `<span class="sk">${escaped}</span>`;
+      } else if (TYPES.has(word)) {
+        out += `<span class="st">${escaped}</span>`;
+      } else if (isCall) {
+        out += `<span class="sf">${escaped}</span>`;
+      } else {
+        out += escaped;
+      }
+      i = j; continue;
+    }
+
+    // 5. Number
+    if (/[0-9]/.test(src[i])) {
+      let j = i+1;
+      while (j < len && /[0-9.]/.test(src[j])) j++;
+      out += `<span class="sn">${escStr(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+
+    // 6. Everything else — emit escaped
+    out += escChar(src[i]);
+    i++;
+  }
+
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════
+// CODE PANEL RENDERING
+// ═══════════════════════════════════════════════════════
+function renderCode(highlightedLine) {
+  const container = document.getElementById('code-display');
+  container.innerHTML = '';
+  CODE_LINES.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'code-line' + (i === highlightedLine ? ' highlighted' : '');
+    div.id = 'cl-' + i;
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'line-num';
+    numSpan.textContent = i + 1;
+
+    const codeSpan = document.createElement('span');
+    codeSpan.className = 'line-code';
+    codeSpan.innerHTML = highlightLine(line);
+
+    div.appendChild(numSpan);
+    div.appendChild(codeSpan);
+    container.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// BFS SIMULATION — generates steps
+// ═══════════════════════════════════════════════════════
+function simulateBFS(n, edges) {
+  const steps = [];
+
+  function snap(line, desc, vars, nodeStates, queueArr, visitedArr, result=null) {
+    steps.push({ line, desc, vars: {...vars}, nodeStates: nodeStates ? [...nodeStates] : null, queue: queueArr ? [...queueArr] : [], visited: visitedArr ? [...visitedArr] : [], result });
+  }
+
+  // Build adj
+  const adj = {};
+  for (let i = 0; i < n; i++) adj[i] = [];
+  for (const [u,v] of edges) { adj[u].push(v); adj[v].push(u); }
+
+  // Step 1: Check edge count
+  snap(12, `Check guard: len(edges) = ${edges.length}, n-1 = ${n-1}`, { 'len(edges)': edges.length, 'n-1': n-1 }, null, [], []);
+
+  if (edges.length !== n - 1) {
+    snap(13, `Edge count ${edges.length} ≠ ${n-1} → return False (can't be a tree)`, { result: false }, null, [], []);
+    steps[steps.length-1].result = false;
+    return steps;
+  }
+
+  snap(12, `Guard passed ✓ len(edges) = ${n-1} = n-1`, { 'len(edges)': edges.length, 'n-1': n-1 }, null, [], []);
+
+  // Build adj steps
+  snap(16, `Build undirected adjacency list`, { adj: JSON.stringify(adj) }, null, [], []);
+  for (const [u,v] of edges) {
+    snap(17, `Add edge ${u}↔${v} to adjacency list`, { u, v, 'adj[u]': JSON.stringify(adj[u]), 'adj[v]': JSON.stringify(adj[v]) }, null, [], []);
+  }
+
+  // BFS init
+  const visited = new Set([0]);
+  const queue = [0];
+  const nodeStates = Array(n).fill('unvisited');
+  nodeStates[0] = 'current';
+
+  snap(22, `BFS init: visited = {0}, queue = [0]`, { visited: '{0}', queue: '[0]' }, nodeStates, queue, [...visited]);
+
+  // BFS loop
+  while (queue.length > 0) {
+    const node = queue.shift();
+    nodeStates[node] = 'visited';
+    snap(26, `Dequeue node ${node}`, { node, visited: '{'+[...visited].join(',')+'}', queue: '['+queue.join(',')+']' }, nodeStates, [...queue], [...visited]);
+
+    for (const nb of adj[node]) {
+      snap(27, `Check neighbour ${nb} of node ${node}`, { node, neighbour: nb, 'in visited?': visited.has(nb) }, nodeStates, [...queue], [...visited]);
+      if (!visited.has(nb)) {
+        visited.add(nb);
+        queue.push(nb);
+        nodeStates[nb] = 'queued';
+        snap(29, `Add ${nb} to visited and queue`, { neighbour: nb, visited: '{'+[...visited].join(',')+'}', queue: '['+queue.join(',')+']' }, nodeStates, [...queue], [...visited]);
+        nodeStates[nb] = 'visited';
+      }
+    }
+  }
+
+  const connected = visited.size === n;
+  snap(33, `BFS done. visited.size = ${visited.size}, n = ${n}. ${connected ? 'All nodes reachable → True ✓' : 'Not all reachable → False ✗'}`,
+    { 'len(visited)': visited.size, n, result: connected }, nodeStates, [], [...visited], connected);
+
+  return steps;
+}
+
+// ═══════════════════════════════════════════════════════
+// GRAPH DRAWING
+// ═══════════════════════════════════════════════════════
+function getThemeVar(v) {
+  return getComputedStyle(document.body).getPropertyValue(v).trim();
+}
+
+function layoutNodes(n, cx, cy, r) {
+  const positions = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    positions.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  }
+  return positions;
+}
+
+function drawGraph(n, edges, nodeStates, queueArr, currentStep) {
+  const svg = document.getElementById('viz-svg');
+  const W = svg.clientWidth || 400, H = svg.clientHeight || 350;
+  const cx = W / 2, cy = H / 2 - 20;
+  const r = Math.min(W, H) * 0.32;
+  const NR = 22;
+
+  const positions = layoutNodes(n, cx, cy, r);
+  const stateColor = {
+    'unvisited': getThemeVar('--node-default'),
+    'current': getThemeVar('--node-current'),
+    'queued': getThemeVar('--node-queued'),
+    'visited': getThemeVar('--node-visited'),
+  };
+
+  let html = `<defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="${getThemeVar('--text-muted')}"/>
+    </marker>
+  </defs>`;
+
+  // Draw edges
+  for (const [u, v] of edges) {
+    const p1 = positions[u], p2 = positions[v];
+    html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${getThemeVar('--border')}" stroke-width="2"/>`;
+  }
+
+  // Draw nodes
+  for (let i = 0; i < n; i++) {
+    const p = positions[i];
+    const st = nodeStates ? nodeStates[i] : 'unvisited';
+    const fill = stateColor[st] || stateColor['unvisited'];
+    const isInQueue = queueArr && queueArr.includes(i);
+    const strokeColor = isInQueue ? getThemeVar('--green') : getThemeVar('--accent');
+    const strokeW = isInQueue ? 3 : (st !== 'unvisited' ? 2 : 1);
+    html += `
+      <circle cx="${p.x}" cy="${p.y}" r="${NR}" fill="${fill}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+      <text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" 
+            fill="${getThemeVar('--bg-primary')}" font-size="13" font-weight="700" font-family="var(--font-mono)">${i}</text>`;
+  }
+
+  // Legend
+  const ly = H - 28;
+  const items = [
+    { color: stateColor['unvisited'], label: 'Unvisited' },
+    { color: stateColor['visited'], label: 'Visited' },
+    { color: stateColor['queued'], label: 'In Queue' },
+    { color: stateColor['current'], label: 'Dequeued' },
+  ];
+  let lx = 12;
+  items.forEach(it => {
+    html += `<circle cx="${lx+7}" cy="${ly}" r="6" fill="${it.color}"/>
+             <text x="${lx+17}" y="${ly}" dominant-baseline="central" fill="${getThemeVar('--text-muted')}" font-size="10">${it.label}</text>`;
+    lx += 80;
+  });
+
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXECUTION STATE
+// ═══════════════════════════════════════════════════════
+let execSteps = [];
+let execCurrent = 0;
+let execPlaying = false;
+let execTimer = null;
+let execSpeed = 1000;
+
+function parseInput() {
+  const n = parseInt(document.getElementById('inp-n').value) || 5;
+  let edgesStr = document.getElementById('inp-edges').value.trim();
+  let edges = [];
+  try { edges = JSON.parse(edgesStr); } catch(e) { edges = [[0,1],[0,2],[0,3],[1,4]]; }
+  return { n, edges };
+}
+
+function rerun() {
+  const { n, edges } = parseInput();
+  execSteps = simulateBFS(n, edges);
+  execCurrent = 0;
+  execPlaying = false;
+  clearInterval(execTimer);
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').classList.remove('active');
+  renderExecStep();
+}
+
+function renderExecStep() {
+  const { n, edges } = parseInput();
+  const step = execSteps[execCurrent];
+  if (!step) return;
+
+  // Code highlight
+  const cont = document.getElementById('code-display');
+  cont.querySelectorAll('.code-line').forEach((el, i) => {
+    el.className = 'code-line' + (i === step.line ? ' highlighted' : '');
+  });
+  // Scroll highlighted line into view
+  const hl = document.getElementById('cl-' + step.line);
+  if (hl) hl.scrollIntoView({ block: 'nearest' });
+
+  // Graph
+  drawGraph(n, edges, step.nodeStates, step.queue, execCurrent);
+
+  // Step counter
+  document.getElementById('step-counter').textContent = `Step ${execCurrent + 1} / ${execSteps.length}`;
+
+  // Result
+  if (step.result !== null && step.result !== undefined) {
+    const r = step.result;
+    document.getElementById('exec-result').innerHTML =
+      `<span class="result-badge ${r ? 'result-true' : 'result-false'}">${r ? 'true ✓' : 'false ✗'}</span>`;
+  }
+
+  // Log
+  const logEl = document.getElementById('log-inner');
+  let html = `<div class="log-current">${step.desc}</div>`;
+  html += `<div class="log-vars"><h4>Variables</h4>`;
+  Object.entries(step.vars).forEach(([k, v]) => {
+    html += `<div class="var-row"><span class="var-name">${k}</span>: ${v}</div>`;
+  });
+  html += `</div><div class="log-history"><h4>History</h4>`;
+  execSteps.slice(0, execCurrent + 1).forEach((s, i) => {
+    html += `<div class="hist-item ${i === execCurrent ? 'active' : ''}">${i+1}. ${s.desc}</div>`;
+  });
+  html += `</div>`;
+  logEl.innerHTML = html;
+  // auto scroll history
+  const activeH = logEl.querySelector('.hist-item.active');
+  if (activeH) activeH.scrollIntoView({ block: 'nearest' });
+}
+
+function execPlayPause() {
+  execPlaying = !execPlaying;
+  const btn = document.getElementById('play-btn');
+  if (execPlaying) {
+    btn.textContent = '⏸';
+    btn.classList.add('active');
+    execTimer = setInterval(() => {
+      if (execCurrent < execSteps.length - 1) {
+        execCurrent++;
+        renderExecStep();
+      } else {
+        execPlaying = false;
+        clearInterval(execTimer);
+        btn.textContent = '▶';
+        btn.classList.remove('active');
+      }
+    }, execSpeed);
+  } else {
+    clearInterval(execTimer);
+    btn.textContent = '▶';
+    btn.classList.remove('active');
+  }
+}
+
+function execForward() {
+  if (execCurrent < execSteps.length - 1) { execCurrent++; renderExecStep(); }
+}
+function execBack() {
+  if (execCurrent > 0) { execCurrent--; renderExecStep(); }
+}
+function execReset() {
+  execCurrent = 0;
+  execPlaying = false;
+  clearInterval(execTimer);
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').classList.remove('active');
+  document.getElementById('exec-result').innerHTML = '';
+  renderExecStep();
+}
+function setSpeed(v) {
+  execSpeed = parseInt(v);
+  if (execPlaying) { clearInterval(execTimer); execPlayPause(); execPlayPause(); }
+}
+
+// ═══════════════════════════════════════════════════════
+// INTUITION STAGES
+// ═══════════════════════════════════════════════════════
+const intuitionStages = [
+  {
+    title: "What is the problem asking?",
+    thought: "Okay, n nodes, some edges — when is this a valid tree? A tree is a connected acyclic graph... let me think about what that means in terms of the inputs.",
+    body: `Given <code class="inline">n</code> nodes and a list of edges, determine if they form a valid <strong>undirected tree</strong>.<br><br>
+A tree is not just any connected graph — it must have <strong>no cycles</strong> and must be <strong>fully connected</strong>. Together, these two constraints fully define a tree.<br><br>
+The challenge: we're given raw edges, not a tree structure, so we need to verify both properties programmatically.`,
+    insight: "A valid tree = connected + acyclic. Equivalently, n nodes connected with exactly n-1 edges.",
+    viz: 'problem_intro'
+  },
+  {
+    title: "The Two-Pillar Insight",
+    thought: "Wait — I know that any tree with n nodes has exactly n-1 edges. Can I just check edge count? Let me think of a counterexample...",
+    body: `A tree on <code class="inline">n</code> nodes has <strong>exactly n-1 edges</strong> — but this alone isn't sufficient.<br><br>
+Consider 5 nodes with edges <code class="inline">[[0,1],[1,2],[0,2],[3,4]]</code> — that's 4 edges (= n-1) but contains a <strong>cycle</strong> 0→1→2→0 AND a disconnected component {3,4}.<br><br>
+We need <strong>both pillars</strong>:<br>
+① <strong>Edge count = n-1</strong> (rules out extra edges / cycles)<br>
+② <strong>All nodes connected</strong> (rules out disconnected components)`,
+    insight: "Edge count = n-1 is a cheap O(1) pre-check that eliminates many invalid cases before any traversal!",
+    viz: 'two_pillars'
+  },
+  {
+    title: "Choosing the Algorithm",
+    thought: "For connectivity I can use BFS or DFS — both visit every reachable node from a starting point. BFS is maybe cleaner to reason about level by level. Union-Find is another option but BFS is simpler to explain.",
+    body: `Two solid approaches exist for checking connectivity:<br><br>
+<strong>BFS / DFS</strong>: Start from node 0, explore all reachable nodes. If <code class="inline">|visited| == n</code> → connected.<br><br>
+<strong>Union-Find (DSU)</strong>: Merge components as edges are added; detect cycles on-the-fly when two nodes share a root.<br><br>
+For a one-shot validation (not streaming edges), <strong>BFS is more readable</strong>. Union-Find shines when edges arrive dynamically.`,
+    insight: "BFS is our weapon of choice — simple, O(n+e) time, and easy to explain in an interview.",
+    viz: 'algo_compare'
+  },
+  {
+    title: "Building the BFS Solution",
+    thought: "Step 1: guard clause for edge count. Step 2: build adjacency list. Step 3: BFS from node 0 counting visited. Step 4: compare visited count to n.",
+    body: `The solution has a beautiful two-phase structure:<br><br>
+<strong>Phase 1 — O(1) Guard:</strong><br>
+<code class="inline">if len(edges) != n - 1: return False</code><br>
+This eliminates clearly invalid inputs instantly.<br><br>
+<strong>Phase 2 — O(n) BFS Connectivity Check:</strong><br>
+Build undirected adjacency list, BFS from node 0, count how many nodes we reach. If all <code class="inline">n</code> nodes are reachable, the graph is connected.`,
+    insight: "Because we already know len(edges)==n-1, if BFS reaches all nodes then there can be no cycles — a connected n-node graph with n-1 edges IS a tree by definition.",
+    viz: 'bfs_flow'
+  },
+  {
+    title: "Complexity Analysis",
+    thought: "Let me check: each node is visited at most once, each edge is traversed at most twice (once from each direction). That's O(V+E) = O(n) since E = n-1.",
+    body: `<strong>Time Complexity: O(n)</strong><br>
+• Building adjacency list: O(n-1) = O(n) for edge insertions<br>
+• BFS traversal: each node enqueued/dequeued once → O(n)<br>
+• Each edge examined at most twice → O(n)<br>
+• Total: O(n)<br><br>
+<strong>Space Complexity: O(n)</strong><br>
+• Adjacency list stores all edges: O(n)<br>
+• Visited set: O(n)<br>
+• BFS queue: at most O(n) nodes<br>
+• Total: O(n)`,
+    insight: "This is optimal — we must examine every node and edge at least once to verify connectivity, so O(n) is the theoretical lower bound.",
+    viz: 'complexity'
+  },
+  {
+    title: "Edge Cases to Consider",
+    thought: "What about n=1? That's a single node, zero edges — valid tree! What about n=0? Typically n≥1 per constraints. What about self-loops or parallel edges?",
+    body: `Key edge cases the solution handles gracefully:<br><br>
+<strong>n=1, edges=[]</strong>: Edge count check passes (0 = 1-1), BFS visits just node 0, visited={0}, len=1=n → <code class="inline" style="color:var(--green)">True ✓</code><br><br>
+<strong>Too many edges</strong>: Guard clause catches it immediately → <code class="inline" style="color:var(--red)">False ✗</code><br><br>
+<strong>Too few edges</strong>: Guard catches it → <code class="inline" style="color:var(--red)">False ✗</code><br><br>
+<strong>Disconnected with correct edge count</strong>: BFS doesn't reach all nodes → <code class="inline" style="color:var(--red)">False ✗</code>`,
+    insight: "The guard clause handles edge-count edge cases in O(1). BFS handles connectivity edge cases gracefully — a disconnected graph simply won't have len(visited)==n.",
+    viz: 'edge_cases'
+  },
+  {
+    title: "The Union-Find Alternative",
+    thought: "Union-Find is worth knowing — it's the go-to for this entire class of dynamic connectivity problems. Path compression + union by rank makes it nearly O(1) per operation.",
+    body: `Union-Find processes edges one-by-one, detecting cycles on-the-fly:<br><br>
+For each edge (u, v):<br>
+• <code class="inline">find(u) == find(v)</code>? → They're already connected → <strong>cycle detected</strong> → return False<br>
+• Otherwise → <code class="inline">union(u, v)</code> to merge their components<br><br>
+After all edges: check exactly n-1 were processed (or simply that one component remains).<br><br>
+Path compression + union by rank gives <strong>O(α(n))</strong> ≈ O(1) per operation — effectively faster for large inputs with streaming edges.`,
+    insight: "Union-Find is the pattern to reach for in follow-up questions like 'what if edges arrive one at a time?' or 'detect cycle in real-time as edges are added.'",
+    viz: 'uf_concept'
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+// INTUITION VISUALIZATIONS
+// ═══════════════════════════════════════════════════════
+function getIntuitionViz(stageIdx) {
+  const viz = intuitionStages[stageIdx].viz;
+
+  if (viz === 'problem_intro') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Example: Is this a valid tree?</div>
+        <div class="viz-card-body">
+          <svg viewBox="0 0 280 180" style="width:100%;height:160px">
+            ${drawSmallGraph(5,[[0,1],[0,2],[0,3],[1,4]],[0,1,0,0,1],'valid')}
+            <text x="140" y="170" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="700">n=5, edges=4=n-1 → Valid Tree ✓</text>
+          </svg>
+        </div>
+      </div>
+      <div class="viz-card">
+        <div class="viz-card-title">Invalid: Has a cycle</div>
+        <div class="viz-card-body">
+          <svg viewBox="0 0 280 180" style="width:100%;height:160px">
+            ${drawSmallGraph(4,[[0,1],[1,2],[2,0],[2,3]],[0,0,0,0],'cycle')}
+            <text x="140" y="170" text-anchor="middle" fill="#f38ba8" font-size="11" font-weight="700">Cycle 0→1→2→0 → Not a tree ✗</text>
+          </svg>
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'two_pillars') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Two Requirements for a Valid Tree</div>
+        <div class="viz-card-body" style="display:flex;gap:8px;">
+          <div style="flex:1;background:rgba(137,180,250,.07);border:1px solid var(--accent);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">①</div>
+            <div style="color:var(--accent);font-weight:700;font-size:12px">n-1 Edges</div>
+            <div style="color:var(--text-secondary);font-size:11px;margin-top:6px">Necessary condition.<br>O(1) pre-check.<br>Eliminates obvious invalids.</div>
+          </div>
+          <div style="flex:1;background:rgba(166,227,161,.07);border:1px solid var(--green);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">②</div>
+            <div style="color:var(--green);font-weight:700;font-size:12px">Fully Connected</div>
+            <div style="color:var(--text-secondary);font-size:11px;margin-top:6px">Sufficient with ①.<br>O(n) BFS/DFS.<br>All nodes reachable.</div>
+          </div>
+        </div>
+      </div>
+      <div class="viz-card">
+        <div class="viz-card-title">Counterexample: n=5, 4 edges but NOT a tree</div>
+        <div class="viz-card-body">
+          <svg viewBox="0 0 280 160" style="width:100%;height:145px">
+            ${drawSmallGraph(5,[[0,1],[1,2],[0,2],[3,4]],[0,0,0,0,0],'counter')}
+            <text x="72" y="155" text-anchor="middle" fill="#f38ba8" font-size="10">Cycle: 0-1-2-0</text>
+            <text x="210" y="155" text-anchor="middle" fill="#f38ba8" font-size="10">Disconnected: {3,4}</text>
+          </svg>
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'algo_compare') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Algorithm Comparison</div>
+        <div class="viz-card-body">
+          <table class="compare-table">
+            <tr><th></th><th>BFS/DFS</th><th>Union-Find</th></tr>
+            <tr><td>Intuition</td><td>Graph traversal</td><td>Component merging</td></tr>
+            <tr><td>Time</td><td><span class="badge badge-blue">O(n)</span></td><td><span class="badge badge-green">O(n·α(n))</span></td></tr>
+            <tr><td>Space</td><td><span class="badge badge-blue">O(n)</span></td><td><span class="badge badge-blue">O(n)</span></td></tr>
+            <tr><td>Best for</td><td>Single validation</td><td>Dynamic / streaming</td></tr>
+            <tr><td>Interview clarity</td><td><span class="badge badge-green">Excellent</span></td><td><span class="badge badge-yellow">Good (more code)</span></td></tr>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'bfs_flow') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">BFS Flow</div>
+        <div class="viz-card-body">
+          ${['1. Guard: len(edges) != n-1 → False','2. Build adjacency list (undirected)','3. visited={0}, queue=[0]','4. While queue: dequeue node','5. Add unvisited neighbours to queue','6. Return len(visited) == n'].map((s,i)=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--accent2);color:var(--bg-primary);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+              <span style="font-size:12px;color:var(--text-secondary)">${s}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="viz-card">
+        <div class="viz-card-title">BFS on Example: n=5</div>
+        <div class="viz-card-body">
+          <svg viewBox="0 0 280 150" style="width:100%;height:135px">
+            ${drawSmallGraph(5,[[0,1],[0,2],[0,3],[1,4]],[0,1,0,0,1],'bfs')}
+          </svg>
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'complexity') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Time Complexity Breakdown</div>
+        <div class="viz-card-body">
+          ${[['Guard check','O(1)','blue'],['Build adj list','O(n)','blue'],['BFS (n nodes)','O(n)','blue'],['Total','O(n)','green']].map(([op,cx,c])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+              <span style="font-size:12px;color:var(--text-secondary)">${op}</span>
+              <span class="badge badge-${c}">${cx}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="viz-card">
+        <div class="viz-card-title">Space Complexity Breakdown</div>
+        <div class="viz-card-body">
+          ${[['Adjacency list','O(n)','blue'],['Visited set','O(n)','blue'],['BFS queue','O(n)','blue'],['Total','O(n)','green']].map(([op,cx,c])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+              <span style="font-size:12px;color:var(--text-secondary)">${op}</span>
+              <span class="badge badge-${c}">${cx}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'edge_cases') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Edge Case Analysis</div>
+        <div class="viz-card-body">
+          ${[
+            ['n=1, edges=[]','0 edges = 1-1 ✓, BFS visits {0}, len=1=n','green'],
+            ['n=2, edges=[[0,1],[1,0]]','2 edges ≠ n-1=1 → guard returns False','red'],
+            ['Cycle with n-1 edges','Guard passes, but BFS stuck → len(visited)<n','red'],
+            ['Disconnected components','Guard may pass, BFS can\'t reach all nodes','red'],
+          ].map(([cas,exp,c])=>`
+            <div style="padding:7px 0;border-bottom:1px solid var(--border)">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--${c==='green'?'green':'red'});margin-bottom:3px">${cas}</div>
+              <div style="font-size:11px;color:var(--text-secondary)">${exp}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  if (viz === 'uf_concept') {
+    return `
+      <div class="viz-card">
+        <div class="viz-card-title">Union-Find: Key Operations</div>
+        <div class="viz-card-body">
+          <div style="margin-bottom:10px">
+            <div style="color:var(--accent);font-weight:700;font-size:12px;margin-bottom:4px">find(x) — with path compression</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);background:var(--bg-panel);padding:6px 8px;border-radius:4px">if parent[x] != x:<br>&nbsp;&nbsp;parent[x] = find(parent[x])<br>return parent[x]</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="color:var(--accent2);font-weight:700;font-size:12px;margin-bottom:4px">union(x, y) — with union by rank</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);background:var(--bg-panel);padding:6px 8px;border-radius:4px">rx, ry = find(x), find(y)<br>if rx == ry: return False  # cycle!<br># attach smaller tree under larger<br>parent[ry] = rx</div>
+          </div>
+          <div style="background:rgba(249,226,175,.08);border-left:2px solid var(--yellow);padding:8px 10px;font-size:11px;color:var(--text-secondary)">
+            α(n) = inverse Ackermann function ≈ constant for all practical n. Essentially O(1) per op.
+          </div>
+        </div>
+      </div>
+      <div class="viz-card">
+        <div class="viz-card-title">When to Use Union-Find?</div>
+        <div class="viz-card-body">
+          ${['Edges arrive one at a time (streaming)','Need to detect cycle at each new edge','Repeated connectivity queries','Number of Connected Components','Redundant Connection (LC 684)'].map(s=>`
+            <div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-secondary)">✦ ${s}</div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  return `<div class="viz-card"><div class="viz-card-body"><div style="color:var(--text-muted);font-size:12px;padding:12px">Visualization</div></div></div>`;
+}
+
+// Helper: draw small SVG graph for intuition panels
+function drawSmallGraph(n, edges, highlights, style) {
+  const cx = 140, cy = 80, r = 55, nr = 16;
+  const positions = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    positions.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  }
+
+  // Which edges form a cycle (for style='cycle' or 'counter')
+  let cycleEdges = new Set();
+  if (style === 'cycle') cycleEdges = new Set(['0-1','1-2','2-0','0-2']);
+  if (style === 'counter') cycleEdges = new Set(['0-1','1-2','0-2']);
+
+  let html = '';
+  // Edges
+  for (const [u, v] of edges) {
+    const p1 = positions[u], p2 = positions[v];
+    const key1 = u+'-'+v, key2 = v+'-'+u;
+    const isCycle = cycleEdges.has(key1) || cycleEdges.has(key2);
+    html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${isCycle?'#f38ba8':'#45475a'}" stroke-width="${isCycle?2.5:1.5}" stroke-dasharray="${isCycle?'5,3':''}"/>`;
+  }
+
+  // For counter, draw disconnected visual hint
+  if (style === 'counter') {
+    html += `<line x1="165" y1="80" x2="215" y2="80" stroke="#45475a" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }
+
+  // Nodes
+  for (let i = 0; i < n; i++) {
+    const p = positions[i];
+    let fill = '#313244';
+    if (style === 'valid' && highlights[i]) fill = '#89b4fa';
+    if (style === 'bfs' && highlights[i]) fill = '#89b4fa';
+    if (style === 'cycle' && i < 3) fill = '#f38ba8';
+    if (style === 'counter') {
+      if (i < 3) fill = '#f38ba8';
+      else fill = '#fab387';
+    }
+    html += `<circle cx="${p.x}" cy="${p.y}" r="${nr}" fill="${fill}" stroke="#585b70" stroke-width="1.5"/>`;
+    html += `<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" fill="#cdd6f4" font-size="11" font-weight="700">${i}</text>`;
+  }
+
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// INTUITION STATE
+// ═══════════════════════════════════════════════════════
+let intCurrent = 0;
+let intPlaying = false;
+let intTimer = null;
+
+function renderIntuition() {
+  const stagesHTML = intuitionStages.map((s, i) => {
+    let cls = i === intCurrent ? 'active' : (i < intCurrent ? 'past' : 'future');
+    return `<div class="int-stage ${cls}" id="int-stage-${i}">
+      <div class="stage-title">
+        <span class="stage-num ${i < intCurrent ? 'done' : ''}">${i < intCurrent ? '✓' : i+1}</span>
+        ${s.title}
+      </div>
+      <div class="thought-bubble">💭 "${s.thought}"</div>
+      <div class="stage-body">${s.body}</div>
+      <div class="key-insight"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+    </div>`;
+  }).join('');
+
+  const viz = getIntuitionViz(intCurrent);
+
+  document.getElementById('intuition-content').innerHTML = `
+    <div style="display:flex;width:100%;height:100%;">
+      <div style="flex:1;overflow:auto;border-right:1px solid var(--border);">${stagesHTML}</div>
+      <div style="flex:1;overflow:auto;"><div class="int-right-inner">${viz}</div></div>
+    </div>`;
+
+  // Scroll active stage into view
+  const el = document.getElementById('int-stage-' + intCurrent);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  document.getElementById('stage-progress').textContent = `Stage ${intCurrent+1} / ${intuitionStages.length}`;
+}
+
+function intNext() {
+  if (intCurrent < intuitionStages.length - 1) { intCurrent++; renderIntuition(); }
+}
+function intPrev() {
+  if (intCurrent > 0) { intCurrent--; renderIntuition(); }
+}
+function intPlayPause() {
+  intPlaying = !intPlaying;
+  const btn = document.getElementById('int-play-btn');
+  if (intPlaying) {
+    btn.textContent = '⏸ Pause';
+    btn.classList.add('active');
+    intTimer = setInterval(() => {
+      if (intCurrent < intuitionStages.length - 1) {
+        intCurrent++;
+        renderIntuition();
+      } else {
+        intPlaying = false;
+        clearInterval(intTimer);
+        btn.textContent = '▶ Play';
+        btn.classList.remove('active');
+      }
+    }, 4000);
+  } else {
+    clearInterval(intTimer);
+    btn.textContent = '▶ Play';
+    btn.classList.remove('active');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MODE SWITCHING
+// ═══════════════════════════════════════════════════════
+let currentMode = 'intuition';
+function setMode(mode) {
+  currentMode = mode;
+  intPlaying = false; clearInterval(intTimer);
+  execPlaying = false; clearInterval(execTimer);
+  document.getElementById('int-play-btn').textContent = '▶ Play';
+  document.getElementById('int-play-btn').classList.remove('active');
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').classList.remove('active');
+
+  document.getElementById('mode-int').className = 'mode-btn' + (mode==='intuition'?' active':'');
+  document.getElementById('mode-exec').className = 'mode-btn' + (mode==='execution'?' active':'');
+
+  document.getElementById('intuition-wrapper').style.display = mode==='intuition' ? 'flex' : 'none';
+  document.getElementById('execution-wrapper').style.display = mode==='execution' ? 'flex' : 'none';
+  document.getElementById('exec-input-row').style.display = mode==='execution' ? 'flex' : 'none';
+  document.getElementById('int-nav').style.display = mode==='intuition' ? 'flex' : 'none';
+
+  if (mode === 'execution') {
+    setTimeout(() => { rerun(); }, 50);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════
+function toggleTheme() {
+  const isDark = document.body.dataset.theme === 'dark';
+  document.body.dataset.theme = isDark ? 'light' : 'dark';
+  document.getElementById('theme-btn').textContent = isDark ? '🌙 Dark' : '☀ Light';
+  if (currentMode === 'execution') renderExecStep();
+}
+
+// ═══════════════════════════════════════════════════════
+// RESIZE PANELS
+// ═══════════════════════════════════════════════════════
+function initResizers() {
+  ['res1','res2'].forEach(id => {
+    const resizer = document.getElementById(id);
+    if (!resizer) return;
+    let startX, startWidthA, startWidthB;
+
+    resizer.addEventListener('mousedown', e => {
+      startX = e.clientX;
+      resizer.classList.add('active');
+      const panelA = resizer.previousElementSibling;
+      const panelB = resizer.nextElementSibling;
+      startWidthA = panelA.offsetWidth;
+      startWidthB = panelB.offsetWidth;
+
+      const onMove = ev => {
+        const dx = ev.clientX - startX;
+        const newA = Math.max(120, startWidthA + dx);
+        const newB = Math.max(120, startWidthB - dx);
+        panelA.style.width = newA + 'px';
+        panelA.style.flex = 'none';
+        panelB.style.width = newB + 'px';
+        panelB.style.flex = 'none';
+      };
+      const onUp = () => {
+        resizer.classList.remove('active');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intPlayPause() : execPlayPause();
+  } else if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intNext() : execForward();
+  } else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    currentMode === 'intuition' ? intPrev() : execBack();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// CALCULATE HEADER HEIGHT AND SET TOP PADDING
+// ═══════════════════════════════════════════════════════
+function adjustLayout() {
+  const h = document.getElementById('header').offsetHeight;
+  document.getElementById('main').style.paddingTop = h + 'px';
+  document.getElementById('intuition-wrapper').style.height = '100%';
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  adjustLayout();
+  renderCode(-1);
+  renderIntuition();
+  initResizers();
+  setMode('intuition');
+});
+
+window.addEventListener('resize', () => {
+  adjustLayout();
+  if (currentMode === 'execution') renderExecStep();
+});
+</script>
+</body>
+</html>
