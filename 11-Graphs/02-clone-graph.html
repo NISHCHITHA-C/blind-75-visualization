@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>133. Clone Graph - Visualizer</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --bg-panel: #1a2332;
+  --bg-panel-header: #151f2e;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border: #2d3f55;
+  --accent: #60a5fa;
+  --accent2: #34d399;
+  --accent3: #f59e0b;
+  --highlight-line-bg: rgba(251,191,36,0.13);
+  --code-bg: #0d1117;
+  --font-mono: 'Cascadia Code','Fira Code','Consolas','Monaco','Courier New',monospace;
+  --node-unvisited: #374151;
+  --node-visiting: #d97706;
+  --node-cloned: #059669;
+  --node-current: #2563eb;
+}
+[data-theme="light"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #e2e8f0;
+  --bg-panel: #ffffff;
+  --bg-panel-header: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: #cbd5e1;
+  --accent: #2563eb;
+  --accent2: #059669;
+  --accent3: #d97706;
+  --highlight-line-bg: #fef9c3;
+  --code-bg: #f8fafc;
+  --node-unvisited: #94a3b8;
+  --node-visiting: #d97706;
+  --node-cloned: #059669;
+  --node-current: #2563eb;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background: var(--bg-secondary); color: var(--text-primary); }
+
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* HEADER */
+.header {
+  flex-shrink: 0;
+  background: var(--bg-panel-header);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px 0;
+  z-index: 10;
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.header-title { font-size: 15px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.header-title span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.btn-theme { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary); padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all .15s; }
+.btn-theme:hover { border-color: var(--accent); color: var(--accent); }
+.mode-toggle { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-secondary); }
+.mode-btn { flex: 1; padding: 7px 18px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; background: transparent; color: var(--text-secondary); transition: all .15s; white-space: nowrap; }
+.mode-btn.active { background: var(--accent); color: #fff; }
+.mode-btn:hover:not(.active) { background: var(--border); color: var(--text-primary); }
+
+/* INPUT BAR (execution) */
+.input-bar { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+.input-bar label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.input-bar input { flex: 1; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 4px 10px; border-radius: 5px; font-size: 12px; font-family: var(--font-mono); }
+.input-bar input:focus { outline: none; border-color: var(--accent); }
+.btn-parse { background: var(--accent); color: #fff; border: none; padding: 4px 14px; border-radius: 5px; font-size: 12px; cursor: pointer; font-weight: 600; }
+.btn-parse:hover { opacity: .85; }
+
+/* MAIN CONTENT */
+.main { flex: 1; display: flex; overflow: hidden; }
+
+/* PANELS */
+.panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
+.panel:last-child { border-right: none; }
+.panel-header { flex-shrink: 0; background: var(--bg-panel-header); padding: 7px 14px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.panel-body { flex: 1; overflow: auto; background: var(--bg-panel); }
+
+/* DIVIDER (resize) */
+.divider { width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0; transition: background .15s; z-index: 5; }
+.divider:hover, .divider.dragging { background: var(--accent); }
+
+/* CODE PANEL */
+.code-panel { background: var(--code-bg); padding: 14px 0; font-family: var(--font-mono); font-size: 14px; line-height: 1.6; }
+.code-line { display: flex; align-items: stretch; min-height: 22.4px; transition: background .12s; }
+.code-line.active { background: var(--highlight-line-bg); }
+.line-num { display: inline-block; min-width: 42px; text-align: right; padding-right: 14px; padding-left: 6px; color: #6272a4; user-select: none; font-size: 12px; flex-shrink: 0; }
+.line-code { white-space: pre; flex: 1; padding-right: 16px; color: var(--text-primary); }
+
+/* GRAPH VIZ */
+.viz-svg { width: 100%; height: 100%; }
+.graph-wrap { width: 100%; height: 100%; display: flex; flex-direction: column; }
+.graph-svg-wrap { flex: 1; position: relative; overflow: hidden; }
+.graph-bottom { flex-shrink: 0; background: var(--bg-panel-header); border-top: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 8px; justify-content: center; }
+.ctrl-btn { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.play { background: var(--accent); color: #fff; border-color: var(--accent); }
+.ctrl-btn.play:hover { opacity: .85; }
+.speed-sel { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; }
+.step-counter { font-size: 12px; color: var(--text-muted); margin-left: 8px; }
+
+/* STEP LOG */
+.step-log { padding: 14px; }
+.step-num { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.step-desc { font-size: 13px; color: var(--text-primary); line-height: 1.55; margin-bottom: 14px; padding: 10px 12px; background: var(--bg-secondary); border-radius: 6px; border-left: 3px solid var(--accent); }
+.vars-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.var-row { display: flex; gap: 6px; margin-bottom: 5px; font-family: var(--font-mono); font-size: 12px; }
+.var-name { color: var(--accent); }
+.var-val { color: var(--text-secondary); word-break: break-all; }
+.history-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px; }
+.history-item { padding: 5px 9px; margin-bottom: 3px; border-radius: 5px; font-size: 12px; color: var(--text-muted); transition: all .12s; cursor: pointer; }
+.history-item.current { background: var(--bg-secondary); color: var(--text-primary); border-left: 2px solid var(--accent); padding-left: 7px; }
+
+/* LEGEND */
+.legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 6px 14px; background: var(--bg-panel-header); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text-secondary); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+/* INTUITION MODE */
+.intuition-wrap { display: flex; width: 100%; height: 100%; overflow: hidden; }
+.intuition-left { flex: 1; overflow: auto; padding: 20px; background: var(--bg-panel); }
+.intuition-right { flex: 0 0 45%; overflow: auto; background: var(--bg-panel-header); border-left: 1px solid var(--border); }
+.intuition-right-inner { padding: 20px; }
+
+.stage-item { margin-bottom: 20px; padding: 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-secondary); transition: all .25s; }
+.stage-item.active { border-color: var(--accent); background: rgba(96,165,250,0.07); }
+.stage-item.past { opacity: 0.55; }
+.stage-item.future { opacity: 0.28; }
+.stage-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.stage-num { background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.stage-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.thought-bubble { background: rgba(96,165,250,0.09); border-left: 3px solid var(--accent); padding: 9px 13px; margin-bottom: 10px; font-style: italic; font-size: 13px; color: var(--text-secondary); border-radius: 0 5px 5px 0; }
+.stage-content { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 10px; }
+.key-insight { background: rgba(52,211,153,0.09); border-left: 3px solid var(--accent2); padding: 9px 13px; font-size: 13px; color: var(--text-primary); border-radius: 0 5px 5px 0; }
+.key-insight strong { color: var(--accent2); }
+
+.intuition-controls { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--border); background: var(--bg-panel-header); flex-shrink: 0; }
+.stage-progress { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+.viz-card { background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; }
+.viz-card h4 { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+.comparison-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.comparison-box { flex: 1; padding: 12px; border-radius: 6px; font-size: 12px; }
+.good { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); }
+.bad { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); }
+.comparison-box h5 { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.good h5 { color: var(--accent2); }
+.bad h5 { color: #ef4444; }
+.comparison-box p { color: var(--text-secondary); line-height: 1.5; }
+.code-snippet { background: var(--code-bg); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); white-space: pre; overflow-x: auto; border: 1px solid var(--border); margin: 8px 0; }
+</style>
+</head>
+<body data-theme="dark">
+<div class="app" id="app"></div>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PROBLEM_NUM = 133;
+const PROBLEM_TITLE = "Clone Graph";
+
+const PYTHON_CODE = `from typing import Optional
+from collections import deque
+
+# LeetCode-provided Node definition
+class Node:
+    def __init__(self, val=0, neighbors=None):
+        self.val = val
+        self.neighbors = neighbors or []
+
+
+class Solution:
+    def cloneGraph(
+        self, node: Optional['Node']
+    ) -> Optional['Node']:
+        """
+        Deep-clone undirected graph with DFS + visited map.
+        Time: O(V+E)  Space: O(V)
+        """
+        if not node:
+            return None
+
+        visited: dict[Node, Node] = {}
+
+        def dfs(curr: Node) -> Node:
+            if curr in visited:
+                return visited[curr]   # cycle guard
+
+            clone = Node(curr.val)     # skeleton clone
+            visited[curr] = clone      # register BEFORE recursing
+
+            for neighbour in curr.neighbors:
+                clone.neighbors.append(
+                    dfs(neighbour)
+                )
+
+            return clone
+
+        return dfs(node)
+
+
+# ── BFS alternative (avoids recursion limit) ──────────
+    def cloneGraphBFS(
+        self, node: Optional['Node']
+    ) -> Optional['Node']:
+        if not node:
+            return None
+
+        visited = {node: Node(node.val)}
+        queue = deque([node])
+
+        while queue:
+            curr = queue.popleft()
+            for nb in curr.neighbors:
+                if nb not in visited:
+                    visited[nb] = Node(nb.val)
+                    queue.append(nb)
+                visited[curr].neighbors.append(
+                    visited[nb]
+                )
+
+        return visited[node]
+`;
+
+// Line index → step mapping (0-based)
+const LINE_DFS_CHECK   = 24;  // if curr in visited
+const LINE_RETURN_VIS  = 25;  // return visited[curr]
+const LINE_CLONE       = 27;  // clone = Node(curr.val)
+const LINE_REGISTER    = 28;  // visited[curr] = clone
+const LINE_FOR         = 30;  // for neighbour in ...
+const LINE_APPEND      = 31;  // clone.neighbors.append(...)
+const LINE_RETURN      = 34;  // return clone
+const LINE_CALL        = 36;  // return dfs(node)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GRAPH BUILDER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildGraph(adjList) {
+  // adjList: [[2,4],[1,3],[2,4],[1,3]] (1-indexed)
+  const nodes = adjList.map((_, i) => ({ id: i+1, val: i+1, neighbors: [] }));
+  adjList.forEach((nbrs, i) => {
+    nodes[i].neighbors = nbrs.map(n => nodes[n-1]);
+  });
+  return nodes[0] || null;
+}
+
+function parseAdjList(str) {
+  try {
+    const arr = JSON.parse(str.replace(/'/g, '"'));
+    if (!Array.isArray(arr) || arr.length === 0) return null;
+    return buildGraph(arr);
+  } catch { return null; }
+}
+
+// Returns positions in a 600-wide logical space; renderGraphSVG scales y into two halves
+function getNodePositions(nodeCount) {
+  if (nodeCount === 4) {
+    // Diamond layout — clear and readable
+    return [ {x:300,y:60}, {x:500,y:200}, {x:300,y:340}, {x:100,y:200} ];
+  }
+  // Generic circular layout centred at (300, 200), radius 160
+  const cx = 300, cy = 200, r = 150;
+  return Array.from({ length: nodeCount }, (_, i) => ({
+    x: Math.round(cx + r * Math.cos(2 * Math.PI * i / nodeCount - Math.PI / 2)),
+    y: Math.round(cy + r * Math.sin(2 * Math.PI * i / nodeCount - Math.PI / 2)),
+  }));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIMULATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+function simulate(rootNode, adjList) {
+  const steps = [];
+  const nodeList = [];
+
+  function collectAll(n, seen=new Set()) {
+    if (!n || seen.has(n.id)) return;
+    seen.add(n.id);
+    nodeList.push(n);
+    n.neighbors.forEach(nb => collectAll(nb, seen));
+  }
+  collectAll(rootNode);
+  const nodeCount = nodeList.length;
+
+  const visitedMap = new Map();   // original id → cloned id
+  const clonedEdges = [];         // {from, to} cloned ids
+
+  function snap(line, desc, currId=null, extraVars={}) {
+    steps.push({
+      line,
+      description: desc,
+      currentNodeId: currId,
+      visitedIds: [...visitedMap.keys()],
+      clonedEdges: clonedEdges.map(e=>({...e})),
+      vars: {
+        visited: `{${[...visitedMap.entries()].map(([k,v])=>`node${k}→clone${v}`).join(', ')}}`,
+        ...extraVars
+      }
+    });
+  }
+
+  snap(LINE_CALL, 'Start: call dfs(node 1)', 1, { node: 'node_1' });
+
+  function dfs(node) {
+    if (!node) return;
+    const id = node.id;
+
+    snap(LINE_DFS_CHECK, `Check: is node ${id} in visited?`, id, { curr: `node_${id}`, 'in visited': visitedMap.has(id) ? 'True → return clone' : 'False → proceed' });
+
+    if (visitedMap.has(id)) {
+      snap(LINE_RETURN_VIS, `Node ${id} already cloned — return clone${id} (cycle guard!)`, id, { curr: `node_${id}`, action: `return clone${id}` });
+      return;
+    }
+
+    snap(LINE_CLONE, `Create clone${id} = Node(${id}) — skeleton (no neighbors yet)`, id, { curr: `node_${id}`, 'clone created': `Node(val=${id})` });
+    visitedMap.set(id, id);
+
+    snap(LINE_REGISTER, `Register: visited[node${id}] = clone${id} — BEFORE recursing (critical!)`, id, { curr: `node_${id}`, 'visited size': visitedMap.size });
+
+    for (const nb of node.neighbors) {
+      snap(LINE_FOR, `Loop neighbor: node${nb.id} of node${id}`, id, { curr: `node_${id}`, neighbour: `node_${nb.id}` });
+      const prevSize = visitedMap.size;
+      dfs(nb);
+      clonedEdges.push({ from: id, to: nb.id });
+      snap(LINE_APPEND, `Append clone${nb.id} to clone${id}.neighbors`, id, { curr: `node_${id}`, 'appended neighbor': `clone${nb.id}`, 'clone neighbors so far': node.neighbors.slice(0, node.neighbors.indexOf(nb)+1).map(n=>`clone${n.id}`).join(', ') });
+    }
+
+    snap(LINE_RETURN, `Return clone${id}`, id, { curr: `node_${id}`, returning: `clone${id}` });
+  }
+
+  dfs(rootNode);
+  snap(LINE_CALL, '✅ Done! All nodes cloned. Return cloned graph root (clone1).', null, { result: 'clone1 (deep copy of original graph)' });
+
+  return { steps, nodeCount, nodeList };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SYNTAX HIGHLIGHTING
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── SYNTAX HIGHLIGHTER ──────────────────────────────────────────────────────
+// Token-based: operates on raw string, never on already-injected HTML.
+// Returns an HTML string. Uses hardcoded hex so inline styles always resolve.
+
+const DARK_COLORS = {
+  keyword:   '#ff79c6',
+  builtin:   '#ff79c6',
+  func:      '#50fa7b',
+  string:    '#f1fa8c',
+  comment:   '#6272a4',
+  type:      '#8be9fd',
+  number:    '#bd93f9',
+  decorator: '#ffb86c',
+  plain:     '#f8f8f2',
+};
+const LIGHT_COLORS = {
+  keyword:   '#d73a49',
+  builtin:   '#d73a49',
+  func:      '#22863a',
+  string:    '#e36209',
+  comment:   '#6a737d',
+  type:      '#005cc5',
+  number:    '#6f42c1',
+  decorator: '#e36209',
+  plain:     '#24292e',
+};
+
+function getColors() {
+  return state.theme === 'dark' ? DARK_COLORS : LIGHT_COLORS;
+}
+
+function span(color, text, extra) {
+  const style = `color:${color}${extra ? ';' + extra : ''}`;
+  return `<span style="${style}">${esc(text)}</span>`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const KEYWORDS = new Set([
+  'def','class','if','elif','else','while','for','return',
+  'import','from','in','and','or','not','True','False','None',
+  'is','lambda','pass','break','continue','with','as','try',
+  'except','finally','raise','yield','async','await',
+]);
+const TYPES = new Set([
+  'Optional','Node','dict','list','deque','int','str','bool','set','tuple','Any',
+]);
+
+// Tokenize a single line (raw string, no prior escaping)
+function tokenizeLine(line) {
+  const tokens = [];
+  let i = 0;
+  const n = line.length;
+
+  while (i < n) {
+    // Triple-quoted string (docstring) — just consume to end of line for per-line rendering
+    if ((line[i] === '"' && line.slice(i,i+3) === '"""') ||
+        (line[i] === "'" && line.slice(i,i+3) === "'''")) {
+      let j = i + 3;
+      const q = line.slice(i,i+3);
+      while (j < n && line.slice(j,j+3) !== q) j++;
+      if (j < n) j += 3;
+      tokens.push({ type: 'string', val: line.slice(i,j) });
+      i = j;
+      continue;
+    }
+    // Single/double quoted string
+    if (line[i] === '"' || line[i] === "'") {
+      const q = line[i]; let j = i+1;
+      while (j < n && line[j] !== q && line[j] !== '\n') {
+        if (line[j] === '\\') j++;
+        j++;
+      }
+      if (j < n) j++;
+      tokens.push({ type: 'string', val: line.slice(i,j) });
+      i = j;
+      continue;
+    }
+    // Comment
+    if (line[i] === '#') {
+      tokens.push({ type: 'comment', val: line.slice(i) });
+      break;
+    }
+    // Decorator
+    if (line[i] === '@') {
+      let j = i+1;
+      while (j < n && /\w/.test(line[j])) j++;
+      tokens.push({ type: 'decorator', val: line.slice(i,j) });
+      i = j;
+      continue;
+    }
+    // Number
+    if (/\d/.test(line[i]) && (i===0 || !/\w/.test(line[i-1]))) {
+      let j = i;
+      while (j < n && /[\d._xXoObB]/.test(line[j])) j++;
+      tokens.push({ type: 'number', val: line.slice(i,j) });
+      i = j;
+      continue;
+    }
+    // Word (keyword / type / function call / identifier)
+    if (/[a-zA-Z_]/.test(line[i])) {
+      let j = i;
+      while (j < n && /\w/.test(line[j])) j++;
+      const word = line.slice(i,j);
+      // Check if followed by '('
+      let k = j; while (k < n && line[k] === ' ') k++;
+      const isCall = line[k] === '(';
+      if (KEYWORDS.has(word)) {
+        tokens.push({ type: 'keyword', val: word });
+      } else if (TYPES.has(word)) {
+        tokens.push({ type: 'type', val: word });
+      } else if (isCall) {
+        tokens.push({ type: 'func', val: word });
+      } else {
+        tokens.push({ type: 'plain', val: word });
+      }
+      i = j;
+      continue;
+    }
+    // Anything else: punctuation, operators, spaces
+    tokens.push({ type: 'plain', val: line[i] });
+    i++;
+  }
+  return tokens;
+}
+
+function highlightPython(line) {
+  if (line === '') return '&nbsp;';
+  const C = getColors();
+
+  // Handle lines that are purely docstring continuation (no token start)
+  // Heuristic: if trimmed line is just '"""' or "'''" treat as string
+  const trimmed = line.trim();
+  if (trimmed === '"""' || trimmed === "'''" || trimmed === '"""' ) {
+    return span(C.string, line, 'font-style:italic');
+  }
+
+  const tokens = tokenizeLine(line);
+  let out = '';
+
+  for (const tok of tokens) {
+    switch (tok.type) {
+      case 'keyword':   out += span(C.keyword, tok.val, 'font-weight:600'); break;
+      case 'func':      out += span(C.func,    tok.val); break;
+      case 'type':      out += span(C.type,    tok.val); break;
+      case 'string':    out += span(C.string,  tok.val, 'font-style:italic'); break;
+      case 'comment':   out += span(C.comment, tok.val, 'font-style:italic'); break;
+      case 'number':    out += span(C.number,  tok.val); break;
+      case 'decorator': out += span(C.decorator, tok.val); break;
+      default:          out += esc(tok.val); break;
+    }
+  }
+  return out;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+const state = {
+  theme: 'dark',
+  mode: 'intuition',
+  steps: [],
+  currentStep: 0,
+  isPlaying: false,
+  speed: 1,
+  playTimer: null,
+  inputValue: '[[2,4],[1,3],[2,4],[1,3]]',
+  adjList: [[2,4],[1,3],[2,4],[1,3]],
+  nodeCount: 4,
+  nodeList: [],
+  intuitionStage: 0,
+  intuitionPlaying: false,
+  intuitionTimer: null,
+  panelWidths: [30, 50, 20],
+  dragging: null,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTUITION STAGES
+// ─────────────────────────────────────────────────────────────────────────────
+
+const INTUITION_STAGES = [
+  {
+    title: "Understanding the Problem",
+    thought: "What does 'clone' even mean for a graph? Let me think… I need every node copied AND every edge rewired to point to copies, not originals.",
+    content: `The input is a reference to a single node in a connected undirected graph.\n\nEach node has:\n• <code>val</code> — an integer (1..n)\n• <code>neighbors</code> — list of adjacent Node objects\n\nI need to return a completely independent deep copy — no shared references with the original.`,
+    insight: "The tricky part isn't the copy — it's cycles. Graphs can have cycles (1→2→1), so naive recursion will loop forever.",
+    vizType: "graph_intro"
+  },
+  {
+    title: "Why Naive Recursion Fails",
+    thought: "If I just recurse into every neighbor, node 1 sees node 2, which sees node 1 again… infinite loop!",
+    content: `Graph 1→2→1 creates infinite recursion:\n\n<code>clone(1) → clone(2) → clone(1) → clone(2) → ...</code>\n\nWe need a way to track which nodes we've already cloned, and immediately return the existing clone instead of creating a new one.`,
+    insight: "A visited map {original → clone} solves two problems at once: it breaks cycles AND it lets us wire neighbors to the correct clone.",
+    vizType: "cycle_problem"
+  },
+  {
+    title: "The Visited Map — The Secret Weapon",
+    thought: "Aha! A hash map from original node → clone. First time we see a node: create clone and store it. Any subsequent time: just return the stored clone.",
+    content: `<code>visited: dict[Node, Node] = {}</code>\n\nThe map is the entire algorithm. It:\n\n• <strong>Guards against infinite loops</strong> — if curr is in visited, return immediately\n• <strong>Wires edges correctly</strong> — every neighbor lookup returns the same clone object\n• Runs in <strong>O(1)</strong> per lookup`,
+    insight: "Register visited[curr] = clone BEFORE recursing into neighbors. This is the crucial ordering — it handles cycles.",
+    vizType: "visited_map"
+  },
+  {
+    title: "DFS Implementation Strategy",
+    thought: "Structure: base case (null or already visited), create clone, register it, recurse neighbors. Clean recursive shape.",
+    content: `<div class="code-snippet">def dfs(curr):\n    if curr in visited:          # ← cycle guard\n        return visited[curr]\n\n    clone = Node(curr.val)       # ← skeleton\n    visited[curr] = clone        # ← register FIRST\n\n    for nb in curr.neighbors:\n        clone.neighbors.append(dfs(nb))\n\n    return clone</div>\n\nNotice the order: create skeleton → register → recurse. If we registered AFTER recursing, cycles would still loop.`,
+    insight: "Two-line pattern: (1) check visited, (2) register before recursing. These two lines handle all graph complexity.",
+    vizType: "code_walkthrough"
+  },
+  {
+    title: "Tracing Through the Example",
+    thought: "Let me trace graph 1—2—3—4 (a cycle). What happens step by step?",
+    content: `Graph: 1↔2↔3↔4↔1 (all connected in a ring)\n\n1. <code>dfs(1)</code>: create clone1, register. Loop: nb=2\n2. <code>dfs(2)</code>: create clone2, register. Loop: nb=1\n3. <code>dfs(1)</code>: already in visited → return clone1 ✓\n4. Back in dfs(2): append clone1. Loop: nb=3\n5. <code>dfs(3)</code>: create clone3, register... and so on\n\nThe visited map makes each node created exactly once.`,
+    insight: "Every node visited exactly once → O(V) node creations. Every edge followed exactly once → O(E) neighbor appends. Total: O(V+E).",
+    vizType: "trace"
+  },
+  {
+    title: "BFS Alternative",
+    thought: "DFS is elegant but deep graphs could hit Python's recursion limit (~1000). BFS with an explicit queue is safer.",
+    content: `<div class="code-snippet">visited = {node: Node(node.val)}\nqueue = deque([node])\n\nwhile queue:\n    curr = queue.popleft()\n    for nb in curr.neighbors:\n        if nb not in visited:\n            visited[nb] = Node(nb.val)\n            queue.append(nb)\n        visited[curr].neighbors.append(\n            visited[nb]\n        )</div>\n\nSame logic, same O(V+E) complexity — no recursion stack overflow risk.`,
+    insight: "Same visited-map trick, same O(V+E). Choose BFS for very large graphs; DFS for cleaner code.",
+    vizType: "bfs_compare"
+  },
+  {
+    title: "Complexity & Edge Cases",
+    thought: "Is this optimal? Let me verify. And what breaks it?",
+    content: `<strong>Complexity:</strong>\n• Time: O(V+E) — each node and edge visited exactly once\n• Space: O(V) — visited map + recursion stack\n\n<strong>Edge Cases:</strong>\n• <code>node = None</code> → return None immediately ✓\n• Single node, no neighbors → creates one clone ✓\n• Disconnected graph → problem says graph is connected ✓\n• Self-loop (node neighbors itself) → visited guard handles it ✓`,
+    insight: "The solution is optimal — you must visit every node and edge at least once, so O(V+E) is a lower bound.",
+    vizType: "complexity"
+  }
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INITIALIZATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+function initSimulation() {
+  try {
+    const root = parseAdjList(state.inputValue);
+    if (!root) return;
+    const { steps, nodeCount, nodeList } = simulate(root, state.adjList);
+    state.steps = steps;
+    state.nodeCount = nodeCount;
+    state.nodeList = nodeList;
+    state.currentStep = 0;
+  } catch(e) { console.error(e); }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GRAPH SVG RENDERING
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderGraphSVG(step, adj) {
+  if (!adj || !Array.isArray(adj) || adj.length === 0) {
+    return '<svg viewBox="0 0 600 520" width="100%" height="100%"><text x="300" y="260" text-anchor="middle" fill="#6b7280" font-family="sans-serif">No graph data</text></svg>';
+  }
+  const n = adj.length;
+  const rawPos = getNodePositions(n);
+
+  // Scale positions to fit two half-graphs in the SVG (top = original, bottom = clone)
+  // rawPos are in ~[50,500] range for x, [50,470] for y. Compress y into 0-200, then offset.
+  const minY = Math.min(...rawPos.map(p=>p.y));
+  const maxY = Math.max(...rawPos.map(p=>p.y));
+  const rangeY = maxY - minY || 1;
+
+  function scalePos(raw, yOffset) {
+    return {
+      x: raw.x,
+      y: ((raw.y - minY) / rangeY) * 160 + yOffset
+    };
+  }
+
+  const topPos = rawPos.map(p => scalePos(p, 55));   // original graph y: 55–215
+  const botPos = rawPos.map(p => scalePos(p, 295));  // cloned graph  y: 295–455
+
+  const visited    = step ? new Set(step.visitedIds) : new Set();
+  const clonedEdges = step ? (step.clonedEdges || []) : [];
+  const currId     = step ? step.currentNodeId : null;
+
+  // Helper: safe position lookup (returns null if out of bounds)
+  function tp(id) { return (id >= 1 && id <= n) ? topPos[id-1] : null; }
+  function bp(id) { return (id >= 1 && id <= n) ? botPos[id-1] : null; }
+
+  let svg = `<svg viewBox="0 0 600 520" width="100%" height="100%" style="display:block">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <text x="300" y="22" text-anchor="middle" font-size="12" font-family="sans-serif" font-weight="600" fill="#6b7280" letter-spacing="1">ORIGINAL GRAPH</text>
+  <text x="300" y="272" text-anchor="middle" font-size="12" font-family="sans-serif" font-weight="600" fill="#34d399" letter-spacing="1">CLONED GRAPH</text>
+  <line x1="20" y1="248" x2="580" y2="248" stroke="#2d3f55" stroke-width="1" stroke-dasharray="4,4"/>`;
+
+  // ── ORIGINAL: edges ──────────────────────────────────────────────────────
+  adj.forEach((nbrs, i) => {
+    nbrs.forEach(nbId => {
+      if (nbId - 1 > i) {                        // draw each edge once
+        const a = topPos[i], b = tp(nbId);
+        if (!a || !b) return;
+        svg += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#374151" stroke-width="2"/>`;
+      }
+    });
+  });
+
+  // ── ORIGINAL: nodes ──────────────────────────────────────────────────────
+  adj.forEach((_, i) => {
+    const id = i + 1;
+    const p  = topPos[i];
+    if (!p) return;
+    const isCurr    = currId === id;
+    const isVisited = visited.has(id);
+    const fill   = isCurr ? '#1d4ed8' : isVisited ? '#065f46' : '#374151';
+    const stroke = isCurr ? '#60a5fa' : isVisited ? '#34d399' : '#4b5563';
+    const sw     = isCurr ? 3 : 2;
+    svg += `<circle cx="${p.x}" cy="${p.y}" r="22" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${isCurr ? ' filter="url(#glow)"' : ''}/>`;
+    svg += `<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="#f8f8f2" font-family="sans-serif">${id}</text>`;
+    if (isCurr) svg += `<text x="${p.x}" y="${p.y - 30}" text-anchor="middle" font-size="11" fill="#60a5fa" font-family="sans-serif">curr</text>`;
+  });
+
+  // ── CLONED: edges (only those registered so far in this step) ────────────
+  const drawnCloned = new Set();
+  clonedEdges.forEach(({from, to}) => {
+    if (from < 1 || from > n || to < 1 || to > n) return;  // bounds guard
+    const key = [Math.min(from, to), Math.max(from, to)].join('-');
+    if (drawnCloned.has(key)) return;
+    drawnCloned.add(key);
+    const a = bp(from), b = bp(to);
+    if (!a || !b) return;
+    svg += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#065f46" stroke-width="2" stroke-dasharray="5,3"/>`;
+  });
+
+  // ── CLONED: nodes ─────────────────────────────────────────────────────────
+  adj.forEach((_, i) => {
+    const id = i + 1;
+    const p  = botPos[i];
+    if (!p) return;
+    const isCloned = visited.has(id);
+    const fill   = isCloned ? '#065f46' : '#1e293b';
+    const stroke = isCloned ? '#34d399' : '#334155';
+    svg += `<circle cx="${p.x}" cy="${p.y}" r="22" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    svg += `<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="${isCloned ? '#6ee7b7' : '#475569'}" font-family="sans-serif">${isCloned ? id : '?'}</text>`;
+    if (isCloned) svg += `<text x="${p.x}" y="${p.y - 30}" text-anchor="middle" font-size="10" fill="#34d399" font-family="sans-serif">clone${id}</text>`;
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTUITION VISUALIZATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderIntuitionViz(stageIdx) {
+  const vt = INTUITION_STAGES[stageIdx].vizType;
+  if (vt === 'graph_intro') return `
+    <div class="viz-card">
+      <h4>The 4-Node Ring Graph</h4>
+      <svg viewBox="0 0 300 260" width="100%">
+        ${[[150,50],[250,145],[150,240],[50,145]].map((p,i)=>{
+          const nbrs = [[1,3],[0,2],[1,3],[0,2]];
+          return nbrs[i].filter(j=>j>i).map(j=>{
+            const q=[[150,50],[250,145],[150,240],[50,145]][j];
+            return `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#4b5563" stroke-width="2"/>`;
+          }).join('');
+        }).join('')}
+        ${[[150,50],[250,145],[150,240],[50,145]].map((p,i)=>`
+          <circle cx="${p[0]}" cy="${p[1]}" r="20" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2"/>
+          <text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="#93c5fd" font-family="sans-serif">${i+1}</text>
+        `).join('')}
+      </svg>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px">Each node connects to its neighbors — edges are bidirectional. Goal: deep copy the whole thing.</p>
+    </div>`;
+
+  if (vt === 'cycle_problem') return `
+    <div class="viz-card">
+      <h4>The Cycle Problem</h4>
+      <svg viewBox="0 0 300 120" width="100%">
+        <line x1="60" y1="60" x2="240" y2="60" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+        ${[{x:60,v:1},{x:240,v:2}].map(n=>`
+          <circle cx="${n.x}" cy="60" r="22" fill="#7f1d1d" stroke="#ef4444" stroke-width="2"/>
+          <text x="${n.x}" y="60" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="#fca5a5" font-family="sans-serif">${n.v}</text>
+        `).join('')}
+        <text x="150" y="30" text-anchor="middle" font-size="11" fill="#ef4444" font-family="sans-serif">↔ undirected edge = cycle risk</text>
+        <text x="150" y="100" text-anchor="middle" font-size="11" fill="#6b7280" font-family="sans-serif">dfs(1)→dfs(2)→dfs(1)→dfs(2)→∞</text>
+      </svg>
+    </div>
+    <div class="viz-card">
+      <h4>The Fix: Visited Map</h4>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);line-height:1.8">
+        <div><span style="color:#8be9fd">visited</span> = {}</div>
+        <div style="margin-top:8px;color:var(--text-muted)">Step 1: dfs(1)</div>
+        <div style="padding-left:12px"><span style="color:var(--accent2)">visited[node1] = clone1</span></div>
+        <div style="color:var(--text-muted)">Step 2: dfs(2)</div>
+        <div style="padding-left:12px"><span style="color:var(--accent2)">visited[node2] = clone2</span></div>
+        <div style="color:var(--text-muted)">Step 3: dfs(1) again...</div>
+        <div style="padding-left:12px"><span style="color:#f59e0b)">node1 in visited → return clone1</span> ✓</div>
+      </div>
+    </div>`;
+
+  if (vt === 'visited_map') return `
+    <div class="viz-card">
+      <h4>Visited Map State During Traversal</h4>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:2">
+        ${[
+          {step:'Initial', map:'{}', note:''},
+          {step:'After dfs(1)', map:'{node1→clone1}', note:''},
+          {step:'After dfs(2)', map:'{node1→clone1, node2→clone2}', note:''},
+          {step:'dfs(1) again', map:'already in map!', note:'→ return clone1 immediately'},
+          {step:'After dfs(3)', map:'{...node3→clone3}', note:''},
+          {step:'After dfs(4)', map:'{...node4→clone4}', note:'Done!'},
+        ].map(r=>`<div style="display:flex;gap:8px;padding:4px 8px;border-radius:4px;${r.note?'background:rgba(96,165,250,0.08)':''}">
+          <span style="min-width:120px;color:var(--text-muted)">${r.step}</span>
+          <span style="font-family:var(--font-mono);color:var(--accent2)">${r.map}</span>
+          <span style="color:var(--accent3)">${r.note}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+  if (vt === 'code_walkthrough') return `
+    <div class="viz-card">
+      <h4>Critical Ordering</h4>
+      <div class="comparison-row">
+        <div class="bad comparison-box">
+          <h5>❌ Wrong Order</h5>
+          <div class="code-snippet" style="font-size:11px">clone = Node(val)
+# recurse first (BAD!)
+for nb in neighbors:
+    dfs(nb)
+visited[curr] = clone  # too late!</div>
+          <p>Cycle 1→2→1 still loops — node1 not in visited yet when dfs(1) is called from dfs(2)</p>
+        </div>
+        <div class="good comparison-box">
+          <h5>✅ Correct Order</h5>
+          <div class="code-snippet" style="font-size:11px">clone = Node(val)
+visited[curr] = clone  # register first!
+for nb in neighbors:
+    dfs(nb)            # safe now</div>
+          <p>Node1 in visited before we recurse into neighbors — any back-edge returns immediately</p>
+        </div>
+      </div>
+    </div>`;
+
+  if (vt === 'trace') return `
+    <div class="viz-card">
+      <h4>Call Stack Trace (4-node ring)</h4>
+      <div style="font-size:12px;font-family:var(--font-mono);line-height:2;color:var(--text-secondary)">
+        ${[
+          ['dfs(1)','create clone1, register, loop nbrs: [2,4]','#60a5fa'],
+          ['  dfs(2)','create clone2, register, loop nbrs: [1,3]','#60a5fa'],
+          ['    dfs(1)','already in visited → return clone1','#f59e0b'],
+          ['    dfs(3)','create clone3, register, loop nbrs: [2,4]','#60a5fa'],
+          ['      dfs(2)','already in visited → return clone2','#f59e0b'],
+          ['      dfs(4)','create clone4, register, loop nbrs: [1,3]','#60a5fa'],
+          ['        dfs(1)','already visited → return clone1','#f59e0b'],
+          ['        dfs(3)','already visited → return clone3','#f59e0b'],
+          ['      return clone4','','#34d399'],
+          ['    return clone3','','#34d399'],
+          ['  return clone2','','#34d399'],
+          ['  dfs(4)','already in visited → return clone4','#f59e0b'],
+          ['return clone1 ✓','','#34d399'],
+        ].map(([call,note,c])=>`<div><span style="color:${c}">${call}</span><span style="color:var(--text-muted);font-family:sans-serif;font-size:11px"> ${note}</span></div>`).join('')}
+      </div>
+    </div>`;
+
+  if (vt === 'bfs_compare') return `
+    <div class="viz-card">
+      <h4>DFS vs BFS</h4>
+      <div class="comparison-row">
+        <div class="good comparison-box">
+          <h5>DFS (Recursive)</h5>
+          <p>✅ Concise, elegant<br>✅ Easy to understand<br>⚠️ Stack overflow on V &gt; 1000</p>
+        </div>
+        <div class="good comparison-box">
+          <h5>BFS (Queue)</h5>
+          <p>✅ No recursion limit<br>✅ Same complexity<br>⚠️ Slightly more verbose</p>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px">Both use the same visited map trick. For LeetCode, either is accepted. In production, prefer BFS for safety.</p>
+    </div>`;
+
+  if (vt === 'complexity') return `
+    <div class="viz-card">
+      <h4>Complexity Analysis</h4>
+      <div style="font-size:13px;line-height:2">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="flex:1;background:rgba(96,165,250,0.08);padding:12px;border-radius:6px;border:1px solid rgba(96,165,250,0.2)">
+            <div style="color:var(--accent);font-weight:700;margin-bottom:6px">⏱ Time: O(V+E)</div>
+            <div style="color:var(--text-secondary);font-size:12px">• Each of V nodes visited once<br>• Each of E edges traversed once<br>• Hash map ops: O(1) each</div>
+          </div>
+          <div style="flex:1;background:rgba(52,211,153,0.08);padding:12px;border-radius:6px;border:1px solid rgba(52,211,153,0.2)">
+            <div style="color:var(--accent2);font-weight:700;margin-bottom:6px">💾 Space: O(V)</div>
+            <div style="color:var(--text-secondary);font-size:12px">• visited map: O(V) entries<br>• Recursion stack: O(V) worst<br>• New nodes: O(V) (unavoidable)</div>
+          </div>
+        </div>
+        <div style="background:rgba(245,158,11,0.08);padding:12px;border-radius:6px;border:1px solid rgba(245,158,11,0.2)">
+          <div style="color:var(--accent3);font-weight:700;margin-bottom:4px">💡 Is this optimal?</div>
+          <div style="color:var(--text-secondary);font-size:12px">Yes. You must visit every node (V) and every edge (E) at least once to produce a complete clone. O(V+E) is a lower bound.</div>
+        </div>
+      </div>
+    </div>`;
+
+  return `<div class="viz-card"><h4>Visualization</h4><p style="color:var(--text-muted);font-size:13px">See the Execution mode for a live step-by-step trace.</p></div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = buildHTML();
+  attachEvents();
+}
+
+function buildHTML() {
+  return `
+  <div class="header">
+    <div class="header-top">
+      <div class="header-title"><span>${PROBLEM_NUM}.</span> ${PROBLEM_TITLE}</div>
+      <div class="header-right">
+        <button class="btn-theme" onclick="toggleTheme()">
+          ${state.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+        </button>
+        <div class="mode-toggle">
+          <button class="mode-btn ${state.mode==='intuition'?'active':''}" onclick="setMode('intuition')">💡 Intuition</button>
+          <button class="mode-btn ${state.mode==='execution'?'active':''}" onclick="setMode('execution')">▶ Execution</button>
+        </div>
+      </div>
+    </div>
+    ${state.mode === 'execution' ? `
+    <div class="input-bar">
+      <label>Adj List:</label>
+      <input id="adjInput" value="${state.inputValue}" placeholder="e.g. [[2,4],[1,3],[2,4],[1,3]]"/>
+      <button class="btn-parse" onclick="parseInput()">Run ▶</button>
+    </div>` : ''}
+  </div>
+
+  <div class="main">
+    ${state.mode === 'execution' ? buildExecutionHTML() : buildIntuitionHTML()}
+  </div>`;
+}
+
+function buildExecutionHTML() {
+  const step = state.steps[state.currentStep] || null;
+  const codeLines = PYTHON_CODE.split('\n');
+  const activeLine = step ? step.line : -1;
+
+  // Code panel
+  const codeHTML = codeLines.map((line, i) => {
+    const isActive = i === activeLine;
+    return `<div class="code-line${isActive?' active':''}">
+      <span class="line-num">${i+1}</span>
+      <code class="line-code">${highlightPython(line) || '&nbsp;'}</code>
+    </div>`;
+  }).join('');
+
+  // Step log
+  const logHTML = buildStepLog(step);
+
+  // Graph
+  const graphHTML = renderGraphSVG(step, state.adjList);
+
+  return `
+  <div class="panel" id="pCode" style="width:${state.panelWidths[0]}%;min-width:180px">
+    <div class="panel-header">Code <span style="font-weight:400;text-transform:none;letter-spacing:0">Python · DFS</span></div>
+    <div class="panel-body">
+      <div class="code-panel">${codeHTML}</div>
+    </div>
+  </div>
+  <div class="divider" id="div1"></div>
+  <div class="panel" id="pViz" style="flex:1;min-width:200px">
+    <div class="panel-header">Graph Visualization</div>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#374151;border:1px solid #4b5563"></span> Unvisited</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#065f46;border:1px solid #34d399"></span> Cloned</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#1d4ed8;border:1px solid #60a5fa"></span> Current</span>
+    </div>
+    <div class="graph-wrap">
+      <div class="graph-svg-wrap">${graphHTML}</div>
+      <div class="graph-bottom">
+        <button class="ctrl-btn" onclick="resetSteps()" title="Reset">↺</button>
+        <button class="ctrl-btn" onclick="stepBack()" title="Step Back">◀</button>
+        <button class="ctrl-btn play" onclick="togglePlay()" title="Play/Pause">
+          ${state.isPlaying ? '⏸' : '▶'}
+        </button>
+        <button class="ctrl-btn" onclick="stepForward()" title="Step Forward">▶</button>
+        <select class="speed-sel" onchange="setSpeed(this.value)">
+          <option value="0.5" ${state.speed===0.5?'selected':''}>0.5×</option>
+          <option value="1" ${state.speed===1?'selected':''}>1×</option>
+          <option value="2" ${state.speed===2?'selected':''}>2×</option>
+          <option value="4" ${state.speed===4?'selected':''}>4×</option>
+        </select>
+        <span class="step-counter">Step ${state.currentStep+1} / ${state.steps.length}</span>
+      </div>
+    </div>
+  </div>
+  <div class="divider" id="div2"></div>
+  <div class="panel" id="pLog" style="width:${state.panelWidths[2]}%;min-width:160px">
+    <div class="panel-header">Step Log</div>
+    <div class="panel-body" id="stepLogBody">
+      <div class="step-log">${logHTML}</div>
+    </div>
+  </div>`;
+}
+
+function buildStepLog(step) {
+  if (!step) return '<div style="padding:14px;color:var(--text-muted);font-size:13px">Press ▶ to start</div>';
+  const vars = step.vars || {};
+  const history = state.steps.slice(0, state.currentStep+1);
+  return `
+    <div class="step-num">Step ${state.currentStep+1} of ${state.steps.length}</div>
+    <div class="step-desc">${step.description}</div>
+    <div class="vars-title">Variables</div>
+    ${Object.entries(vars).map(([k,v])=>`
+      <div class="var-row">
+        <span class="var-name">${k}</span>
+        <span style="color:var(--text-muted)">:</span>
+        <span class="var-val">${typeof v==='object'?JSON.stringify(v):String(v)}</span>
+      </div>`).join('')}
+    <div class="history-title">History</div>
+    ${history.map((s,i)=>`
+      <div class="history-item${i===state.currentStep?' current':''}" onclick="jumpToStep(${i})">
+        ${i+1}. ${s.description.length>45?s.description.slice(0,45)+'…':s.description}
+      </div>`).join('')}`;
+}
+
+function buildIntuitionHTML() {
+  const stages = INTUITION_STAGES;
+  const curr = state.intuitionStage;
+
+  const stagesHTML = stages.map((s, i) => {
+    const cls = i===curr ? 'active' : i<curr ? 'past' : 'future';
+    return `<div class="stage-item ${cls}">
+      <div class="stage-header">
+        <div class="stage-num">${i+1}</div>
+        <div class="stage-title">${s.title}</div>
+      </div>
+      ${s.thought ? `<div class="thought-bubble">💭 "${s.thought}"</div>` : ''}
+      <div class="stage-content">${s.content.replace(/\n/g,'<br>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/<code>/g,'<code style="font-family:var(--font-mono);background:var(--bg-secondary);padding:1px 5px;border-radius:3px;font-size:12px">').replace(/<\/code>/g,'</code>')}</div>
+      <div class="key-insight"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+    </div>`;
+  }).join('');
+
+  const vizHTML = renderIntuitionViz(curr);
+
+  return `
+  <div style="display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden">
+    <div style="display:flex;flex:1;overflow:hidden">
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div class="panel-header">Senior Engineer's Thought Process</div>
+        <div style="flex:1;overflow:auto;background:var(--bg-panel);padding:16px" id="intuitionLeft">
+          ${stagesHTML}
+        </div>
+      </div>
+      <div style="flex:0 0 42%;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden">
+        <div class="panel-header">Visual Explanation</div>
+        <div style="flex:1;overflow:auto;background:var(--bg-panel-header);padding:16px">
+          ${vizHTML}
+        </div>
+      </div>
+    </div>
+    <div class="intuition-controls">
+      <button class="ctrl-btn" onclick="intuitionReset()">↺</button>
+      <button class="ctrl-btn" onclick="intuitionPrev()">◀</button>
+      <button class="ctrl-btn play" onclick="intuitionTogglePlay()">${state.intuitionPlaying?'⏸':'▶'}</button>
+      <button class="ctrl-btn" onclick="intuitionNext()">▶</button>
+      <span class="stage-progress">Stage ${curr+1} of ${stages.length}</span>
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTROLS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  document.body.dataset.theme = state.theme;
+  render();
+}
+
+function setMode(m) {
+  stopPlay();
+  stopIntuitionPlay();
+  state.mode = m;
+  render();
+}
+
+function parseInput() {
+  const v = document.getElementById('adjInput')?.value || state.inputValue;
+  state.inputValue = v;
+  try {
+    state.adjList = JSON.parse(v.replace(/'/g,'"'));
+  } catch { return; }
+  initSimulation();
+  render();
+}
+
+function resetSteps() { stopPlay(); state.currentStep = 0; partialRender(); }
+function stepBack() { stopPlay(); if (state.currentStep > 0) { state.currentStep--; partialRender(); } }
+function stepForward() { stopPlay(); if (state.currentStep < state.steps.length-1) { state.currentStep++; partialRender(); } else stopPlay(); }
+function jumpToStep(i) { state.currentStep = i; partialRender(); }
+
+function togglePlay() {
+  state.isPlaying ? stopPlay() : startPlay();
+}
+function startPlay() {
+  state.isPlaying = true;
+  partialRender();
+  state.playTimer = setInterval(() => {
+    if (state.currentStep < state.steps.length - 1) {
+      state.currentStep++;
+      partialRender();
+    } else {
+      stopPlay();
+    }
+  }, 1000 / state.speed);
+}
+function stopPlay() {
+  state.isPlaying = false;
+  clearInterval(state.playTimer);
+}
+function setSpeed(v) { state.speed = parseFloat(v); if (state.isPlaying) { stopPlay(); startPlay(); } }
+
+// Intuition controls
+function intuitionReset() { stopIntuitionPlay(); state.intuitionStage = 0; render(); }
+function intuitionPrev() { stopIntuitionPlay(); if (state.intuitionStage > 0) { state.intuitionStage--; render(); } }
+function intuitionNext() { stopIntuitionPlay(); if (state.intuitionStage < INTUITION_STAGES.length-1) { state.intuitionStage++; render(); } }
+function intuitionTogglePlay() { state.intuitionPlaying ? stopIntuitionPlay() : startIntuitionPlay(); }
+function startIntuitionPlay() {
+  state.intuitionPlaying = true;
+  render();
+  state.intuitionTimer = setInterval(() => {
+    if (state.intuitionStage < INTUITION_STAGES.length-1) {
+      state.intuitionStage++;
+      render();
+    } else { stopIntuitionPlay(); }
+  }, 4000);
+}
+function stopIntuitionPlay() { state.intuitionPlaying = false; clearInterval(state.intuitionTimer); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PARTIAL RE-RENDER (execution mode only — no full DOM rebuild)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function partialRender() {
+  if (state.mode !== 'execution') { render(); return; }
+  const step = state.steps[state.currentStep] || null;
+  const activeLine = step ? step.line : -1;
+
+  // Update code line highlights
+  document.querySelectorAll('.code-line').forEach((el, i) => {
+    el.classList.toggle('active', i === activeLine);
+  });
+  // Scroll active line into view
+  const activeEl = document.querySelector('.code-line.active');
+  if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Update graph SVG
+  const svgWrap = document.querySelector('.graph-svg-wrap');
+  if (svgWrap) svgWrap.innerHTML = renderGraphSVG(step, state.adjList);
+
+  // Update play button
+  const playBtn = document.querySelector('.ctrl-btn.play');
+  if (playBtn) playBtn.textContent = state.isPlaying ? '⏸' : '▶';
+
+  // Update step counter
+  const counter = document.querySelector('.step-counter');
+  if (counter) counter.textContent = `Step ${state.currentStep+1} / ${state.steps.length}`;
+
+  // Update log
+  const logBody = document.getElementById('stepLogBody');
+  if (logBody) {
+    logBody.innerHTML = `<div class="step-log">${buildStepLog(step)}</div>`;
+    // Auto-scroll current history item into view
+    const curr = logBody.querySelector('.history-item.current');
+    if (curr) curr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PANEL RESIZING
+// ─────────────────────────────────────────────────────────────────────────────
+
+function attachEvents() {
+  // Keyboard
+  document.removeEventListener('keydown', handleKey);
+  document.addEventListener('keydown', handleKey);
+
+  // Divider drag
+  ['div1','div2'].forEach((id, di) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const panels = ['pCode','pViz','pLog'].map(p=>document.getElementById(p)).filter(Boolean);
+      if (panels.length < 3) return;
+      const startX = e.clientX;
+      const startWidths = panels.map(p => p.getBoundingClientRect().width);
+      const totalW = startWidths.reduce((a,b)=>a+b,0);
+      el.classList.add('dragging');
+
+      const onMove = e2 => {
+        const dx = e2.clientX - startX;
+        const pct = (dx / totalW) * 100;
+        if (di === 0) {
+          const w0 = Math.max(15, Math.min(55, (startWidths[0]/totalW*100) + pct));
+          state.panelWidths[0] = w0;
+          panels[0].style.width = w0 + '%';
+        } else {
+          const w2 = Math.max(12, Math.min(40, (startWidths[2]/totalW*100) - pct));
+          state.panelWidths[2] = w2;
+          panels[2].style.width = w2 + '%';
+        }
+      };
+      const onUp = () => {
+        el.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
+function handleKey(e) {
+  if (e.target.tagName === 'INPUT') return;
+  if (state.mode === 'execution') {
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowRight') { e.preventDefault(); stepForward(); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); stepBack(); }
+  } else {
+    if (e.code === 'Space') { e.preventDefault(); intuitionTogglePlay(); }
+    if (e.code === 'ArrowRight') { e.preventDefault(); intuitionNext(); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); intuitionPrev(); }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────────────────────
+
+initSimulation();
+render();
+</script>
+</body>
+</html>
