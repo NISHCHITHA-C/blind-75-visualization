@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>269. Foreign Dictionary - Visualizer</title>
+<style>
+  :root {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #181825;
+    --bg-panel: #1e1e2e;
+    --bg-header: #11111b;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --text-muted: #6c7086;
+    --border: #313244;
+    --accent: #89b4fa;
+    --accent2: #cba6f7;
+    --success: #a6e3a1;
+    --warning: #f9e2af;
+    --error: #f38ba8;
+    --highlight-line: rgba(249, 226, 175, 0.10);
+    --btn-bg: #313244;
+    --btn-hover: #45475a;
+    --node-default: #313244;
+    --node-active: #89b4fa;
+    --node-visited: #a6e3a1;
+    --node-queued: #f9e2af;
+    --node-cycle: #f38ba8;
+    --edge-default: #45475a;
+    --edge-active: #89b4fa;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+    /* Dracula-inspired syntax */
+    --syn-keyword: #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-type: #8be9fd;
+    --syn-number: #bd93f9;
+    --syn-operator: #ff79c6;
+    --syn-builtin: #ffb86c;
+    --syn-decorator: #ff79c6;
+    --syn-self: #f8f8f2;
+    --syn-param: #ffb86c;
+  }
+  [data-theme="light"] {
+    --bg-primary: #fafafa;
+    --bg-secondary: #f3f4f6;
+    --bg-panel: #ffffff;
+    --bg-header: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --accent: #3b82f6;
+    --accent2: #8b5cf6;
+    --success: #16a34a;
+    --warning: #d97706;
+    --error: #dc2626;
+    --highlight-line: rgba(253, 224, 71, 0.18);
+    --btn-bg: #e2e8f0;
+    --btn-hover: #cbd5e1;
+    --node-default: #e2e8f0;
+    --node-active: #93c5fd;
+    --node-visited: #86efac;
+    --node-queued: #fde68a;
+    --node-cycle: #fca5a5;
+    --edge-default: #cbd5e1;
+    --edge-active: #3b82f6;
+    /* GitHub-inspired syntax */
+    --syn-keyword: #d73a49;
+    --syn-function: #6f42c1;
+    --syn-string: #032f62;
+    --syn-comment: #6a737d;
+    --syn-type: #005cc5;
+    --syn-number: #005cc5;
+    --syn-operator: #d73a49;
+    --syn-builtin: #e36209;
+    --syn-decorator: #e36209;
+    --syn-self: #24292e;
+    --syn-param: #e36209;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; }
+  
+  #app { display: flex; flex-direction: column; height: 100vh; }
+  
+  /* HEADER */
+  .header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .header-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .problem-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .problem-title span { color: var(--accent); }
+  .header-controls { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--btn-bg); color: var(--text-primary); cursor: pointer;
+    font-size: 12px; font-weight: 500; transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--btn-hover); }
+  .btn.active { background: var(--accent); color: #11111b; border-color: var(--accent); }
+  .btn.accent { background: var(--accent); color: #11111b; border-color: var(--accent); }
+  .btn.small { padding: 3px 8px; font-size: 11px; }
+  
+  .mode-toggle { display: flex; gap: 6px; }
+  .input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .input-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+  .input-field {
+    flex: 1; min-width: 200px; max-width: 480px;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    color: var(--text-primary); padding: 4px 10px; border-radius: 5px;
+    font-family: var(--font-mono); font-size: 12px;
+  }
+  .input-field:focus { outline: none; border-color: var(--accent); }
+
+  /* MAIN LAYOUT */
+  .main { display: flex; flex: 1; overflow: hidden; }
+  
+  .panel {
+    display: flex; flex-direction: column;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    min-width: 120px;
+  }
+  .panel:last-child { border-right: none; }
+  .panel-header {
+    padding: 7px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-muted);
+    background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-content { flex: 1; overflow: auto; }
+  
+  /* RESIZER */
+  .resizer {
+    width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0;
+    transition: background 0.15s; position: relative; z-index: 5;
+  }
+  .resizer:hover, .resizer.dragging { background: var(--accent); }
+
+  /* CODE PANEL */
+  .code-wrap {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    height: 100%;
+    overflow: auto;
+  }
+  .code-wrap pre { margin: 0; padding: 14px 0; }
+  .code-line {
+    display: flex; align-items: center; padding: 1px 0; min-height: 21px;
+    transition: background 0.15s;
+  }
+  .code-line.active { background: var(--highlight-line); }
+  .line-num {
+    display: inline-block; min-width: 38px; text-align: right;
+    padding-right: 14px; color: var(--text-muted);
+    user-select: none; font-size: 12px; flex-shrink: 0;
+  }
+  .line-code { flex: 1; white-space: pre; color: var(--text-primary); padding-right: 12px; }
+  
+  /* Syntax highlight classes */
+  .sk { color: var(--syn-keyword); font-weight: 600; }
+  .sf { color: var(--syn-function); }
+  .ss { color: var(--syn-string); }
+  .sc { color: var(--syn-comment); font-style: italic; }
+  .st { color: var(--syn-type); }
+  .sn { color: var(--syn-number); }
+  .sb { color: var(--syn-builtin); }
+  .sd { color: var(--syn-decorator); }
+  .sp { color: var(--syn-param); }
+
+  /* VIZ PANEL */
+  .viz-content { padding: 0; height: 100%; display: flex; flex-direction: column; }
+  .viz-svg-area { flex: 1; overflow: hidden; position: relative; }
+  .viz-svg-area svg { width: 100%; height: 100%; }
+  .viz-controls {
+    padding: 8px 12px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    background: var(--btn-bg); border: 1px solid var(--border); color: var(--text-primary);
+    border-radius: 5px; padding: 4px 10px; cursor: pointer; font-size: 13px;
+    transition: background 0.15s; min-width: 32px; text-align: center;
+  }
+  .ctrl-btn:hover { background: var(--btn-hover); }
+  .ctrl-btn.accent { background: var(--accent); color: #11111b; border-color: var(--accent); }
+  .speed-sel {
+    background: var(--btn-bg); border: 1px solid var(--border); color: var(--text-primary);
+    border-radius: 5px; padding: 4px 6px; font-size: 12px; cursor: pointer;
+  }
+  .step-counter { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+  /* STEP LOG */
+  .step-log { padding: 12px; }
+  .step-desc {
+    background: var(--bg-secondary); border-radius: 7px; padding: 10px 12px;
+    font-size: 12px; color: var(--text-primary); line-height: 1.6; margin-bottom: 12px;
+    border-left: 3px solid var(--accent);
+  }
+  .vars-section { margin-bottom: 12px; }
+  .vars-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 6px; }
+  .var-row { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin: 3px 0; }
+  .var-name { color: var(--accent); }
+  .hist-item {
+    padding: 5px 8px; border-radius: 4px; font-size: 11px; margin: 3px 0;
+    color: var(--text-muted); cursor: pointer; transition: background 0.1s;
+  }
+  .hist-item.current { background: var(--btn-bg); color: var(--text-primary); }
+  .hist-item:hover { background: var(--btn-hover); }
+
+  /* INTUITION MODE */
+  .intuition-wrap { display: flex; width: 100%; height: 100%; overflow: hidden; }
+  .intuition-left { flex: 1; overflow-y: auto; padding: 16px; border-right: 1px solid var(--border); }
+  .intuition-right { flex: 1; overflow-y: auto; padding: 16px; }
+  
+  .stage-card {
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;
+    border: 1px solid var(--border); background: var(--bg-secondary);
+    transition: opacity 0.3s, border-color 0.3s;
+  }
+  .stage-card.active { border-color: var(--accent); background: rgba(137,180,250,0.06); }
+  .stage-card.past { opacity: 0.55; }
+  .stage-card.future { opacity: 0.28; }
+  
+  .stage-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--btn-bg);
+    font-size: 11px; font-weight: 700; margin-right: 8px;
+    color: var(--text-muted);
+  }
+  .stage-card.active .stage-num { background: var(--accent); color: #11111b; }
+  .stage-title { font-size: 13px; font-weight: 600; color: var(--text-primary); display: inline; }
+  
+  .thought-bubble {
+    background: rgba(137,180,250,0.08); border-left: 3px solid var(--accent);
+    padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0;
+    font-style: italic; font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+  }
+  .key-insight {
+    background: rgba(166,227,161,0.08); border-left: 3px solid var(--success);
+    padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0;
+    font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+  }
+  .stage-content { font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin: 8px 0; }
+  
+  .intuition-nav {
+    display: flex; gap: 8px; align-items: center; padding: 10px 16px;
+    border-top: 1px solid var(--border); background: var(--bg-secondary);
+    flex-shrink: 0;
+  }
+  .stage-progress { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+  /* Legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-secondary); flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Result badge */
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    margin-left: 8px;
+  }
+  .result-badge.ok { background: rgba(166,227,161,0.15); color: var(--success); border: 1px solid rgba(166,227,161,0.3); }
+  .result-badge.err { background: rgba(243,139,168,0.15); color: var(--error); border: 1px solid rgba(243,139,168,0.3); }
+
+  /* Comparison table */
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .cmp-table th, .cmp-table td { padding: 7px 10px; border: 1px solid var(--border); text-align: left; }
+  .cmp-table th { background: var(--bg-secondary); color: var(--text-muted); font-weight: 600; font-size: 11px; }
+  .cmp-good { color: var(--success); }
+  .cmp-bad { color: var(--error); }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body data-theme="dark">
+<div id="app"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// PYTHON CODE (pre-formatted with HTML)
+// ─────────────────────────────────────────────
+const CODE_LINES = [
+  `<span class="sk">from</span> typing <span class="sk">import</span> <span class="st">List</span>`,
+  `<span class="sk">from</span> collections <span class="sk">import</span> <span class="st">defaultdict</span>, <span class="st">deque</span>`,
+  ``,
+  `<span class="sk">class</span> <span class="sf">Solution</span>:`,
+  `    <span class="sk">def</span> <span class="sf">foreignDictionary</span>(<span class="sp">self</span>, <span class="sp">words</span>: <span class="st">List</span>[<span class="st">str</span>]) -&gt; <span class="st">str</span>:`,
+  `        <span class="sc"># Build adjacency list with only chars that appear in words</span>`,
+  `        chars = {c <span class="sk">for</span> word <span class="sk">in</span> words <span class="sk">for</span> c <span class="sk">in</span> word}`,
+  `        adj = <span class="st">defaultdict</span>(<span class="sb">set</span>)`,
+  `        in_degree = {c: <span class="sn">0</span> <span class="sk">for</span> c <span class="sk">in</span> chars}`,
+  `        `,
+  `        <span class="sc"># Extract ordering constraints from adjacent word pairs</span>`,
+  `        <span class="sk">for</span> i <span class="sk">in</span> <span class="sb">range</span>(<span class="sb">len</span>(words) - <span class="sn">1</span>):`,
+  `            w1, w2 = words[i], words[i + <span class="sn">1</span>]`,
+  `            min_len = <span class="sb">min</span>(<span class="sb">len</span>(w1), <span class="sb">len</span>(w2))`,
+  `            `,
+  `            <span class="sc"># Invalid: prefix word comes after longer word</span>`,
+  `            <span class="sk">if</span> <span class="sb">len</span>(w1) &gt; <span class="sb">len</span>(w2) <span class="sk">and</span> w1[:min_len] == w2[:min_len]:`,
+  `                <span class="sk">return</span> <span class="ss">""</span>`,
+  `            `,
+  `            <span class="sk">for</span> j <span class="sk">in</span> <span class="sb">range</span>(min_len):`,
+  `                <span class="sk">if</span> w1[j] != w2[j]:`,
+  `                    <span class="sk">if</span> w2[j] <span class="sk">not in</span> adj[w1[j]]:`,
+  `                        adj[w1[j]].<span class="sf">add</span>(w2[j])`,
+  `                        in_degree[w2[j]] += <span class="sn">1</span>`,
+  `                    <span class="sk">break</span>`,
+  `        `,
+  `        <span class="sc"># Topological sort (Kahn's BFS algorithm)</span>`,
+  `        queue = <span class="st">deque</span>([c <span class="sk">for</span> c <span class="sk">in</span> in_degree <span class="sk">if</span> in_degree[c] == <span class="sn">0</span>])`,
+  `        result = []`,
+  `        `,
+  `        <span class="sk">while</span> queue:`,
+  `            c = queue.<span class="sf">popleft</span>()`,
+  `            result.<span class="sf">append</span>(c)`,
+  `            <span class="sk">for</span> neighbor <span class="sk">in</span> adj[c]:`,
+  `                in_degree[neighbor] -= <span class="sn">1</span>`,
+  `                <span class="sk">if</span> in_degree[neighbor] == <span class="sn">0</span>:`,
+  `                    queue.<span class="sf">append</span>(neighbor)`,
+  `        `,
+  `        <span class="sc"># Cycle detected — invalid ordering</span>`,
+  `        <span class="sk">if</span> <span class="sb">len</span>(result) != <span class="sb">len</span>(chars):`,
+  `            <span class="sk">return</span> <span class="ss">""</span>`,
+  `        `,
+  `        <span class="sk">return</span> <span class="ss">""</span>.<span class="sf">join</span>(result)`,
+];
+
+// ─────────────────────────────────────────────
+// SIMULATION ENGINE
+// ─────────────────────────────────────────────
+function simulate(words) {
+  const steps = [];
+  const snap = (line, desc, vars, graph) => {
+    steps.push({ line, desc, vars: JSON.parse(JSON.stringify(vars)), graph: JSON.parse(JSON.stringify(graph)) });
+  };
+
+  // collect chars
+  const charSet = new Set(words.flatMap(w => [...w]));
+  const chars = [...charSet].sort();
+  const adj = {};
+  const inDeg = {};
+  chars.forEach(c => { adj[c] = new Set(); inDeg[c] = 0; });
+
+  const graph = () => ({
+    nodes: chars.map(c => ({ id: c, inDeg: inDeg[c], state: 'default' })),
+    edges: chars.flatMap(c => [...adj[c]].map(n => ({ from: c, to: n, state: 'default' })))
+  });
+
+  snap(6, 'Collect all unique characters from all words', { chars: chars.join(', '), 'adj': '{}', in_degree: '{' + chars.map(c => `${c}:0`).join(', ') + '}' }, graph());
+
+  let invalid = false;
+
+  for (let i = 0; i < words.length - 1; i++) {
+    const w1 = words[i], w2 = words[i+1];
+    const minLen = Math.min(w1.length, w2.length);
+    snap(11, `Compare words[${i}]="${w1}" and words[${i+1}]="${w2}"`, { w1, w2, min_len: minLen }, graph());
+
+    if (w1.length > w2.length && w1.slice(0, minLen) === w2.slice(0, minLen)) {
+      snap(16, `❌ INVALID: "${w1}" is longer but shares prefix with "${w2}" — return ""`, { w1, w2, error: 'prefix violation' }, graph());
+      return [steps, null, chars];
+    }
+
+    for (let j = 0; j < minLen; j++) {
+      if (w1[j] !== w2[j]) {
+        snap(19, `First difference at index ${j}: '${w1[j]}' < '${w2[j]}' → add edge ${w1[j]} → ${w2[j]}`, { w1_char: w1[j], w2_char: w2[j], position: j }, graph());
+        if (!adj[w1[j]].has(w2[j])) {
+          adj[w1[j]].add(w2[j]);
+          inDeg[w2[j]] += 1;
+          snap(22, `Add directed edge: ${w1[j]} → ${w2[j]}, in_degree[${w2[j]}] = ${inDeg[w2[j]]}`, { edge: `${w1[j]} → ${w2[j]}`, [`in_degree[${w2[j]}]`]: inDeg[w2[j]] }, graph());
+        }
+        break;
+      }
+    }
+  }
+
+  // Kahn's BFS
+  const queue = chars.filter(c => inDeg[c] === 0);
+  const result = [];
+
+  snap(27, `Initialize queue with zero-in-degree nodes: [${queue.join(', ')}]`, { queue: queue.join(', '), in_degree: chars.map(c => `${c}:${inDeg[c]}`).join(', ') }, graph());
+
+  const queueState = [...queue];
+  while (queueState.length > 0) {
+    const c = queueState.shift();
+    result.push(c);
+    
+    const g = graph();
+    g.nodes.find(n => n.id === c).state = 'visited';
+    snap(31, `Dequeue '${c}' → append to result. Result so far: "${result.join('')}"`, { c, result: result.join(''), queue: queueState.join(', ') }, g);
+
+    for (const nb of adj[c]) {
+      inDeg[nb] -= 1;
+      snap(34, `Decrease in_degree[${nb}] by 1 → ${inDeg[nb]}`, { from: c, neighbor: nb, [`in_degree[${nb}]`]: inDeg[nb] }, graph());
+      if (inDeg[nb] === 0) {
+        queueState.push(nb);
+        snap(36, `in_degree[${nb}] = 0 → enqueue '${nb}'. Queue: [${queueState.join(', ')}]`, { enqueued: nb, queue: queueState.join(', ') }, graph());
+      }
+    }
+  }
+
+  if (result.length !== chars.length) {
+    const cycleGraph = graph();
+    chars.forEach(c => { if (!result.includes(c)) { cycleGraph.nodes.find(n => n.id === c).state = 'cycle'; } });
+    snap(39, `❌ CYCLE DETECTED: result length (${result.length}) ≠ chars count (${chars.length}) → return ""`, { result: result.join(''), chars_count: chars.length, result_count: result.length }, cycleGraph);
+    return [steps, '', chars];
+  }
+
+  snap(41, `✅ Valid order found! Return "${result.join('')}"`, { result: result.join(''), order: result.join(' → ') }, graph());
+  return [steps, result.join(''), chars];
+}
+
+// ─────────────────────────────────────────────
+// GRAPH LAYOUT
+// ─────────────────────────────────────────────
+function layoutGraph(chars, edges) {
+  const n = chars.length;
+  if (n === 0) return { nodePos: {}, edges: [] };
+
+  // Build adjacency for layout
+  const adj = {};
+  chars.forEach(c => { adj[c] = []; });
+  edges.forEach(e => adj[e.from].push(e.to));
+
+  // Simple layered layout with in-degree based tiers
+  const inDeg = {};
+  chars.forEach(c => { inDeg[c] = 0; });
+  edges.forEach(e => inDeg[e.to]++);
+
+  // BFS layers
+  const layers = [];
+  const visited = new Set();
+  const queue = chars.filter(c => inDeg[c] === 0);
+  while (queue.length > 0) {
+    layers.push([...queue]);
+    const next = [];
+    queue.forEach(c => {
+      visited.add(c);
+      adj[c].forEach(nb => {
+        if (!visited.has(nb) && !next.includes(nb)) next.push(nb);
+      });
+    });
+    queue.length = 0;
+    queue.push(...next);
+  }
+  // Add any unvisited (cycle nodes)
+  const remaining = chars.filter(c => !visited.has(c));
+  if (remaining.length > 0) layers.push(remaining);
+
+  const W = 700, H = 400;
+  const nodePos = {};
+  layers.forEach((layer, li) => {
+    const y = 60 + (li / Math.max(layers.length - 1, 1)) * (H - 120);
+    layer.forEach((c, ci) => {
+      const x = (W / (layer.length + 1)) * (ci + 1);
+      nodePos[c] = { x, y };
+    });
+  });
+
+  return { nodePos, edges };
+}
+
+// ─────────────────────────────────────────────
+// INTUITION STAGES
+// ─────────────────────────────────────────────
+const INTUITION_STAGES = [
+  {
+    title: "Understanding the Problem",
+    thought: "We have a list of words in a foreign language, sorted lexicographically. What does that mean? Comparing adjacent words tells us something about the ordering of characters.",
+    content: `Given words sorted in a foreign alphabet, we need to deduce the character ordering.
+<br><br>
+Key observations:
+<br>• Compare <strong>adjacent</strong> words — they reveal ordering constraints
+<br>• The <strong>first</strong> position where two words differ tells us one character comes before another
+<br>• If a longer word is a <strong>prefix</strong> of a shorter one and comes after it — that's invalid!
+<br>• Output any valid total ordering, or "" if a contradiction exists`,
+    insight: "We're essentially building a DAG (directed acyclic graph) from implicit ordering rules, then doing topological sort.",
+    viz: 'problem_intro',
+  },
+  {
+    title: "Extracting Constraints",
+    thought: "Take 'wrt' before 'wrf'. Same first two chars, but at index 2: 't' vs 'f'. So t < f in this alphabet. Each adjacent word pair gives us AT MOST one constraint!",
+    content: `For each adjacent pair (w1, w2):
+<br>• Find first index j where w1[j] ≠ w2[j]
+<br>• This means w1[j] comes <em>before</em> w2[j]
+<br>• Add directed edge: w1[j] → w2[j]
+<br>• Stop after the first differing character — later chars tell us nothing
+<br><br>
+<strong>The prefix trap:</strong> If w1 = "abc" and w2 = "ab", but w1 comes first... that's impossible! A prefix can't sort after the longer word.`,
+    insight: "Only the FIRST differing character creates a valid constraint. Everything after that is irrelevant for this pair.",
+    viz: 'constraint_extraction',
+  },
+  {
+    title: "Building the Graph",
+    thought: "OK so now I have a bunch of 'this char comes before that char' rules. This is just a directed graph! And the question becomes: is there a valid topological ordering?",
+    content: `We build:
+<br>• <strong>adj[c]</strong>: set of characters that must come AFTER c
+<br>• <strong>in_degree[c]</strong>: how many characters must come BEFORE c
+<br><br>
+We use a <em>set</em> for adjacency to avoid duplicate edges between the same pair. Duplicates would incorrectly inflate in-degrees and break Kahn's algorithm.`,
+    insight: "The constraint graph will have a cycle ↔ the input is contradictory. No cycle = valid alien alphabet order exists.",
+    viz: 'graph_build',
+  },
+  {
+    title: "Kahn's Algorithm (Topological Sort)",
+    thought: "Now I need a topological sort. Kahn's BFS is perfect here — start with nodes that have no prerequisites (in_degree = 0), add them to result, reduce neighbors' in-degrees, repeat.",
+    content: `Kahn's Algorithm:
+<br>1. Start queue with all nodes where in_degree = 0
+<br>2. Pop a node c, append to result
+<br>3. For each neighbor of c: decrement in_degree
+<br>4. If neighbor's in_degree reaches 0, enqueue it
+<br>5. Repeat until queue is empty
+<br><br>
+<strong>Cycle detection:</strong> If result.length ≠ total chars, some nodes were never reachable — they're in a cycle!`,
+    insight: "If we can process all characters, we have a valid order. If some remain with non-zero in-degree, there's a cycle — impossible ordering.",
+    viz: 'kahn_demo',
+  },
+  {
+    title: "Complexity Analysis",
+    thought: "Is this optimal? We visit every character once and every edge once. That's O(V + E). But V and E are bounded by the total characters in all words.",
+    content: `<strong>Time Complexity: O(C)</strong> where C = total characters in all words
+<br>• Building constraints: O(C) to scan all words
+<br>• BFS: O(V + E) = O(unique chars + edges) ≤ O(26 + 26²) = O(1) if treating alphabet as constant
+<br>• In practice: dominated by input size O(C)
+<br><br>
+<strong>Space Complexity: O(1)</strong> or O(U) where U = unique chars
+<br>• adj and in_degree: at most 26 chars
+<br>• BFS queue: at most 26 entries`,
+    insight: "Since the alphabet is bounded by 26, the graph operations are effectively O(1). Overall: O(C) dominated by input parsing.",
+    viz: 'complexity',
+  },
+  {
+    title: "Edge Cases",
+    thought: "What could go wrong? Empty list, single word, all same chars, cycle in constraints, or a word that's a prefix of the previous one...",
+    content: `Critical edge cases:
+<br>• <strong>Single word:</strong> No constraints → any ordering of its chars works
+<br>• <strong>Prefix violation:</strong> ["abc", "ab"] → "abc" appears before "ab" but "ab" is a prefix — impossible
+<br>• <strong>Cycle:</strong> a→b, b→a → return ""
+<br>• <strong>Disconnected:</strong> Two chars with no relationship — both orderings are valid
+<br>• <strong>Duplicate adjacent words:</strong> ["abc", "abc"] → no constraint extracted (fine!)`,
+    insight: "The two failure modes are: (1) prefix ordering violation caught during constraint extraction, (2) cycle detected after BFS via result length check.",
+    viz: 'edge_cases',
+  },
+  {
+    title: "Full Solution Walkthrough",
+    thought: "Let me trace through ['wrt', 'wrf', 'er', 'ett', 'rftt']. This is the classic example. We should get 'wertf'.",
+    content: `Input: ["wrt", "wrf", "er", "ett", "rftt"]
+<br><br>Constraints extracted:
+<br>• wrt vs wrf: t → f
+<br>• wrf vs er: w → e  
+<br>• er vs ett: r → t
+<br>• ett vs rftt: e → r
+<br><br>Graph: w→e, e→r, r→t, t→f
+<br>in_degrees: w=0, e=1, r=1, t=1, f=1
+<br><br>BFS: start with [w] → "w", then [e] → "we", then [r] → "wer", then [t] → "wert", then [f] → "wertf" ✅`,
+    insight: "The output 'wertf' is one valid topological ordering. It respects all derived constraints and contains all characters exactly once.",
+    viz: 'final_demo',
+  }
+];
+
+// ─────────────────────────────────────────────
+// APP
+// ─────────────────────────────────────────────
+class App {
+  constructor() {
+    this.theme = 'dark';
+    this.mode = 'intuition';
+    this.inputValue = '["wrt","wrf","er","ett","rftt"]';
+    this.steps = [];
+    this.result = null;
+    this.chars = [];
+    this.currentStep = 0;
+    this.isPlaying = false;
+    this.playInterval = null;
+    this.speed = 1;
+    this.intuitionStage = 0;
+    this.panelWidths = [28, 48, 24]; // percentages
+    this.dragState = null;
+
+    this.parseAndSimulate();
+    this.render();
+    this.attachEvents();
+  }
+
+  parseInput() {
+    try {
+      const v = this.inputValue.trim();
+      const parsed = JSON.parse(v);
+      if (!Array.isArray(parsed)) return null;
+      return parsed.map(String);
+    } catch { return null; }
+  }
+
+  parseAndSimulate() {
+    const words = this.parseInput();
+    if (!words) {
+      this.steps = [{ line: 0, desc: 'Invalid input format. Use JSON array, e.g. ["wrt","wrf","er"]', vars: {}, graph: { nodes: [], edges: [] } }];
+      this.result = null;
+      this.chars = [];
+      return;
+    }
+    [this.steps, this.result, this.chars] = simulate(words);
+    this.currentStep = 0;
+  }
+
+  render() {
+    const app = document.getElementById('app');
+    app.innerHTML = this.renderHeader() + this.renderMain();
+    this.bindPanelResize();
+  }
+
+  renderHeader() {
+    const resultBadge = this.result === null ? '' :
+      this.result === '' ?
+        `<span class="result-badge err">❌ ""</span>` :
+        `<span class="result-badge ok">✅ "${this.result}"</span>`;
+
+    const inputRow = this.mode === 'execution' ? `
+      <div class="input-row">
+        <span class="input-label">Input words (JSON array):</span>
+        <input class="input-field" id="inputField" value="${this.inputValue.replace(/"/g, '&quot;')}" placeholder='["wrt","wrf","er","ett","rftt"]'>
+        <button class="btn accent small" onclick="app.onParseInput()">▶ Run</button>
+        ${resultBadge}
+      </div>` : '';
+
+    return `<div class="header">
+      <div class="header-row1">
+        <div class="problem-title"><span>269.</span> Foreign Dictionary — Alien Alphabet Ordering</div>
+        <div class="header-controls">
+          <div class="mode-toggle">
+            <button class="btn ${this.mode === 'intuition' ? 'active' : ''}" onclick="app.setMode('intuition')">💡 Intuition</button>
+            <button class="btn ${this.mode === 'execution' ? 'active' : ''}" onclick="app.setMode('execution')">▶ Execution</button>
+          </div>
+          <button class="btn small" onclick="app.toggleTheme()">${this.theme === 'dark' ? '☀️' : '🌙'}</button>
+        </div>
+      </div>
+      ${inputRow}
+    </div>`;
+  }
+
+  renderMain() {
+    if (this.mode === 'intuition') {
+      return `<div class="main" style="flex-direction:column;">
+        <div style="flex:1;overflow:hidden;display:flex;">
+          ${this.renderIntuitionMode()}
+        </div>
+        <div class="intuition-nav">
+          <button class="btn small" onclick="app.prevStage()">◀ Prev</button>
+          <button class="btn small ${this.isPlaying ? 'active' : ''}" onclick="app.toggleIntuitionPlay()">${this.isPlaying ? '⏸ Pause' : '▶ Auto'}</button>
+          <button class="btn small" onclick="app.nextStage()">Next ▶</button>
+          <span class="stage-progress">Stage ${this.intuitionStage + 1} of ${INTUITION_STAGES.length}</span>
+        </div>
+      </div>`;
+    }
+
+    const [lw, mw, rw] = this.panelWidths;
+    return `<div class="main" id="mainPanels">
+      <div class="panel" id="panelCode" style="width:${lw}%">
+        <div class="panel-header">Code <span style="color:var(--syn-comment);font-size:10px;text-transform:none;font-weight:400;">Python 3</span></div>
+        <div class="panel-content">${this.renderCodePanel()}</div>
+      </div>
+      <div class="resizer" id="resizer0" data-idx="0"></div>
+      <div class="panel" id="panelViz" style="width:${mw}%">
+        <div class="panel-header">Graph Visualization
+          <span style="font-size:10px;color:var(--text-muted);font-weight:400;text-transform:none;">Step ${this.currentStep + 1}/${this.steps.length}</span>
+        </div>
+        <div class="panel-content" style="display:flex;flex-direction:column;">
+          ${this.renderLegend()}
+          <div class="viz-svg-area" style="flex:1;">${this.renderGraph()}</div>
+          ${this.renderControls()}
+        </div>
+      </div>
+      <div class="resizer" id="resizer1" data-idx="1"></div>
+      <div class="panel" id="panelLog" style="width:${rw}%">
+        <div class="panel-header">Step Log</div>
+        <div class="panel-content" id="stepLogContent">${this.renderStepLog()}</div>
+      </div>
+    </div>`;
+  }
+
+  renderCodePanel() {
+    const curLine = this.steps[this.currentStep]?.line ?? -1;
+    let html = `<div class="code-wrap"><pre>`;
+    CODE_LINES.forEach((lineHtml, i) => {
+      const active = i === curLine ? ' active' : '';
+      html += `<div class="code-line${active}">
+        <span class="line-num">${i + 1}</span>
+        <span class="line-code">${lineHtml || ' '}</span>
+      </div>`;
+    });
+    html += '</pre></div>';
+    return html;
+  }
+
+  renderLegend() {
+    return `<div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--node-default);border:1.5px solid var(--border)"></div>Unvisited</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--node-queued)"></div>In Queue</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--node-active)"></div>Processing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--node-visited)"></div>Done</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--node-cycle)"></div>In Cycle</div>
+    </div>`;
+  }
+
+  renderGraph() {
+    const step = this.steps[this.currentStep];
+    if (!step) return '<svg viewBox="0 0 700 400"><text x="350" y="200" fill="#6c7086" text-anchor="middle">No steps</text></svg>';
+    const { nodes, edges } = step.graph;
+
+    if (nodes.length === 0) {
+      return `<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="200" fill="var(--text-muted)" text-anchor="middle" font-size="14">No nodes yet</text>
+      </svg>`;
+    }
+
+    const { nodePos } = layoutGraph(nodes.map(n => n.id), edges);
+    const R = 22;
+
+    // Determine active node from step desc
+    const descMatch = step.desc.match(/node '([a-z])'/);
+    const activeNode = descMatch ? descMatch[1] : null;
+
+    const edgeSVG = edges.map(e => {
+      const from = nodePos[e.from], to = nodePos[e.to];
+      if (!from || !to) return '';
+      // Offset for arrow
+      const dx = to.x - from.x, dy = to.y - from.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      const ux = dx/dist, uy = dy/dist;
+      const x1 = from.x + ux*R, y1 = from.y + uy*R;
+      const x2 = to.x - ux*R, y2 = to.y - uy*R;
+      const color = e.state === 'active' ? 'var(--edge-active)' : 'var(--edge-default)';
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" marker-end="url(#ah)"/>`;
+    }).join('');
+
+    const nodeSVG = nodes.map(n => {
+      const pos = nodePos[n.id];
+      if (!pos) return '';
+      let fill = 'var(--node-default)';
+      if (n.state === 'visited') fill = 'var(--node-visited)';
+      else if (n.state === 'cycle') fill = 'var(--node-cycle)';
+      else if (n.id === activeNode) fill = 'var(--node-active)';
+      
+      const isActive = n.id === activeNode;
+      const stroke = isActive ? 'var(--accent)' : 'var(--border)';
+      const strokeW = isActive ? 3 : 1.5;
+      const textCol = (n.state === 'default' || n.state === '') ? 'var(--text-primary)' : '#11111b';
+
+      return `<g>
+        <circle cx="${pos.x}" cy="${pos.y}" r="${R}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}"/>
+        <text x="${pos.x}" y="${pos.y - 3}" text-anchor="middle" dominant-baseline="middle" fill="${textCol}" font-size="15" font-weight="700" font-family="monospace">${n.id}</text>
+        <text x="${pos.x}" y="${pos.y + 13}" text-anchor="middle" dominant-baseline="middle" fill="${textCol}" font-size="10" opacity="0.75">d=${n.inDeg}</text>
+      </g>`;
+    }).join('');
+
+    return `<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="var(--edge-default)"/>
+        </marker>
+      </defs>
+      ${edgeSVG}
+      ${nodeSVG}
+    </svg>`;
+  }
+
+  renderControls() {
+    const speeds = [0.5, 1, 2, 4];
+    return `<div class="viz-controls">
+      <button class="ctrl-btn" onclick="app.reset()" title="Reset">⏮</button>
+      <button class="ctrl-btn" onclick="app.stepBack()" title="Step back">◀</button>
+      <button class="ctrl-btn ${this.isPlaying ? 'accent' : ''}" onclick="app.togglePlay()">${this.isPlaying ? '⏸' : '▶'}</button>
+      <button class="ctrl-btn" onclick="app.stepFwd()" title="Step forward">▶</button>
+      <select class="speed-sel" onchange="app.setSpeed(parseFloat(this.value))">
+        ${speeds.map(s => `<option value="${s}" ${s === this.speed ? 'selected' : ''}>${s}x</option>`).join('')}
+      </select>
+      <span class="step-counter">Step ${this.currentStep + 1} / ${this.steps.length}</span>
+    </div>`;
+  }
+
+  renderStepLog() {
+    const step = this.steps[this.currentStep];
+    if (!step) return '';
+    const vars = Object.entries(step.vars || {});
+
+    const history = this.steps.slice(0, this.currentStep + 1).map((s, i) =>
+      `<div class="hist-item ${i === this.currentStep ? 'current' : ''}" onclick="app.gotoStep(${i})">
+        <span style="color:var(--text-muted);margin-right:6px;">${i+1}.</span>${s.desc}
+      </div>`
+    ).reverse().join('');
+
+    return `<div class="step-log">
+      <div class="step-desc">${step.desc}</div>
+      ${vars.length > 0 ? `
+      <div class="vars-section">
+        <div class="vars-title">Variables</div>
+        ${vars.map(([k,v]) => `<div class="var-row"><span class="var-name">${k}</span>: ${typeof v === 'object' ? JSON.stringify(v) : v}</div>`).join('')}
+      </div>` : ''}
+      <div class="vars-title">History</div>
+      <div>${history}</div>
+    </div>`;
+  }
+
+  // ── INTUITION MODE ──
+  renderIntuitionMode() {
+    const stages = INTUITION_STAGES;
+    const cur = this.intuitionStage;
+
+    const leftPanel = stages.map((s, i) => {
+      let cls = 'future';
+      if (i === cur) cls = 'active';
+      else if (i < cur) cls = 'past';
+      return `<div class="stage-card ${cls}" onclick="app.gotoStage(${i})">
+        <div style="display:flex;align-items:center;margin-bottom:8px;">
+          <span class="stage-num">${i+1}</span>
+          <span class="stage-title">${s.title}</span>
+        </div>
+        ${i === cur ? `
+          <div class="thought-bubble">💭 ${s.thought}</div>
+          <div class="stage-content">${s.content}</div>
+          <div class="key-insight">💡 <strong>Key Insight:</strong> ${s.insight}</div>
+        ` : ''}
+      </div>`;
+    }).join('');
+
+    const rightPanel = this.renderIntuitionViz(cur);
+
+    return `
+      <div style="display:flex;width:100%;height:100%;overflow:hidden;">
+        <div style="width:50%;overflow-y:auto;padding:14px;border-right:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px;">Senior Engineer's Thought Process</div>
+          ${leftPanel}
+        </div>
+        <div style="width:50%;overflow-y:auto;padding:14px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px;">Visual Explanation</div>
+          ${rightPanel}
+        </div>
+      </div>`;
+  }
+
+  renderIntuitionViz(stage) {
+    const vizType = INTUITION_STAGES[stage].viz;
+    switch (vizType) {
+      case 'problem_intro': return this.vizProblemIntro();
+      case 'constraint_extraction': return this.vizConstraints();
+      case 'graph_build': return this.vizGraphBuild();
+      case 'kahn_demo': return this.vizKahn();
+      case 'complexity': return this.vizComplexity();
+      case 'edge_cases': return this.vizEdgeCases();
+      case 'final_demo': return this.vizFinalDemo();
+      default: return '';
+    }
+  }
+
+  card(content) {
+    return `<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;line-height:1.7;color:var(--text-secondary);">${content}</div>`;
+  }
+  
+  highlightCard(content, color = 'var(--accent)') {
+    return `<div style="background:rgba(0,0,0,0.1);border-left:3px solid ${color};border-radius:0 6px 6px 0;padding:10px 14px;margin-bottom:10px;font-size:12px;line-height:1.7;color:var(--text-secondary);">${content}</div>`;
+  }
+
+  vizProblemIntro() {
+    return this.card(`
+      <strong style="color:var(--text-primary);display:block;margin-bottom:8px;">Input: sorted words in foreign alphabet</strong>
+      <div style="font-family:var(--font-mono);color:var(--syn-string);">["wrt", "wrf", "er", "ett", "rftt"]</div>
+      <br>
+      <strong style="color:var(--text-primary);">Goal:</strong> Find the character ordering of this alphabet.
+      <br><br>
+      <strong style="color:var(--warning);">Key idea:</strong> If "wrt" comes before "wrf", then at the first difference (index 2): <strong>t &lt; f</strong> in this alphabet.
+      <br><br>
+      <svg viewBox="0 0 340 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin-top:8px;">
+        <text x="10" y="28" font-size="13" font-family="monospace" fill="var(--syn-string)">w r t</text>
+        <text x="10" y="56" font-size="13" font-family="monospace" fill="var(--syn-string)">w r f</text>
+        <rect x="30" y="38" width="12" height="24" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="2"/>
+        <rect x="30" y="10" width="12" height="24" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="2"/>
+        <text x="60" y="36" font-size="11" fill="var(--text-muted)">same</text>
+        <text x="60" y="56" font-size="11" fill="var(--text-muted)">same</text>
+        <text x="115" y="22" font-size="12" fill="var(--warning)">← different!</text>
+        <line x1="170" y1="28" x2="220" y2="28" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#ah2)"/>
+        <text x="230" y="32" font-size="13" font-family="monospace" fill="var(--syn-keyword)">t → f</text>
+        <defs><marker id="ah2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--accent)"/></marker></defs>
+      </svg>
+    `);
+  }
+
+  vizConstraints() {
+    const pairs = [
+      { w1: 'wrt', w2: 'wrf', j: 2, c1: 't', c2: 'f' },
+      { w1: 'wrf', w2: 'er',  j: 0, c1: 'w', c2: 'e' },
+      { w1: 'er',  w2: 'ett', j: 1, c1: 'r', c2: 't' },
+      { w1: 'ett', w2: 'rftt',j: 0, c1: 'e', c2: 'r' },
+    ];
+    const rows = pairs.map(p => `
+      <tr>
+        <td style="font-family:var(--font-mono);color:var(--syn-string);">"${p.w1}" vs "${p.w2}"</td>
+        <td style="text-align:center;color:var(--text-muted);">${p.j}</td>
+        <td style="font-family:var(--font-mono);color:var(--syn-keyword);">${p.c1} → ${p.c2}</td>
+      </tr>`).join('');
+
+    return `<table class="cmp-table" style="margin-bottom:12px;">
+      <tr><th>Word Pair</th><th>First Diff Index</th><th>Constraint</th></tr>
+      ${rows}
+    </table>
+    ${this.card('<strong style="color:var(--text-primary);">Result:</strong> 4 edges extracted: t→f, w→e, r→t, e→r')}`;
+  }
+
+  vizGraphBuild() {
+    return `
+    ${this.card(`<strong style="color:var(--text-primary);">Graph after extracting all constraints:</strong><br><br>
+      Nodes: w, e, r, t, f<br>
+      Edges: w→e, e→r, r→t, t→f<br><br>
+      <strong>in_degree:</strong> w=0, e=1, r=1, t=1, f=1`)}
+    <svg viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+      <defs><marker id="ga" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--edge-default)"/></marker></defs>
+      ${[['w',30],['e',95],['r',160],['t',225],['f',300]].map(([c,x]) => `
+        <circle cx="${x}" cy="65" r="22" fill="var(--node-default)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="${x}" y="69" text-anchor="middle" dominant-baseline="middle" font-size="15" font-weight="700" font-family="monospace" fill="var(--text-primary)">${c}</text>
+      `).join('')}
+      ${[[30,95],[95,160],[160,225],[225,300]].map(([x1,x2]) =>
+        `<line x1="${x1+22}" y1="65" x2="${x2-22}" y2="65" stroke="var(--edge-default)" stroke-width="2" marker-end="url(#ga)"/>`
+      ).join('')}
+    </svg>`;
+  }
+
+  vizKahn() {
+    const steps = [
+      { q: ['w'], res: '', note: 'Start: only w has in_degree=0' },
+      { q: ['e'], res: 'w', note: 'Pop w → result="w", push e (in_deg→0)' },
+      { q: ['r'], res: 'we', note: 'Pop e → result="we", push r (in_deg→0)' },
+      { q: ['t'], res: 'wer', note: 'Pop r → result="wer", push t (in_deg→0)' },
+      { q: ['f'], res: 'wert', note: 'Pop t → result="wert", push f (in_deg→0)' },
+      { q: [], res: 'wertf', note: 'Pop f → result="wertf". Queue empty!' },
+    ];
+    return steps.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;background:${i===steps.length-1?'rgba(166,227,161,0.08)':'var(--bg-secondary)'};margin-bottom:6px;border:1px solid ${i===steps.length-1?'rgba(166,227,161,0.3)':'var(--border)'};">
+        <span style="font-size:10px;color:var(--text-muted);min-width:14px;">${i+1}.</span>
+        <span style="font-size:11px;color:var(--text-secondary);flex:1;">${s.note}</span>
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--syn-string);">${s.res || '""'}</span>
+      </div>`).join('');
+  }
+
+  vizComplexity() {
+    return `
+    ${this.highlightCard(`<strong>Time: O(C)</strong> where C = total characters in all words<br>
+    <span style="margin-left:12px;">• Input scan: O(C)</span><br>
+    <span style="margin-left:12px;">• Graph ops: O(V+E) = O(26 + 26²) = O(1) for fixed alphabet</span>`, 'var(--accent)')}
+    ${this.highlightCard(`<strong>Space: O(U)</strong> where U = unique characters (≤ 26)<br>
+    <span style="margin-left:12px;">• adj & in_degree: at most 26 entries</span><br>
+    <span style="margin-left:12px;">• BFS queue: at most 26 chars</span>`, 'var(--success)')}
+    ${this.card(`<strong style="color:var(--text-primary);">vs Brute Force:</strong><br>
+    Trying all permutations: O(26! × C) = impossibly slow<br>
+    Our topological approach: O(C) — optimal!`)}`;
+  }
+
+  vizEdgeCases() {
+    const cases = [
+      { title: 'Prefix Violation', input: '["abc", "ab"]', result: '""', color: 'var(--error)', reason: '"abc" before "ab" is impossible — "ab" is a prefix of "abc"' },
+      { title: 'Cycle', input: '["ab", "ba"]', result: '""', color: 'var(--error)', reason: 'a→b and b→a creates a cycle' },
+      { title: 'Single Word', input: '["abc"]', result: '"abc" (any order)', color: 'var(--success)', reason: 'No constraints — all orderings valid' },
+      { title: 'Duplicates', input: '["abc", "abc"]', result: '"abc"', color: 'var(--success)', reason: 'No constraint extracted from equal words' },
+    ];
+    return cases.map(c => `
+      <div style="border-left:3px solid ${c.color};padding:8px 12px;margin-bottom:8px;border-radius:0 6px 6px 0;background:var(--bg-secondary);">
+        <div style="font-weight:600;font-size:12px;color:var(--text-primary);">${c.title}</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">${c.input}</div>
+        <div style="font-size:11px;color:${c.color};margin-top:3px;">Returns: ${c.result}</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">${c.reason}</div>
+      </div>`).join('');
+  }
+
+  vizFinalDemo() {
+    return `
+    ${this.card(`<strong style="color:var(--text-primary);">Input: ["wrt","wrf","er","ett","rftt"]</strong><br><br>
+    <strong>Edges:</strong> t→f, w→e, r→t, e→r<br>
+    <strong>Chain:</strong> w → e → r → t → f<br>
+    <strong>Output:</strong> <span style="font-family:var(--font-mono);color:var(--success);">"wertf"</span>`)}
+    <svg viewBox="0 0 340 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+      <defs><marker id="fd" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--success)"/></marker></defs>
+      ${[['w',30],['e',95],['r',160],['t',225],['f',300]].map(([c,x]) => `
+        <circle cx="${x}" cy="40" r="22" fill="var(--node-visited)" stroke="var(--success)" stroke-width="2"/>
+        <text x="${x}" y="44" text-anchor="middle" dominant-baseline="middle" font-size="15" font-weight="700" font-family="monospace" fill="#11111b">${c}</text>
+      `).join('')}
+      ${[[30,95],[95,160],[160,225],[225,300]].map(([x1,x2]) =>
+        `<line x1="${x1+22}" y1="40" x2="${x2-22}" y2="40" stroke="var(--success)" stroke-width="2.5" marker-end="url(#fd)"/>`
+      ).join('')}
+    </svg>
+    ${this.card('Switch to <strong>Execution mode</strong> to trace through every step of the algorithm!')}`;
+  }
+
+  // ── CONTROLS ──
+  setMode(m) {
+    this.stopPlay();
+    this.mode = m;
+    this.render();
+    this.attachEvents();
+  }
+
+  toggleTheme() {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', this.theme);
+    this.render();
+    this.attachEvents();
+  }
+
+  onParseInput() {
+    const field = document.getElementById('inputField');
+    if (field) this.inputValue = field.value;
+    this.parseAndSimulate();
+    this.render();
+    this.attachEvents();
+  }
+
+  stepFwd() { if (this.currentStep < this.steps.length - 1) { this.currentStep++; this.updateExecution(); } }
+  stepBack() { if (this.currentStep > 0) { this.currentStep--; this.updateExecution(); } }
+  reset() { this.currentStep = 0; this.updateExecution(); }
+  gotoStep(i) { this.currentStep = i; this.updateExecution(); }
+
+  togglePlay() {
+    if (this.isPlaying) this.stopPlay(); else this.startPlay();
+  }
+
+  startPlay() {
+    this.isPlaying = true;
+    this.playInterval = setInterval(() => {
+      if (this.currentStep >= this.steps.length - 1) { this.stopPlay(); return; }
+      this.currentStep++;
+      this.updateExecution();
+    }, 1000 / this.speed);
+    this.updateExecution();
+  }
+
+  stopPlay() {
+    this.isPlaying = false;
+    clearInterval(this.playInterval);
+  }
+
+  setSpeed(s) { this.speed = s; if (this.isPlaying) { this.stopPlay(); this.startPlay(); } }
+
+  // Intuition controls
+  nextStage() { if (this.intuitionStage < INTUITION_STAGES.length - 1) { this.intuitionStage++; this.render(); this.attachEvents(); } }
+  prevStage() { if (this.intuitionStage > 0) { this.intuitionStage--; this.render(); this.attachEvents(); } }
+  gotoStage(i) { this.intuitionStage = i; this.render(); this.attachEvents(); }
+
+  toggleIntuitionPlay() {
+    if (this.isPlaying) { this.stopPlay(); this.render(); this.attachEvents(); return; }
+    this.isPlaying = true;
+    this.render(); this.attachEvents();
+    this.playInterval = setInterval(() => {
+      if (this.intuitionStage >= INTUITION_STAGES.length - 1) { this.stopPlay(); this.render(); this.attachEvents(); return; }
+      this.intuitionStage++;
+      this.render(); this.attachEvents();
+    }, 4000 / this.speed);
+  }
+
+  // Partial update (execution mode only — avoid full re-render for performance)
+  updateExecution() {
+    if (this.mode !== 'execution') return;
+    // Update code panel
+    const codePanel = document.querySelector('#panelCode .panel-content');
+    if (codePanel) codePanel.innerHTML = this.renderCodePanel();
+    // Update viz
+    const vizArea = document.querySelector('.viz-svg-area');
+    if (vizArea) vizArea.innerHTML = this.renderGraph();
+    // Update controls
+    const ctrlArea = document.querySelector('.viz-controls');
+    if (ctrlArea) ctrlArea.outerHTML = this.renderControls();
+    // Rebuild controls after replace
+    this.rebindVizControls();
+    // Update step log
+    const logContent = document.getElementById('stepLogContent');
+    if (logContent) logContent.innerHTML = this.renderStepLog();
+    // Update panel header step count
+    const panelHdr = document.querySelector('#panelViz .panel-header span');
+    if (panelHdr) panelHdr.textContent = `Step ${this.currentStep + 1}/${this.steps.length}`;
+    // Scroll log to top (latest history entry)
+    if (logContent) logContent.scrollTop = 0;
+  }
+
+  rebindVizControls() {
+    // After innerHTML swap, buttons lose their onclick; re-render viz panel controls
+    const ctrlArea = document.querySelector('.viz-controls');
+    if (!ctrlArea) return;
+    ctrlArea.outerHTML = this.renderControls();
+  }
+
+  // ── PANEL RESIZE ──
+  bindPanelResize() {
+    if (this.mode !== 'execution') return;
+    ['resizer0', 'resizer1'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const panels = ['panelCode', 'panelViz', 'panelLog'];
+        const main = document.getElementById('mainPanels');
+        const mainW = main.offsetWidth;
+        const startX = e.clientX;
+        const startWidths = panels.map(pid => document.getElementById(pid)?.offsetWidth || 0);
+
+        const onMove = (me) => {
+          const dx = me.clientX - startX;
+          const dPct = dx / mainW * 100;
+          const ws = [...this.panelWidths];
+          ws[idx] += dPct;
+          ws[idx + 1] -= dPct;
+          if (ws[idx] < 15 || ws[idx + 1] < 10) return;
+          this.panelWidths = ws;
+          panels.forEach((pid, i) => {
+            const p = document.getElementById(pid);
+            if (p) p.style.width = ws[i] + '%';
+          });
+        };
+        const onUp = () => {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    });
+  }
+
+  attachEvents() {
+    this.bindPanelResize();
+    document.onkeydown = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT') return;
+      if (e.code === 'Space') { e.preventDefault(); this.mode === 'execution' ? this.togglePlay() : this.toggleIntuitionPlay(); }
+      else if (e.code === 'ArrowRight') { e.preventDefault(); this.mode === 'execution' ? this.stepFwd() : this.nextStage(); }
+      else if (e.code === 'ArrowLeft') { e.preventDefault(); this.mode === 'execution' ? this.stepBack() : this.prevStage(); }
+    };
+  }
+}
+
+// Boot
+const app = new App();
+</script>
+</body>
+</html>
