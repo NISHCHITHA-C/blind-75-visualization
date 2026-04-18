@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>213. House Robber II - Visualizer</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-tertiary: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border: #d1d5db;
+    --accent: #3b82f6;
+    --accent2: #10b981;
+    --highlight: #fef3c7;
+    --highlight-border: #f59e0b;
+    --code-bg: #f9fafb;
+    --font-mono: 'Consolas','Monaco','Courier New',monospace;
+    --syn-keyword: #d73a49;
+    --syn-function: #6f42c1;
+    --syn-string: #032f62;
+    --syn-comment: #6a737d;
+    --syn-type: #005cc5;
+    --syn-number: #098658;
+    --syn-decorator: #e36209;
+    --panel-header: #e5e7eb;
+  }
+  [data-theme="dark"] {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #181825;
+    --bg-tertiary: #313244;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --border: #45475a;
+    --accent: #89b4fa;
+    --accent2: #a6e3a1;
+    --highlight: rgba(249,168,37,0.13);
+    --highlight-border: #f9a825;
+    --code-bg: #11111b;
+    --syn-keyword: #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string: #f1fa8c;
+    --syn-comment: #6272a4;
+    --syn-type: #8be9fd;
+    --syn-number: #bd93f9;
+    --syn-decorator: #ffb86c;
+    --panel-header: #313244;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: var(--bg-secondary); color: var(--text-primary); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* HEADER */
+  #header { background: var(--bg-primary); border-bottom: 1px solid var(--border); padding: 10px 16px; flex-shrink: 0; }
+  #header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  #header-top h1 { font-size: 16px; font-weight: 700; }
+  .badge { background: var(--accent); color: #fff; border-radius: 4px; font-size: 11px; padding: 2px 7px; margin-left: 8px; }
+  .theme-btn { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 12px; }
+  .theme-btn:hover { background: var(--bg-tertiary); }
+
+  /* MODE TOGGLE */
+  .mode-row { display: flex; gap: 8px; }
+  .mode-btn { flex: 1; padding: 7px 0; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all .15s; }
+  .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .mode-btn:not(.active):hover { background: var(--bg-tertiary); }
+
+  /* INPUT ROW */
+  .input-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .input-row label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  .input-row input { flex: 1; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 5px 9px; font-size: 12px; font-family: var(--font-mono); }
+  .input-row button { background: var(--accent); color: #fff; border: none; border-radius: 5px; padding: 5px 12px; cursor: pointer; font-size: 12px; }
+
+  /* MAIN */
+  #main { flex: 1; display: flex; overflow: hidden; }
+
+  /* PANELS */
+  .panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); min-width: 120px; }
+  .panel:last-child { border-right: none; }
+  .panel-header { background: var(--panel-header); padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
+  .panel-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
+
+  /* CODE PANEL */
+  #code-panel { width: 30%; }
+  .code-wrap { font-family: var(--font-mono); font-size: 14px; line-height: 1.0; background: var(--code-bg); color: var(--text-primary); height: 100%; }
+  .code-wrap pre { margin: 0; padding: 12px 0; }
+  .code-line { display: flex; align-items: stretch; min-height: 20px; transition: background .15s; padding: 1px 0; }
+  .code-line.active { background: var(--highlight); border-left: 2px solid var(--highlight-border); }
+  .line-num { display: inline-flex; align-items: center; justify-content: flex-end; min-width: 36px; padding-right: 12px; color: var(--text-secondary); user-select: none; font-size: 12px; opacity: .6; }
+  .line-code { flex: 1; white-space: pre; color: inherit; padding-right: 12px; }
+
+  /* Syntax colors */
+  .sk { color: var(--syn-keyword); font-weight: 600; }
+  .sf { color: var(--syn-function); }
+  .ss { color: var(--syn-string); }
+  .sc { color: var(--syn-comment); font-style: italic; }
+  .st { color: var(--syn-type); }
+  .sn { color: var(--syn-number); }
+  .sd { color: var(--syn-decorator); }
+
+  /* VIZ PANEL */
+  #viz-panel { flex: 1; }
+  .viz-body { padding: 16px; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+  svg.main-viz { width: 100%; }
+
+  /* Controls */
+  .controls { background: var(--bg-primary); border-top: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .ctrl-btn { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 14px; }
+  .ctrl-btn:hover { background: var(--bg-tertiary); }
+  .ctrl-btn.play { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .speed-sel { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 4px 7px; font-size: 12px; }
+  .step-counter { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+
+  /* STEP LOG */
+  #log-panel { width: 22%; }
+  .log-body { padding: 10px; font-size: 12px; }
+  .log-desc { background: var(--bg-tertiary); border-radius: 6px; padding: 10px; margin-bottom: 10px; line-height: 1.5; color: var(--text-primary); font-size: 12px; }
+  .vars-grid { display: grid; gap: 4px; margin-bottom: 10px; }
+  .var-row { display: flex; justify-content: space-between; background: var(--bg-secondary); border-radius: 4px; padding: 4px 8px; gap: 8px; }
+  .var-name { color: var(--accent); font-family: var(--font-mono); font-weight: 600; }
+  .var-val { color: var(--text-primary); font-family: var(--font-mono); font-size: 11px; word-break: break-all; }
+  .history-item { padding: 5px 8px; border-radius: 4px; margin: 2px 0; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+  .history-item.current { background: var(--bg-tertiary); color: var(--text-primary); font-weight: 600; }
+  .history-item:hover { background: var(--bg-tertiary); }
+
+  /* INTUITION MODE */
+  #intuition-main { display: flex; flex: 1; overflow: hidden; }
+  .int-left { width: 50%; border-right: 1px solid var(--border); overflow-y: auto; padding: 20px; }
+  .int-right { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg-secondary); }
+  .stage-card { padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 14px; background: var(--bg-primary); transition: opacity .3s, border-color .3s; }
+  .stage-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,.12); }
+  .stage-card.past { opacity: .55; }
+  .stage-card.future { opacity: .25; }
+  .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; margin-right: 8px; }
+  .stage-title { font-size: 14px; font-weight: 700; display: inline; }
+  .thought-bubble { background: rgba(59,130,246,.08); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 9px 13px; margin: 10px 0; font-style: italic; font-size: 13px; color: var(--text-secondary); }
+  .stage-content { font-size: 13px; line-height: 1.65; color: var(--text-secondary); white-space: pre-line; }
+  .key-insight { background: rgba(16,185,129,.09); border-left: 3px solid var(--accent2); border-radius: 0 6px 6px 0; padding: 9px 13px; margin-top: 10px; font-size: 13px; }
+  .int-controls { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
+  .int-ctrl { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+  .int-ctrl:hover { background: var(--bg-tertiary); }
+  .int-ctrl.play { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* DP table */
+  .dp-table { border-collapse: collapse; font-family: var(--font-mono); font-size: 13px; }
+  .dp-table td, .dp-table th { border: 1px solid var(--border); padding: 6px 10px; text-align: center; min-width: 36px; }
+  .dp-table th { background: var(--bg-tertiary); font-weight: 700; color: var(--text-secondary); font-size: 11px; }
+  .dp-table td.active-cell { background: rgba(249,168,37,.25); border-color: var(--highlight-border); font-weight: 700; }
+  .dp-table td.computed { background: rgba(59,130,246,.1); }
+  .dp-table td.best { background: rgba(16,185,129,.2); font-weight: 700; }
+
+  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); margin-bottom: 8px; }
+  .info-box { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-size: 13px; line-height: 1.6; }
+  .info-box.green { border-color: var(--accent2); background: rgba(16,185,129,.06); }
+  .info-box.blue { border-color: var(--accent); background: rgba(59,130,246,.06); }
+  .info-box.yellow { border-color: var(--highlight-border); background: rgba(249,168,37,.08); }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 2px; }
+  .tag.green { background: rgba(16,185,129,.15); color: var(--accent2); }
+  .tag.red { background: rgba(239,68,68,.13); color: #ef4444; }
+  .tag.blue { background: rgba(59,130,246,.15); color: var(--accent); }
+  .hidden { display: none !important; }
+
+  /* Resizer */
+  .resizer { width: 5px; background: var(--border); cursor: col-resize; flex-shrink: 0; transition: background .1s; }
+  .resizer:hover, .resizer.dragging { background: var(--accent); }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="header">
+  <div id="header-top">
+    <div style="display:flex;align-items:center;gap:10px">
+      <h1>213. House Robber II</h1>
+      <span class="badge">Medium</span>
+      <span class="badge" style="background:var(--accent2)">DP</span>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">☀️ Light</button>
+  </div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="btn-intuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
+    <button class="mode-btn" id="btn-execution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
+  </div>
+  <div class="input-row" id="input-row" style="display:none">
+    <label>nums =</label>
+    <input id="input-val" value="[2,3,2]" />
+    <button onclick="rerun()">▶ Run</button>
+  </div>
+</div>
+
+<!-- INTUITION MODE -->
+<div id="intuition-main">
+  <div class="int-left" id="int-left"></div>
+  <div class="int-right" id="int-right"></div>
+</div>
+
+<!-- EXECUTION MODE -->
+<div id="exec-main" class="hidden" style="flex:1;display:flex;overflow:hidden;">
+  <div class="panel" id="code-panel">
+    <div class="panel-header">Code</div>
+    <div class="panel-body">
+      <div class="code-wrap"><pre id="code-pre"></pre></div>
+    </div>
+  </div>
+  <div class="resizer" id="r1"></div>
+  <div class="panel" id="viz-panel">
+    <div class="panel-header">
+      <span>Visualization</span>
+      <span id="phase-label" style="font-size:11px;color:var(--accent)"></span>
+    </div>
+    <div class="panel-body viz-body" id="viz-body"></div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="stepBack()" title="Back">⏮</button>
+      <button class="ctrl-btn" onclick="stepBack1()" title="Step Back">◀</button>
+      <button class="ctrl-btn play" id="play-btn" onclick="togglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="stepFwd()" title="Step Fwd">▶|</button>
+      <button class="ctrl-btn" onclick="stepEnd()" title="End">⏭</button>
+      <select class="speed-sel" id="speed-sel" onchange="setSpeed(this.value)">
+        <option value="2000">0.5×</option>
+        <option value="1000" selected>1×</option>
+        <option value="500">2×</option>
+        <option value="250">4×</option>
+      </select>
+      <span class="step-counter" id="step-counter">Step 1 / 1</span>
+    </div>
+  </div>
+  <div class="resizer" id="r2"></div>
+  <div class="panel" id="log-panel">
+    <div class="panel-header">Step Log</div>
+    <div class="panel-body log-body" id="log-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── SYNTAX HIGHLIGHTING ────────────────────────────────────────────────────
+const PYTHON_CODE = [
+  'from typing import List',
+  'class Solution:',
+  '    def rob(self, nums: List[int]) -> int:',
+  '        n = len(nums)',
+  '        # Edge cases',
+  '        if n == 1:',
+  '            return nums[0]',
+  '        if n == 2:',
+  '            return max(nums)',
+  '        def rob_linear(houses: List[int]) -> int:',
+  '            \'\'\'Space-optimised O(n) DP on a linear street.\'\'\'',
+  '            prev2, prev1 = 0, 0',
+  '            for amount in houses:',
+  '                prev2, prev1 = prev1, max(prev1, prev2 + amount)',
+  '            return prev1',
+  '        # Case 1: rob houses 0..n-2 (first included, last excluded)',
+  '        # Case 2: rob houses 1..n-1 (first excluded, last included)',
+  '        return max(',
+  '            rob_linear(nums[:-1]),',
+  '            rob_linear(nums[1:])',
+  '        )'
+].join('\n');
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// Token-based Python highlighter — never re-processes injected spans
+function highlightPython(rawLine) {
+  const KEYWORDS = new Set(['def','class','return','if','elif','else','for','while',
+    'in','and','or','not','import','from','True','False','None','lambda','pass',
+    'break','continue','with','as','try','except','finally','raise','yield']);
+  const TYPES = new Set(['List','Dict','Tuple','Set','Optional','Union','Any',
+    'int','str','bool','float','bytes','type']);
+
+  // Tokenize: comment, docstring-line, string, word, number, other
+  const tokens = [];
+  let i = 0;
+  const s = rawLine;
+
+  while (i < s.length) {
+    // Inline comment
+    if (s[i] === '#') {
+      tokens.push({ t: 'comment', v: s.slice(i) });
+      break;
+    }
+    // Triple-quoted string (single line occurrence)
+    if (s.slice(i, i+3) === '"""' || s.slice(i, i+3) === "'''") {
+      const q = s.slice(i, i+3);
+      let j = i + 3;
+      while (j < s.length && s.slice(j, j+3) !== q) j++;
+      j += 3;
+      tokens.push({ t: 'string', v: s.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // Single/double quoted string
+    if (s[i] === '"' || s[i] === "'") {
+      const q = s[i];
+      let j = i + 1;
+      while (j < s.length && s[j] !== q) {
+        if (s[j] === '\\') j++;
+        j++;
+      }
+      j++;
+      tokens.push({ t: 'string', v: s.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // Word (identifier / keyword)
+    if (/[a-zA-Z_]/.test(s[i])) {
+      let j = i;
+      while (j < s.length && /[a-zA-Z0-9_]/.test(s[j])) j++;
+      const word = s.slice(i, j);
+      // Check if followed by '('
+      let k = j;
+      while (k < s.length && s[k] === ' ') k++;
+      const isCall = s[k] === '(';
+      if (KEYWORDS.has(word)) tokens.push({ t: 'kw', v: word });
+      else if (TYPES.has(word)) tokens.push({ t: 'type', v: word });
+      else if (isCall) tokens.push({ t: 'fn', v: word });
+      else tokens.push({ t: 'ident', v: word });
+      i = j;
+      continue;
+    }
+    // Number
+    if (/[0-9]/.test(s[i])) {
+      let j = i;
+      while (j < s.length && /[0-9.]/.test(s[j])) j++;
+      tokens.push({ t: 'num', v: s.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // Other character
+    tokens.push({ t: 'other', v: s[i] });
+    i++;
+  }
+
+  // Render tokens to HTML
+  return tokens.map(tok => {
+    const e = escapeHtml(tok.v);
+    switch (tok.t) {
+      case 'kw':      return `<span class="sk">${e}</span>`;
+      case 'type':    return `<span class="st">${e}</span>`;
+      case 'fn':      return `<span class="sf">${e}</span>`;
+      case 'string':  return `<span class="ss">${e}</span>`;
+      case 'comment': return `<span class="sc">${e}</span>`;
+      case 'num':     return `<span class="sn">${e}</span>`;
+      default:        return e;
+    }
+  }).join('');
+}
+
+function buildCodePanel(activeLine) {
+  const lines = PYTHON_CODE.split('\n');
+  const pre = document.getElementById('code-pre');
+  if (!pre) return;
+  pre.innerHTML = '';
+  lines.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'code-line' + (i === activeLine ? ' active' : '');
+    div.innerHTML =
+      `<span class="line-num">${i + 1}</span>` +
+      `<span class="line-code">${highlightPython(line) || '&nbsp;'}</span>`;
+    pre.appendChild(div);
+  });
+  // Scroll active line into view
+  const active = pre.querySelector('.active');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+}
+
+// ─── SIMULATION ─────────────────────────────────────────────────────────────
+let steps = [];
+let currentStep = 0;
+let playTimer = null;
+let playSpeed = 1000;
+
+function parseNums(str) {
+  try {
+    const arr = JSON.parse(str.trim());
+    if (Array.isArray(arr) && arr.every(Number.isFinite)) return arr;
+  } catch {}
+  return null;
+}
+
+function robLinearTrace(houses, offset, phaseName, steps, nums) {
+  let prev2 = 0, prev1 = 0;
+  steps.push({
+    line: 11, phase: phaseName,
+    desc: `Initialize prev2=0, prev1=0 for ${phaseName}`,
+    vars: { phase: phaseName, houses: JSON.stringify(houses), prev2, prev1, amount: '—', result: '—' },
+    dpState: { houses, prev2, prev1, i: -1, offset }
+  });
+  for (let idx = 0; idx < houses.length; idx++) {
+    const amount = houses[idx];
+    const newPrev1 = Math.max(prev1, prev2 + amount);
+    const newPrev2 = prev1;
+    steps.push({
+      line: 13, phase: phaseName,
+      desc: `House ${idx + offset}: amount=${amount} → max(${prev1}, ${prev2}+${amount})=${newPrev1}`,
+      vars: { phase: phaseName, i: idx + offset, amount, prev2, prev1, 'new prev1': newPrev1 },
+      dpState: { houses, prev2: newPrev2, prev1: newPrev1, i: idx, offset, activeHouse: idx }
+    });
+    prev2 = newPrev2;
+    prev1 = newPrev1;
+  }
+  steps.push({
+    line: 14, phase: phaseName,
+    desc: `${phaseName} result = ${prev1}`,
+    vars: { phase: phaseName, result: prev1 },
+    dpState: { houses, prev2, prev1, i: houses.length, offset, done: true }
+  });
+  return prev1;
+}
+
+function simulate(numsStr) {
+  const nums = parseNums(numsStr);
+  if (!nums) return [];
+  const n = nums.length;
+  const out = [];
+
+  out.push({
+    line: 3, phase: 'init',
+    desc: `Start rob([${nums}]), n = ${n}`,
+    vars: { nums: JSON.stringify(nums), n },
+    dpState: null
+  });
+
+  if (n === 1) {
+    out.push({ line: 5, phase: 'edge', desc: `Edge case: n=1, return ${nums[0]}`, vars: { result: nums[0] }, dpState: null });
+    return out;
+  }
+  if (n === 2) {
+    out.push({ line: 7, phase: 'edge', desc: `Edge case: n=2, return max(${nums})=${Math.max(...nums)}`, vars: { result: Math.max(...nums) }, dpState: null });
+    return out;
+  }
+
+  out.push({ line: 15, phase: 'split', desc: 'Split into Case 1 (no last house) and Case 2 (no first house)', vars: { case1_range: `nums[0..${n-2}]`, case2_range: `nums[1..${n-1}]` }, dpState: null });
+
+  const r1 = robLinearTrace(nums.slice(0, n - 1), 0, 'Case 1 (skip last)', out, nums);
+  const r2 = robLinearTrace(nums.slice(1), 1, 'Case 2 (skip first)', out, nums);
+
+  out.push({
+    line: 17, phase: 'final',
+    desc: `Return max(Case1=${r1}, Case2=${r2}) = ${Math.max(r1, r2)}`,
+    vars: { case1: r1, case2: r2, answer: Math.max(r1, r2) },
+    dpState: null
+  });
+
+  return out;
+}
+
+// ─── VISUALIZATION RENDERER ─────────────────────────────────────────────────
+function renderViz(step, nums) {
+  const body = document.getElementById('viz-body');
+  const phaseLabel = document.getElementById('phase-label');
+  if (!body) return;
+  body.innerHTML = '';
+  if (!step) return;
+
+  // Phase label
+  const phaseColors = { init: '#a6adc8', split: '#89b4fa', 'Case 1 (skip last)': '#f1c27d', 'Case 2 (skip first)': '#89dceb', edge: '#f38ba8', final: '#a6e3a1' };
+  phaseLabel.textContent = step.phase || '';
+  phaseLabel.style.color = phaseColors[step.phase] || 'var(--accent)';
+
+  const n = nums.length;
+
+  // Always draw the house array at top
+  const CELL = 46, GAP = 6, CX0 = 24;
+  const svgW = Math.max(500, n * (CELL + GAP) + CX0 * 2);
+
+  // Build house status
+  let activeHouse = step.dpState ? step.dpState.activeHouse : undefined;
+  let phase = step.phase || '';
+  let houseColor = [];
+  for (let i = 0; i < n; i++) {
+    if (phase === 'split') {
+      houseColor[i] = (i < n - 1) ? '#89b4fa44' : '#f38ba820';
+    } else if (phase.includes('Case 1')) {
+      houseColor[i] = (i === n - 1) ? '#f38ba822' : (i === activeHouse ? '#f9a82566' : '#89b4fa22');
+    } else if (phase.includes('Case 2')) {
+      houseColor[i] = (i === 0) ? '#f38ba822' : (i === activeHouse + 1 ? '#89dceb66' : '#89dceb22');
+    } else if (phase === 'final') {
+      houseColor[i] = '#a6e3a122';
+    } else {
+      houseColor[i] = '#ffffff10';
+    }
+  }
+
+  let cells = '';
+  for (let i = 0; i < n; i++) {
+    const x = CX0 + i * (CELL + GAP);
+    const isCurrent = (phase.includes('Case 1') && i === activeHouse) ||
+                      (phase.includes('Case 2') && step.dpState && i === step.dpState.activeHouse + 1);
+    cells += `
+      <rect x="${x}" y="24" width="${CELL}" height="${CELL}" rx="7"
+        fill="${houseColor[i]}" stroke="${isCurrent ? '#f9a825' : 'var(--border)'}"
+        stroke-width="${isCurrent ? 2 : 1}" />
+      <text x="${x + CELL/2}" y="${24 + CELL/2 + 6}" text-anchor="middle"
+        fill="${isCurrent ? '#f9a825' : 'var(--text-primary)'}"
+        font-size="16" font-weight="${isCurrent ? '700' : '500'}"
+        font-family="var(--font-mono)">${nums[i]}</text>
+      <text x="${x + CELL/2}" y="20" text-anchor="middle"
+        fill="var(--text-secondary)" font-size="11"
+        font-family="var(--font-mono)">${i}</text>`;
+    // Range indicators
+    if (phase.includes('Case 1') && i === n - 1) {
+      cells += `<text x="${x + CELL/2}" y="${24 + CELL + 15}" text-anchor="middle" fill="#f38ba8" font-size="10">skip</text>`;
+    }
+    if (phase.includes('Case 2') && i === 0) {
+      cells += `<text x="${x + CELL/2}" y="${24 + CELL + 15}" text-anchor="middle" fill="#f38ba8" font-size="10">skip</text>`;
+    }
+  }
+
+  // Draw bracket for active range
+  let bracket = '';
+  if (phase.includes('Case 1') || phase.includes('Case 2')) {
+    const lo = phase.includes('Case 2') ? 1 : 0;
+    const hi = phase.includes('Case 1') ? n - 2 : n - 1;
+    const x1 = CX0 + lo * (CELL + GAP);
+    const x2 = CX0 + hi * (CELL + GAP) + CELL;
+    const by = 82;
+    const bc = phase.includes('Case 1') ? '#f1c27d' : '#89dceb';
+    bracket = `
+      <line x1="${x1}" y1="${by}" x2="${x2}" y2="${by}" stroke="${bc}" stroke-width="2" />
+      <line x1="${x1}" y1="${by-5}" x2="${x1}" y2="${by+5}" stroke="${bc}" stroke-width="2" />
+      <line x1="${x2}" y1="${by-5}" x2="${x2}" y2="${by+5}" stroke="${bc}" stroke-width="2" />
+      <text x="${(x1+x2)/2}" y="${by+15}" text-anchor="middle" fill="${bc}" font-size="11">${phase}</text>`;
+  }
+
+  const arraySvg = `<svg class="main-viz" viewBox="0 0 ${svgW} 100" style="max-height:110px">${cells}${bracket}</svg>`;
+
+  // DP State boxes
+  let dpHtml = '';
+  if (step.dpState && step.dpState.houses) {
+    const { houses, prev2, prev1, i: dpI, offset, done, activeHouse: ah } = step.dpState;
+    const phaseC = phase.includes('Case 1') ? '#f1c27d' : '#89dceb';
+    dpHtml = `<div class="section-title">DP State (${phase})</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="info-box" style="flex:1;min-width:120px">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">prev2 (dp[i-2])</div>
+          <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--accent)">${prev2}</div>
+        </div>
+        <div class="info-box" style="flex:1;min-width:120px">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">prev1 (dp[i-1])</div>
+          <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:${done ? 'var(--accent2)' : 'var(--accent)'}">${prev1}</div>
+        </div>
+      </div>`;
+
+    // mini DP table
+    const visited = dpI;
+    let tableRows = `<tr><th>i</th><th>house</th><th>prev2</th><th>prev1</th><th>→ new prev1</th></tr>`;
+    let p2 = 0, p1 = 0;
+    for (let j = 0; j < houses.length; j++) {
+      const a = houses[j];
+      const np1 = Math.max(p1, p2 + a);
+      const np2 = p1;
+      const cls = j === ah ? 'active-cell' : (j < (visited !== undefined ? visited + 1 : 0) ? 'computed' : '');
+      tableRows += `<tr>
+        <td class="${cls}">${j + offset}</td>
+        <td class="${cls}">${a}</td>
+        <td class="${cls}">${p2}</td>
+        <td class="${cls}">${p1}</td>
+        <td class="${j === ah ? 'active-cell' : (cls ? cls : '')}">${j <= (visited !== undefined ? visited : -1) ? np1 : '?'}</td>
+      </tr>`;
+      p2 = np2; p1 = np1;
+    }
+    dpHtml += `<div class="section-title">Trace Table</div>
+      <div style="overflow-x:auto"><table class="dp-table">${tableRows}</table></div>`;
+  }
+
+  // Final comparison
+  let finalHtml = '';
+  if (phase === 'final' && step.vars && step.vars.case1 !== undefined) {
+    const { case1, case2, answer } = step.vars;
+    finalHtml = `
+      <div class="section-title" style="margin-top:12px">Result</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="info-box ${case1 >= case2 ? 'green' : ''}" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--text-secondary)">Case 1 (skip last)</div>
+          <div style="font-size:24px;font-weight:700;font-family:var(--font-mono)">${case1}</div>
+        </div>
+        <div class="info-box ${case2 > case1 ? 'green' : ''}" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--text-secondary)">Case 2 (skip first)</div>
+          <div style="font-size:24px;font-weight:700;font-family:var(--font-mono)">${case2}</div>
+        </div>
+        <div class="info-box blue" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--accent)">Answer</div>
+          <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent)">${answer}</div>
+        </div>
+      </div>`;
+  }
+
+  // Split visualization
+  let splitHtml = '';
+  if (phase === 'split') {
+    const n2 = nums.length;
+    splitHtml = `
+      <div class="section-title">Two Sub-Problems</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="info-box yellow" style="flex:1">
+          <div style="font-size:11px;margin-bottom:4px;font-weight:600">Case 1: nums[0..${n2-2}]</div>
+          <div style="font-family:var(--font-mono)">[${nums.slice(0,n2-1).join(', ')}]</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">First house included, last house excluded</div>
+        </div>
+        <div class="info-box blue" style="flex:1">
+          <div style="font-size:11px;margin-bottom:4px;font-weight:600">Case 2: nums[1..${n2-1}]</div>
+          <div style="font-family:var(--font-mono)">[${nums.slice(1).join(', ')}]</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">First house excluded, last house included</div>
+        </div>
+      </div>`;
+  }
+
+  body.innerHTML = `
+    <div class="section-title">Houses (circular arrangement)</div>
+    ${arraySvg}
+    ${splitHtml}
+    ${dpHtml}
+    ${finalHtml}
+  `;
+}
+
+function renderLog(step, idx) {
+  const body = document.getElementById('log-body');
+  if (!body || !step) return;
+
+  const varsHtml = Object.entries(step.vars || {}).map(([k, v]) =>
+    `<div class="var-row"><span class="var-name">${escapeHtml(String(k))}</span><span class="var-val">${escapeHtml(String(v))}</span></div>`
+  ).join('');
+
+  const histHtml = steps.slice(Math.max(0, idx - 12), idx + 1).map((s, i) => {
+    const realIdx = Math.max(0, idx - 12) + i;
+    return `<div class="history-item ${realIdx === idx ? 'current' : ''}" onclick="goStep(${realIdx})">${realIdx + 1}. ${escapeHtml(s.desc)}</div>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="log-desc">${escapeHtml(step.desc)}</div>
+    <div class="section-title">Variables</div>
+    <div class="vars-grid">${varsHtml}</div>
+    <div class="section-title">History</div>
+    ${histHtml}
+  `;
+  // Auto scroll last history item
+  const cur = body.querySelector('.history-item.current');
+  if (cur) cur.scrollIntoView({ block: 'nearest' });
+}
+
+// ─── PLAYBACK ────────────────────────────────────────────────────────────────
+let currentNums = [2, 3, 2];
+
+function goStep(n) {
+  currentStep = Math.max(0, Math.min(steps.length - 1, n));
+  buildCodePanel(steps[currentStep].line);
+  renderViz(steps[currentStep], currentNums);
+  renderLog(steps[currentStep], currentStep);
+  document.getElementById('step-counter').textContent = `Step ${currentStep + 1} / ${steps.length}`;
+}
+
+function stepFwd() { goStep(currentStep + 1); }
+function stepBack1() { goStep(currentStep - 1); }
+function stepBack() { goStep(0); }
+function stepEnd() { goStep(steps.length - 1); }
+
+function togglePlay() {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; document.getElementById('play-btn').textContent = '▶'; }
+  else {
+    document.getElementById('play-btn').textContent = '⏸';
+    playTimer = setInterval(() => {
+      if (currentStep >= steps.length - 1) { clearInterval(playTimer); playTimer = null; document.getElementById('play-btn').textContent = '▶'; return; }
+      goStep(currentStep + 1);
+    }, playSpeed);
+  }
+}
+
+function setSpeed(v) { playSpeed = parseInt(v); if (playTimer) { clearInterval(playTimer); playTimer = null; togglePlay(); } }
+
+function rerun() {
+  const val = document.getElementById('input-val').value.trim();
+  const nums = parseNums(val);
+  if (!nums) { alert('Invalid input. Use format: [2,3,2]'); return; }
+  currentNums = nums;
+  steps = simulate(val);
+  currentStep = 0;
+  goStep(0);
+}
+
+// ─── INTUITION MODE ──────────────────────────────────────────────────────────
+let intuitionStage = 0;
+let intTimer = null;
+
+const STAGES = [
+  {
+    title: 'Understanding the Problem',
+    thought: 'Houses in a circle — robbing the first and last together triggers the alarm. What constraint does that add?',
+    content: `Given n houses in a circle, you can't rob both house 0 and house n-1 (they're adjacent).
+
+Constraints:
+• 1 ≤ nums.length ≤ 100
+• 0 ≤ nums[i] ≤ 1000
+• Adjacent houses have a security connection
+
+This is basically House Robber I (linear) with one extra rule: the street wraps around.`,
+    insight: 'The circular constraint breaks the neat DP of House Robber I. We need to handle it explicitly.',
+    viz: 'circle'
+  },
+  {
+    title: 'The Brute Force Trap',
+    thought: "Can I just add the circular edge to the DP? If I add dp[n-1] can't include dp[0]... that's messy.",
+    content: `Adding the circular constraint directly into the DP state is complex.
+You'd need to track whether house 0 was robbed throughout the entire DP.
+
+That turns O(n) into O(n) with doubled state — doable but ugly.
+
+There's a cleaner insight hiding here...`,
+    insight: "The complexity isn't in the DP itself, but in handling the first/last exclusion elegantly.",
+    viz: 'brute'
+  },
+  {
+    title: 'The Key Insight: Split into Two Linear Problems',
+    thought: "Wait! Either I rob house 0 OR house n-1 — never both. So I can split into two cases and take the max!",
+    content: `Case 1: Rob houses 0 through n-2 (include first, exclude last)
+Case 2: Rob houses 1 through n-1 (exclude first, include last)
+
+Answer = max(case1, case2)
+
+Both cases are standard House Robber I — linear, no circular constraint!`,
+    insight: 'Reducing a circular problem to two linear sub-problems is a classic decomposition trick.',
+    viz: 'split'
+  },
+  {
+    title: 'The Linear DP Helper',
+    thought: "For each linear sub-array, I use the standard rob_linear with rolling variables. O(n) time, O(1) space.",
+    content: `rob_linear(houses):
+  prev2, prev1 = 0, 0
+  for amount in houses:
+    prev2, prev1 = prev1, max(prev1, prev2 + amount)
+  return prev1
+
+prev1 = best loot ending at or before current house
+prev2 = best loot ending at or before previous house
+
+No need for a full DP array — just two variables!`,
+    insight: 'Rolling variable DP gives O(1) space instead of O(n) without losing any information.',
+    viz: 'dp_trace'
+  },
+  {
+    title: 'Complexity Analysis',
+    thought: "Two passes over ~n elements each. O(n) total, O(1) space. That's optimal for this problem.",
+    content: `Time Complexity: O(n)
+  • rob_linear called twice on arrays of size n-1
+  • Each call is O(n) with O(1) inner work
+  • Total: 2 × O(n) = O(n)
+
+Space Complexity: O(1)
+  • Only prev2, prev1 stored — no extra array
+  • The slices nums[:-1] and nums[1:] use O(n)
+    (can be replaced with index ranges to get true O(1))`,
+    insight: 'This is asymptotically optimal: you must read every input element at least once.',
+    viz: 'complexity'
+  },
+  {
+    title: 'Edge Cases',
+    thought: "n=1: only one house, trivially return it. n=2: pick the bigger one — they're adjacent.",
+    content: `n = 1: return nums[0]
+  Only one house, just take it.
+
+n = 2: return max(nums)
+  Two adjacent houses — pick the richer one.
+
+n ≥ 3: apply the split strategy.
+  
+Also: all zeros → 0 ✓
+Large n → still O(n) ✓
+All equal → correct ✓`,
+    insight: 'Edge cases n=1 and n=2 are special because the circular constraint reduces to trivial choices.',
+    viz: 'edge'
+  },
+  {
+    title: 'Final Synthesis',
+    thought: "Elegant! A O(n) solution that reduces a circular problem to two linear ones. Interview gold.",
+    content: `The complete strategy:
+1. Handle trivial n=1, n=2 cases
+2. Run rob_linear on nums[0..n-2] (Case 1)
+3. Run rob_linear on nums[1..n-1] (Case 2)
+4. Return max(Case1, Case2)
+
+The key insight: circular adjacency = mutual exclusion of endpoints
+The key technique: reduce circular → two linear sub-problems
+The key optimization: rolling DP for O(1) space`,
+    insight: 'This pattern — decompose circular into linear — appears in many interval and ring DP problems.',
+    viz: 'final'
+  }
+];
+
+function renderIntViz(stage) {
+  const right = document.getElementById('int-right');
+  const nums = currentNums;
+  const n = nums.length;
+
+  const CELL = 44, GAP = 6;
+
+  // Simple array bar chart
+  const barH = 80, barW = 28, barGap = 8;
+  const maxV = Math.max(...nums, 1);
+
+  const makeBars = (arr, from, colorFn) => {
+    return arr.map((v, i) => {
+      const h = Math.round((v / maxV) * barH) + 4;
+      const x = i * (barW + barGap);
+      return `<g>
+        <rect x="${x}" y="${barH - h}" width="${barW}" height="${h}" rx="3" fill="${colorFn(i)}" />
+        <text x="${x + barW/2}" y="${barH + 14}" text-anchor="middle" font-size="11" fill="var(--text-secondary)">${from + i}</text>
+        <text x="${x + barW/2}" y="${barH - h - 4}" text-anchor="middle" font-size="11" fill="var(--text-primary)" font-weight="600">${v}</text>
+      </g>`;
+    }).join('');
+  };
+
+  const vizMap = {
+    circle: () => `
+      <div class="section-title">The Circular Arrangement</div>
+      <div class="info-box" style="text-align:center;padding:20px">
+        ${renderCircleViz(nums)}
+        <div style="margin-top:12px;font-size:13px;color:var(--text-secondary)">
+          House 0 and House ${n-1} are <strong style="color:#f38ba8">adjacent</strong> — cannot rob both!
+        </div>
+      </div>`,
+    brute: () => `
+      <div class="section-title">Why Direct DP Fails</div>
+      <div class="info-box yellow" style="margin-bottom:10px">
+        <strong>Problem:</strong> dp[n-1] value depends on whether dp[0] was used.<br>
+        Standard DP doesn't track this.
+      </div>
+      <div class="info-box" style="margin-bottom:10px">
+        One option: run DP twice with state tracking<br>
+        → Complex, error-prone code
+      </div>
+      <div class="info-box green">
+        Better option: <strong>split into two clean sub-problems</strong>
+      </div>`,
+    split: () => {
+      const c1 = nums.slice(0, n-1);
+      const c2 = nums.slice(1);
+      const svgW1 = c1.length * (barW + barGap);
+      const svgW2 = c2.length * (barW + barGap);
+      return `
+      <div class="section-title">Two Linear Sub-Problems</div>
+      <div class="info-box yellow" style="margin-bottom:12px">
+        <div style="font-weight:600;margin-bottom:6px">Case 1: indices 0 → ${n-2}</div>
+        <svg viewBox="0 0 ${svgW1} ${barH+20}" style="width:100%;max-height:100px">
+          ${makeBars(c1, 0, i => '#f1c27d66')}
+        </svg>
+      </div>
+      <div class="info-box blue">
+        <div style="font-weight:600;margin-bottom:6px">Case 2: indices 1 → ${n-1}</div>
+        <svg viewBox="0 0 ${svgW2} ${barH+20}" style="width:100%;max-height:100px">
+          ${makeBars(c2, 1, i => '#89b4fa44')}
+        </svg>
+      </div>`;
+    },
+    dp_trace: () => {
+      const houses = nums.slice(0, n-1);
+      let p2 = 0, p1 = 0, rows = '';
+      for (let i = 0; i < houses.length; i++) {
+        const a = houses[i];
+        const np1 = Math.max(p1, p2 + a);
+        rows += `<tr>
+          <td>${i}</td><td>${a}</td>
+          <td>${p2}</td><td>${p1}</td>
+          <td style="color:var(--accent2);font-weight:700">${np1}</td>
+        </tr>`;
+        p2 = p1; p1 = np1;
+      }
+      return `
+      <div class="section-title">rob_linear Trace (Case 1)</div>
+      <div style="overflow-x:auto">
+        <table class="dp-table" style="width:100%">
+          <tr><th>i</th><th>amount</th><th>prev2</th><th>prev1</th><th>new prev1</th></tr>
+          ${rows}
+        </table>
+      </div>
+      <div class="info-box green" style="margin-top:10px">Final result = <strong>${p1}</strong></div>`;
+    },
+    complexity: () => `
+      <div class="section-title">Complexity</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="info-box blue" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--text-secondary)">Time</div>
+          <div style="font-size:24px;font-weight:800;font-family:var(--font-mono)">O(n)</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px">2 passes over n elements</div>
+        </div>
+        <div class="info-box green" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--text-secondary)">Space</div>
+          <div style="font-size:24px;font-weight:800;font-family:var(--font-mono)">O(1)</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px">Only 2 variables stored</div>
+        </div>
+      </div>`,
+    edge: () => `
+      <div class="section-title">Edge Cases</div>
+      ${[['[5]', '→ 5', 'Only one house'], ['[3,7]', '→ 7', 'Two adjacent, pick larger'], ['[0,0,0]', '→ 0', 'All zeros'], ['[1,2,3,1]', '→ 4', 'Circular wrap matters']].map(([inp, out, note]) =>
+        `<div class="info-box" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+          <span><span class="tag blue">${inp}</span> <span class="tag green">${out}</span></span>
+          <span style="font-size:12px;color:var(--text-secondary)">${note}</span>
+        </div>`).join('')}`,
+    final: () => {
+      const r1 = robLinear(nums.slice(0, n-1));
+      const r2 = robLinear(nums.slice(1));
+      const ans = Math.max(r1, r2);
+      return `
+      <div class="section-title">Final Answer for [${nums}]</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="info-box yellow" style="flex:1;text-align:center">
+          <div style="font-size:11px">Case 1</div>
+          <div style="font-size:22px;font-weight:700;font-family:var(--font-mono)">${r1}</div>
+        </div>
+        <div class="info-box blue" style="flex:1;text-align:center">
+          <div style="font-size:11px">Case 2</div>
+          <div style="font-size:22px;font-weight:700;font-family:var(--font-mono)">${r2}</div>
+        </div>
+        <div class="info-box green" style="flex:1;text-align:center">
+          <div style="font-size:11px;color:var(--accent2)">Answer</div>
+          <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent2)">${ans}</div>
+        </div>
+      </div>
+      <div class="info-box" style="font-size:12px;line-height:1.7">
+        🎯 Decompose circular → 2 linear<br>
+        🔁 Rolling DP: O(1) space<br>
+        ⚡ O(n) total — optimal!
+      </div>`;
+    }
+  };
+
+  const fn = vizMap[stage.viz] || vizMap['final'];
+  right.innerHTML = `
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--accent)">Visual Explanation</h3>
+    ${fn()}
+    <div class="int-controls">
+      <button class="int-ctrl" onclick="prevStage()">◀ Prev</button>
+      <button class="int-ctrl play" onclick="toggleIntPlay()">${intTimer ? '⏸ Pause' : '▶ Auto'}</button>
+      <button class="int-ctrl" onclick="nextStage()">Next ▶</button>
+      <span style="margin-left:auto;font-size:12px;color:var(--text-secondary)">Stage ${intuitionStage+1}/${STAGES.length}</span>
+    </div>
+  `;
+}
+
+function renderCircleViz(nums) {
+  const n = nums.length;
+  const cx = 130, cy = 90, r = 70;
+  let items = '';
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const isFirst = i === 0, isLast = i === n - 1;
+    const col = isFirst ? '#f9a825' : isLast ? '#f38ba8' : 'var(--accent)';
+    items += `
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="18"
+        fill="${col}22" stroke="${col}" stroke-width="2" />
+      <text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle"
+        fill="${col}" font-size="13" font-weight="700" font-family="var(--font-mono)">${nums[i]}</text>
+      <text x="${(cx + (r+22)*Math.cos(angle)).toFixed(1)}" y="${(cy + (r+22)*Math.sin(angle)+4).toFixed(1)}"
+        text-anchor="middle" fill="var(--text-secondary)" font-size="10">${i}</text>`;
+  }
+  // Draw dashed edge between house 0 and n-1
+  if (n > 1) {
+    const a0 = -Math.PI / 2, a1 = (2 * Math.PI * (n-1) / n) - Math.PI/2;
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    items = `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"
+      stroke="#f38ba8" stroke-width="2" stroke-dasharray="5,3" opacity=".7" />` + items;
+  }
+  return `<svg viewBox="0 0 260 180" style="width:100%;max-height:180px">${items}</svg>`;
+}
+
+function robLinear(arr) {
+  let p2 = 0, p1 = 0;
+  for (const a of arr) { [p2, p1] = [p1, Math.max(p1, p2 + a)]; }
+  return p1;
+}
+
+function renderIntuition() {
+  const left = document.getElementById('int-left');
+  left.innerHTML = STAGES.map((s, i) => {
+    const state = i === intuitionStage ? 'active' : i < intuitionStage ? 'past' : 'future';
+    return `<div class="stage-card ${state}" id="stage-${i}">
+      <div style="margin-bottom:8px"><span class="stage-num">${i+1}</span><span class="stage-title">${escapeHtml(s.title)}</span></div>
+      <div class="thought-bubble">💭 "${escapeHtml(s.thought)}"</div>
+      <div class="stage-content">${escapeHtml(s.content)}</div>
+      <div class="key-insight"><strong>💡 Key Insight:</strong> ${escapeHtml(s.insight)}</div>
+    </div>`;
+  }).join('');
+
+  const active = document.getElementById(`stage-${intuitionStage}`);
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  renderIntViz(STAGES[intuitionStage]);
+}
+
+function nextStage() {
+  if (intuitionStage < STAGES.length - 1) { intuitionStage++; renderIntuition(); }
+}
+function prevStage() {
+  if (intuitionStage > 0) { intuitionStage--; renderIntuition(); }
+}
+function toggleIntPlay() {
+  if (intTimer) { clearInterval(intTimer); intTimer = null; renderIntViz(STAGES[intuitionStage]); }
+  else {
+    intTimer = setInterval(() => {
+      if (intuitionStage >= STAGES.length - 1) { clearInterval(intTimer); intTimer = null; renderIntViz(STAGES[intuitionStage]); return; }
+      intuitionStage++;
+      renderIntuition();
+    }, 3500);
+    renderIntViz(STAGES[intuitionStage]);
+  }
+}
+
+// ─── MODE SWITCHING ──────────────────────────────────────────────────────────
+let mode = 'intuition';
+
+function setMode(m) {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  if (intTimer) { clearInterval(intTimer); intTimer = null; }
+  mode = m;
+  document.getElementById('btn-intuition').classList.toggle('active', m === 'intuition');
+  document.getElementById('btn-execution').classList.toggle('active', m === 'execution');
+  document.getElementById('intuition-main').style.display = m === 'intuition' ? 'flex' : 'none';
+  document.getElementById('exec-main').classList.toggle('hidden', m !== 'execution');
+  document.getElementById('input-row').style.display = m === 'execution' ? 'flex' : 'none';
+  if (m === 'execution') {
+    steps = simulate(document.getElementById('input-val').value || '[2,3,2]');
+    currentStep = 0;
+    goStep(0);
+  } else {
+    renderIntuition();
+  }
+}
+
+// ─── THEME ────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const body = document.body;
+  const isDark = body.dataset.theme === 'dark';
+  body.dataset.theme = isDark ? 'light' : 'dark';
+  document.querySelector('.theme-btn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
+  if (mode === 'execution') buildCodePanel(steps[currentStep]?.line);
+  else renderIntuition();
+}
+
+// ─── RESIZE ───────────────────────────────────────────────────────────────────
+function initResizer(rId, leftId, rightId) {
+  const r = document.getElementById(rId);
+  const left = document.getElementById(leftId);
+  const right = document.getElementById(rightId);
+  let dragging = false, startX = 0, startLeft = 0, startRight = 0;
+  r.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX;
+    startLeft = left.offsetWidth;
+    startRight = right.offsetWidth;
+    r.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const nl = Math.max(120, startLeft + dx);
+    const nr = Math.max(120, startRight - dx);
+    left.style.width = nl + 'px';
+    right.style.width = nr + 'px';
+    left.style.flex = 'none';
+    right.style.flex = 'none';
+  });
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+    r.classList.remove('dragging');
+    document.body.style.userSelect = '';
+  });
+}
+
+// ─── KEYBOARD ────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (mode === 'execution') {
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowRight') { e.preventDefault(); stepFwd(); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); stepBack1(); }
+  } else {
+    if (e.code === 'ArrowRight') { e.preventDefault(); nextStage(); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); prevStage(); }
+    if (e.code === 'Space') { e.preventDefault(); toggleIntPlay(); }
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+initResizer('r1', 'code-panel', 'viz-panel');
+initResizer('r2', 'viz-panel', 'log-panel');
+
+steps = simulate('[2,3,2]');
+renderIntuition();
+document.getElementById('intuition-main').style.display = 'flex';
+</script>
+</body>
+</html>
