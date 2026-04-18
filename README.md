@@ -102,7 +102,7 @@ Interactive visual explanations of Blind 75 LeetCode problems. Step through algo
 | 2 | Clone Graph | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/02-clone-graph.html) | ✅ Available |
 | 3 | Pacific Atlantic Water Flow | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/03-pacific-atlantic.html) | ✅ Available |
 | 4 | Course Schedule | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/04-course-schedule.html) | ✅ Available |
-| 5 | Number of Connected Components in Undirected Graph | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/05-connected-components.html) | ✅ Available |
+| 5 | Number of Connected Components in Undirected Graph | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/05-longest-consecutive.html) | ✅ Available |
 | 6 | Graph Valid Tree | 🟡 Medium | [▶ Open](https://nishchitha-c.github.io/blind-75-visualization/11-Graphs/06-valid-tree.html) | ✅ Available |
 
 ## 12 - Advanced Graphs
