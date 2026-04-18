@@ -28,16 +28,17 @@
     --font-mono: 'JetBrains Mono', 'Consolas', monospace;
     --font-ui: 'Syne', sans-serif;
 
-    /* syntax - dark (One Dark) */
-    --syn-keyword: #c678dd;
-    --syn-func: #61afef;
-    --syn-string: #98c379;
-    --syn-comment: #5c6370;
-    --syn-number: #d19a66;
-    --syn-type: #e5c07b;
-    --syn-param: #e06c75;
-    --syn-builtin: #56b6c2;
-    --syn-decorator: #e5c07b;
+    /* syntax - dark (One Dark / Dracula inspired) */
+    --syn-keyword:   #ff79c6;
+    --syn-func:      #50fa7b;
+    --syn-string:    #f1fa8c;
+    --syn-comment:   #6272a4;
+    --syn-number:    #bd93f9;
+    --syn-type:      #8be9fd;
+    --syn-param:     #ffb86c;
+    --syn-builtin:   #50fa7b;
+    --syn-decorator: #ffb86c;
+    --syn-op:        #ff79c6;
 
     --hl-active: rgba(255,210,0,0.12);
     --hl-border: #f0c419;
@@ -61,24 +62,24 @@
     --pacific: #0550ae;
     --atlantic: #953800;
     --both: #6e40c9;
-    --syn-keyword: #d73a49;
-    --syn-func: #005cc5;
-    --syn-string: #22863a;
-    --syn-comment: #6a737d;
-    --syn-number: #e36209;
-    --syn-type: #6f42c1;
-    --syn-param: #e36209;
-    --syn-builtin: #005cc5;
+    --syn-keyword:   #d73a49;
+    --syn-func:      #005cc5;
+    --syn-string:    #22863a;
+    --syn-comment:   #6a737d;
+    --syn-number:    #6f42c1;
+    --syn-type:      #0086b3;
+    --syn-param:     #e36209;
+    --syn-builtin:   #005cc5;
     --syn-decorator: #6f42c1;
+    --syn-op:        #d73a49;
     --hl-active: rgba(255,210,0,0.20);
     --hl-border: #d4a017;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html, body { height: 100%; overflow: hidden; background: var(--bg0); color: var(--text0); font-family: var(--font-ui); }
 
-  /* ─── LAYOUT ───────────────────────────────────────────── */
+  /* ─── LAYOUT ─────────────────────────────── */
   #app { display: flex; flex-direction: column; height: 100vh; }
 
   .header {
@@ -90,140 +91,77 @@
     flex-direction: column;
     gap: 8px;
   }
-
   .header-row1 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
-  .problem-title {
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    color: var(--text0);
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
+  .problem-title { font-size: 15px; font-weight: 700; color: var(--text0); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .problem-title span { color: var(--accent); }
 
   .mode-toggle { display: flex; gap: 6px; }
   .mode-btn {
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text1);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-family: var(--font-ui); font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg2); color: var(--text1); cursor: pointer; transition: all 0.15s;
   }
   .mode-btn:hover { border-color: var(--accent); color: var(--text0); }
   .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   .header-row2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
   .input-label { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
   .input-field {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text0);
-    padding: 4px 10px;
-    border-radius: 6px;
-    width: 420px;
-    outline: none;
-    transition: border-color 0.15s;
+    font-family: var(--font-mono); font-size: 11px; background: var(--bg2);
+    border: 1px solid var(--border); color: var(--text0); padding: 4px 10px;
+    border-radius: 6px; width: 420px; outline: none; transition: border-color 0.15s;
   }
   .input-field:focus { border-color: var(--accent); }
 
   .btn {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text1);
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
+    font-family: var(--font-ui); font-size: 11px; font-weight: 600;
+    padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg2); color: var(--text1); cursor: pointer; transition: all 0.15s;
   }
   .btn:hover { border-color: var(--accent); color: var(--text0); background: var(--bg3); }
   .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .btn.primary:hover { opacity: 0.85; }
 
   .theme-btn {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text1);
-    cursor: pointer;
-    margin-left: auto;
-    transition: all 0.15s;
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg2); color: var(--text1);
+    cursor: pointer; margin-left: auto; transition: all 0.15s;
   }
   .theme-btn:hover { border-color: var(--accent); color: var(--text0); }
 
-  /* ─── PANELS ───────────────────────────────────────────── */
+  /* ─── PANELS ──────────────────────────────── */
   .panels { display: flex; flex: 1; overflow: hidden; }
-
   .panel { display: flex; flex-direction: column; overflow: hidden; position: relative; }
   .panel + .panel { border-left: 1px solid var(--border); }
-
   .panel-header {
-    font-family: var(--font-ui);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text2);
-    padding: 6px 14px;
-    background: var(--bg1);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text2); padding: 6px 14px; background: var(--bg1);
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
   }
-
   .panel-body { flex: 1; overflow: auto; }
 
-  /* ─── RESIZER ──────────────────────────────────────────── */
   .resizer {
-    width: 4px;
-    background: var(--border);
-    cursor: col-resize;
-    flex-shrink: 0;
-    transition: background 0.15s;
-    z-index: 10;
+    width: 4px; background: var(--border); cursor: col-resize;
+    flex-shrink: 0; transition: background 0.15s; z-index: 10;
   }
   .resizer:hover, .resizer.dragging { background: var(--accent); }
 
-  /* ─── CODE PANEL ───────────────────────────────────────── */
+  /* ─── CODE PANEL ──────────────────────────── */
   .code-wrap {
     font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.6;
     background: var(--bg0);
     color: var(--text0);
     height: 100%;
     overflow: auto;
   }
-
-  .code-wrap pre { margin: 0; padding: 12px 0; }
+  .code-wrap pre { margin: 0; padding: 10px 0; }
 
   .code-line {
     display: flex;
     align-items: stretch;
-    min-height: 21px;
+    min-height: 22px;
     transition: background 0.12s;
     border-left: 2px solid transparent;
   }
@@ -240,88 +178,57 @@
     padding-right: 14px;
     color: var(--text2);
     user-select: none;
-    font-size: 11px;
+    font-size: 12px;
     line-height: inherit;
     flex-shrink: 0;
     padding-top: 1px;
   }
   .code-text { white-space: pre; flex: 1; padding-right: 16px; }
 
-  /* ─── SYNTAX ───────────────────────────────────────────── */
-  .sk  { color: var(--syn-keyword); font-weight: 500; }
+  /* ─── SYNTAX CLASSES ──────────────────────── */
+  .sk  { color: var(--syn-keyword);   font-weight: 500; }
   .sf  { color: var(--syn-func); }
   .ss  { color: var(--syn-string); }
-  .sc  { color: var(--syn-comment); font-style: italic; }
+  .sc  { color: var(--syn-comment);   font-style: italic; }
   .sn  { color: var(--syn-number); }
   .st  { color: var(--syn-type); }
   .sp  { color: var(--syn-param); }
   .sb  { color: var(--syn-builtin); }
   .sd  { color: var(--syn-decorator); }
 
-  /* ─── VIZ PANEL ────────────────────────────────────────── */
+  /* ─── VIZ PANEL ───────────────────────────── */
   .viz-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; overflow: auto; }
-
   .grid-container { display: flex; justify-content: center; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
-
   .grid-section { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .grid-section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text2);
-  }
-
+  .grid-section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); }
   .grid-table { border-collapse: collapse; }
   .grid-cell {
-    width: 42px;
-    height: 42px;
-    text-align: center;
-    vertical-align: middle;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    cursor: default;
-    position: relative;
-    transition: all 0.2s;
+    width: 42px; height: 42px; text-align: center; vertical-align: middle;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); cursor: default; position: relative; transition: all 0.2s;
   }
-
-  .cell-default { background: var(--bg2); color: var(--text0); }
-  .cell-pacific { background: rgba(29,111,165,0.35); color: #7cc4f5; border-color: #1d6fa5; }
-  .cell-atlantic { background: rgba(176,94,42,0.35); color: #f0a87a; border-color: #b05e2a; }
-  .cell-both { background: rgba(124,58,237,0.45); color: #c4b5fd; border-color: #7c3aed; box-shadow: 0 0 0 2px #7c3aed44; }
-  .cell-current { outline: 3px solid var(--yellow); outline-offset: -2px; z-index: 2; }
-  .cell-queue { outline: 2px dashed var(--green); outline-offset: -2px; }
-  .cell-seed-pacific { background: rgba(29,111,165,0.6); color: #fff; border-color: #58a6ff; }
+  .cell-default   { background: var(--bg2); color: var(--text0); }
+  .cell-pacific   { background: rgba(29,111,165,0.35); color: #7cc4f5; border-color: #1d6fa5; }
+  .cell-atlantic  { background: rgba(176,94,42,0.35); color: #f0a87a; border-color: #b05e2a; }
+  .cell-both      { background: rgba(124,58,237,0.45); color: #c4b5fd; border-color: #7c3aed; box-shadow: 0 0 0 2px #7c3aed44; }
+  .cell-current   { outline: 3px solid var(--yellow); outline-offset: -2px; z-index: 2; }
+  .cell-queue     { outline: 2px dashed var(--green); outline-offset: -2px; }
+  .cell-seed-pacific  { background: rgba(29,111,165,0.6); color: #fff; border-color: #58a6ff; }
   .cell-seed-atlantic { background: rgba(176,94,42,0.6); color: #fff; border-color: #f0883e; }
 
   .legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text1); }
   .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
 
-  /* ─── CONTROLS BAR ─────────────────────────────────────── */
+  /* ─── CONTROLS ────────────────────────────── */
   .controls-bar {
-    padding: 8px 12px;
-    border-top: 1px solid var(--border);
-    background: var(--bg1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+    padding: 8px 12px; border-top: 1px solid var(--border); background: var(--bg1);
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
   }
-
   .ctrl-btn {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text0);
-    border-radius: 6px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.12s;
-    display: flex; align-items: center; justify-content: center;
-    min-width: 32px;
+    background: var(--bg2); border: 1px solid var(--border); color: var(--text0);
+    border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 13px;
+    transition: all 0.12s; display: flex; align-items: center; justify-content: center; min-width: 32px;
   }
   .ctrl-btn:hover { background: var(--bg3); border-color: var(--accent); }
   .ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -329,185 +236,95 @@
   .ctrl-btn.play:hover { opacity: 0.85; }
 
   .speed-select {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text1);
-    border-radius: 6px;
-    padding: 4px 8px;
-    cursor: pointer;
-    outline: none;
+    font-size: 11px; font-weight: 600; background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text1); border-radius: 6px; padding: 4px 8px; cursor: pointer; outline: none;
   }
-  .speed-select:focus { border-color: var(--accent); }
-
-  .step-counter {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text2);
-    margin-left: auto;
-  }
-
+  .step-counter { font-family: var(--font-mono); font-size: 11px; color: var(--text2); margin-left: auto; }
   .progress-bar-wrap { flex: 1; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.1s; }
 
-  /* ─── STEP LOG ─────────────────────────────────────────── */
+  /* ─── STEP LOG ────────────────────────────── */
   .step-log { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-
   .step-desc {
-    font-size: 12px;
-    color: var(--text0);
-    line-height: 1.55;
-    padding: 10px 12px;
-    background: var(--bg2);
-    border-radius: 6px;
-    border-left: 3px solid var(--accent);
+    font-size: 12px; color: var(--text0); line-height: 1.55;
+    padding: 10px 12px; background: var(--bg2); border-radius: 6px; border-left: 3px solid var(--accent);
   }
-
   .vars-section { display: flex; flex-direction: column; gap: 4px; }
   .vars-title { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 4px; }
-
   .var-row {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--bg2);
-    display: flex;
-    gap: 6px;
+    font-family: var(--font-mono); font-size: 11px; padding: 3px 8px;
+    border-radius: 4px; background: var(--bg2); display: flex; gap: 6px;
   }
   .var-name { color: var(--accent); flex-shrink: 0; }
   .var-val { color: var(--text1); word-break: break-all; }
-
   .history-title { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 4px; }
   .history-list { display: flex; flex-direction: column; gap: 2px; }
   .history-item {
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: var(--text2);
-    line-height: 1.4;
-    cursor: pointer;
-    transition: all 0.1s;
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; color: var(--text2);
+    line-height: 1.4; cursor: pointer; transition: all 0.1s;
   }
   .history-item:hover { background: var(--bg3); color: var(--text1); }
   .history-item.current { background: var(--bg3); color: var(--text0); font-weight: 600; }
 
-  /* ─── INTUITION MODE ───────────────────────────────────── */
-  .intuition-panels { display: flex; flex: 1; overflow: hidden; }
-
-  .intuition-thought { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
-  .intuition-viz { display: flex; flex-direction: column; overflow: hidden; }
-
-  .stages-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-
+  /* ─── INTUITION ───────────────────────────── */
   .stage-card {
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg1);
-    overflow: hidden;
-    transition: all 0.3s;
+    border-radius: 8px; border: 1px solid var(--border); background: var(--bg1);
+    overflow: hidden; transition: all 0.3s;
   }
-  .stage-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent)22; }
-  .stage-card.past { opacity: 0.55; }
+  .stage-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(88,166,255,0.13); }
+  .stage-card.past   { opacity: 0.55; }
   .stage-card.future { opacity: 0.25; }
-
   .stage-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: var(--bg2);
-    cursor: pointer;
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: var(--bg2); cursor: pointer;
   }
   .stage-num {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--bg3);
-    color: var(--text2);
-    font-size: 11px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--bg3);
+    color: var(--text2); font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     font-family: var(--font-mono);
   }
   .stage-card.active .stage-num { background: var(--accent); color: #fff; }
-  .stage-card.past .stage-num { background: var(--green)33; color: var(--green); }
-
-  .stage-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text0);
-    flex: 1;
-  }
+  .stage-card.past   .stage-num { background: rgba(63,185,80,0.2); color: var(--green); }
+  .stage-title { font-size: 12px; font-weight: 700; color: var(--text0); flex: 1; }
   .stage-card.active .stage-title { color: var(--accent); }
-
   .stage-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 
   .thought-bubble {
-    background: rgba(88,166,255,0.08);
-    border-left: 3px solid var(--accent);
-    padding: 10px 14px;
-    border-radius: 0 6px 6px 0;
-    font-size: 12px;
-    font-style: italic;
-    color: var(--text1);
-    line-height: 1.6;
+    background: rgba(88,166,255,0.08); border-left: 3px solid var(--accent);
+    padding: 10px 14px; border-radius: 0 6px 6px 0;
+    font-size: 12px; font-style: italic; color: var(--text1); line-height: 1.6;
   }
   .thought-bubble::before { content: '💭 '; font-style: normal; }
-
-  .stage-content {
-    font-size: 12px;
-    color: var(--text1);
-    line-height: 1.7;
-  }
+  .stage-content { font-size: 12px; color: var(--text1); line-height: 1.7; }
   .stage-content b { color: var(--text0); font-weight: 600; }
-
   .key-insight {
-    background: rgba(63,185,80,0.08);
-    border-left: 3px solid var(--green);
-    padding: 10px 14px;
-    border-radius: 0 6px 6px 0;
-    font-size: 12px;
-    color: var(--text1);
-    line-height: 1.6;
+    background: rgba(63,185,80,0.08); border-left: 3px solid var(--green);
+    padding: 10px 14px; border-radius: 0 6px 6px 0;
+    font-size: 12px; color: var(--text1); line-height: 1.6;
   }
   .key-insight::before { content: '💡 '; }
   .key-insight b { color: var(--green); }
 
-  /* intuition viz panel */
+  .stages-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .intuition-controls {
+    padding: 8px 12px; border-top: 1px solid var(--border); background: var(--bg1);
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
   .intuition-viz-body { padding: 16px; overflow: auto; height: 100%; }
 
-  .intuition-controls {
-    padding: 8px 12px;
-    border-top: 1px solid var(--border);
-    background: var(--bg1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .approach-compare { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
   .approach-card {
-    padding: 14px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    padding: 14px 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px;
   }
-  .approach-card.bad { border-color: var(--red)44; background: rgba(248,81,73,0.07); }
-  .approach-card.good { border-color: var(--green)44; background: rgba(63,185,80,0.07); }
+  .approach-card.bad  { border-color: rgba(248,81,73,0.3);  background: rgba(248,81,73,0.07); }
+  .approach-card.good { border-color: rgba(63,185,80,0.3);  background: rgba(63,185,80,0.07); }
   .approach-card h4 { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
-  .approach-card.bad h4 { color: var(--red); }
+  .approach-card.bad  h4 { color: var(--red); }
   .approach-card.good h4 { color: var(--green); }
   .approach-card p { font-size: 11px; color: var(--text1); line-height: 1.7; }
 
-  .complexity-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  .complexity-table th, .complexity-table td {
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    text-align: left;
-  }
+  .complexity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+  .complexity-table th, .complexity-table td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
   .complexity-table th { background: var(--bg2); color: var(--text2); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-size: 10px; }
   .complexity-table td { background: var(--bg1); color: var(--text1); font-family: var(--font-mono); font-size: 12px; }
   .complexity-table td:first-child { color: var(--text0); font-weight: 600; }
@@ -516,28 +333,8 @@
   .edge-case .ec-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 4px; }
   .edge-case .ec-desc { font-size: 12px; color: var(--text1); line-height: 1.6; }
 
-  /* grid ocean labels */
-  .grid-ocean-labels { display: flex; gap: 4px; margin-bottom: 2px; justify-content: flex-end; align-items: center; }
-  .grid-with-ocean { position: relative; }
-
-  .ocean-label-top {
-    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    padding: 2px 6px; border-radius: 3px; margin-bottom: 4px; text-align: center;
-  }
-  .ocean-pac { color: #7cc4f5; background: rgba(29,111,165,0.2); border: 1px solid #1d6fa540; }
-  .ocean-atl { color: #f0a87a; background: rgba(176,94,42,0.2); border: 1px solid #b05e2a40; }
-  .ocean-both { color: #c4b5fd; background: rgba(124,58,237,0.2); border: 1px solid #7c3aed40; }
-
   .stat-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .stat-chip {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text1);
-  }
+  .stat-chip { font-family: var(--font-mono); font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg2); color: var(--text1); }
   .stat-chip b { color: var(--text0); }
 </style>
 </head>
@@ -545,9 +342,9 @@
 <div id="app"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// CODE DATA
+// ═══════════════════════════════════════════════════════════
 
 const CODE_LINES = [
   'from typing import List',
@@ -597,6 +394,141 @@ const CODE_LINES = [
 
 const DEFAULT_INPUT = '[[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]';
 
+// ═══════════════════════════════════════════════════════════
+// SYNTAX HIGHLIGHTER  ← COMPLETELY REWRITTEN
+// ═══════════════════════════════════════════════════════════
+//
+// Strategy: tokenize the raw source line into a flat array of
+// {type, text} tokens BEFORE any HTML escaping, then escape
+// each token text individually and wrap in the right <span>.
+// This guarantees span tags are never re-processed.
+//
+function highlightPython(rawLine) {
+  // ── 1. Comment lines ──────────────────────────────────────
+  const trimmed = rawLine.trimStart();
+  if (trimmed.startsWith('#')) {
+    return `<span class="sc">${esc(rawLine)}</span>`;
+  }
+
+  const tokens = [];
+  let i = 0;
+  const src = rawLine;
+
+  // ── 2. Tokeniser ─────────────────────────────────────────
+  while (i < src.length) {
+
+    // --- Inline comment (not inside string) ---
+    if (src[i] === '#') {
+      tokens.push({ type: 'comment', text: src.slice(i) });
+      break;
+    }
+
+    // --- String literals (single or double, no triple handling needed for these lines) ---
+    if (src[i] === '"' || src[i] === "'") {
+      const quote = src[i];
+      let j = i + 1;
+      while (j < src.length) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src[j] === quote) { j++; break; }
+        j++;
+      }
+      tokens.push({ type: 'string', text: src.slice(i, j) });
+      i = j;
+      continue;
+    }
+
+    // --- Identifier or keyword ---
+    if (/[A-Za-z_]/.test(src[i])) {
+      let j = i;
+      while (j < src.length && /\w/.test(src[j])) j++;
+      const word = src.slice(i, j);
+      tokens.push({ type: 'word', text: word });
+      i = j;
+      continue;
+    }
+
+    // --- Number ---
+    if (/\d/.test(src[i]) && (i === 0 || !/\w/.test(src[i-1]))) {
+      let j = i;
+      while (j < src.length && /[\d.]/.test(src[j])) j++;
+      tokens.push({ type: 'number', text: src.slice(i, j) });
+      i = j;
+      continue;
+    }
+
+    // --- Everything else (operators, brackets, spaces) ---
+    tokens.push({ type: 'plain', text: src[i] });
+    i++;
+  }
+
+  // ── 3. Classify words ─────────────────────────────────────
+  const KEYWORDS = new Set([
+    'def','class','return','if','elif','else','while','for','in','not','and',
+    'or','import','from','True','False','None','lambda','yield','with','as',
+    'pass','break','continue','raise','try','except','finally','global','nonlocal'
+  ]);
+  const BUILTINS = new Set([
+    'len','range','set','list','dict','tuple','print','enumerate','zip','map',
+    'filter','sorted','min','max','sum','abs','isinstance','type','repr','str',
+    'int','float','bool','deque'
+  ]);
+  const TYPES = new Set([
+    'List','Dict','Set','Tuple','Optional','Union','Any','Callable','Generator',
+    'Iterator','Iterable','Sequence'
+  ]);
+
+  // Look-ahead: after a 'def' token, the next word token is a function name
+  let expectFuncName = false;
+
+  // ── 4. Render ─────────────────────────────────────────────
+  let html = '';
+  for (let ti = 0; ti < tokens.length; ti++) {
+    const tok = tokens[ti];
+    const t = esc(tok.text);
+
+    if (tok.type === 'comment') { html += `<span class="sc">${t}</span>`; continue; }
+    if (tok.type === 'string')  { html += `<span class="ss">${t}</span>`; continue; }
+    if (tok.type === 'number')  { html += `<span class="sn">${t}</span>`; continue; }
+
+    if (tok.type === 'word') {
+      if (expectFuncName) {
+        expectFuncName = false;
+        html += `<span class="sf">${t}</span>`;
+        continue;
+      }
+      if (KEYWORDS.has(tok.text)) {
+        if (tok.text === 'def') expectFuncName = true;
+        html += `<span class="sk">${t}</span>`;
+        continue;
+      }
+      if (TYPES.has(tok.text)) { html += `<span class="st">${t}</span>`; continue; }
+      if (BUILTINS.has(tok.text)) {
+        // Only colour as builtin if followed by '('
+        const next = tokens.slice(ti+1).find(x => x.text.trim() !== '');
+        if (next && next.text === '(') { html += `<span class="sb">${t}</span>`; continue; }
+      }
+      html += t;
+      continue;
+    }
+
+    // plain
+    html += t;
+  }
+
+  return html;
+}
+
+// HTML-escape helper — uses DOM, zero regex required
+function esc(str) {
+  const d = document.createElement('span');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTUITION STAGES
+// ═══════════════════════════════════════════════════════════
+
 const INTUITION_STAGES = [
   {
     title: 'Understanding the Problem',
@@ -604,24 +536,24 @@ const INTUITION_STAGES = [
     content: `<b>The grid:</b> An <b>m×n</b> matrix where each cell has a height.<br><br>
 <b>Rules:</b> Water moves to adjacent cells with <b>equal or lower</b> height. Pacific borders the top row and left column. Atlantic borders the bottom row and right column.<br><br>
 <b>Goal:</b> Find every cell from which water can eventually reach <em>both</em> oceans.`,
-    insight: "<b>Key constraint:</b> \"equal or lower\" means a plateau can drain — both heights must be reachable, not just the strictly downhill path.",
+    insight: "<b>Key constraint:</b> \"equal or lower\" means a plateau can drain — both heights must be reachable, not just strictly downhill paths.",
     viz: 'problem'
   },
   {
     title: 'Why Naive DFS Is Too Slow',
-    thought: "I could do a DFS from every cell, check if it reaches both oceans... but that's O(m·n) cells each doing O(m·n) work. That's O(m²·n²). With a 200×200 grid that's 1.6 billion operations. Not going to work.",
+    thought: "I could do a DFS from every cell, check if it reaches both oceans... but that's O(m·n) cells each doing O(m·n) work. O(m²·n²). With a 200×200 grid that's 1.6 billion operations. Not going to work.",
     content: `<b>Brute Force:</b> For each cell, DFS and check reachability to both oceans.<br>
 → Time: <b>O(m² × n²)</b> — unacceptable.<br><br>
-<b>The problem:</b> We're repeating enormous amounts of work. If cell A can reach the Pacific via cell B, and cell C can also reach it via B, we're recomputing cell B's entire subtree for both A and C.`,
+<b>The problem:</b> We repeat enormous amounts of work. If cell A can reach the Pacific via cell B, and cell C can also reach it via B, we're recomputing cell B's entire subtree for both A and C.`,
     insight: "<b>Better idea:</b> Reverse the question — instead of asking \"can this cell reach the ocean?\", ask \"which cells can the ocean reach?\" That's exactly one BFS per ocean.",
     viz: 'compare'
   },
   {
     title: 'The Reversal Trick',
-    thought: "What if I flip the direction? Instead of water flowing DOWN from cells to the ocean, I start AT the ocean border and ask: which cells can I reach by flowing UPHILL? A cell is reachable uphill if its height ≥ the current cell's height. The set of cells I can reach is exactly the set that can drain to that ocean!",
+    thought: "What if I flip the direction? Instead of water flowing DOWN from cells to the ocean, I start AT the ocean border and ask: which cells can I reach by flowing UPHILL? A cell is reachable uphill if its height ≥ the current cell's height.",
     content: `<b>Forward:</b> Water flows downhill from cell → ocean (neighbour height ≤ current).<br><br>
 <b>Reversed:</b> Start at ocean border, climb uphill to reach cells (neighbour height ≥ current).<br><br>
-Both directions are equivalent — a path exists forward iff one exists backward. But reversed lets us seed from the entire border at once, getting the full reachable set in a single BFS pass.`,
+Both directions are equivalent. But reversed lets us seed from the entire border at once, getting the full reachable set in a single BFS pass.`,
     insight: "<b>The elegance:</b> Two multi-source BFS passes, one per ocean. Then the answer is simply the intersection of the two reachable sets.",
     viz: 'reverse'
   },
@@ -643,88 +575,36 @@ All seed cells are marked visited immediately. The BFS then expands to any unvis
 &nbsp;&nbsp;• Not already visited<br>
 &nbsp;&nbsp;• heights[nr][nc] >= heights[r][c]<br><br>
 Each cell is enqueued at most once per BFS → total work is O(m×n) per pass.`,
-    insight: "<b>Visited set as a frontier:</b> Adding seeds directly to visited ensures we don't re-process them even when multiple seeds are adjacent.",
+    insight: "<b>Visited set as frontier:</b> Adding seeds directly to visited ensures we don't re-process them even when multiple seeds are adjacent.",
     viz: 'bfs'
   },
   {
     title: 'Intersection = The Answer',
-    thought: "After both BFS passes, I have `pacific_reach` and `atlantic_reach` as sets of (r,c) tuples. The answer is just their intersection — cells in both sets. Python's set `&` operator does this in one line.",
+    thought: "After both BFS passes, I have pacific_reach and atlantic_reach as sets of (r,c) tuples. The answer is just their intersection — cells in both sets. Python's set & operator does this in one line.",
     content: `<b>pacific_reach:</b> All cells that can drain to the Pacific.<br>
 <b>atlantic_reach:</b> All cells that can drain to the Atlantic.<br><br>
-<b>Answer:</b> <code>pacific_reach & atlantic_reach</code><br><br>
+<b>Answer:</b> <code style="font-family:var(--font-mono)">pacific_reach &amp; atlantic_reach</code><br><br>
 The set intersection gives every cell reachable from both ocean borders — exactly the cells that can drain to both oceans.`,
     insight: "<b>For Example 1:</b> The intersection yields 7 cells (shown in purple). These are the high-elevation \"watershed\" cells that drain both ways.",
     viz: 'result'
   },
   {
     title: 'Complexity & Edge Cases',
-    thought: "Two BFS passes, each visiting every cell at most once. Total: O(m×n) time and O(m×n) space for the visited sets. That's optimal — we must read the input, so we can't do better than O(m×n).",
+    thought: "Two BFS passes, each visiting every cell at most once. Total: O(m×n) time and O(m×n) space for the visited sets. That's optimal — we must read the input, so we can't do better.",
     content: `<b>Time:</b> O(m × n) — each cell enqueued/dequeued at most once per BFS, two passes total.<br><br>
-<b>Space:</b> O(m × n) — two visited sets, each at most m×n entries; queue at most m×n.<br><br>
+<b>Space:</b> O(m × n) — two visited sets; queue at most m×n.<br><br>
 <b>Edge cases handled:</b><br>
 &nbsp;&nbsp;• Empty grid → return [] immediately<br>
-&nbsp;&nbsp;• Single cell → it borders all ocean sides, so it's in the answer<br>
+&nbsp;&nbsp;• Single cell → borders all ocean sides, always in answer<br>
 &nbsp;&nbsp;• Flat grid → all cells drain everywhere, entire grid is the answer`,
     insight: "<b>This is optimal:</b> Any algorithm must read the entire input, so O(m×n) is the best achievable bound.",
     viz: 'complexity'
   }
 ];
 
-// ══════════════════════════════════════════════════════════════════
-// SYNTAX HIGHLIGHTER
-// ══════════════════════════════════════════════════════════════════
-
-function highlightPython(raw) {
-  // Escape HTML first
-  const el = document.createElement('span');
-  el.textContent = raw;
-  let line = el.innerHTML;
-
-  if (line.trim().startsWith('#')) {
-    return `<span class="sc">${line}</span>`;
-  }
-
-  // Decorators
-  line = line.replace(/(@\w+)/g, '<span class="sd">$1</span>');
-
-  // Docstring / triple-quote strings — handle before other strings
-  // (single line only since we process line by line)
-  line = line.replace(/(&#34;&#34;&#34;.*?&#34;&#34;&#34;|&#39;&#39;&#39;.*?&#39;&#39;&#39;)/g, '<span class="ss">$1</span>');
-
-  // Regular strings
-  line = line.replace(/(&#34;(?:[^&#]|&#(?!34;))*?&#34;|&#39;(?:[^&#]|&#(?!39;))*?&#39;)/g, '<span class="ss">$1</span>');
-
-  // Type annotations (after colon or arrow) — common types
-  line = line.replace(/\b(List|Dict|Set|Tuple|Optional|Union|Any|int|str|bool|float|None|deque|tuple)\b(?=[^<])/g, (m, p1) => `<span class="st">${p1}</span>`);
-
-  // Keywords
-  const keywords = ['def', 'class', 'return', 'if', 'elif', 'else', 'while', 'for', 'in',
-                    'not', 'and', 'or', 'import', 'from', 'True', 'False', 'lambda',
-                    'yield', 'with', 'as', 'pass', 'break', 'continue', 'raise', 'try', 'except', 'finally'];
-  for (const kw of keywords) {
-    const re = new RegExp(`(?<![\\w#"])\\b(${kw})\\b(?![\\w"])`, 'g');
-    line = line.replace(re, '<span class="sk">$1</span>');
-  }
-
-  // Function names (def name)
-  line = line.replace(/(<span class="sk">def<\/span>\s+)(\w+)/g, '$1<span class="sf">$2</span>');
-
-  // Built-in functions
-  const builtins = ['len', 'range', 'set', 'list', 'deque', 'print', 'enumerate', 'zip', 'map', 'filter', 'sorted', 'min', 'max', 'sum', 'abs'];
-  for (const b of builtins) {
-    const re = new RegExp(`(?<![\\w.])\\b(${b})\\b(?=\\()`, 'g');
-    line = line.replace(re, '<span class="sb">$1</span>');
-  }
-
-  // Numbers
-  line = line.replace(/(?<![&#\w])\b(\d+)\b(?!;)/g, '<span class="sn">$1</span>');
-
-  return line;
-}
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // SIMULATION ENGINE
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function parseGrid(str) {
   try {
@@ -736,133 +616,114 @@ function parseGrid(str) {
 
 function simulateBFS(heights) {
   const steps = [];
-  const m = heights.length;
-  const n = heights[0].length;
+  const m = heights.length, n = heights[0].length;
   const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
+  const key = (r, c) => `${r},${c}`;
 
   const pacificVisited = new Set();
   const atlanticVisited = new Set();
 
-  const key = (r, c) => `${r},${c}`;
-
-  function doStep(line, desc, vars, phase, pV, aV, currentCell, queueCells) {
-    steps.push({
-      line,
-      description: desc,
-      vars,
-      phase, // 'init','pacific','atlantic','result'
-      pacificVisited: new Set(pV),
-      atlanticVisited: new Set(aV),
-      currentCell,
-      queueCells: [...queueCells]
-    });
+  function push(line, desc, vars, phase, pV, aV, cur, queue) {
+    steps.push({ line, description: desc, vars,
+      phase, pacificVisited: new Set(pV), atlanticVisited: new Set(aV),
+      currentCell: cur, queueCells: [...queue] });
   }
 
-  // ── init ─────────────────────────────────────────────────────
-  doStep(5, 'Check if input is empty.', { m, n, 'heights.length': m }, 'init', new Set(), new Set(), null, []);
-  doStep(8, `Grid dimensions resolved.`, { m, n }, 'init', new Set(), new Set(), null, []);
-  doStep(9, 'Define 4-directional movement offsets.', { m, n, DIRS: '[(0,1),(0,-1),(1,0),(-1,0)]' }, 'init', new Set(), new Set(), null, []);
+  push(5,  'Check if input is empty.',                   { m, n, 'heights.length': m }, 'init', new Set(), new Set(), null, []);
+  push(8,  'Grid dimensions resolved.',                   { m, n }, 'init', new Set(), new Set(), null, []);
+  push(9,  'Define 4-directional movement offsets.',      { m, n, DIRS: '[(0,1),(0,-1),(1,0),(-1,0)]' }, 'init', new Set(), new Set(), null, []);
 
-  // ── pacific seeds ─────────────────────────────────────────────
+  // Pacific seeds
   const pacSeeds = [];
   for (let r = 0; r < m; r++) pacSeeds.push([r, 0]);
   for (let c = 1; c < n; c++) pacSeeds.push([0, c]);
   for (const [r, c] of pacSeeds) pacificVisited.add(key(r, c));
-
-  doStep(30, `Build Pacific seeds: left column + top row (${pacSeeds.length} cells).`,
+  push(30, `Build Pacific seeds: left column + top row (${pacSeeds.length} cells).`,
     { pacific_seeds_count: pacSeeds.length, seeds: pacSeeds.map(([r,c]) => `(${r},${c})`).join(', ') },
     'pacific', new Set(pacificVisited), new Set(), null, pacSeeds.map(([r,c]) => key(r,c)));
 
-  // pacific BFS
   const pacQueue = [...pacSeeds];
   let qi = 0;
-  doStep(12, 'Initialize Pacific BFS — mark all seed cells as visited, enqueue them.',
+  push(12, 'Initialize Pacific BFS — mark all seed cells as visited, enqueue them.',
     { queue_size: pacQueue.length, visited_size: pacificVisited.size },
     'pacific', new Set(pacificVisited), new Set(), null, pacQueue.map(([r,c]) => key(r,c)));
 
   while (qi < pacQueue.length) {
     const [r, c] = pacQueue[qi++];
-    doStep(16, `Dequeue (${r},${c}) — height=${heights[r][c]}. Checking 4 neighbours.`,
+    push(16, `Dequeue (${r},${c}) — height=${heights[r][c]}. Checking 4 neighbours.`,
       { r, c, 'heights[r][c]': heights[r][c], queue_remaining: pacQueue.length - qi, visited: pacificVisited.size },
       'pacific', new Set(pacificVisited), new Set(), key(r, c), pacQueue.slice(qi).map(([a,b]) => key(a,b)));
-
     for (const [dr, dc] of DIRS) {
-      const nr = r + dr, nc = c + dc;
+      const nr = r+dr, nc = c+dc;
       if (nr < 0 || nr >= m || nc < 0 || nc >= n) continue;
       if (pacificVisited.has(key(nr, nc))) continue;
       if (heights[nr][nc] >= heights[r][c]) {
         pacificVisited.add(key(nr, nc));
         pacQueue.push([nr, nc]);
-        doStep(23, `(${nr},${nc}) height=${heights[nr][nc]} ≥ ${heights[r][c]} — reachable from Pacific. Added.`,
-          { nr, nc, 'heights[nr][nc]': heights[nr][nc], 'heights[r][c]': heights[r][c], uphill_ok: true, pacific_visited: pacificVisited.size },
+        push(23, `(${nr},${nc}) height=${heights[nr][nc]} ≥ ${heights[r][c]} — reachable from Pacific. Added.`,
+          { nr, nc, 'heights[nr][nc]': heights[nr][nc], 'heights[r][c]': heights[r][c], pacific_visited: pacificVisited.size },
           'pacific', new Set(pacificVisited), new Set(), key(r, c), pacQueue.slice(qi).map(([a,b]) => key(a,b)));
       }
     }
   }
-
-  doStep(28, `Pacific BFS complete. ${pacificVisited.size} cells can reach the Pacific.`,
+  push(28, `Pacific BFS complete. ${pacificVisited.size} cells can reach the Pacific.`,
     { pacific_reachable: pacificVisited.size },
     'pacific', new Set(pacificVisited), new Set(), null, []);
 
-  // ── atlantic seeds ────────────────────────────────────────────
+  // Atlantic seeds
   const atlSeeds = [];
   for (let r = 0; r < m; r++) atlSeeds.push([r, n-1]);
   for (let c = 0; c < n-1; c++) atlSeeds.push([m-1, c]);
   for (const [r, c] of atlSeeds) atlanticVisited.add(key(r, c));
-
-  doStep(33, `Build Atlantic seeds: right column + bottom row (${atlSeeds.length} cells).`,
-    { atlantic_seeds_count: atlSeeds.length, seeds: atlSeeds.map(([r,c]) => `(${r},${c})`).join(', ') },
+  push(33, `Build Atlantic seeds: right column + bottom row (${atlSeeds.length} cells).`,
+    { atlantic_seeds_count: atlSeeds.length },
     'atlantic', new Set(pacificVisited), new Set(atlanticVisited), null, atlSeeds.map(([r,c]) => key(r,c)));
 
   const atlQueue = [...atlSeeds];
   let ai = 0;
-  doStep(12, 'Initialize Atlantic BFS — mark all seed cells as visited, enqueue them.',
+  push(12, 'Initialize Atlantic BFS — mark all seed cells as visited, enqueue them.',
     { queue_size: atlQueue.length, visited_size: atlanticVisited.size },
     'atlantic', new Set(pacificVisited), new Set(atlanticVisited), null, atlQueue.map(([r,c]) => key(r,c)));
 
   while (ai < atlQueue.length) {
     const [r, c] = atlQueue[ai++];
-    doStep(16, `Dequeue (${r},${c}) — height=${heights[r][c]}. Checking 4 neighbours.`,
+    push(16, `Dequeue (${r},${c}) — height=${heights[r][c]}. Checking 4 neighbours.`,
       { r, c, 'heights[r][c]': heights[r][c], queue_remaining: atlQueue.length - ai, visited: atlanticVisited.size },
       'atlantic', new Set(pacificVisited), new Set(atlanticVisited), key(r, c), atlQueue.slice(ai).map(([a,b]) => key(a,b)));
-
     for (const [dr, dc] of DIRS) {
-      const nr = r + dr, nc = c + dc;
+      const nr = r+dr, nc = c+dc;
       if (nr < 0 || nr >= m || nc < 0 || nc >= n) continue;
       if (atlanticVisited.has(key(nr, nc))) continue;
       if (heights[nr][nc] >= heights[r][c]) {
         atlanticVisited.add(key(nr, nc));
         atlQueue.push([nr, nc]);
-        doStep(23, `(${nr},${nc}) height=${heights[nr][nc]} ≥ ${heights[r][c]} — reachable from Atlantic. Added.`,
-          { nr, nc, 'heights[nr][nc]': heights[nr][nc], 'heights[r][c]': heights[r][c], uphill_ok: true, atlantic_visited: atlanticVisited.size },
+        push(23, `(${nr},${nc}) height=${heights[nr][nc]} ≥ ${heights[r][c]} — reachable from Atlantic. Added.`,
+          { nr, nc, 'heights[nr][nc]': heights[nr][nc], 'heights[r][c]': heights[r][c], atlantic_visited: atlanticVisited.size },
           'atlantic', new Set(pacificVisited), new Set(atlanticVisited), key(r, c), atlQueue.slice(ai).map(([a,b]) => key(a,b)));
       }
     }
   }
-
-  doStep(28, `Atlantic BFS complete. ${atlanticVisited.size} cells can reach the Atlantic.`,
+  push(28, `Atlantic BFS complete. ${atlanticVisited.size} cells can reach the Atlantic.`,
     { atlantic_reachable: atlanticVisited.size },
     'atlantic', new Set(pacificVisited), new Set(atlanticVisited), null, []);
 
-  // result
   const bothSet = new Set([...pacificVisited].filter(k => atlanticVisited.has(k)));
   const result = [...bothSet].map(k => k.split(',').map(Number));
-
-  doStep(39, `Intersection of both sets → ${bothSet.size} cells drain to BOTH oceans.`,
+  push(39, `Intersection → ${bothSet.size} cells drain to BOTH oceans.`,
     { result_count: bothSet.size, result: '[' + result.map(([r,c]) => `[${r},${c}]`).join(', ') + ']' },
     'result', new Set(pacificVisited), new Set(atlanticVisited), null, []);
 
   return steps;
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // APP
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 class App {
   constructor() {
     this.theme = 'dark';
-    this.mode = 'intuition'; // 'intuition' | 'execution'
+    this.mode = 'intuition';
     this.inputVal = DEFAULT_INPUT;
     this.heights = parseGrid(this.inputVal);
     this.steps = simulateBFS(this.heights);
@@ -873,7 +734,6 @@ class App {
     this.intuitionStage = 0;
     this.intuitionPlaying = false;
     this.intuitionTimer = null;
-    // panel widths
     this.panelWidths = [28, 50, 22];
     this.dragging = null;
     this.render();
@@ -912,7 +772,7 @@ class App {
     `;
   }
 
-  // ── EXECUTION ──────────────────────────────────────────────────
+  // ── EXECUTION ────────────────────────────────────────────
   buildExecutionPanels() {
     const [w0, w1, w2] = this.panelWidths;
     return `
@@ -922,7 +782,7 @@ class App {
           <div class="panel-body">${this.buildCodePanel()}</div>
         </div>
         <div class="resizer" data-idx="0"></div>
-        <div class="panel" style="width:${w1}%; flex-direction:column">
+        <div class="panel" style="width:${w1}%;flex-direction:column">
           <div class="panel-header">Visualization
             <span style="color:var(--text2);font-size:10px">
               ${this.steps[this.currentStep]?.phase==='pacific'?'🌊 Pacific BFS':
@@ -943,14 +803,13 @@ class App {
   }
 
   buildCodePanel() {
-    const step = this.steps[this.currentStep];
-    const activeLine = step ? step.line : -1;
+    const activeLine = this.steps[this.currentStep]?.line ?? -1;
     const lines = CODE_LINES.map((raw, i) => {
-      const isActive = (i === activeLine);
-      return `<div class="code-line${isActive?' active':''}" id="cl-${i}">
-        <span class="ln">${i+1}</span>
-        <code class="code-text">${highlightPython(raw)}</code>
-      </div>`;
+      const active = i === activeLine;
+      return `<div class="code-line${active?' active':''}" id="cl-${i}">` +
+        `<span class="ln">${i+1}</span>` +
+        `<code class="code-text">${highlightPython(raw)}</code>` +
+        `</div>`;
     }).join('');
     return `<div class="code-wrap"><pre>${lines}</pre></div>`;
   }
@@ -979,24 +838,20 @@ class App {
   buildGrid(m, n, step) {
     const key = (r, c) => `${r},${c}`;
     const queueSet = new Set(step.queueCells || []);
-    const both = new Set([...step.pacificVisited].filter(k => step.atlanticVisited.has(k)));
-
     let rows = '';
     for (let r = 0; r < m; r++) {
       let cols = '';
       for (let c = 0; c < n; c++) {
         const k = key(r, c);
         const isCurrent = step.currentCell === k;
-        const isQueue = queueSet.has(k);
-        const inPac = step.pacificVisited.has(k);
-        const inAtl = step.atlanticVisited.has(k);
+        const isQueue   = queueSet.has(k);
+        const inPac     = step.pacificVisited.has(k);
+        const inAtl     = step.atlanticVisited.has(k);
         let cls = 'cell-default';
         if (inPac && inAtl) cls = 'cell-both';
         else if (inPac) cls = 'cell-pacific';
         else if (inAtl) cls = 'cell-atlantic';
-        let extra = '';
-        if (isCurrent) extra += ' cell-current';
-        if (isQueue && !isCurrent) extra += ' cell-queue';
+        let extra = isCurrent ? ' cell-current' : (isQueue ? ' cell-queue' : '');
         cols += `<td class="grid-cell ${cls}${extra}" title="(${r},${c})">${this.heights[r][c]}</td>`;
       }
       rows += `<tr>${cols}</tr>`;
@@ -1009,15 +864,15 @@ class App {
     const pct = total > 1 ? (this.currentStep / (total - 1)) * 100 : 0;
     return `
       <button class="ctrl-btn" onclick="app.goStep(0)" title="Reset">⏮</button>
-      <button class="ctrl-btn" onclick="app.stepBack()" ${this.currentStep===0?'disabled':''} title="Step Back">◀</button>
-      <button class="ctrl-btn play" onclick="app.togglePlay()" title="${this.isPlaying?'Pause':'Play'}">${this.isPlaying?'⏸':'▶'}</button>
-      <button class="ctrl-btn" onclick="app.stepFwd()" ${this.currentStep>=total-1?'disabled':''} title="Step Forward">▶</button>
-      <button class="ctrl-btn" onclick="app.goStep(total-1)" title="End">⏭</button>
+      <button class="ctrl-btn" onclick="app.stepBack()" ${this.currentStep===0?'disabled':''}>◀</button>
+      <button class="ctrl-btn play" onclick="app.togglePlay()">${this.isPlaying?'⏸':'▶'}</button>
+      <button class="ctrl-btn" onclick="app.stepFwd()" ${this.currentStep>=total-1?'disabled':''}>▶</button>
+      <button class="ctrl-btn" onclick="app.goStep(${total-1})" title="End">⏭</button>
       <select class="speed-select" onchange="app.setSpeed(this.value)">
         <option value="0.5" ${this.speed==0.5?'selected':''}>0.5×</option>
-        <option value="1" ${this.speed==1?'selected':''}>1×</option>
-        <option value="2" ${this.speed==2?'selected':''}>2×</option>
-        <option value="4" ${this.speed==4?'selected':''}>4×</option>
+        <option value="1"   ${this.speed==1  ?'selected':''}>1×</option>
+        <option value="2"   ${this.speed==2  ?'selected':''}>2×</option>
+        <option value="4"   ${this.speed==4  ?'selected':''}>4×</option>
       </select>
       <div class="progress-bar-wrap" style="cursor:pointer" onclick="app.seekBar(event,this)">
         <div class="progress-bar-fill" style="width:${pct}%"></div>
@@ -1037,29 +892,22 @@ class App {
     ).join('');
     return `
       <div class="step-desc">${step.description}</div>
-      <div class="vars-section">
-        <div class="vars-title">Variables</div>
-        ${vars}
-      </div>
-      <div>
-        <div class="history-title">History</div>
-        <div class="history-list">${history}</div>
-      </div>
+      <div class="vars-section"><div class="vars-title">Variables</div>${vars}</div>
+      <div><div class="history-title">History</div><div class="history-list">${history}</div></div>
     `;
   }
 
   scrollToActiveHistory() {
     requestAnimationFrame(() => {
-      const el = document.getElementById(`hi-${this.currentStep}`);
-      el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      document.getElementById(`hi-${this.currentStep}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
 
-  // ── INTUITION ──────────────────────────────────────────────────
+  // ── INTUITION ────────────────────────────────────────────
   buildIntuitionPanels() {
     return `
       <div class="panels" style="flex:1">
-        <div class="panel intuition-thought" style="width:50%">
+        <div class="panel" style="width:50%;flex-direction:column">
           <div class="panel-header">Engineer's Thought Process
             <span style="color:var(--text2)">${this.intuitionStage+1}/${INTUITION_STAGES.length}</span>
           </div>
@@ -1074,7 +922,7 @@ class App {
             <span class="step-counter">${this.intuitionStage+1}/${INTUITION_STAGES.length}</span>
           </div>
         </div>
-        <div class="panel intuition-viz" style="flex:1;border-left:1px solid var(--border)">
+        <div class="panel" style="flex:1;border-left:1px solid var(--border)">
           <div class="panel-header">Visual Explanation</div>
           <div class="panel-body intuition-viz-body">${this.buildIntuitionViz()}</div>
         </div>
@@ -1084,9 +932,7 @@ class App {
 
   buildStages() {
     return INTUITION_STAGES.map((s, i) => {
-      let cls = 'future';
-      if (i === this.intuitionStage) cls = 'active';
-      else if (i < this.intuitionStage) cls = 'past';
+      const cls = i === this.intuitionStage ? 'active' : i < this.intuitionStage ? 'past' : 'future';
       return `
         <div class="stage-card ${cls}" onclick="app.iGoTo(${i})">
           <div class="stage-header">
@@ -1099,8 +945,7 @@ class App {
             <div class="stage-content">${s.content}</div>
             <div class="key-insight">${s.insight}</div>
           </div>` : ''}
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
 
@@ -1110,198 +955,161 @@ class App {
     if (!h) return '<div style="padding:16px;color:var(--text2)">No grid.</div>';
     const m = h.length, n = h[0].length;
     const key = (r, c) => `${r},${c}`;
-
-    if (viz === 'problem') return this.ivProblem(h, m, n);
-    if (viz === 'compare') return this.ivCompare();
-    if (viz === 'reverse') return this.ivReverse(h, m, n);
-    if (viz === 'seeds') return this.ivSeeds(h, m, n, key);
-    if (viz === 'bfs') return this.ivBfs(h, m, n, key);
-    if (viz === 'result') return this.ivResult(h, m, n, key);
-    if (viz === 'complexity') return this.ivComplexity(m, n);
+    if (viz === 'problem')     return this.ivProblem(h, m, n, key);
+    if (viz === 'compare')     return this.ivCompare();
+    if (viz === 'reverse')     return this.ivReverse();
+    if (viz === 'seeds')       return this.ivSeeds(h, m, n, key);
+    if (viz === 'bfs')         return this.ivBfs(h, m, n, key);
+    if (viz === 'result')      return this.ivResult(h, m, n, key);
+    if (viz === 'complexity')  return this.ivComplexity(m, n);
     return '';
   }
 
-  ivProblem(h, m, n) {
+  ivProblem(h, m, n, key) {
     let rows = '';
     for (let r = 0; r < m; r++) {
       let cols = '';
       for (let c = 0; c < n; c++) {
-        const isPacBorder = r === 0 || c === 0;
-        const isAtlBorder = r === m-1 || c === n-1;
-        let cls = 'cell-default';
-        if (isPacBorder && isAtlBorder) cls = 'cell-both';
-        else if (isPacBorder) cls = 'cell-seed-pacific';
-        else if (isAtlBorder) cls = 'cell-seed-atlantic';
+        const isPac = r === 0 || c === 0;
+        const isAtl = r === m-1 || c === n-1;
+        let cls = isPac && isAtl ? 'cell-both' : isPac ? 'cell-seed-pacific' : isAtl ? 'cell-seed-atlantic' : 'cell-default';
         cols += `<td class="grid-cell ${cls}">${h[r][c]}</td>`;
       }
       rows += `<tr>${cols}</tr>`;
     }
-    return `
-      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.6)"></div> Pacific border</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.6)"></div> Atlantic border</div>
-        </div>
-        <table class="grid-table"><tbody>${rows}</tbody></table>
-        <div style="font-size:11px;color:var(--text2);text-align:center;max-width:260px;line-height:1.6">
-          Water flows to cells with equal or lower height (4-directional).<br>
-          Find cells that can drain to <b style="color:#7cc4f5">Pacific</b> AND <b style="color:#f0a87a">Atlantic</b>.
-        </div>
-      </div>`;
+    return `<div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.6)"></div>Pacific border</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.6)"></div>Atlantic border</div>
+      </div>
+      <table class="grid-table"><tbody>${rows}</tbody></table>
+      <div style="font-size:11px;color:var(--text2);text-align:center;max-width:260px;line-height:1.6">
+        Water flows to cells with equal or lower height (4-directional).<br>
+        Find cells that can drain to <b style="color:#7cc4f5">Pacific</b> AND <b style="color:#f0a87a">Atlantic</b>.
+      </div>
+    </div>`;
   }
 
   ivCompare() {
-    return `
-      <div style="padding:8px;display:flex;flex-direction:column;gap:12px">
-        <div class="approach-card bad">
-          <h4>❌ Brute Force DFS Per Cell</h4>
-          <p>
-            For each of the <b>m×n</b> cells, run a DFS to check if it can reach both oceans.<br>
-            Each DFS can visit up to <b>m×n</b> cells.<br>
-            <b>Total: O(m² × n²)</b><br>
-            On a 200×200 grid: <b>1.6 billion</b> operations. Way too slow.
-          </p>
-        </div>
-        <div class="approach-card good">
-          <h4>✅ Reverse Multi-Source BFS</h4>
-          <p>
-            Seed from each ocean border, expand uphill.<br>
-            Each cell is visited <b>at most once per BFS</b>.<br>
-            Two BFS passes → <b>O(m × n)</b> total.<br>
-            The answer is simply <b>pacific_reach ∩ atlantic_reach</b>.
-          </p>
-        </div>
-        <div style="background:var(--bg2);padding:12px;border-radius:6px;font-size:11px;color:var(--text1);line-height:1.7">
-          <b style="color:var(--text0)">Why they're equivalent:</b> A cell X can drain to the Pacific forward iff the Pacific can reach X going uphill backward. Reversing the direction doesn't change which cells are connected — just the traversal direction.
-        </div>
-      </div>`;
+    return `<div style="padding:8px">
+      <div class="approach-card bad">
+        <h4>❌ Brute Force DFS Per Cell</h4>
+        <p>For each of the <b>m×n</b> cells, run a DFS to check if it can reach both oceans.<br>
+        Each DFS can visit up to <b>m×n</b> cells.<br>
+        <b>Total: O(m² × n²)</b><br>
+        On a 200×200 grid: <b>1.6 billion</b> operations.</p>
+      </div>
+      <div class="approach-card good">
+        <h4>✅ Reverse Multi-Source BFS</h4>
+        <p>Seed from each ocean border, expand uphill.<br>
+        Each cell is visited <b>at most once per BFS</b>.<br>
+        Two BFS passes → <b>O(m × n)</b> total.<br>
+        Answer = <b>pacific_reach ∩ atlantic_reach</b>.</p>
+      </div>
+      <div style="background:var(--bg2);padding:12px;border-radius:6px;font-size:11px;color:var(--text1);line-height:1.7;margin-top:0">
+        <b style="color:var(--text0)">Why they're equivalent:</b> A cell X can drain to the Pacific forward iff the Pacific can reach X going uphill backward. Same reachability, different traversal direction.
+      </div>
+    </div>`;
   }
 
-  ivReverse(h, m, n) {
-    const key = (r, c) => `${r},${c}`;
-    const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
-    // Show a small forward vs reverse arrow diagram using SVG
-    return `
-      <div style="padding:8px;display:flex;flex-direction:column;gap:14px;align-items:center">
-        <svg viewBox="0 0 340 160" width="320" style="font-family:var(--font-mono)">
-          <!-- Forward -->
-          <text x="10" y="18" font-size="11" fill="var(--text2)" font-family="var(--font-ui)" font-weight="700">FORWARD (downhill)</text>
-          <rect x="10" y="28" width="50" height="34" rx="4" fill="rgba(29,111,165,0.3)" stroke="#1d6fa5" stroke-width="1.5"/>
-          <text x="35" y="50" text-anchor="middle" font-size="13" fill="#7cc4f5">5</text>
-          <rect x="78" y="28" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
-          <text x="103" y="50" text-anchor="middle" font-size="13" fill="var(--text0)">4</text>
-          <rect x="146" y="28" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
-          <text x="171" y="50" text-anchor="middle" font-size="13" fill="var(--text0)">3</text>
-          <rect x="214" y="28" width="50" height="34" rx="4" fill="rgba(176,94,42,0.3)" stroke="#b05e2a" stroke-width="1.5"/>
-          <text x="239" y="50" text-anchor="middle" font-size="13" fill="#f0a87a">1</text>
-          <!-- arrows forward -->
-          <line x1="60" y1="45" x2="75" y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line x1="128" y1="45" x2="143" y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line x1="196" y1="45" x2="211" y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#arr)"/>
-          <text x="10" y="80" font-size="10" fill="var(--text2)">Pacific→</text>
-          <text x="225" y="80" font-size="10" fill="var(--text2)">→Atlantic</text>
+  ivReverse() {
+    return `<div style="padding:8px;display:flex;flex-direction:column;gap:14px;align-items:center">
+      <svg viewBox="0 0 340 170" width="310" style="font-family:var(--font-mono)">
+        <text x="10" y="18" font-size="11" fill="var(--text2)" font-family="var(--font-ui)" font-weight="700">FORWARD (downhill → ocean)</text>
+        <rect x="10"  y="28" width="50" height="34" rx="4" fill="rgba(29,111,165,0.3)"  stroke="#1d6fa5" stroke-width="1.5"/>
+        <text x="35"  y="50" text-anchor="middle" font-size="13" fill="#7cc4f5">5</text>
+        <rect x="78"  y="28" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="103" y="50" text-anchor="middle" font-size="13" fill="var(--text0)">4</text>
+        <rect x="146" y="28" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="171" y="50" text-anchor="middle" font-size="13" fill="var(--text0)">3</text>
+        <rect x="214" y="28" width="50" height="34" rx="4" fill="rgba(176,94,42,0.3)" stroke="#b05e2a" stroke-width="1.5"/>
+        <text x="239" y="50" text-anchor="middle" font-size="13" fill="#f0a87a">1</text>
+        <line x1="60"  y1="45" x2="75"  y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#a1)"/>
+        <line x1="128" y1="45" x2="143" y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#a1)"/>
+        <line x1="196" y1="45" x2="211" y2="45" stroke="var(--text1)" stroke-width="1.5" marker-end="url(#a1)"/>
+        <text x="10"  y="76" font-size="10" fill="var(--text2)">Pacific↗</text>
+        <text x="224" y="76" font-size="10" fill="var(--text2)">→ Atlantic</text>
 
-          <!-- Reverse -->
-          <text x="10" y="110" font-size="11" fill="var(--text2)" font-family="var(--font-ui)" font-weight="700">REVERSED (uphill)</text>
-          <rect x="10" y="120" width="50" height="34" rx="4" fill="rgba(29,111,165,0.3)" stroke="#1d6fa5" stroke-width="1.5"/>
-          <text x="35" y="142" text-anchor="middle" font-size="13" fill="#7cc4f5">5</text>
-          <rect x="78" y="120" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
-          <text x="103" y="142" text-anchor="middle" font-size="13" fill="var(--text0)">4</text>
-          <rect x="146" y="120" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
-          <text x="171" y="142" text-anchor="middle" font-size="13" fill="var(--text0)">3</text>
-          <rect x="214" y="120" width="50" height="34" rx="4" fill="rgba(176,94,42,0.3)" stroke="#b05e2a" stroke-width="1.5"/>
-          <text x="239" y="142" text-anchor="middle" font-size="13" fill="#f0a87a">1</text>
-          <!-- arrows reversed -->
-          <line x1="75" y1="137" x2="63" y2="137" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arr2)"/>
-          <line x1="143" y1="137" x2="131" y2="137" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arr2)"/>
-          <line x1="211" y1="137" x2="199" y2="137" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arr2)"/>
-          <text x="10" y="158" font-size="10" fill="var(--text2)">← Pacific</text>
-          <text x="225" y="158" font-size="10" fill="var(--text2)">Atlantic→</text>
-
-          <defs>
-            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <polygon points="0 0,8 3,0 6" fill="var(--text1)"/>
-            </marker>
-            <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <polygon points="0 0,8 3,0 6" fill="var(--accent)"/>
-            </marker>
-          </defs>
-        </svg>
-        <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.7">
-          Uphill constraint: <code style="font-family:var(--font-mono);color:var(--text0)">heights[nr][nc] >= heights[r][c]</code><br>
-          (Reversed form of the original downhill rule)
-        </div>
-      </div>`;
+        <text x="10" y="108" font-size="11" fill="var(--text2)" font-family="var(--font-ui)" font-weight="700">REVERSED (uphill from ocean)</text>
+        <rect x="10"  y="118" width="50" height="34" rx="4" fill="rgba(29,111,165,0.3)"  stroke="#1d6fa5" stroke-width="1.5"/>
+        <text x="35"  y="140" text-anchor="middle" font-size="13" fill="#7cc4f5">5</text>
+        <rect x="78"  y="118" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="103" y="140" text-anchor="middle" font-size="13" fill="var(--text0)">4</text>
+        <rect x="146" y="118" width="50" height="34" rx="4" fill="var(--bg2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="171" y="140" text-anchor="middle" font-size="13" fill="var(--text0)">3</text>
+        <rect x="214" y="118" width="50" height="34" rx="4" fill="rgba(176,94,42,0.3)" stroke="#b05e2a" stroke-width="1.5"/>
+        <text x="239" y="140" text-anchor="middle" font-size="13" fill="#f0a87a">1</text>
+        <line x1="75"  y1="135" x2="63"  y2="135" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="143" y1="135" x2="131" y2="135" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="211" y1="135" x2="199" y2="135" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="10"  y="162" font-size="10" fill="var(--text2)">← Pacific</text>
+        <text x="224" y="162" font-size="10" fill="var(--text2)">Atlantic ↙</text>
+        <defs>
+          <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--text1)"/></marker>
+          <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="var(--accent)"/></marker>
+        </defs>
+      </svg>
+      <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.7">
+        Uphill rule: <code style="font-family:var(--font-mono);color:var(--text0)">heights[nr][nc] &gt;= heights[r][c]</code>
+      </div>
+    </div>`;
   }
 
   ivSeeds(h, m, n, key) {
-    const pacSeeds = new Set();
-    const atlSeeds = new Set();
+    const pacSeeds = new Set(), atlSeeds = new Set();
     for (let r = 0; r < m; r++) pacSeeds.add(key(r, 0));
     for (let c = 1; c < n; c++) pacSeeds.add(key(0, c));
     for (let r = 0; r < m; r++) atlSeeds.add(key(r, n-1));
     for (let c = 0; c < n-1; c++) atlSeeds.add(key(m-1, c));
-
     let rows = '';
     for (let r = 0; r < m; r++) {
       let cols = '';
       for (let c = 0; c < n; c++) {
         const k = key(r, c);
-        let cls = 'cell-default';
-        if (pacSeeds.has(k) && atlSeeds.has(k)) cls = 'cell-both';
-        else if (pacSeeds.has(k)) cls = 'cell-seed-pacific';
-        else if (atlSeeds.has(k)) cls = 'cell-seed-atlantic';
+        const p = pacSeeds.has(k), a = atlSeeds.has(k);
+        let cls = p && a ? 'cell-both' : p ? 'cell-seed-pacific' : a ? 'cell-seed-atlantic' : 'cell-default';
         cols += `<td class="grid-cell ${cls}">${h[r][c]}</td>`;
       }
       rows += `<tr>${cols}</tr>`;
     }
-    return `
-      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.6)"></div> Pacific seeds (${pacSeeds.size})</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.6)"></div> Atlantic seeds (${atlSeeds.size})</div>
-        </div>
-        <table class="grid-table"><tbody>${rows}</tbody></table>
-        <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.6">
-          All border cells are enqueued simultaneously at the start of their respective BFS.
-        </div>
-      </div>`;
+    return `<div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.6)"></div>Pacific seeds (${pacSeeds.size})</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.6)"></div>Atlantic seeds (${atlSeeds.size})</div>
+      </div>
+      <table class="grid-table"><tbody>${rows}</tbody></table>
+      <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.6">
+        All border cells are enqueued simultaneously at the start of their respective BFS.
+      </div>
+    </div>`;
   }
 
   ivBfs(h, m, n, key) {
-    // Show a mid-pacific-BFS snapshot using the actual steps
-    const pacStep = this.steps.find(s => s.phase === 'pacific' && s.pacificVisited.size > 4 && s.pacificVisited.size < 10);
-    const step = pacStep || this.steps[Math.floor(this.steps.length * 0.3)];
+    const step = this.steps.find(s => s.phase === 'pacific' && s.pacificVisited.size > 4 && s.pacificVisited.size < 10)
+               || this.steps[Math.floor(this.steps.length * 0.3)];
     let rows = '';
     for (let r = 0; r < m; r++) {
       let cols = '';
       for (let c = 0; c < n; c++) {
         const k = key(r, c);
         const isCur = step.currentCell === k;
-        const isQ = (step.queueCells||[]).includes(k);
+        const isQ   = (step.queueCells||[]).includes(k);
         const inPac = step.pacificVisited.has(k);
-        let cls = 'cell-default';
-        if (inPac) cls = 'cell-pacific';
-        let extra = '';
-        if (isCur) extra = ' cell-current';
-        else if (isQ) extra = ' cell-queue';
+        let cls = inPac ? 'cell-pacific' : 'cell-default';
+        let extra = isCur ? ' cell-current' : isQ ? ' cell-queue' : '';
         cols += `<td class="grid-cell ${cls}${extra}">${h[r][c]}</td>`;
       }
       rows += `<tr>${cols}</tr>`;
     }
-    return `
-      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
-        <div style="font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.08em">Pacific BFS — mid-execution snapshot</div>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.35);border:1px solid #1d6fa5"></div> Pacific reachable</div>
-          <div class="legend-item"><div class="legend-swatch" style="outline:3px solid var(--yellow);background:var(--bg2)"></div> Current cell</div>
-          <div class="legend-item"><div class="legend-swatch" style="outline:2px dashed var(--green);background:var(--bg2)"></div> In queue</div>
-        </div>
-        <table class="grid-table"><tbody>${rows}</tbody></table>
-        <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.6">
-          Each cell is processed at most once — when dequeued, it tries to expand uphill to 4 neighbours.
-        </div>
-      </div>`;
+    return `<div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
+      <div style="font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.08em">Pacific BFS — mid-execution snapshot</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.35);border:1px solid #1d6fa5"></div>Pacific reachable</div>
+        <div class="legend-item"><div class="legend-swatch" style="outline:3px solid var(--yellow);background:var(--bg2)"></div>Current cell</div>
+        <div class="legend-item"><div class="legend-swatch" style="outline:2px dashed var(--green);background:var(--bg2)"></div>In queue</div>
+      </div>
+      <table class="grid-table"><tbody>${rows}</tbody></table>
+    </div>`;
   }
 
   ivResult(h, m, n, key) {
@@ -1311,134 +1119,88 @@ class App {
     for (let c = 1; c < n; c++) pacV.add(key(0, c));
     for (let r = 0; r < m; r++) atlV.add(key(r, n-1));
     for (let c = 0; c < n-1; c++) atlV.add(key(m-1, c));
-
-    const bfsFull = (seeds, visited) => {
-      const q = [...seeds.values()].map(k => k.split(',').map(Number));
-      let qi = 0;
+    const bfsFull = (visited) => {
+      const q = [...visited].map(k => k.split(',').map(Number)); let qi = 0;
       while (qi < q.length) {
         const [r, c] = q[qi++];
         for (const [dr, dc] of DIRS) {
-          const nr = r+dr, nc = c+dc;
-          const nk = key(nr, nc);
+          const nr = r+dr, nc = c+dc, nk = key(nr, nc);
           if (nr<0||nr>=m||nc<0||nc>=n||visited.has(nk)) continue;
           if (h[nr][nc] >= h[r][c]) { visited.add(nk); q.push([nr, nc]); }
         }
       }
     };
-    bfsFull(pacV, pacV);
-    bfsFull(atlV, atlV);
-
+    bfsFull(pacV); bfsFull(atlV);
     const both = new Set([...pacV].filter(k => atlV.has(k)));
     let rows = '';
     for (let r = 0; r < m; r++) {
       let cols = '';
       for (let c = 0; c < n; c++) {
         const k = key(r, c);
-        let cls = 'cell-default';
-        if (both.has(k)) cls = 'cell-both';
-        else if (pacV.has(k) && atlV.has(k)) cls = 'cell-both';
-        else if (pacV.has(k)) cls = 'cell-pacific';
-        else if (atlV.has(k)) cls = 'cell-atlantic';
+        let cls = both.has(k) ? 'cell-both' : pacV.has(k) ? 'cell-pacific' : atlV.has(k) ? 'cell-atlantic' : 'cell-default';
         cols += `<td class="grid-cell ${cls}">${h[r][c]}</td>`;
       }
       rows += `<tr>${cols}</tr>`;
     }
-    return `
-      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.35);border:1px solid #1d6fa5"></div> Pacific only</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.35);border:1px solid #b05e2a"></div> Atlantic only</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:rgba(124,58,237,0.45);border:1px solid #7c3aed"></div> Both (answer)</div>
-        </div>
-        <table class="grid-table"><tbody>${rows}</tbody></table>
-        <div style="font-size:11px;color:var(--accent);font-weight:700">Answer: ${both.size} cells</div>
-        <div style="font-size:11px;color:var(--text2);text-align:center;max-width:280px;line-height:1.6">
-          Purple cells drain to <b>both</b> oceans — they sit on the "watershed" between the two.
-        </div>
-      </div>`;
+    return `<div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(29,111,165,0.35);border:1px solid #1d6fa5"></div>Pacific only</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,94,42,0.35);border:1px solid #b05e2a"></div>Atlantic only</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(124,58,237,0.45);border:1px solid #7c3aed"></div>Both (answer)</div>
+      </div>
+      <table class="grid-table"><tbody>${rows}</tbody></table>
+      <div style="font-size:11px;color:var(--accent);font-weight:700">Answer: ${both.size} cells</div>
+    </div>`;
   }
 
   ivComplexity(m, n) {
-    return `
-      <div style="padding:8px;display:flex;flex-direction:column;gap:14px">
-        <table class="complexity-table">
-          <thead><tr><th>Operation</th><th>Bound</th><th>Why</th></tr></thead>
-          <tbody>
-            <tr><td>Pacific BFS</td><td>O(m×n)</td><td>Each cell enqueued ≤ once</td></tr>
-            <tr><td>Atlantic BFS</td><td>O(m×n)</td><td>Each cell enqueued ≤ once</td></tr>
-            <tr><td>Intersection</td><td>O(m×n)</td><td>Set intersection</td></tr>
-            <tr><td><b>Total Time</b></td><td><b>O(m×n)</b></td><td>Two BFS passes</td></tr>
-            <tr><td><b>Total Space</b></td><td><b>O(m×n)</b></td><td>Two visited sets + queue</td></tr>
-          </tbody>
-        </table>
-        <div class="edge-case">
-          <div class="ec-label">Edge Case: Empty grid</div>
-          <div class="ec-desc">Line 5–6: <code style="font-family:var(--font-mono)">if not heights or not heights[0]: return []</code></div>
-        </div>
-        <div class="edge-case">
-          <div class="ec-label">Edge Case: Single cell</div>
-          <div class="ec-desc">A 1×1 grid borders all four ocean edges — it's in both seed sets and will appear in the answer.</div>
-        </div>
-        <div class="edge-case">
-          <div class="ec-label">Edge Case: Flat grid (all same height)</div>
-          <div class="ec-desc">Uphill constraint (≥) allows equal-height traversal, so BFS expands everywhere — all cells are the answer.</div>
-        </div>
-      </div>`;
+    return `<div style="padding:8px">
+      <table class="complexity-table">
+        <thead><tr><th>Operation</th><th>Bound</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Pacific BFS</td><td>O(m×n)</td><td>Each cell enqueued ≤ once</td></tr>
+          <tr><td>Atlantic BFS</td><td>O(m×n)</td><td>Each cell enqueued ≤ once</td></tr>
+          <tr><td>Intersection</td><td>O(m×n)</td><td>Set intersection</td></tr>
+          <tr><td><b>Total Time</b></td><td><b>O(m×n)</b></td><td>Two BFS passes</td></tr>
+          <tr><td><b>Total Space</b></td><td><b>O(m×n)</b></td><td>Two visited sets + queue</td></tr>
+        </tbody>
+      </table>
+      <div class="edge-case"><div class="ec-label">Edge: Empty grid</div>
+        <div class="ec-desc"><code style="font-family:var(--font-mono)">if not heights or not heights[0]: return []</code></div></div>
+      <div class="edge-case"><div class="ec-label">Edge: Single cell</div>
+        <div class="ec-desc">A 1×1 grid borders all four ocean edges — always in the answer.</div></div>
+      <div class="edge-case"><div class="ec-label">Edge: Flat grid</div>
+        <div class="ec-desc">Uphill constraint (≥) allows equal-height traversal — BFS covers everything.</div></div>
+    </div>`;
   }
 
-  // ── CONTROLS ───────────────────────────────────────────────────
-  goStep(i) {
-    this.currentStep = Math.max(0, Math.min(i, this.steps.length - 1));
-    this.render();
-  }
-  stepFwd() { if (this.currentStep < this.steps.length - 1) { this.currentStep++; this.render(); } }
+  // ── CONTROLS ──────────────────────────────────────────────
+  goStep(i) { this.currentStep = Math.max(0, Math.min(i, this.steps.length-1)); this.render(); }
+  stepFwd()  { if (this.currentStep < this.steps.length-1) { this.currentStep++; this.render(); } }
   stepBack() { if (this.currentStep > 0) { this.currentStep--; this.render(); } }
   togglePlay() {
     this.isPlaying = !this.isPlaying;
     if (this.isPlaying) {
       this.playTimer = setInterval(() => {
-        if (this.currentStep >= this.steps.length - 1) {
-          this.isPlaying = false;
-          clearInterval(this.playTimer);
-          this.render();
-          return;
-        }
-        this.currentStep++;
-        this.render();
+        if (this.currentStep >= this.steps.length-1) { this.isPlaying = false; clearInterval(this.playTimer); this.render(); return; }
+        this.currentStep++; this.render();
       }, 1000 / this.speed);
-    } else {
-      clearInterval(this.playTimer);
-    }
+    } else { clearInterval(this.playTimer); }
     this.render();
   }
   setSpeed(v) { this.speed = parseFloat(v); if (this.isPlaying) { clearInterval(this.playTimer); this.isPlaying = false; this.togglePlay(); } }
-  seekBar(e, el) {
-    const rect = el.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    this.goStep(Math.round(pct * (this.steps.length - 1)));
-  }
+  seekBar(e, el) { const r = el.getBoundingClientRect(); this.goStep(Math.round(((e.clientX-r.left)/r.width)*(this.steps.length-1))); }
 
   iGoTo(i) { this.intuitionStage = i; this.render(); }
-  iStep(d) {
-    this.intuitionStage = Math.max(0, Math.min(this.intuitionStage + d, INTUITION_STAGES.length - 1));
-    this.render();
-  }
+  iStep(d)  { this.intuitionStage = Math.max(0, Math.min(this.intuitionStage+d, INTUITION_STAGES.length-1)); this.render(); }
   iToggle() {
     this.intuitionPlaying = !this.intuitionPlaying;
     if (this.intuitionPlaying) {
       this.intuitionTimer = setInterval(() => {
-        if (this.intuitionStage >= INTUITION_STAGES.length - 1) {
-          this.intuitionPlaying = false;
-          clearInterval(this.intuitionTimer);
-          this.render();
-          return;
-        }
-        this.intuitionStage++;
-        this.render();
+        if (this.intuitionStage >= INTUITION_STAGES.length-1) { this.intuitionPlaying = false; clearInterval(this.intuitionTimer); this.render(); return; }
+        this.intuitionStage++; this.render();
       }, 3500);
-    } else {
-      clearInterval(this.intuitionTimer);
-    }
+    } else { clearInterval(this.intuitionTimer); }
     this.render();
   }
 
@@ -1447,67 +1209,53 @@ class App {
     document.documentElement.setAttribute('data-theme', this.theme);
     this.render();
   }
-
   setMode(m) {
     this.mode = m;
-    clearInterval(this.playTimer);
-    clearInterval(this.intuitionTimer);
-    this.isPlaying = false;
-    this.intuitionPlaying = false;
+    clearInterval(this.playTimer); clearInterval(this.intuitionTimer);
+    this.isPlaying = false; this.intuitionPlaying = false;
     this.render();
   }
-
   parseInput() {
     const val = document.getElementById('input-field')?.value;
     const g = parseGrid(val);
     if (!g) { alert('Invalid input. Expected JSON 2D array e.g. [[1,2],[3,4]]'); return; }
-    this.inputVal = val;
-    this.heights = g;
-    this.steps = simulateBFS(g);
-    this.currentStep = 0;
-    this.render();
+    this.inputVal = val; this.heights = g;
+    this.steps = simulateBFS(g); this.currentStep = 0; this.render();
   }
 
-  // ── DRAG RESIZE ────────────────────────────────────────────────
+  // ── DRAG RESIZE ───────────────────────────────────────────
   bindDrag() {
     document.querySelectorAll('.resizer').forEach(el => {
       el.addEventListener('mousedown', (e) => {
-        const idx = parseInt(el.dataset.idx);
-        this.dragging = { idx, startX: e.clientX, startWidths: [...this.panelWidths] };
-        el.classList.add('dragging');
-        e.preventDefault();
+        this.dragging = { idx: parseInt(el.dataset.idx), startX: e.clientX, startWidths: [...this.panelWidths] };
+        el.classList.add('dragging'); e.preventDefault();
       });
     });
     document.addEventListener('mousemove', (e) => {
       if (!this.dragging) return;
       const root = document.getElementById('panels-root');
       if (!root) return;
-      const totalW = root.offsetWidth;
-      const dx = ((e.clientX - this.dragging.startX) / totalW) * 100;
+      const dx = ((e.clientX - this.dragging.startX) / root.offsetWidth) * 100;
       const { idx, startWidths } = this.dragging;
-      const newWidths = [...startWidths];
-      newWidths[idx] = Math.max(15, startWidths[idx] + dx);
-      newWidths[idx+1] = Math.max(15, startWidths[idx+1] - dx);
-      this.panelWidths = newWidths;
-      // Live update widths without full re-render
-      const panels = document.querySelectorAll('.panels > .panel');
-      panels.forEach((p, i) => { if (this.panelWidths[i] !== undefined) p.style.width = this.panelWidths[i] + '%'; });
+      const nw = [...startWidths];
+      nw[idx]   = Math.max(15, startWidths[idx]   + dx);
+      nw[idx+1] = Math.max(15, startWidths[idx+1] - dx);
+      this.panelWidths = nw;
+      document.querySelectorAll('.panels > .panel').forEach((p, i) => {
+        if (nw[i] !== undefined) p.style.width = nw[i] + '%';
+      });
     });
     document.addEventListener('mouseup', () => {
-      if (this.dragging) {
-        document.querySelectorAll('.resizer').forEach(el => el.classList.remove('dragging'));
-        this.dragging = null;
-      }
+      if (this.dragging) { document.querySelectorAll('.resizer').forEach(el => el.classList.remove('dragging')); this.dragging = null; }
     });
   }
 
-  // ── KEYS ───────────────────────────────────────────────────────
   bindKeys() {
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT') return;
-      if (e.code === 'Space') { e.preventDefault(); this.mode === 'execution' ? this.togglePlay() : this.iToggle(); }
-      if (e.code === 'ArrowRight') { e.preventDefault(); this.mode === 'execution' ? this.stepFwd() : this.iStep(1); }
-      if (e.code === 'ArrowLeft') { e.preventDefault(); this.mode === 'execution' ? this.stepBack() : this.iStep(-1); }
+      if (e.code === 'Space')      { e.preventDefault(); this.mode === 'execution' ? this.togglePlay() : this.iToggle(); }
+      if (e.code === 'ArrowRight') { e.preventDefault(); this.mode === 'execution' ? this.stepFwd()    : this.iStep(1); }
+      if (e.code === 'ArrowLeft')  { e.preventDefault(); this.mode === 'execution' ? this.stepBack()   : this.iStep(-1); }
     });
   }
 }
