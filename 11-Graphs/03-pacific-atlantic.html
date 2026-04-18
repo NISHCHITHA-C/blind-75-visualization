@@ -378,10 +378,10 @@ const CODE_LINES = [
   '            return visited',
   '',
   '        pacific_seeds  = [(r, 0) for r in range(m)] + \\',
-  '                         [(0, c) for c in range(1, n)]',
+  '                         [(0, c) for c in range(1, n)]', # all the co-ordinates of top and left is fetched
   '',
   '        atlantic_seeds = [(r, n - 1) for r in range(m)] + \\',
-  '                         [(m - 1, c) for c in range(n - 1)]',
+  '                         [(m - 1, c) for c in range(n - 1)]', # all the co-ordinates of bottom and  right is fetched
   '',
   '        pacific_reach  = bfs(pacific_seeds)',
   '        atlantic_reach = bfs(atlantic_seeds)',
