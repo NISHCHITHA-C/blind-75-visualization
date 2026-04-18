@@ -1,338 +1,1467 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>70. Climbing Stairs</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<title>70. Climbing Stairs - Visualizer</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090f;--surface:#0d1117;--card:#111620;--border:#1a2235;
-  --curr:#3b82f6;--prev1:#10b981;--prev2:#a78bfa;--result:#f59e0b;
-  --text:#e2e8f0;--muted:#475569;--dim:#1e293b;
-}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;}
+  :root {
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-panel: #1a2332;
+    --bg-header: #0f172a;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: #374151;
+    --accent: #60a5fa;
+    --accent2: #818cf8;
+    --highlight-line-bg: rgba(251, 191, 36, 0.13);
+    --highlight-line-border: #fbbf24;
+    --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
 
-header{display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.h-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:#3b82f6;}
-.h-title{font-size:.82rem;font-weight:600;color:var(--muted);}
-.h-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#10b981;}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.inp{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:5px 10px;border-radius:5px;outline:none;transition:border-color .2s;width:100px;}
-.inp:focus{border-color:#3b82f6;}
-.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;}
-.btn-p{background:#3b82f6;color:#fff;}.btn-p:hover{background:#2563eb;}
+    /* Dracula-inspired syntax */
+    --syn-keyword:  #ff79c6;
+    --syn-function: #50fa7b;
+    --syn-string:   #f1fa8c;
+    --syn-comment:  #6272a4;
+    --syn-number:   #bd93f9;
+    --syn-type:     #8be9fd;
+    --syn-operator: #ff79c6;
+    --syn-builtin:  #ffb86c;
+    --syn-self:     #ff5555;
+    --syn-default:  #f8f8f2;
+  }
+  [data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-panel: #fafbfc;
+    --bg-header: #f0f4ff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --highlight-line-bg: #fef9c3;
+    --highlight-line-border: #f59e0b;
+    /* GitHub-inspired syntax */
+    --syn-keyword:  #d73a49;
+    --syn-function: #6f42c1;
+    --syn-string:   #032f62;
+    --syn-comment:  #6a737d;
+    --syn-number:   #005cc5;
+    --syn-type:     #22863a;
+    --syn-operator: #d73a49;
+    --syn-builtin:  #e36209;
+    --syn-self:     #e36209;
+    --syn-default:  #24292e;
+  }
 
-main{display:grid;grid-template-columns:330px 1fr 240px;flex:1;overflow:hidden;}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.code-panel{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.plabel{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.code-scroll{overflow-y:auto;flex:1;padding:4px 0;}
-.cl{display:flex;align-items:stretch;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.8;position:relative;transition:background .15s;}
-.cl.active{background:rgba(59,130,246,.1);}
-.cl.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:0 2px 2px 0;}
-.ln{width:28px;text-align:right;padding-right:8px;color:var(--muted);font-size:.65rem;flex-shrink:0;user-select:none;line-height:1.8;}
-.cl.active .ln{color:#3b82f6;}
-.ct{padding-right:14px;white-space:pre;color:#abb2bf;}
-.kw{color:#c678dd;}.fn{color:#61afef;}.cm{color:#3d4d60;font-style:italic;}.nm{color:#e5c07b;}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-.viz-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.formula{padding:12px 18px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono';font-size:.8rem;color:var(--muted);text-align:center;}
-.formula .highlight{color:var(--curr);font-weight:700;}
+  /* ── HEADER ── */
+  #header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .header-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .problem-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .problem-title .num { color: var(--accent); }
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34,197,94,0.3);
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .theme-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .theme-btn:hover { color: var(--text-primary); border-color: var(--accent); }
 
-.dp-viz{flex:1;overflow:auto;padding:20px;}
-.dp-array{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:30px;}
-.dp-cell{display:flex;flex-direction:column;align-items:center;gap:6px;}
-.dp-idx{font-family:'JetBrains Mono';font-size:.65rem;color:var(--muted);}
-.dp-box{width:65px;height:65px;border-radius:10px;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:1.1rem;font-weight:700;color:var(--text);transition:all .3s;}
-.dp-cell.curr .dp-box{border-color:var(--curr);box-shadow:0 0 14px rgba(59,130,246,.3);color:var(--curr);}
-.dp-cell.prev1 .dp-box{border-color:var(--prev1);background:rgba(16,185,129,.06);color:var(--prev1);}
-.dp-cell.prev2 .dp-box{border-color:var(--prev2);background:rgba(167,139,250,.06);color:var(--prev2);}
-.dp-cell.done .dp-box{border-color:var(--result);background:rgba(245,158,11,.08);color:var(--result);}
+  /* mode toggle */
+  .mode-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .mode-btn {
+    padding: 6px 18px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .mode-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+  .mode-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(96,165,250,.18);
+  }
 
-.stairs-viz{margin-top:20px;display:flex;justify-content:center;}
-.stairs{display:flex;flex-direction:column-reverse;gap:2px;}
-.stair{display:flex;align-items:center;gap:2px;}
-.step{width:50px;height:30px;background:var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:.7rem;color:var(--muted);transition:all .3s;}
-.step.active{background:var(--curr);color:#fff;}
-.step.path{background:var(--prev1);color:#fff;}
+  /* input row (execution only) */
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .input-row label { font-size: 12px; color: var(--text-secondary); }
+  .input-row input {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    width: 80px;
+  }
+  .input-row input:focus { outline: none; border-color: var(--accent); }
+  .run-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity .15s;
+  }
+  .run-btn:hover { opacity: .85; }
 
-.decision{margin:10px 18px;padding:10px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-family:'JetBrains Mono';font-size:.73rem;color:var(--muted);flex-shrink:0;}
-.decision.calc{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.07);color:var(--curr);}
-.decision.done{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.07);color:var(--result);}
+  /* ── MAIN AREA ── */
+  #main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+  }
 
-.bot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-g:hover{border-color:#3b82f6;color:#3b82f6;}
-.btn:disabled{opacity:.3;cursor:not-allowed;}
-.step-info{font-family:'JetBrains Mono';font-size:.72rem;color:var(--muted);}
-.spd-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.spd-wrap label{font-size:.7rem;color:var(--muted);}
-input[type=range]{accent-color:#3b82f6;width:80px;}
+  /* ── PANELS ── */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+    background: var(--bg-panel);
+    min-width: 0;
+  }
+  .panel:last-child { border-right: none; }
+  .panel-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-header);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-body {
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+  }
 
-.log-panel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.log-panel .plabel{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;}
-.lc{font-size:.6rem;padding:2px 6px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:3px;cursor:pointer;font-family:inherit;}
-.lc:hover{color:var(--text);}
-.log-scroll{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:3px;}
-.le{font-family:'JetBrains Mono';font-size:.65rem;padding:4px 7px;border-radius:4px;background:var(--card);border:1px solid var(--border);}
-.le.calc{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05);color:var(--curr);}
-.le.done{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);color:var(--result);}
-.ls{color:var(--muted);margin-right:6px;}
+  /* drag handle */
+  .drag-handle {
+    width: 5px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background .15s;
+    z-index: 10;
+  }
+  .drag-handle:hover, .drag-handle.dragging { background: var(--accent); }
+
+  /* ── CODE PANEL ── */
+  .code-container {
+    padding: 12px 0;
+    min-height: 100%;
+  }
+  .code-line {
+    display: flex;
+    align-items: stretch;
+    min-height: 22px;
+    transition: background .15s;
+    padding: 1px 0;
+    border-left: 3px solid transparent;
+  }
+  .code-line.active {
+    background: var(--highlight-line-bg) !important;
+    border-left-color: var(--highlight-line-border);
+  }
+  .line-num {
+    display: inline-block;
+    min-width: 42px;
+    text-align: right;
+    padding-right: 14px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 22px;
+    user-select: none;
+    font-family: var(--font-mono);
+    opacity: .6;
+  }
+  .line-code {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 22px;
+    white-space: pre;
+    padding-right: 12px;
+    color: var(--syn-default);
+  }
+
+  /* Syntax token colors */
+  .kw   { color: var(--syn-keyword);  font-weight: 600; }
+  .fn   { color: var(--syn-function); }
+  .str  { color: var(--syn-string);   }
+  .cmt  { color: var(--syn-comment);  font-style: italic; }
+  .num  { color: var(--syn-number);   }
+  .typ  { color: var(--syn-type);     }
+  .op   { color: var(--syn-operator); }
+  .bi   { color: var(--syn-builtin);  }
+  .slf  { color: var(--syn-self);     }
+
+  /* ── VIZ PANEL ── */
+  .viz-inner {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  svg.main-viz { width: 100%; height: auto; }
+
+  /* ── CONTROL BAR ── */
+  .control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-header);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 13px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .12s;
+    min-width: 36px;
+  }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ctrl-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .ctrl-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .speed-sel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .step-counter {
+    font-size: 12px;
+    color: var(--text-secondary);
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* ── STEP LOG ── */
+  .step-log { padding: 12px; }
+  .step-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-primary);
+    background: rgba(96,165,250,.07);
+    border-left: 3px solid var(--accent);
+    padding: 8px 10px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 12px;
+  }
+  .vars-section h4, .hist-section h4 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+  }
+  .var-row {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 3px 0;
+  }
+  .var-row .vname { color: var(--accent); font-weight: 600; }
+  .var-row .vval  { color: var(--text-primary); }
+  .vars-section { margin-bottom: 14px; }
+  .hist-item {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    margin: 2px 0;
+    color: var(--text-secondary);
+    transition: background .1s;
+  }
+  .hist-item.current {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ── INTUITION PANELS ── */
+  .intuition-left, .intuition-right {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+  }
+  .intuition-left { border-right: 1px solid var(--border); }
+  .intuition-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 16px;
+  }
+  .stage-card {
+    margin-bottom: 22px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: opacity .3s, border-color .3s;
+  }
+  .stage-card.future { opacity: .28; }
+  .stage-card.past   { opacity: .55; }
+  .stage-card.active { opacity: 1; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(96,165,250,.15); }
+  .stage-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+  }
+  .stage-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stage-card.past .stage-num   { background: var(--text-secondary); }
+  .stage-card.future .stage-num { background: var(--border); }
+  .stage-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .stage-body { padding: 12px 14px; }
+  .thought-bubble {
+    background: rgba(96,165,250,.08);
+    border-left: 3px solid var(--accent2);
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .stage-content {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    white-space: pre-line;
+    margin-bottom: 10px;
+  }
+  .key-insight {
+    background: rgba(16,185,129,.08);
+    border-left: 3px solid #10b981;
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  .key-insight strong { color: #10b981; }
+
+  /* intuition viz area */
+  .intuition-viz-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* intuition controls */
+  .intuition-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-header);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  /* DP table */
+  .dp-table-wrap { overflow-x: auto; }
+  table.dp-tbl {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    width: 100%;
+  }
+  table.dp-tbl th, table.dp-tbl td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: center;
+    min-width: 36px;
+  }
+  table.dp-tbl th { background: var(--bg-secondary); color: var(--text-secondary); font-size: 11px; }
+  table.dp-tbl td { background: var(--bg-panel); color: var(--text-primary); }
+  table.dp-tbl td.hi { background: rgba(96,165,250,.2); color: var(--accent); font-weight: 700; }
+  table.dp-tbl td.hi2 { background: rgba(251,191,36,.15); color: #fbbf24; font-weight: 700; }
+
+  /* approach box */
+  .approach-box {
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .approach-bad  { background: rgba(239,68,68,.08); border-left: 4px solid #ef4444; }
+  .approach-good { background: rgba(16,185,129,.08); border-left: 4px solid #10b981; }
+  .approach-box h4 { margin-bottom: 6px; }
+  .approach-bad  h4 { color: #ef4444; }
+  .approach-good h4 { color: #10b981; }
+
+  /* recurrence box */
+  .recurrence {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    text-align: center;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: 8px;
+    color: var(--accent2);
+    font-weight: 600;
+    letter-spacing: .03em;
+  }
+
+  /* fib stairs */
+  .stairs-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .stair-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: all .3s;
+  }
+  .stair-rect {
+    width: 44px;
+    border-radius: 4px 4px 0 0;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 13px;
+    transition: background .3s, height .3s;
+  }
+
+  /* complexity table */
+  .cplx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cplx-table th, .cplx-table td {
+    border: 1px solid var(--border);
+    padding: 7px 12px;
+    text-align: left;
+  }
+  .cplx-table th { background: var(--bg-secondary); color: var(--text-secondary); font-size: 11px; text-transform: uppercase; }
+  .cplx-table td { background: var(--bg-panel); color: var(--text-primary); }
+  .cplx-table td.good { color: #22c55e; font-weight: 600; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 </style>
 </head>
 <body>
-<header>
-  <div class="h-num">70</div>
-  <div class="h-title">Climbing Stairs</div>
-  <div class="h-badge">EASY</div>
-  <div class="h-right">
-    <input id="nInput" class="inp" placeholder="n = 5"/>
-    <button class="btn btn-p" onclick="init()">Reset</button>
-  </div>
-</header>
 
-<main>
-  <div class="code-panel">
-    <div class="plabel">Dynamic Programming</div>
-    <div class="code-scroll" id="codePanel"></div>
+<div id="header">
+  <div class="header-row1">
+    <div class="problem-title">
+      <span class="num">70.</span> Climbing Stairs
+      <span class="badge">Easy</span>
+    </div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
   </div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="btnIntuition" onclick="setMode('intuition')">💡 Intuition &amp; Thought Process</button>
+    <button class="mode-btn"        id="btnExecution" onclick="setMode('execution')">▶️ Step-by-Step Execution</button>
+  </div>
+  <div class="input-row" id="inputRow" style="display:none">
+    <label>n =</label>
+    <input type="number" id="nInput" value="6" min="1" max="30"/>
+    <button class="run-btn" onclick="rerun()">▶ Run</button>
+  </div>
+</div>
 
-  <div class="viz-panel">
-    <div class="formula">
-      DP Formula: <span class="highlight">dp[i] = dp[i-1] + dp[i-2]</span>
-    </div>
-    
-    <div class="dp-viz">
-      <div class="dp-array" id="dpArray"></div>
-      <div class="stairs-viz" id="stairsViz"></div>
-    </div>
-    
-    <div id="decision" class="decision">Computing ways to climb stairs...</div>
-    
-    <div class="bot">
-      <button class="btn btn-g" id="btnPrev" onclick="stepBack()">◀ Prev</button>
-      <button class="btn btn-p" id="btnPlay" onclick="togglePlay()">▶ Play</button>
-      <button class="btn btn-g" id="btnNext" onclick="stepFwd()">Next ▶</button>
-      <span class="step-info" id="stepInfo">0 / 0</span>
-      <div class="spd-wrap">
-        <label>Speed:</label>
-        <input type="range" id="speedSlider" min="200" max="1400" value="800"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="log-panel">
-    <div class="plabel">
-      DP Log
-      <button class="lc" onclick="clearLog()">Clear</button>
-    </div>
-    <div class="log-scroll" id="logScroll"></div>
-  </div>
-</main>
+<div id="main"></div>
 
 <script>
-const code=[
-  {t:'def climbStairs(n):',cm:true},
-  {t:'    if n <= 2:',ln:1},
-  {t:'        return n',ln:2},
-  {t:'    ',ln:3},
-  {t:'    # dp[i] = ways to reach step i',cm:true},
-  {t:'    dp = [0] * (n + 1)',ln:4},
-  {t:'    dp[1] = 1  # 1 way to reach step 1',ln:5},
-  {t:'    dp[2] = 2  # 2 ways to reach step 2',ln:6},
-  {t:'    ',ln:7},
-  {t:'    for i in range(3, n + 1):',ln:8},
-  {t:'        # Can reach from (i-1) or (i-2)',cm:true},
-  {t:'        dp[i] = dp[i-1] + dp[i-2]',ln:9},
-  {t:'    ',ln:10},
-  {t:'    return dp[n]',ln:11}
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let state = {
+  theme: 'dark',
+  mode: 'intuition',
+  n: 6,
+  steps: [],
+  currentStep: 0,
+  isPlaying: false,
+  speed: 1,
+  playTimer: null,
+  iStage: 0,
+  iPlaying: false,
+  iTimer: null,
+};
+
+// ─────────────────────────────────────────────
+//  SOLUTION + STEP GENERATION
+// ─────────────────────────────────────────────
+function generateSteps(n) {
+  const steps = [];
+  function log(line, vars, desc, extra={}) {
+    steps.push({ line, vars: JSON.parse(JSON.stringify(vars)), desc, ...extra });
+  }
+
+  const vars = {};
+  log(0, {n}, `Start: climbStairs(${n})`);
+
+  if (n <= 2) {
+    vars.result = n;
+    log(1, {n, result:n}, `Base case: n=${n} ≤ 2, return ${n}`);
+    return steps;
+  }
+
+  log(1, {n}, `n=${n} > 2, skip base case branch`);
+
+  vars.prev2 = 1; vars.prev1 = 2;
+  log(5, {...vars}, `Initialise: prev2=1 (ways for n=1), prev1=2 (ways for n=2)`);
+
+  for (let i = 3; i <= n; i++) {
+    log(6, {...vars, i}, `Loop iteration i=${i}: computing ways for stair ${i}`);
+    const newPrev1 = vars.prev2 + vars.prev1;
+    const newPrev2 = vars.prev1;
+    vars.prev2 = newPrev2;
+    vars.prev1 = newPrev1;
+    log(7, {...vars, i, computed: `${newPrev2} + (${newPrev2}) → prev1=${newPrev1}`},
+        `prev2, prev1 = prev1, prev2+prev1  →  prev2=${vars.prev2}, prev1=${vars.prev1}`);
+  }
+
+  log(8, {...vars, result: vars.prev1}, `Return prev1 = ${vars.prev1} (ways to climb ${n} stairs)`);
+  return steps;
+}
+
+// ─────────────────────────────────────────────
+//  INTUITION STAGES
+// ─────────────────────────────────────────────
+const intuitionStages = [
+  {
+    title: "Understanding the Problem",
+    thought: "So I need to count how many distinct ways I can climb n stairs, taking 1 or 2 steps at a time...",
+    content: `The problem gives us n stairs and two allowed moves: take 1 step or take 2 steps. We want to count all distinct sequences of moves that get us from step 0 to step n.
+
+For example, with n=3:
+  [1,1,1], [1,2], [2,1] → 3 ways`,
+    insight: "At every stair, we arrive from either 1 step below or 2 steps below — that duality is the key.",
+    viz: "example"
+  },
+  {
+    title: "Spotting the Recursive Structure",
+    thought: "How many ways to reach stair i? I must have come from stair i−1 OR stair i−2. So ways(i) = ways(i−1) + ways(i−2). That's Fibonacci!",
+    content: `The number of ways to reach stair i is exactly:
+  ways(i) = ways(i−1) + ways(i−2)
+
+Because the last step was either +1 from i−1, or +2 from i−2.
+
+Base cases:
+  ways(1) = 1  (only one way: a single step)
+  ways(2) = 2  ({1+1} or {2})`,
+    insight: "This is the Fibonacci sequence in disguise. ways(n) = fib(n+1).",
+    viz: "recurrence"
+  },
+  {
+    title: "Naive Recursion vs DP",
+    thought: "Naive recursion recalculates the same subproblems exponentially. But I only need the last two values at any point...",
+    content: `Naïve recursion: T(n) = T(n-1) + T(n-2) → O(2ⁿ) — too slow!
+Memoised recursion: O(n) time, O(n) space — better.
+DP table: O(n) time, O(n) space — same complexity.
+Space-optimised DP: O(n) time, O(1) space — optimal!
+
+We only ever look back two positions, so we only need two variables.`,
+    insight: "Rolling two variables (prev2, prev1) replaces the entire DP array.",
+    viz: "comparison"
+  },
+  {
+    title: "The Rolling Variables Trick",
+    thought: "Instead of an array dp[0..n], I slide a window of size 2 forward. Each step: prev2, prev1 = prev1, prev2+prev1.",
+    content: `Iteration by iteration for n=6:
+  Init: prev2=1, prev1=2
+  i=3:  prev2=2, prev1=3
+  i=4:  prev2=3, prev1=5
+  i=5:  prev2=5, prev1=8
+  i=6:  prev2=8, prev1=13
+
+Answer = prev1 = 13 ✓`,
+    insight: "One tuple assignment per iteration — clean, cache-friendly, and O(1) space.",
+    viz: "rolling"
+  },
+  {
+    title: "Complexity Analysis",
+    thought: "O(n) time, O(1) space — this is provably optimal for this problem.",
+    content: `Time Complexity: O(n)
+  • Single loop from 3 to n
+  • One addition + one reassignment per step
+
+Space Complexity: O(1)
+  • Only prev2 and prev1 are stored
+  • No recursion stack, no array
+
+Can we do better? No — we must at least read n, so Ω(n) is a lower bound.`,
+    insight: "This solution matches the theoretical lower bound — it's as efficient as possible.",
+    viz: "complexity"
+  },
+  {
+    title: "Edge Cases & Testing",
+    thought: "What if n=1? n=2? Large n? The base case handles them without entering the loop.",
+    content: `n=1 → return 1  (base case, skip loop)
+n=2 → return 2  (base case, skip loop)
+n=3 → loop runs once: 1+2=3 ✓
+n=10 → 89 ways
+n=45 → 1,836,311,903 (fits in int32)
+
+The constraint says 1 ≤ n ≤ 45, so no overflow.`,
+    insight: "The early return for n ≤ 2 prevents an off-by-one error and simplifies the loop.",
+    viz: "edgecases"
+  },
+  {
+    title: "Final Synthesis",
+    thought: "Elegant. Two lines of init, one loop, one return. The whole solution is the Fibonacci recurrence written in-place.",
+    content: `The pattern: Fibonacci recurrence expressed as sliding variables.
+
+• Identify the recurrence: ways(i) = ways(i-1) + ways(i-2)
+• Recognise only the last two values are needed
+• Replace array with two variables
+• Handle base cases separately
+
+This exact rolling-window technique applies to House Robber, Min Cost Climbing Stairs, and many more DP problems.`,
+    insight: "Master the rolling-variable Fibonacci pattern and a whole class of DP problems becomes trivial.",
+    viz: "final"
+  }
 ];
 
-let n,steps=[],cursor=0,playing=false,playTimer;
+// ─────────────────────────────────────────────
+//  SYNTAX HIGHLIGHTING
+// ─────────────────────────────────────────────
+const RAW_CODE = [
+  'class Solution:',
+  '    def climbStairs(self, n: int) -> int:',
+  '        if n <= 2:',
+  '            return n',
+  '        ',
+  '        # Space-optimised DP: O(1) space, O(n) time',
+  '        # No need for an array — only the last two values matter',
+  '        prev2, prev1 = 1, 2',
+  '        for _ in range(3, n + 1):',
+  '            prev2, prev1 = prev1, prev2 + prev1',
+  '        return prev1',
+];
 
-function buildCode(){
-  const panel=document.getElementById('codePanel');
-  code.forEach((c,i)=>{
-    const line=document.createElement('div');
-    line.className='cl';
-    line.id=`line${c.ln||i}`;
-    const ln=document.createElement('div');ln.className='ln';
-    ln.textContent=c.ln!==undefined?c.ln:'';
-    const ct=document.createElement('div');ct.className='ct';
-    if(c.cm){
-      ct.innerHTML=`<span class="cm">${c.t}</span>`;
-    }else{
-      ct.innerHTML=c.t
-        .replace(/(def|if|for|in|return|range)/g,'<span class="kw">$1</span>')
-        .replace(/(climbStairs)/g,'<span class="fn">$1</span>')
-        .replace(/(n|dp|i)/g,'<span class="nm">$1</span>');
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Token-based highlighter: tokenise the RAW string first, then emit HTML.
+// Regexes only ever run on plain text — never on already-emitted HTML.
+function highlightLine(raw) {
+  if (!raw || !raw.trim()) return '&nbsp;';
+
+  const KEYWORDS = new Set(['class','def','return','if','elif','else','for','while',
+    'in','and','or','not','import','from','pass','True','False','None',
+    'lambda','with','as','yield','raise','try','except','finally','break','continue']);
+  const BUILTINS = new Set(['range','len','print','int','str','list','dict','set',
+    'tuple','enumerate','zip','map','filter','sorted','reversed','sum',
+    'min','max','abs','type','isinstance','hasattr','getattr']);
+
+  // Tokeniser: produces [{type, val}]
+  const tokens = [];
+  let i = 0;
+  const s = raw;
+
+  while (i < s.length) {
+    // Inline comment
+    if (s[i] === '#') {
+      tokens.push({ type: 'comment', val: s.slice(i) });
+      break;
     }
-    line.appendChild(ln);line.appendChild(ct);panel.appendChild(line);
+    // Triple-quoted string
+    if (s.slice(i,i+3) === '"""' || s.slice(i,i+3) === "'''") {
+      const q = s.slice(i,i+3);
+      let j = i + 3;
+      while (j < s.length && s.slice(j,j+3) !== q) j++;
+      j += 3;
+      tokens.push({ type: 'string', val: s.slice(i, j) });
+      i = j; continue;
+    }
+    // Single-quoted string
+    if (s[i] === '"' || s[i] === "'") {
+      const q = s[i]; let j = i + 1;
+      while (j < s.length && s[j] !== q && s[j] !== '\n') {
+        if (s[j] === '\\') j++;
+        j++;
+      }
+      j++;
+      tokens.push({ type: 'string', val: s.slice(i, j) });
+      i = j; continue;
+    }
+    // Number
+    if (/\d/.test(s[i]) && (i === 0 || /[\W]/.test(s[i-1]))) {
+      let j = i;
+      while (j < s.length && /[\d.]/.test(s[j])) j++;
+      tokens.push({ type: 'number', val: s.slice(i, j) });
+      i = j; continue;
+    }
+    // Identifier or keyword
+    if (/[a-zA-Z_]/.test(s[i])) {
+      let j = i;
+      while (j < s.length && /\w/.test(s[j])) j++;
+      const word = s.slice(i, j);
+      // peek ahead for '(' to detect function calls
+      let k = j;
+      while (k < s.length && s[k] === ' ') k++;
+      const isCall = s[k] === '(';
+      if (word === 'self') {
+        tokens.push({ type: 'self', val: word });
+      } else if (KEYWORDS.has(word)) {
+        tokens.push({ type: 'keyword', val: word });
+      } else if (BUILTINS.has(word) && isCall) {
+        tokens.push({ type: 'builtin', val: word });
+      } else if (isCall) {
+        tokens.push({ type: 'function', val: word });
+      } else if (/^[A-Z]/.test(word)) {
+        tokens.push({ type: 'type', val: word });
+      } else {
+        tokens.push({ type: 'plain', val: word });
+      }
+      i = j; continue;
+    }
+    // Arrow ->
+    if (s.slice(i,i+2) === '->') {
+      tokens.push({ type: 'operator', val: '->' });
+      i += 2; continue;
+    }
+    // Operators
+    if (/[+\-*\/=<>!%^~|&]/.test(s[i])) {
+      let j = i;
+      while (j < s.length && /[+\-*\/=<>!%^~|&]/.test(s[j])) j++;
+      tokens.push({ type: 'operator', val: s.slice(i, j) });
+      i = j; continue;
+    }
+    // Everything else (spaces, punctuation, colons, parens…)
+    tokens.push({ type: 'plain', val: s[i] });
+    i++;
+  }
+
+  // Emit HTML — each token's text is escaped individually
+  const CLASS = {
+    keyword: 'kw', function: 'fn', string: 'str', comment: 'cmt',
+    number: 'num', type: 'typ', operator: 'op', builtin: 'bi',
+    self: 'slf', plain: null
+  };
+  return tokens.map(t => {
+    const cls = CLASS[t.type];
+    const escaped = esc(t.val);
+    return cls ? `<span class="${cls}">${escaped}</span>` : escaped;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const main = document.getElementById('main');
+  document.getElementById('inputRow').style.display = state.mode === 'execution' ? 'flex' : 'none';
+  document.getElementById('btnIntuition').className = 'mode-btn' + (state.mode === 'intuition' ? ' active' : '');
+  document.getElementById('btnExecution').className = 'mode-btn' + (state.mode === 'execution' ? ' active' : '');
+
+  if (state.mode === 'execution') {
+    main.innerHTML = renderExecutionMode();
+    // Mount code panel via DOM to avoid double-escaping highlighted HTML
+    const mount = document.getElementById('codeMount');
+    if (mount) mount.replaceWith(buildCodePanel(state.steps[state.currentStep]?.line ?? -1));
+    attachDragHandles();
+    scrollLogToStep();
+    scrollCodeToLine(state.steps[state.currentStep]?.line ?? 0);
+  } else {
+    main.innerHTML = renderIntuitionMode();
+    scrollIntuitionToStage();
+  }
+}
+
+// ── EXECUTION MODE ──
+let panelW = [30, 50, 20]; // %
+
+function buildCodePanel(currentLine) {
+  const container = document.createElement('div');
+  container.className = 'code-container';
+  container.id = 'codeContainer';
+
+  RAW_CODE.forEach((rawLine, i) => {
+    const row = document.createElement('div');
+    row.className = 'code-line' + (i === currentLine ? ' active' : '');
+
+    const num = document.createElement('span');
+    num.className = 'line-num';
+    num.textContent = i + 1;
+
+    const code = document.createElement('span');
+    code.className = 'line-code';
+    // highlightLine returns safe HTML — assign via innerHTML
+    code.innerHTML = highlightLine(rawLine) || '&nbsp;';
+
+    row.appendChild(num);
+    row.appendChild(code);
+    container.appendChild(row);
+  });
+
+  return container;
+}
+
+function renderExecutionMode() {
+  const step = state.steps[state.currentStep] || {};
+  const currentLine = step.line ?? -1;
+
+  // Viz panel
+  const vizHTML = renderExecViz(step);
+
+  // Step log
+  const logHTML = renderStepLog(step);
+
+  return `
+    <div class="panel" id="pCode" style="width:${panelW[0]}%">
+      <div class="panel-header">Code <span>Python 3</span></div>
+      <div class="panel-body">
+        <div id="codeMount"></div>
+      </div>
+    </div>
+    <div class="drag-handle" id="dh0"></div>
+    <div class="panel" id="pViz" style="width:${panelW[1]}%;flex:1">
+      <div class="panel-header">Visualisation <span style="color:var(--text-secondary);font-weight:400">n = ${state.n}</span></div>
+      <div class="panel-body">
+        <div class="viz-inner" id="vizInner">${vizHTML}</div>
+      </div>
+      <div class="control-bar">
+        <button class="ctrl-btn" onclick="resetSteps()" title="Reset">⏮</button>
+        <button class="ctrl-btn" onclick="stepBack()" ${state.currentStep===0?'disabled':''}>◀</button>
+        <button class="ctrl-btn primary" onclick="togglePlay()">${state.isPlaying ? '⏸' : '▶'}</button>
+        <button class="ctrl-btn" onclick="stepFwd()" ${state.currentStep>=state.steps.length-1?'disabled':''}>▶</button>
+        <select class="speed-sel" onchange="setSpeed(parseFloat(this.value))">
+          <option value="0.5" ${state.speed===0.5?'selected':''}>0.5×</option>
+          <option value="1"   ${state.speed===1  ?'selected':''}>1×</option>
+          <option value="2"   ${state.speed===2  ?'selected':''}>2×</option>
+          <option value="4"   ${state.speed===4  ?'selected':''}>4×</option>
+        </select>
+        <span class="step-counter">Step ${state.currentStep + 1} / ${state.steps.length}</span>
+      </div>
+    </div>
+    <div class="drag-handle" id="dh1"></div>
+    <div class="panel" id="pLog" style="width:${panelW[2]}%">
+      <div class="panel-header">Step Log</div>
+      <div class="panel-body" id="logBody">
+        <div class="step-log">${logHTML}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderExecViz(step) {
+  const vars = step.vars || {};
+  const n = state.n;
+  const dp = computeDP(n);
+
+  // Determine which cells to highlight
+  const currentI = vars.i ?? (step.line === 5 ? 2 : (step.line === 8 ? n : -1));
+
+  // We'll highlight prev2 and prev1 positions
+  let hi2pos = -1, hi1pos = -1;
+  if (vars.prev2 !== undefined && vars.prev1 !== undefined) {
+    // find positions in dp array where value matches
+    const p1 = vars.prev1, p2 = vars.prev2;
+    // reconstruct which index we're at from the iteration i
+    if (vars.i !== undefined) {
+      hi1pos = vars.i;
+      hi2pos = vars.i - 1;
+    } else if (step.line === 5) {
+      hi1pos = 2; hi2pos = 1;
+    } else if (step.line === 8) {
+      hi1pos = n; hi2pos = n - 1;
+    }
+  }
+
+  // Build DP table cells
+  const cells = dp.map((v, i) => {
+    let cls = '';
+    if (i === hi1pos) cls = 'hi';
+    else if (i === hi2pos) cls = 'hi2';
+    return `<td class="${cls}">${v}</td>`;
+  }).join('');
+
+  const headers = dp.map((_, i) => `<th>${i}</th>`).join('');
+
+  // Variable display
+  const varBoxes = [];
+  if (vars.prev2 !== undefined) varBoxes.push(`<div style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;margin:0 12px"><div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:#fbbf24">${vars.prev2}</div><div style="font-size:11px;color:var(--text-secondary);font-family:var(--font-mono)">prev2</div></div>`);
+  if (vars.prev1 !== undefined) varBoxes.push(`<div style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;margin:0 12px"><div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--accent)">${vars.prev1}</div><div style="font-size:11px;color:var(--text-secondary);font-family:var(--font-mono)">prev1</div></div>`);
+
+  const varRow = varBoxes.length ? `
+    <div style="display:flex;align-items:center;justify-content:center;padding:14px;background:var(--bg-secondary);border-radius:10px;border:1px solid var(--border)">
+      ${varBoxes.join('<div style="font-size:24px;color:var(--text-secondary);font-weight:300;margin:0 4px">→</div>')}
+    </div>
+  ` : '';
+
+  // Stairs SVG
+  const stairSvg = buildStairsSVG(n, vars);
+
+  return `
+    ${varRow}
+    <div style="width:100%">
+      <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">DP Values (index = stair)</div>
+      <div class="dp-table-wrap">
+        <table class="dp-tbl">
+          <tr>${headers}</tr>
+          <tr>${cells}</tr>
+        </table>
+      </div>
+    </div>
+    ${stairSvg}
+  `;
+}
+
+function computeDP(n) {
+  const dp = [0, 1, 2];
+  for (let i = 3; i <= n; i++) dp.push(dp[i-1] + dp[i-2]);
+  return dp.slice(0, n + 1);
+}
+
+function buildStairsSVG(n, vars) {
+  const dp = computeDP(n);
+  const maxVal = dp[n];
+  const W = 560, H = 180;
+  const barW = Math.min(44, (W - 40) / (n + 1));
+  const barGap = barW + 4;
+
+  // Determine highlighted index
+  let hiIdx = -1;
+  if (vars.i !== undefined) hiIdx = vars.i;
+  else if (vars.result !== undefined) hiIdx = n;
+
+  const bars = dp.slice(1).map((v, idx) => {
+    const i = idx + 1;
+    const barH = Math.max(10, (v / maxVal) * (H - 50));
+    const x = 20 + idx * barGap;
+    const y = H - 20 - barH;
+    const fill = i === hiIdx ? '#60a5fa' : (i === n ? '#818cf8' : '#374151');
+    return `
+      <rect x="${x}" y="${y}" width="${barW}" height="${barH}" fill="${fill}" rx="3" opacity="${i > (vars.i ?? n) && vars.i !== undefined ? 0.4 : 1}"/>
+      <text x="${x + barW/2}" y="${y - 4}" text-anchor="middle" font-size="11" fill="${i === hiIdx ? '#60a5fa' : '#9ca3af'}" font-family="var(--font-mono)">${v}</text>
+      <text x="${x + barW/2}" y="${H - 4}" text-anchor="middle" font-size="10" fill="#6b7280" font-family="var(--font-mono)">${i}</text>
+    `;
+  }).join('');
+
+  return `<div style="width:100%">
+    <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Ways per Stair</div>
+    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      ${bars}
+    </svg>
+  </div>`;
+}
+
+function renderStepLog(step) {
+  const vars = step.vars || {};
+  const varRows = Object.entries(vars).map(([k, v]) =>
+    `<div class="var-row"><span class="vname">${k}</span><span style="color:var(--text-secondary)"> = </span><span class="vval">${typeof v === 'object' ? JSON.stringify(v) : v}</span></div>`
+  ).join('');
+
+  const hist = state.steps.slice(0, state.currentStep + 1).map((s, i) =>
+    `<div class="hist-item${i === state.currentStep ? ' current' : ''}" id="hist${i}">${i+1}. ${s.desc}</div>`
+  ).join('');
+
+  return `
+    <div class="step-desc">${step.desc || '—'}</div>
+    <div class="vars-section">
+      <h4>Variables</h4>
+      ${varRows || '<div style="font-size:12px;color:var(--text-secondary)">—</div>'}
+    </div>
+    <div class="hist-section">
+      <h4>History</h4>
+      ${hist}
+    </div>
+  `;
+}
+
+// ── INTUITION MODE ──
+function renderIntuitionMode() {
+  const stages = intuitionStages;
+  const cur = state.iStage;
+
+  const stageCards = stages.map((s, i) => {
+    const cls = i === cur ? 'active' : (i < cur ? 'past' : 'future');
+    return `
+      <div class="stage-card ${cls}" id="istage${i}" onclick="jumpToStage(${i})">
+        <div class="stage-card-header">
+          <div class="stage-num">${i + 1}</div>
+          <div class="stage-title">${s.title}</div>
+        </div>
+        ${i === cur ? `
+        <div class="stage-body">
+          <div class="thought-bubble">💭 "${s.thought}"</div>
+          <div class="stage-content">${s.content}</div>
+          <div class="key-insight"><strong>💡 Key Insight:</strong> ${s.insight}</div>
+        </div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  const vizHTML = renderIntuitionViz(stages[cur]);
+
+  return `
+    <div class="intuition-left">
+      <div class="panel-header">Senior Engineer's Thought Process <span>Stage ${cur+1}/${stages.length}</span></div>
+      <div class="intuition-body" id="intuitionBody">${stageCards}</div>
+      <div class="intuition-ctrl">
+        <button class="ctrl-btn" onclick="iStepBack()" ${cur===0?'disabled':''}>◀ Prev</button>
+        <button class="ctrl-btn primary" onclick="iTogglePlay()">${state.iPlaying ? '⏸ Pause' : '▶ Play'}</button>
+        <button class="ctrl-btn" onclick="iStepFwd()" ${cur>=stages.length-1?'disabled':''}>Next ▶</button>
+        <span class="step-counter">${cur+1} / ${stages.length}</span>
+      </div>
+    </div>
+    <div class="intuition-right">
+      <div class="panel-header">Visual Explanation</div>
+      <div class="intuition-viz-body" id="intuitionViz">${vizHTML}</div>
+    </div>
+  `;
+}
+
+function renderIntuitionViz(stage) {
+  switch (stage.viz) {
+    case 'example':      return vizExample();
+    case 'recurrence':   return vizRecurrence();
+    case 'comparison':   return vizComparison();
+    case 'rolling':      return vizRolling();
+    case 'complexity':   return vizComplexity();
+    case 'edgecases':    return vizEdgeCases();
+    case 'final':        return vizFinal();
+    default:             return vizExample();
+  }
+}
+
+function vizExample() {
+  return `
+    <div style="background:var(--bg-secondary);border-radius:10px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-primary)">For n = 4, there are 5 ways:</div>
+      ${['[1,1,1,1]','[1,1,2]','[1,2,1]','[2,1,1]','[2,2]'].map((w,i) => `
+        <div style="font-family:var(--font-mono);font-size:13px;padding:5px 10px;border-radius:5px;margin:4px 0;background:rgba(96,165,250,${0.05+i*0.03});color:var(--accent);border-left:3px solid var(--accent)">${w}</div>
+      `).join('')}
+    </div>
+    <div style="background:var(--bg-secondary);border-radius:10px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">Staircase (n=6)</div>
+      <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+        ${[1,2,3,4,5,6].map((s,i) => {
+          const x = 20 + i * 48, y = 130 - s * 18, h = s * 18;
+          return `<rect x="${x}" y="${y}" width="40" height="${h}" fill="rgba(96,165,250,${0.15+i*0.1})" stroke="#60a5fa" stroke-width="1.5" rx="3"/>
+          <text x="${x+20}" y="${y-5}" text-anchor="middle" font-size="11" fill="#9ca3af">${s}</text>`;
+        }).join('')}
+      </svg>
+    </div>
+  `;
+}
+
+function vizRecurrence() {
+  return `
+    <div class="recurrence">dp[i] = dp[i−1] + dp[i−2]</div>
+    <div style="background:var(--bg-secondary);border-radius:10px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">DP Array for n=8</div>
+      <table class="dp-tbl" style="font-size:13px">
+        <tr>${[0,1,2,3,4,5,6,7,8].map(i=>`<th>${i}</th>`).join('')}</tr>
+        <tr>${[0,1,2,3,5,8,13,21,34].map((v,i)=>`<td${i>=1?` class="${i<=2?'hi2':'hi'}"`:''}>${v}</td>`).join('')}</tr>
+      </table>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:10px;line-height:1.7">
+        <span style="color:#fbbf24">■ Base cases</span> &nbsp;
+        <span style="color:var(--accent)">■ Fibonacci values</span>
+      </div>
+    </div>
+    <div class="recurrence" style="font-size:13px;color:var(--text-secondary)">
+      ways(n) = fib(n+1) &nbsp;—&nbsp; Fibonacci shifted by 1
+    </div>
+  `;
+}
+
+function vizComparison() {
+  return `
+    <div class="approach-box approach-bad">
+      <h4>❌ Naive Recursion — O(2ⁿ)</h4>
+      <div style="color:var(--text-secondary)">Recomputes same subproblems repeatedly. For n=40, that's ~1 billion calls.</div>
+    </div>
+    <div class="approach-box" style="background:rgba(251,191,36,.07);border-left:4px solid #fbbf24">
+      <h4 style="color:#fbbf24">⚠️ Memoised / Full DP Table — O(n) time, O(n) space</h4>
+      <div style="color:var(--text-secondary)">Stores all values. Correct and fast, but wastes memory storing the full array.</div>
+    </div>
+    <div class="approach-box approach-good">
+      <h4>✅ Rolling Variables — O(n) time, O(1) space</h4>
+      <div style="color:var(--text-secondary)">Only two variables needed. Memory is constant regardless of n. This is our solution.</div>
+    </div>
+  `;
+}
+
+function vizRolling() {
+  const steps = [
+    {i:'Init', prev2:1, prev1:2},
+    {i:3,  prev2:2, prev1:3},
+    {i:4,  prev2:3, prev1:5},
+    {i:5,  prev2:5, prev1:8},
+    {i:6,  prev2:8, prev1:13},
+  ];
+  const rows = steps.map((s,idx) => `
+    <tr style="${idx===steps.length-1?'background:rgba(96,165,250,.08);font-weight:600':''}">
+      <td style="padding:6px 12px;border:1px solid var(--border);font-family:var(--font-mono);text-align:center">${s.i}</td>
+      <td style="padding:6px 12px;border:1px solid var(--border);font-family:var(--font-mono);text-align:center;color:#fbbf24">${s.prev2}</td>
+      <td style="padding:6px 12px;border:1px solid var(--border);font-family:var(--font-mono);text-align:center;color:var(--accent)">${s.prev1}</td>
+    </tr>
+  `).join('');
+  return `
+    <div class="recurrence">prev2, prev1 = prev1, prev2 + prev1</div>
+    <div style="overflow-x:auto">
+      <table style="border-collapse:collapse;width:100%;font-size:13px">
+        <thead><tr>
+          <th style="padding:6px 12px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-size:11px">i</th>
+          <th style="padding:6px 12px;border:1px solid var(--border);background:var(--bg-secondary);color:#fbbf24;font-size:11px">prev2</th>
+          <th style="padding:6px 12px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--accent);font-size:11px">prev1</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="background:rgba(16,185,129,.08);border-left:3px solid #10b981;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--text-primary)">
+      Answer = <strong style="color:var(--accent)">prev1 = 13</strong> for n=6 ✓
+    </div>
+  `;
+}
+
+function vizComplexity() {
+  return `
+    <table class="cplx-table">
+      <thead><tr><th>Metric</th><th>Value</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Time</td><td class="good">O(n)</td><td>Single loop, 1 op per step</td></tr>
+        <tr><td>Space</td><td class="good">O(1)</td><td>Only prev2 &amp; prev1 stored</td></tr>
+        <tr><td>Best possible time</td><td>Ω(n)</td><td>Must read n at minimum</td></tr>
+        <tr><td>Constraint</td><td>1 ≤ n ≤ 45</td><td>Fits in 32-bit int</td></tr>
+      </tbody>
+    </table>
+    <div style="background:rgba(16,185,129,.08);border-left:3px solid #10b981;padding:12px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--text-primary)">
+      <strong>Optimal:</strong> Time complexity matches the theoretical lower bound. No further improvement is possible.
+    </div>
+  `;
+}
+
+function vizEdgeCases() {
+  const cases = [
+    {n:1, ans:1, note:'Base case — single step'},
+    {n:2, ans:2, note:'Base case — {1+1} or {2}'},
+    {n:3, ans:3, note:'First loop iteration'},
+    {n:10,ans:89,note:'Mid-range value'},
+    {n:45,ans:1836311903,note:'Maximum input — fits in int32'},
+  ];
+  return `
+    <div style="overflow-x:auto">
+      <table class="cplx-table">
+        <thead><tr><th>n</th><th>Answer</th><th>Note</th></tr></thead>
+        <tbody>${cases.map(c=>`<tr><td style="font-family:var(--font-mono)">${c.n}</td><td style="font-family:var(--font-mono);color:var(--accent)">${c.ans.toLocaleString()}</td><td style="color:var(--text-secondary)">${c.note}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function vizFinal() {
+  return `
+    <div style="background:var(--bg-secondary);border-radius:10px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:12px">Pattern: Rolling Fibonacci</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.7">
+        This exact technique solves a whole family of DP problems:<br>
+        • <strong>House Robber</strong> (LeetCode 198)<br>
+        • <strong>Min Cost Climbing Stairs</strong> (LeetCode 746)<br>
+        • <strong>Fibonacci Number</strong> (LeetCode 509)<br>
+        • <strong>Tribonacci</strong> (LeetCode 1137)<br><br>
+        <em>Master this pattern once — apply it everywhere.</em>
+      </div>
+    </div>
+    <div class="recurrence" style="font-size:13px">
+      ways(n) = fib(n+1) &nbsp;•&nbsp; O(n) time &nbsp;•&nbsp; O(1) space
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+//  INTERACTION
+// ─────────────────────────────────────────────
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', state.theme === 'light' ? 'light' : '');
+  document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+}
+
+function setMode(m) {
+  stopPlay(); stopIPlay();
+  state.mode = m;
+  render();
+}
+
+function rerun() {
+  stopPlay();
+  const v = parseInt(document.getElementById('nInput').value);
+  if (isNaN(v) || v < 1 || v > 45) return;
+  state.n = v;
+  state.steps = generateSteps(v);
+  state.currentStep = 0;
+  render();
+}
+
+function stepFwd() {
+  if (state.currentStep < state.steps.length - 1) {
+    state.currentStep++;
+    render();
+  } else stopPlay();
+}
+
+function stepBack() {
+  if (state.currentStep > 0) { state.currentStep--; render(); }
+}
+
+function resetSteps() {
+  stopPlay();
+  state.currentStep = 0;
+  render();
+}
+
+function togglePlay() {
+  if (state.isPlaying) stopPlay();
+  else {
+    state.isPlaying = true;
+    state.playTimer = setInterval(() => {
+      if (state.currentStep >= state.steps.length - 1) { stopPlay(); return; }
+      state.currentStep++;
+      render();
+    }, 1000 / state.speed);
+    render();
+  }
+}
+
+function stopPlay() {
+  state.isPlaying = false;
+  clearInterval(state.playTimer);
+  state.playTimer = null;
+}
+
+function setSpeed(s) {
+  state.speed = s;
+  if (state.isPlaying) { stopPlay(); togglePlay(); }
+}
+
+function iStepFwd() {
+  if (state.iStage < intuitionStages.length - 1) { state.iStage++; render(); }
+  else stopIPlay();
+}
+function iStepBack() {
+  if (state.iStage > 0) { state.iStage--; render(); }
+}
+function iTogglePlay() {
+  if (state.iPlaying) stopIPlay();
+  else {
+    state.iPlaying = true;
+    state.iTimer = setInterval(() => {
+      if (state.iStage >= intuitionStages.length - 1) { stopIPlay(); return; }
+      state.iStage++;
+      render();
+    }, 3500);
+    render();
+  }
+}
+function stopIPlay() {
+  state.iPlaying = false;
+  clearInterval(state.iTimer);
+  state.iTimer = null;
+}
+function jumpToStage(i) {
+  stopIPlay();
+  state.iStage = i;
+  render();
+}
+
+// ─────────────────────────────────────────────
+//  DRAG HANDLES
+// ─────────────────────────────────────────────
+function attachDragHandles() {
+  ['dh0','dh1'].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let startX, startW0, startW1;
+    el.addEventListener('mousedown', e => {
+      startX = e.clientX;
+      const panels = ['pCode','pViz','pLog'];
+      startW0 = document.getElementById(panels[idx]).offsetWidth;
+      startW1 = document.getElementById(panels[idx+1]).offsetWidth;
+      el.classList.add('dragging');
+      const onMove = e2 => {
+        const dx = e2.clientX - startX;
+        const total = startW0 + startW1;
+        const pct0 = Math.max(15, Math.min(65, ((startW0 + dx) / total * 100)));
+        const pct1 = 100 - pct0;
+        panelW[idx] = pct0;
+        panelW[idx+1] = pct1;
+        document.getElementById(panels[idx]).style.width = pct0 + '%';
+        document.getElementById(panels[idx+1]).style.width = pct1 + '%';
+      };
+      const onUp = () => {
+        el.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
   });
 }
 
-function highlight(ln){
-  document.querySelectorAll('.cl').forEach(l=>l.classList.remove('active'));
-  if(ln>=0){const el=document.getElementById(`line${ln}`);if(el)el.classList.add('active');}
-}
-
-function buildSteps(n){
-  const s=[];
-  
-  if(n<=2){
-    s.push({line:2,dp:[],curr:-1,msg:`n=${n}, returning ${n}`,done:true,log:{type:'done',text:`Result: ${n} ways`}});
-    return s;
-  }
-  
-  const dp=Array(n+1).fill(0);
-  
-  s.push({line:4,dp:[...dp],curr:-1,msg:'Initializing DP array',log:{type:'calc',text:'Created DP array'}});
-  
-  dp[1]=1;
-  s.push({line:5,dp:[...dp],curr:1,msg:'Base case: dp[1] = 1 (one way to reach step 1)',log:{type:'calc',text:'dp[1] = 1'}});
-  
-  dp[2]=2;
-  s.push({line:6,dp:[...dp],curr:2,msg:'Base case: dp[2] = 2 (two ways to reach step 2)',log:{type:'calc',text:'dp[2] = 2'}});
-  
-  for(let i=3;i<=n;i++){
-    s.push({line:9,dp:[...dp],curr:i,prev1:i-1,prev2:i-2,msg:`Computing dp[${i}] = dp[${i-1}] + dp[${i-2}] = ${dp[i-1]} + ${dp[i-2]}`,log:{type:'calc',text:`dp[${i}] = ${dp[i-1]} + ${dp[i-2]}`}});
-    
-    dp[i]=dp[i-1]+dp[i-2];
-    
-    s.push({line:9,dp:[...dp],curr:i,msg:`dp[${i}] = ${dp[i]}`,log:{type:'calc',text:`dp[${i}] = ${dp[i]}`}});
-  }
-  
-  s.push({line:11,dp:[...dp],curr:n,msg:`Answer: ${dp[n]} ways to climb ${n} stairs`,done:true,log:{type:'done',text:`Result: ${dp[n]} ways`}});
-  
-  return s;
-}
-
-function renderDP(st){
-  const arr=document.getElementById('dpArray');
-  arr.innerHTML='';
-  
-  st.dp.forEach((val,i)=>{
-    if(i===0)return;
-    
-    const cell=document.createElement('div');
-    cell.className='dp-cell';
-    if(i===st.curr)cell.classList.add('curr');
-    if(i===st.prev1)cell.classList.add('prev1');
-    if(i===st.prev2)cell.classList.add('prev2');
-    if(st.done&&i===n)cell.classList.add('done');
-    
-    const idx=document.createElement('div');
-    idx.className='dp-idx';
-    idx.textContent=`i=${i}`;
-    
-    const box=document.createElement('div');
-    box.className='dp-box';
-    box.textContent=val||'?';
-    
-    cell.appendChild(idx);
-    cell.appendChild(box);
-    arr.appendChild(cell);
+function scrollLogToStep() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(`hist${state.currentStep}`);
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   });
 }
 
-function renderStairs(st){
-  const viz=document.getElementById('stairsViz');
-  viz.innerHTML='';
-  
-  const stairs=document.createElement('div');
-  stairs.className='stairs';
-  
-  for(let i=n;i>=1;i--){
-    const stair=document.createElement('div');
-    stair.className='stair';
-    
-    for(let j=0;j<i;j++){
-      const step=document.createElement('div');
-      step.className='step';
-      if(i===st.curr)step.classList.add('active');
-      if(st.done&&i<=n)step.classList.add('path');
-      step.textContent=i===1?i:'';
-      stair.appendChild(step);
-    }
-    
-    stairs.appendChild(stair);
+function scrollCodeToLine(line) {
+  requestAnimationFrame(() => {
+    const container = document.getElementById('codeContainer');
+    if (!container) return;
+    const lines = container.querySelectorAll('.code-line');
+    if (lines[line]) lines[line].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+}
+
+function scrollIntuitionToStage() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(`istage${state.iStage}`);
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+}
+
+// ─────────────────────────────────────────────
+//  KEYBOARD
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (state.mode === 'execution') togglePlay(); else iTogglePlay();
+  } else if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    if (state.mode === 'execution') stepFwd(); else iStepFwd();
+  } else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    if (state.mode === 'execution') stepBack(); else iStepBack();
   }
-  
-  viz.appendChild(stairs);
-}
+});
 
-function renderDecision(st){
-  const d=document.getElementById('decision');
-  d.className='decision';
-  d.textContent=st.msg;
-  if(st.curr>=0&&!st.done)d.classList.add('calc');
-  if(st.done)d.classList.add('done');
-}
-
-function addLog(idx,log){
-  const el=document.getElementById('logScroll');
-  const d=document.createElement('div');d.className=`le ${log.type}`;
-  d.innerHTML=`<span class="ls">[${idx}]</span>${log.text}`;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-
-function clearLog(){document.getElementById('logScroll').innerHTML='';}
-
-function rebuildLog(){clearLog();for(let i=0;i<=cursor;i++)if(steps[i]?.log)addLog(i,steps[i].log);}
-
-function renderStep(idx){
-  const st=steps[idx];
-  highlight(st.line);
-  renderDP(st);
-  renderStairs(st);
-  renderDecision(st);
-  document.getElementById('stepInfo').textContent=`${idx} / ${steps.length-1}`;
-  document.getElementById('btnPrev').disabled=idx===0;
-  document.getElementById('btnNext').disabled=idx===steps.length-1;
-}
-
-function stepFwd(){
-  if(cursor<steps.length-1){cursor++;if(steps[cursor]?.log)addLog(cursor,steps[cursor].log);renderStep(cursor);}
-}
-
-function stepBack(){if(cursor>0){cursor--;rebuildLog();renderStep(cursor);}}
-
-function togglePlay(){
-  playing=!playing;
-  document.getElementById('btnPlay').textContent=playing?'⏸ Pause':'▶ Play';
-  if(playing)runPlay();else clearTimeout(playTimer);
-}
-
-function runPlay(){
-  if(!playing)return;
-  if(cursor>=steps.length-1){playing=false;document.getElementById('btnPlay').textContent='▶ Play';return;}
-  stepFwd();
-  const spd=1600-parseInt(document.getElementById('speedSlider').value);
-  playTimer=setTimeout(runPlay,spd);
-}
-
-function init(){
-  clearTimeout(playTimer);playing=false;
-  document.getElementById('btnPlay').textContent='▶ Play';
-  clearLog();
-  
-  const rawN=document.getElementById('nInput').value.trim();
-  n=rawN?parseInt(rawN):5;
-  if(isNaN(n)||n<1)n=5;
-  if(n>15)n=15; // Limit for visualization
-  
-  steps=buildSteps(n);
-  
-  cursor=0;
-  highlight(-1);
-  if(steps[0]?.log)addLog(0,steps[0].log);
-  renderStep(0);
-}
-
-buildCode();
-init();
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+state.steps = generateSteps(state.n);
+render();
 </script>
 </body>
 </html>
